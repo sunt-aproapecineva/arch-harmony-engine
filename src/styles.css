@@ -318,3 +318,32 @@ input, textarea, select, button {
   outline: none;
 }
 
+
+a { text-decoration: none; color: inherit; }
+
+input::placeholder, textarea::placeholder { color: var(--fg-3); }
+
+.light input, .light textarea, .light select {
+  background: #FFFFFF;
+  border-color: var(--border);
+  color: var(--fg);
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .desktop-sidebar-wrapper { display: none !important; }
+  .admin-sidebar-wrapper { display: none !important; }
+  .login-left-panel { display: none !important; }
+  .page-content { padding: 16px !important; }
+  .admin-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .module-grid { grid-template-columns: 1fr !important; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .progress-ring-container { transform: scale(0.75); transform-origin: left center; }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 13px; }
+  .calendar-grid { font-size: 11px; }
+}
