@@ -316,6 +316,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_email_whitelisted: { Args: { _email: string }; Returns: boolean }
     }
     Enums: {
       app_role: "student" | "admin"
