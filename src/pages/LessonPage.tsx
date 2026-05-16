@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate, Link } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -12,6 +12,7 @@ import { useProgress } from '../hooks/useProgress';
 import { Confetti } from '../components/aa/Confetti';
 import { useAuthContext } from '../context/AuthContext';
 import { logActivity } from '../lib/activity';
+import { supabase } from '@/integrations/supabase/client';
 
 function getYouTubeId(url: string): string | null {
   if (!url) return null;
@@ -37,14 +38,36 @@ export const LessonPage: React.FC = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const completeButtonRef = useRef<HTMLDivElement>(null);
 
-  // Notes — keyed per user+lesson so users never see each other's notes
+  // Notes — stored in DB (lesson_notes); admins can read all
   const NOTES_KEY = `aa_note_${user?.id ?? 'anon'}_${id}`;
   const [note, setNote] = useState(() => localStorage.getItem(NOTES_KEY) || '');
   const [saved, setSaved] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
 
-  const saveNote = () => {
-    localStorage.setItem(NOTES_KEY, note);
+  // Load existing note from DB on mount
+  useEffect(() => {
+    if (!user?.id || !id) return;
+    supabase
+      .from('lesson_notes')
+      .select('content')
+      .eq('user_id', user.id)
+      .eq('lesson_id', id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.content) {
+          setNote(data.content);
+          try { localStorage.setItem(NOTES_KEY, data.content); } catch {}
+        }
+      });
+  }, [user?.id, id]);
+
+  const saveNote = async () => {
+    try { localStorage.setItem(NOTES_KEY, note); } catch {}
+    if (user?.id && id) {
+      await supabase
+        .from('lesson_notes')
+        .upsert({ user_id: user.id, lesson_id: id, content: note }, { onConflict: 'user_id,lesson_id' });
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
     if (user && lesson) {
