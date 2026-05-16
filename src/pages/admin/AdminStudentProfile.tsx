@@ -564,7 +564,7 @@ export const AdminStudentProfile: React.FC = () => {
             </div>
           );
         })}
-        {MODULES.every(mod => mod.exercises.every(ex => !localStorage.getItem(`aa_ex_${userId}_${ex.id}`))) && (
+        {Object.keys(exercisesById).length === 0 && (
           <p style={{ fontSize: 13, color: 'var(--fg-3)', textAlign: 'center', padding: '16px 0' }}>Niciun exercițiu completat.</p>
         )}
       </motion.div>
