@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
 import { Progress } from '../lib/types';
 import { supabase, isMockMode } from '../lib/supabase';

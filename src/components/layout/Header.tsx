@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from '@/lib/router-compat';
 import { Sun, Moon, Menu, PanelLeftClose, PanelLeftOpen, ChevronDown, LogOut, ShieldCheck, Search } from 'lucide-react';

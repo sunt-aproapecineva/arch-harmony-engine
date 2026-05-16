@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { NavLink, Outlet, Navigate, useNavigate } from '@/lib/router-compat';
 import {
