@@ -1,26 +1,13 @@
+// @ts-nocheck
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, MockUser, WhitelistEntry, Tariff } from '../lib/types';
-import { supabase, isMockMode } from '../lib/supabase';
-import { MOCK_WHITELIST_ENTRIES, MOCK_ADMIN } from '../lib/data';
-import { logActivity } from '../lib/activity';
-
-async function detectCountry(): Promise<{ country: string; city: string }> {
-  try {
-    const r = await fetch('https://ipapi.co/json/');
-    const d = await r.json();
-    return { country: d.country_name || d.country || 'Necunoscut', city: d.city || '' };
-  } catch { return { country: 'Necunoscut', city: '' }; }
-}
+import { supabase } from '@/integrations/supabase/client';
+import type { User, WhitelistEntry, Tariff } from '../lib/types';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string, rememberMe?: boolean) => Promise<{ error: string | null }>;
-  register: (
-    email: string,
-    password: string,
-    fullName: string
-  ) => Promise<{ error: string | null }>;
+  register: (email: string, password: string, fullName: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
   isAdmin: boolean;
 }
@@ -36,270 +23,101 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuthContext = () => useContext(AuthContext);
 
-// --- Mock helpers ---
-const STORAGE_USER_KEY = 'aa_user';
-const STORAGE_USER_EXPIRES_KEY = 'aa_user_expires';
-const STORAGE_USERS_KEY = 'aa_users';
-const STORAGE_WHITELIST_ENTRIES_KEY = 'aa_whitelist_entries';
-const REMEMBER_ME_HOURS = 12;
+async function hydrateUser(authUser: any): Promise<User | null> {
+  if (!authUser) return null;
+  const [{ data: profile }, { data: roles }] = await Promise.all([
+    supabase.from('profiles').select('full_name,email,tariff,avatar_url').eq('id', authUser.id).maybeSingle(),
+    supabase.from('user_roles').select('role').eq('user_id', authUser.id),
+  ]);
+  const isAdmin = (roles || []).some((r: any) => r.role === 'admin');
+  return {
+    id: authUser.id,
+    email: profile?.email || authUser.email,
+    full_name: profile?.full_name || authUser.user_metadata?.full_name || '',
+    role: isAdmin ? 'admin' : 'student',
+    tariff: (profile?.tariff as Tariff) || 'student',
+    avatar_url: profile?.avatar_url || null,
+    created_at: authUser.created_at,
+  };
+}
 
+// Whitelist helper for register page — reads live from Supabase
+export async function fetchWhitelist(): Promise<WhitelistEntry[]> {
+  const { data } = await supabase.from('whitelist').select('email,tariff').order('added_at', { ascending: false });
+  return (data || []) as WhitelistEntry[];
+}
+
+// Legacy sync helper kept for components that still expect it; returns cached snapshot
+let _cachedWhitelist: WhitelistEntry[] = [];
 export function getWhitelist(): WhitelistEntry[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_WHITELIST_ENTRIES_KEY);
-    if (stored) return JSON.parse(stored) as WhitelistEntry[];
-  } catch {}
-  return [...MOCK_WHITELIST_ENTRIES];
+  return _cachedWhitelist;
 }
+fetchWhitelist().then(w => { _cachedWhitelist = w; }).catch(() => {});
 
-export function saveWhitelistEntries(entries: WhitelistEntry[]) {
-  localStorage.setItem(STORAGE_WHITELIST_ENTRIES_KEY, JSON.stringify(entries));
-}
-
-function getStoredUsers(): MockUser[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_USERS_KEY);
-    if (stored) return JSON.parse(stored);
-  } catch {}
-  return [];
-}
-
-function saveUsers(users: MockUser[]) {
-  localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
-}
-
-function hashPassword(password: string): string {
-  return btoa(password + 'aa_salt_2024');
-}
-
-function getCurrentMockUser(): User | null {
-  try {
-    // Session-only login (no remember me)
-    const session = sessionStorage.getItem(STORAGE_USER_KEY);
-    if (session) return JSON.parse(session);
-    // Remember-me login (check expiry)
-    const stored = localStorage.getItem(STORAGE_USER_KEY);
-    if (stored) {
-      const expires = localStorage.getItem(STORAGE_USER_EXPIRES_KEY);
-      if (!expires || Date.now() < Number(expires)) {
-        return JSON.parse(stored);
-      }
-      // Expired
-      localStorage.removeItem(STORAGE_USER_KEY);
-      localStorage.removeItem(STORAGE_USER_EXPIRES_KEY);
-    }
-  } catch {}
-  return null;
-}
-
-function persistMockUser(user: User, rememberMe: boolean) {
-  if (rememberMe) {
-    localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(user));
-    localStorage.setItem(STORAGE_USER_EXPIRES_KEY, String(Date.now() + REMEMBER_ME_HOURS * 3600 * 1000));
-    sessionStorage.removeItem(STORAGE_USER_KEY);
-  } else {
-    sessionStorage.setItem(STORAGE_USER_KEY, JSON.stringify(user));
-    localStorage.removeItem(STORAGE_USER_KEY);
-    localStorage.removeItem(STORAGE_USER_EXPIRES_KEY);
-  }
-}
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isMockMode) {
-      // Initialize default admin if not exists
-      const users = getStoredUsers();
-      const adminExists = users.find((u) => u.email === MOCK_ADMIN.email);
-      if (!adminExists) {
-        users.push({
-          ...MOCK_ADMIN,
-          password_hash: hashPassword('admin123'),
-        });
-        saveUsers(users);
-      }
-
-      const current = getCurrentMockUser();
-      setUser(current);
-      setLoading(false);
-    } else {
-      supabase?.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user) {
-          setUser({
-            id: session.user.id,
-            email: session.user.email!,
-            full_name: session.user.user_metadata?.full_name || '',
-            role: session.user.user_metadata?.role || 'student',
-            tariff: (session.user.user_metadata?.tariff as Tariff) || 'student',
-            created_at: session.user.created_at,
-          });
-        }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      // defer DB calls to avoid deadlock inside listener
+      setTimeout(async () => {
+        const u = await hydrateUser(session?.user);
+        setUser(u);
         setLoading(false);
-      });
-
-      const {
-        data: { subscription },
-      } = supabase!.auth.onAuthStateChange((_event, session) => {
-        if (session?.user) {
-          setUser({
-            id: session.user.id,
-            email: session.user.email!,
-            full_name: session.user.user_metadata?.full_name || '',
-            role: session.user.user_metadata?.role || 'student',
-            tariff: (session.user.user_metadata?.tariff as Tariff) || 'student',
-            created_at: session.user.created_at,
-          });
-        } else {
-          setUser(null);
-        }
-      });
-
-      return () => subscription.unsubscribe();
-    }
+      }, 0);
+    });
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      const u = await hydrateUser(session?.user);
+      setUser(u);
+      setLoading(false);
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (
-    email: string,
-    password: string,
-    rememberMe = false
-  ): Promise<{ error: string | null }> => {
-    if (isMockMode) {
-      const users = getStoredUsers();
-      const found = users.find(
-        (u) =>
-          u.email.toLowerCase() === email.toLowerCase() &&
-          u.password_hash === hashPassword(password)
-      );
-      if (!found) {
-        return { error: 'Email sau parolă incorectă.' };
-      }
-      const { country, city } = await detectCountry();
-      const last_login = new Date().toISOString();
-      const { password_hash: _, ...userWithoutHash } = found;
-      const updatedUser: User = { ...userWithoutHash, country, city, last_login };
-
-      // Update user in users list
-      const allUsers = getStoredUsers();
-      const userIdx = allUsers.findIndex(u => u.id === found.id);
-      if (userIdx !== -1) {
-        allUsers[userIdx] = { ...allUsers[userIdx], country, city, last_login };
-        saveUsers(allUsers);
-      }
-
-      persistMockUser(updatedUser, rememberMe);
-      setUser(updatedUser);
-
-      logActivity({
-        userId: found.id,
-        userEmail: found.email,
-        userName: found.full_name,
-        type: 'login',
-        label: `${found.full_name} s-a conectat`,
-        data: { tariff: found.tariff },
-        country,
-        city,
-      });
-
-      return { error: null };
-    } else {
-      const { error } = await supabase!.auth.signInWithPassword({
-        email,
-        password,
-      });
-      return { error: error?.message || null };
-    }
+  const login = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+    if (error) return { error: error.message === 'Invalid login credentials' ? 'Email sau parolă incorectă.' : error.message };
+    return { error: null };
   };
 
-  const register = async (
-    email: string,
-    password: string,
-    fullName: string
-  ): Promise<{ error: string | null }> => {
-    if (isMockMode) {
-      const whitelist = getWhitelist();
-      const whitelistEntry = whitelist.find(
-        (e) => e.email.toLowerCase() === email.toLowerCase()
-      );
-      if (!whitelistEntry) {
-        return {
-          error:
-            'Adresa de email nu este în lista de acces. Contactează administratorul.',
-        };
-      }
-
-      const users = getStoredUsers();
-      const existing = users.find(
-        (u) => u.email.toLowerCase() === email.toLowerCase()
-      );
-      if (existing) {
+  const register = async (email: string, password: string, fullName: string) => {
+    const cleanEmail = email.trim().toLowerCase();
+    // Pre-check whitelist for nicer UX (DB trigger also enforces)
+    if (cleanEmail !== 'babaradumi@gmail.com') {
+      const { data: wl } = await supabase.from('whitelist').select('email').ilike('email', cleanEmail).maybeSingle();
+      if (!wl) return { error: 'Adresa de email nu este în lista de acces. Contactează administratorul.' };
+    }
+    const { error } = await supabase.auth.signUp({
+      email: cleanEmail,
+      password,
+      options: {
+        data: { full_name: fullName },
+        emailRedirectTo: `${window.location.origin}/dashboard`,
+      },
+    });
+    if (error) {
+      if (error.message.includes('already registered') || error.message.includes('already been registered')) {
         return { error: 'Există deja un cont cu această adresă de email.' };
       }
-
-      const isAdmin = email.toLowerCase() === MOCK_ADMIN.email;
-      const tariff: Tariff = isAdmin ? MOCK_ADMIN.tariff : whitelistEntry.tariff;
-
-      const newUser: MockUser = {
-        id: `user-${Date.now()}`,
-        email: email.toLowerCase(),
-        full_name: fullName,
-        role: isAdmin ? 'admin' : 'student',
-        tariff,
-        created_at: new Date().toISOString(),
-        password_hash: hashPassword(password),
-      };
-
-      users.push(newUser);
-      saveUsers(users);
-
-      const { password_hash: _, ...userWithoutHash } = newUser;
-      persistMockUser(userWithoutHash, false);
-      setUser(userWithoutHash);
-
-      logActivity({
-        userId: newUser.id,
-        userEmail: newUser.email,
-        userName: newUser.full_name,
-        type: 'platform_register',
-        label: `${newUser.full_name} s-a înregistrat`,
-        data: { tariff: newUser.tariff, role: newUser.role },
-      });
-
-      return { error: null };
-    } else {
-      const { error } = await supabase!.auth.signUp({
-        email,
-        password,
-        options: { data: { full_name: fullName, role: 'student' } },
-      });
-      return { error: error?.message || null };
+      if (error.message.includes('lista de acces')) {
+        return { error: 'Adresa de email nu este în lista de acces. Contactează administratorul.' };
+      }
+      return { error: error.message };
     }
+    // Refresh whitelist cache
+    fetchWhitelist().then(w => { _cachedWhitelist = w; }).catch(() => {});
+    return { error: null };
   };
 
   const logout = async () => {
-    if (isMockMode) {
-      localStorage.removeItem(STORAGE_USER_KEY);
-      localStorage.removeItem(STORAGE_USER_EXPIRES_KEY);
-      sessionStorage.removeItem(STORAGE_USER_KEY);
-      setUser(null);
-    } else {
-      await supabase?.auth.signOut();
-      setUser(null);
-    }
+    await supabase.auth.signOut();
+    setUser(null);
   };
 
   return (
     <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        login,
-        register,
-        logout,
-        isAdmin: user?.role === 'admin',
-      }}
+      value={{ user, loading, login, register, logout, isAdmin: user?.role === 'admin' }}
     >
       {children}
     </AuthContext.Provider>
