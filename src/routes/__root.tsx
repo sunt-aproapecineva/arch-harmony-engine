@@ -108,8 +108,8 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-import { AuthProvider } from "@/lib/auth";
-import { ThemeProvider } from "@/lib/theme";
+import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
