@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
 import { logActivity } from '../lib/activity';
+import { generateProfile } from '../lib/quizProfile';
+import { supabase } from '@/integrations/supabase/client';
 
 // ─── Question Data ─────────────────────────────────────────────────────────────
 
@@ -283,7 +285,7 @@ export const OnboardingQuiz: React.FC = () => {
     setAnswers(prev => ({ ...prev, [id]: value }));
   }, []);
 
-  const goNext = () => {
+  const goNext = async () => {
     if (!canContinue) return;
     if (currentIdx === total - 1) {
       const finalAnswers = { ...answers };
@@ -293,6 +295,16 @@ export const OnboardingQuiz: React.FC = () => {
       if (user) {
         localStorage.setItem(`aa_quiz_done_${user.id}`, '1');
         localStorage.setItem(`aa_quiz_answers_${user.id}`, JSON.stringify(finalAnswers));
+        try {
+          const profile = generateProfile(finalAnswers as any);
+          await supabase.from('quiz_responses').upsert({
+            user_id: user.id,
+            answers: finalAnswers,
+            profile: profile as any,
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'user_id' });
+        } catch (e) { /* best-effort */ }
         logActivity({
           userId: user.id,
           userEmail: user.email,

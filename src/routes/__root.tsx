@@ -110,14 +110,30 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { LoadingScreen } from "@/components/aa/LoadingScreen";
+import { useEffect, useState } from "react";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const [booting, setBooting] = useState(true);
+  const [showLoader, setShowLoader] = useState(false);
+
+  useEffect(() => {
+    // Only show loader once per browser session
+    const seen = sessionStorage.getItem('aa_boot_shown');
+    if (!seen) {
+      setShowLoader(true);
+      sessionStorage.setItem('aa_boot_shown', '1');
+    } else {
+      setBooting(false);
+    }
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
+          {showLoader && booting && <LoadingScreen onComplete={() => setBooting(false)} />}
           <Outlet />
         </AuthProvider>
       </ThemeProvider>

@@ -25,11 +25,19 @@ export const useAuthContext = () => useContext(AuthContext);
 
 async function hydrateUser(authUser: any): Promise<User | null> {
   if (!authUser) return null;
-  const [{ data: profile }, { data: roles }] = await Promise.all([
+  const [{ data: profile }, { data: roles }, { data: quiz }] = await Promise.all([
     supabase.from('profiles').select('full_name,email,tariff,avatar_url').eq('id', authUser.id).maybeSingle(),
     supabase.from('user_roles').select('role').eq('user_id', authUser.id),
+    supabase.from('quiz_responses').select('answers,completed_at').eq('user_id', authUser.id).maybeSingle(),
   ]);
   const isAdmin = (roles || []).some((r: any) => r.role === 'admin');
+  // Sync quiz state into localStorage for legacy gating
+  try {
+    if (quiz?.completed_at) {
+      localStorage.setItem(`aa_quiz_done_${authUser.id}`, '1');
+      if (quiz.answers) localStorage.setItem(`aa_quiz_answers_${authUser.id}`, JSON.stringify(quiz.answers));
+    }
+  } catch {}
   return {
     id: authUser.id,
     email: profile?.email || authUser.email,

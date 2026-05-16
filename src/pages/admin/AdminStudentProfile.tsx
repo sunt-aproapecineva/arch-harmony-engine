@@ -99,8 +99,7 @@ export const AdminStudentProfile: React.FC = () => {
     const allProgress = getStoredProgress();
     setProgress(allProgress.filter(p => p.user_id === userId));
 
-    const acts = getActivityForUser(userId);
-    setActivity(acts);
+    getActivityForUser(userId).then(setActivity).catch(() => setActivity([]));
 
     const answers = getQuizAnswersForUser(userId);
     if (answers) {

@@ -1,3 +1,5 @@
+import { supabase } from '@/integrations/supabase/client';
+
 export type ActivityType =
   | 'login' | 'logout'
   | 'lesson_complete' | 'lesson_view'
@@ -11,42 +13,61 @@ export interface ActivityEvent {
   userEmail: string;
   userName: string;
   type: ActivityType;
-  label: string;          // human-readable description
+  label: string;
   data: Record<string, string>;
-  timestamp: string;      // ISO
-  country?: string;
-  city?: string;
-  ip?: string;
+  timestamp: string;
 }
 
-const KEY = 'aa_activity';
-const MAX = 2000;
-
-export function logActivity(event: Omit<ActivityEvent, 'id' | 'timestamp'>): void {
-  const events = getActivity();
-  const newEvent: ActivityEvent = {
-    ...event,
-    id: `ev-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    timestamp: new Date().toISOString(),
-  };
-  events.unshift(newEvent);
-  if (events.length > MAX) events.splice(MAX);
-  try { localStorage.setItem(KEY, JSON.stringify(events)); } catch {}
-}
-
-export function getActivity(): ActivityEvent[] {
+export async function logActivity(event: Omit<ActivityEvent, 'id' | 'timestamp'>): Promise<void> {
   try {
-    const s = localStorage.getItem(KEY);
-    return s ? JSON.parse(s) : [];
-  } catch { return []; }
+    await supabase.from('activity_log').insert({
+      user_id: event.userId,
+      user_email: event.userEmail,
+      user_name: event.userName,
+      type: event.type,
+      label: event.label,
+      data: event.data || {},
+    });
+  } catch (e) {
+    // best-effort
+  }
 }
 
-export function getActivityForUser(userId: string): ActivityEvent[] {
-  return getActivity().filter(e => e.userId === userId);
+export async function getActivity(limit = 500): Promise<ActivityEvent[]> {
+  const { data } = await supabase
+    .from('activity_log')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  return (data || []).map((r: any) => ({
+    id: r.id,
+    userId: r.user_id,
+    userEmail: r.user_email || '',
+    userName: r.user_name || '',
+    type: r.type,
+    label: r.label,
+    data: r.data || {},
+    timestamp: r.created_at,
+  }));
 }
 
-export function clearActivity(): void {
-  localStorage.removeItem(KEY);
+export async function getActivityForUser(userId: string): Promise<ActivityEvent[]> {
+  const { data } = await supabase
+    .from('activity_log')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(500);
+  return (data || []).map((r: any) => ({
+    id: r.id,
+    userId: r.user_id,
+    userEmail: r.user_email || '',
+    userName: r.user_name || '',
+    type: r.type,
+    label: r.label,
+    data: r.data || {},
+    timestamp: r.created_at,
+  }));
 }
 
 export function timeAgo(isoStr: string): string {
