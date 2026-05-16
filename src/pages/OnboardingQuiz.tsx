@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
 import { logActivity } from '../lib/activity';
+import { generateProfile } from '../lib/quizProfile';
+import { supabase } from '@/integrations/supabase/client';
 
 // ─── Question Data ─────────────────────────────────────────────────────────────
 
