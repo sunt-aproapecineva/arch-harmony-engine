@@ -467,7 +467,7 @@ export const AdminStudentProfile: React.FC = () => {
         {MODULES.map(mod => {
           const notesInModule = mod.lessons.map(l => ({
             lesson: l,
-            note: localStorage.getItem(`aa_note_${userId}_${l.id}`) || '',
+            note: notesByLesson[l.id] || '',
           })).filter(x => x.note.trim().length > 0);
 
           if (notesInModule.length === 0) return null;
@@ -504,7 +504,7 @@ export const AdminStudentProfile: React.FC = () => {
             </div>
           );
         })}
-        {MODULES.every(mod => mod.lessons.every(l => !localStorage.getItem(`aa_note_${userId}_${l.id}`)?.trim())) && (
+        {Object.keys(notesByLesson).length === 0 && (
           <p style={{ fontSize: 13, color: 'var(--fg-3)', textAlign: 'center', padding: '16px 0' }}>Nicio notiță salvată.</p>
         )}
       </motion.div>
@@ -513,10 +513,10 @@ export const AdminStudentProfile: React.FC = () => {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} style={cardStyle}>
         <div style={sectionLabel}>Răspunsuri exerciții</div>
         {MODULES.map(mod => {
-          const exWithAnswers = mod.exercises.map(ex => {
-            const raw = localStorage.getItem(`aa_ex_${userId}_${ex.id}`);
-            return { ex, raw };
-          }).filter(x => x.raw);
+          const exWithAnswers = mod.exercises.map(ex => ({
+            ex,
+            parsed: exercisesById[ex.id],
+          })).filter(x => x.parsed !== undefined);
 
           if (exWithAnswers.length === 0) return null;
 
@@ -526,16 +526,14 @@ export const AdminStudentProfile: React.FC = () => {
                 {mod.etapa} — {mod.title}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {exWithAnswers.map(({ ex, raw }) => {
+                {exWithAnswers.map(({ ex, parsed }) => {
                   const template = EXERCISE_TEMPLATES.find(t => t.exerciseId === ex.id);
                   const typeLabel = template?.type || 'unknown';
-                  let parsed: unknown = null;
-                  try { parsed = JSON.parse(raw!); } catch {}
 
-                  // Calculate completion for checklist types
                   let completionPct: number | null = null;
-                  if (typeLabel === 'checklist' && Array.isArray(parsed)) {
-                    const checked = (parsed as boolean[]).filter(Boolean).length;
+                  if (typeLabel === 'checklist' && parsed && typeof parsed === 'object') {
+                    const values = Object.values(parsed as Record<string, boolean>);
+                    const checked = values.filter(Boolean).length;
                     completionPct = template?.items ? Math.round((checked / template.items.length) * 100) : null;
                   }
 
@@ -556,6 +554,9 @@ export const AdminStudentProfile: React.FC = () => {
                           </span>
                         )}
                       </div>
+                      <pre style={{ marginTop: 8, padding: '8px 10px', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, fontSize: 11, color: 'var(--fg-2)', whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: 200, overflow: 'auto' }}>
+                        {typeof parsed === 'string' ? parsed : JSON.stringify(parsed, null, 2)}
+                      </pre>
                     </div>
                   );
                 })}
