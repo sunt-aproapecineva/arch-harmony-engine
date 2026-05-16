@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_app/lesson/$lessonId")({ component: LessonPage });
 
-type Lesson = { id: string; module_id: string; title: string; description: string | null; video_url: string | null; pdf_url: string | null; duration_min: number | null; order_index: number };
+type Lesson = { id: string; module_id: string | null; title: string; description: string | null; video_url: string | null; pdf_url: string | null; duration_min: number | null; order_index: number };
 
 function LessonPage() {
   const { lessonId } = useParams({ from: "/_app/lesson/$lessonId" });
@@ -21,14 +21,15 @@ function LessonPage() {
   useEffect(() => {
     (async () => {
       const { data: l } = await supabase.from("lessons").select("*").eq("id", lessonId).maybeSingle();
-      if (!l) return;
+      if (!l || !l.module_id) return;
       setLesson(l as Lesson);
+      const modId = l.module_id;
       const [{ data: sibs }, { data: prog }, { data: mod }] = await Promise.all([
-        supabase.from("lessons").select("*").eq("module_id", l.module_id).order("order_index"),
+        supabase.from("lessons").select("*").eq("module_id", modId).order("order_index"),
         supabase.from("progress").select("lesson_id").eq("user_id", user!.id).eq("lesson_id", lessonId).maybeSingle(),
-        supabase.from("modules").select("title").eq("id", l.module_id).maybeSingle(),
+        supabase.from("modules").select("title").eq("id", modId).maybeSingle(),
       ]);
-      setSiblings(sibs ?? []);
+      setSiblings((sibs ?? []) as Lesson[]);
       setIsDone(!!prog);
       setModuleTitle(mod?.title ?? "");
     })();

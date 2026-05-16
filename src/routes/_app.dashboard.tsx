@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 export const Route = createFileRoute("/_app/dashboard")({ component: Dashboard });
 
 type Mod = { id: string; title: string; subtitle: string | null; etapa: string | null; saptamana: string | null; order_index: number };
-type Lesson = { id: string; module_id: string; title: string; duration_min: number | null; order_index: number };
+type Lesson = { id: string; module_id: string | null; title: string; duration_min: number | null; order_index: number };
 
 function Dashboard() {
   const { user } = useAuth();
