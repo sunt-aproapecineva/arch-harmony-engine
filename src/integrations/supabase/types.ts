@@ -143,6 +143,7 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          tariff: string
         }
         Insert: {
           avatar_url?: string | null
@@ -150,6 +151,7 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
+          tariff?: string
         }
         Update: {
           avatar_url?: string | null
@@ -157,6 +159,7 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          tariff?: string
         }
         Relationships: []
       }
@@ -223,18 +226,21 @@ export type Database = {
           added_by: string | null
           email: string
           id: string
+          tariff: string
         }
         Insert: {
           added_at?: string | null
           added_by?: string | null
           email: string
           id?: string
+          tariff?: string
         }
         Update: {
           added_at?: string | null
           added_by?: string | null
           email?: string
           id?: string
+          tariff?: string
         }
         Relationships: []
       }
