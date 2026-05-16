@@ -111,8 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return { error: error.message };
     }
-    // Refresh whitelist cache
-    fetchWhitelist().then(w => { _cachedWhitelist = w; }).catch(() => {});
+    // No cache refresh needed — whitelist is admin-only
     return { error: null };
   };
 
