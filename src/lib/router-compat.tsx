@@ -42,7 +42,7 @@ export function useNavigate() {
 }
 
 export function useParams<T = Record<string, string>>(): T {
-  return tUseParams({ strict: false }) as T;
+  return tUseParams({ strict: false } as any) as T;
 }
 
 export function useSearchParams(): [URLSearchParams, (s: URLSearchParams | ((p: URLSearchParams) => URLSearchParams)) => void] {
