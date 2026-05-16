@@ -9,23 +9,46 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminProgressRouteImport } from './routes/admin.progress'
+import { Route as AdminLessonsRouteImport } from './routes/admin.lessons'
+import { Route as AdminActivityRouteImport } from './routes/admin.activity'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
-import { Route as AppAdminRouteImport } from './routes/_app.admin'
-import { Route as AppModuleModuleIdRouteImport } from './routes/_app.module.$moduleId'
-import { Route as AppLessonLessonIdRouteImport } from './routes/_app.lesson.$lessonId'
+import { Route as AdminStudentUserIdRouteImport } from './routes/admin.student.$userId'
+import { Route as AppModuleIdRouteImport } from './routes/_app.module.$id'
+import { Route as AppLessonIdRouteImport } from './routes/_app.lesson.$id'
 
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -37,96 +60,177 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProgressRoute = AdminProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLessonsRoute = AdminLessonsRouteImport.update({
+  id: '/lessons',
+  path: '/lessons',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminActivityRoute = AdminActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAdminRoute = AppAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AdminStudentUserIdRoute = AdminStudentUserIdRouteImport.update({
+  id: '/student/$userId',
+  path: '/student/$userId',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AppModuleIdRoute = AppModuleIdRouteImport.update({
+  id: '/module/$id',
+  path: '/module/$id',
   getParentRoute: () => AppRoute,
 } as any)
-const AppModuleModuleIdRoute = AppModuleModuleIdRouteImport.update({
-  id: '/module/$moduleId',
-  path: '/module/$moduleId',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppLessonLessonIdRoute = AppLessonLessonIdRouteImport.update({
-  id: '/lesson/$lessonId',
-  path: '/lesson/$lessonId',
+const AppLessonIdRoute = AppLessonIdRouteImport.update({
+  id: '/lesson/$id',
+  path: '/lesson/$id',
   getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
+  '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
-  '/admin': typeof AppAdminRoute
+  '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
-  '/lesson/$lessonId': typeof AppLessonLessonIdRoute
-  '/module/$moduleId': typeof AppModuleModuleIdRoute
+  '/admin/activity': typeof AdminActivityRoute
+  '/admin/lessons': typeof AdminLessonsRoute
+  '/admin/progress': typeof AdminProgressRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/': typeof AdminIndexRoute
+  '/lesson/$id': typeof AppLessonIdRoute
+  '/module/$id': typeof AppModuleIdRoute
+  '/admin/student/$userId': typeof AdminStudentUserIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
-  '/admin': typeof AppAdminRoute
+  '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
-  '/lesson/$lessonId': typeof AppLessonLessonIdRoute
-  '/module/$moduleId': typeof AppModuleModuleIdRoute
+  '/admin/activity': typeof AdminActivityRoute
+  '/admin/lessons': typeof AdminLessonsRoute
+  '/admin/progress': typeof AdminProgressRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin': typeof AdminIndexRoute
+  '/lesson/$id': typeof AppLessonIdRoute
+  '/module/$id': typeof AppModuleIdRoute
+  '/admin/student/$userId': typeof AdminStudentUserIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
+  '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
-  '/_app/admin': typeof AppAdminRoute
+  '/welcome': typeof WelcomeRoute
   '/_app/dashboard': typeof AppDashboardRoute
-  '/_app/lesson/$lessonId': typeof AppLessonLessonIdRoute
-  '/_app/module/$moduleId': typeof AppModuleModuleIdRoute
+  '/admin/activity': typeof AdminActivityRoute
+  '/admin/lessons': typeof AdminLessonsRoute
+  '/admin/progress': typeof AdminProgressRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/': typeof AdminIndexRoute
+  '/_app/lesson/$id': typeof AppLessonIdRoute
+  '/_app/module/$id': typeof AppModuleIdRoute
+  '/admin/student/$userId': typeof AdminStudentUserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/login'
-    | '/register'
     | '/admin'
+    | '/login'
+    | '/quiz'
+    | '/register'
+    | '/welcome'
     | '/dashboard'
-    | '/lesson/$lessonId'
-    | '/module/$moduleId'
+    | '/admin/activity'
+    | '/admin/lessons'
+    | '/admin/progress'
+    | '/admin/users'
+    | '/admin/'
+    | '/lesson/$id'
+    | '/module/$id'
+    | '/admin/student/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
+    | '/quiz'
     | '/register'
-    | '/admin'
+    | '/welcome'
     | '/dashboard'
-    | '/lesson/$lessonId'
-    | '/module/$moduleId'
+    | '/admin/activity'
+    | '/admin/lessons'
+    | '/admin/progress'
+    | '/admin/users'
+    | '/admin'
+    | '/lesson/$id'
+    | '/module/$id'
+    | '/admin/student/$userId'
   id:
     | '__root__'
     | '/'
     | '/_app'
+    | '/admin'
     | '/login'
+    | '/quiz'
     | '/register'
-    | '/_app/admin'
+    | '/welcome'
     | '/_app/dashboard'
-    | '/_app/lesson/$lessonId'
-    | '/_app/module/$moduleId'
+    | '/admin/activity'
+    | '/admin/lessons'
+    | '/admin/progress'
+    | '/admin/users'
+    | '/admin/'
+    | '/_app/lesson/$id'
+    | '/_app/module/$id'
+    | '/admin/student/$userId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
   LoginRoute: typeof LoginRoute
+  QuizRoute: typeof QuizRoute
   RegisterRoute: typeof RegisterRoute
+  WelcomeRoute: typeof WelcomeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -134,11 +238,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app': {
@@ -155,6 +273,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/progress': {
+      id: '/admin/progress'
+      path: '/progress'
+      fullPath: '/admin/progress'
+      preLoaderRoute: typeof AdminProgressRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/lessons': {
+      id: '/admin/lessons'
+      path: '/lessons'
+      fullPath: '/admin/lessons'
+      preLoaderRoute: typeof AdminLessonsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/activity': {
+      id: '/admin/activity'
+      path: '/activity'
+      fullPath: '/admin/activity'
+      preLoaderRoute: typeof AdminActivityRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -162,52 +315,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/admin': {
-      id: '/_app/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AppAdminRouteImport
+    '/admin/student/$userId': {
+      id: '/admin/student/$userId'
+      path: '/student/$userId'
+      fullPath: '/admin/student/$userId'
+      preLoaderRoute: typeof AdminStudentUserIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_app/module/$id': {
+      id: '/_app/module/$id'
+      path: '/module/$id'
+      fullPath: '/module/$id'
+      preLoaderRoute: typeof AppModuleIdRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/module/$moduleId': {
-      id: '/_app/module/$moduleId'
-      path: '/module/$moduleId'
-      fullPath: '/module/$moduleId'
-      preLoaderRoute: typeof AppModuleModuleIdRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/lesson/$lessonId': {
-      id: '/_app/lesson/$lessonId'
-      path: '/lesson/$lessonId'
-      fullPath: '/lesson/$lessonId'
-      preLoaderRoute: typeof AppLessonLessonIdRouteImport
+    '/_app/lesson/$id': {
+      id: '/_app/lesson/$id'
+      path: '/lesson/$id'
+      fullPath: '/lesson/$id'
+      preLoaderRoute: typeof AppLessonIdRouteImport
       parentRoute: typeof AppRoute
     }
   }
 }
 
 interface AppRouteChildren {
-  AppAdminRoute: typeof AppAdminRoute
   AppDashboardRoute: typeof AppDashboardRoute
-  AppLessonLessonIdRoute: typeof AppLessonLessonIdRoute
-  AppModuleModuleIdRoute: typeof AppModuleModuleIdRoute
+  AppLessonIdRoute: typeof AppLessonIdRoute
+  AppModuleIdRoute: typeof AppModuleIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppAdminRoute: AppAdminRoute,
   AppDashboardRoute: AppDashboardRoute,
-  AppLessonLessonIdRoute: AppLessonLessonIdRoute,
-  AppModuleModuleIdRoute: AppModuleModuleIdRoute,
+  AppLessonIdRoute: AppLessonIdRoute,
+  AppModuleIdRoute: AppModuleIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface AdminRouteChildren {
+  AdminActivityRoute: typeof AdminActivityRoute
+  AdminLessonsRoute: typeof AdminLessonsRoute
+  AdminProgressRoute: typeof AdminProgressRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminStudentUserIdRoute: typeof AdminStudentUserIdRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminActivityRoute: AdminActivityRoute,
+  AdminLessonsRoute: AdminLessonsRoute,
+  AdminProgressRoute: AdminProgressRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminStudentUserIdRoute: AdminStudentUserIdRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
   LoginRoute: LoginRoute,
+  QuizRoute: QuizRoute,
   RegisterRoute: RegisterRoute,
+  WelcomeRoute: WelcomeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
