@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/router-compat';
 import { motion } from 'framer-motion';
 import { Lock, CheckCircle2, ChevronRight, BookOpen, Pencil } from 'lucide-react';
 import { Module } from '../../lib/types';

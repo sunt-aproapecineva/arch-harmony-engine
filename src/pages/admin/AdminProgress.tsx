@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, ArrowUpDown, Trophy } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/router-compat';
 import { MockUser, Progress, Tariff } from '../../lib/types';
 import { MODULES } from '../../lib/data';
 

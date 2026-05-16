@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/router-compat';
 import {
   ArrowRight, BookOpen, CheckCircle2, Layers, Video,
   Wrench, Lock, Clock, Zap, TrendingUp, Send, ClipboardList

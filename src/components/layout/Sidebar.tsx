@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from '@/lib/router-compat';
 import { Lock, CheckCircle2, LogOut } from 'lucide-react';
 import { MODULES } from '../../lib/data';
 import { useProgress } from '../../hooks/useProgress';

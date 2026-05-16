@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/router-compat';
 import { ClipboardList, X, ArrowRight, Lock } from 'lucide-react';
 
 interface Props { open: boolean; onClose: () => void; }

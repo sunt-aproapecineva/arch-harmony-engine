@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Play, FileText, Award } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';

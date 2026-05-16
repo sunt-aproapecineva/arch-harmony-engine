@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Trash2, ChevronDown, ChevronUp, Shield, User, Search, X, RefreshCw, CheckCircle2, Link2 } from 'lucide-react';
 import { MockUser, Progress, WhitelistEntry, Tariff } from '../../lib/types';

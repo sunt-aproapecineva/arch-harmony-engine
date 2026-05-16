@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, Outlet, Navigate, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, Navigate, useNavigate } from '@/lib/router-compat';
 import {
   LayoutDashboard, Users, BookOpen, TrendingUp, ShieldCheck, LogOut, Activity,
 } from 'lucide-react';

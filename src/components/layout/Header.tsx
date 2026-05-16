@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from '@/lib/router-compat';
 import { Sun, Moon, Menu, PanelLeftClose, PanelLeftOpen, ChevronDown, LogOut, ShieldCheck, Search } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuthContext } from '../../context/AuthContext';

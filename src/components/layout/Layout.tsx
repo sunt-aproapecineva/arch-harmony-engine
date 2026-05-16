@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink } from '@/lib/router-compat';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { AnimatePresence, motion } from 'framer-motion';
