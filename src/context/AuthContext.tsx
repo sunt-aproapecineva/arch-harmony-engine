@@ -89,10 +89,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (email: string, password: string, fullName: string) => {
     const cleanEmail = email.trim().toLowerCase();
-    // Pre-check whitelist for nicer UX (DB trigger also enforces)
-    if (cleanEmail !== 'babaradumi@gmail.com') {
-      const { data: wl } = await supabase.from('whitelist').select('email').ilike('email', cleanEmail).maybeSingle();
-      if (!wl) return { error: 'Adresa de email nu este în lista de acces. Contactează administratorul.' };
+    // Pre-check whitelist via secure RPC (DB trigger also enforces)
+    const { data: allowed } = await supabase.rpc('is_email_whitelisted', { _email: cleanEmail });
+    if (allowed !== true) {
+      return { error: 'Adresa de email nu este în lista de acces. Contactează administratorul.' };
     }
     const { error } = await supabase.auth.signUp({
       email: cleanEmail,
