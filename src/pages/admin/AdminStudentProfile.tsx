@@ -6,21 +6,14 @@ import {
   ArrowLeft, LogIn, CheckCircle, FileText, Award, UserPlus, Pencil,
   AlertTriangle, ChevronDown, ChevronUp,
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { MockUser, Progress } from '../../lib/types';
 import { MODULES } from '../../lib/data';
 import { TariffBadge } from '../../components/aa/TariffBadge';
 import { ProgressBar } from '../../components/aa/ProgressBar';
 import { getActivityForUser, ActivityEvent, timeAgo, ActivityType } from '../../lib/activity';
-import { getQuizAnswersForUser, generateProfile, QuizProfile } from '../../lib/quizProfile';
+import { generateProfile, QuizProfile } from '../../lib/quizProfile';
 import { EXERCISE_TEMPLATES } from '../../lib/exerciseData';
-
-// ── helpers ──────────────────────────────────────────────────────────────────
-function getStoredUsers(): MockUser[] {
-  try { return JSON.parse(localStorage.getItem('aa_users') || '[]'); } catch { return []; }
-}
-function getStoredProgress(): Progress[] {
-  try { return JSON.parse(localStorage.getItem('aa_progress') || '[]'); } catch { return []; }
-}
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -92,20 +85,31 @@ export const AdminStudentProfile: React.FC = () => {
 
   useEffect(() => {
     if (!userId) return;
-    const users = getStoredUsers();
-    const found = users.find(u => u.id === userId) || null;
-    setUser(found);
-
-    const allProgress = getStoredProgress();
-    setProgress(allProgress.filter(p => p.user_id === userId));
-
+    (async () => {
+      const [{ data: profile }, { data: progressRows }, { data: quiz }] = await Promise.all([
+        supabase.from('profiles').select('id,email,full_name,tariff,avatar_url,created_at').eq('id', userId).maybeSingle(),
+        supabase.from('progress').select('user_id,lesson_id,completed_at').eq('user_id', userId),
+        supabase.from('quiz_responses').select('answers,completed_at').eq('user_id', userId).maybeSingle(),
+      ]);
+      if (profile) {
+        setUser({
+          id: profile.id,
+          email: profile.email,
+          full_name: profile.full_name || '',
+          tariff: (profile.tariff as any) || 'student',
+          avatar_url: profile.avatar_url,
+          created_at: profile.created_at,
+          role: 'student',
+        } as any);
+      }
+      setProgress((progressRows || []) as any);
+      if (quiz?.answers) {
+        const answers = quiz.answers as Record<string, string | string[]>;
+        setQuizAnswers(answers);
+        setQuizProfile(generateProfile(answers));
+      }
+    })();
     getActivityForUser(userId).then(setActivity).catch(() => setActivity([]));
-
-    const answers = getQuizAnswersForUser(userId);
-    if (answers) {
-      setQuizAnswers(answers);
-      setQuizProfile(generateProfile(answers));
-    }
   }, [userId]);
 
   if (!user) {
