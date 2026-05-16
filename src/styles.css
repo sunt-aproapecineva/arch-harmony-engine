@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Aboreto&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Aboreto&family=Arimo:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap');
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -6,7 +6,7 @@
 @custom-variant light (&:where(.light, .light *));
 
 @theme inline {
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: 'Arimo', system-ui, sans-serif;
   --font-aboreto: 'Aboreto', serif;
   --color-bg: var(--bg);
   --color-bg-2: var(--bg-2);
@@ -86,7 +86,7 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Arimo', system-ui, sans-serif;
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -318,3 +318,32 @@ input, textarea, select, button {
   outline: none;
 }
 
+
+a { text-decoration: none; color: inherit; }
+
+input::placeholder, textarea::placeholder { color: var(--fg-3); }
+
+.light input, .light textarea, .light select {
+  background: #FFFFFF;
+  border-color: var(--border);
+  color: var(--fg);
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .desktop-sidebar-wrapper { display: none !important; }
+  .admin-sidebar-wrapper { display: none !important; }
+  .login-left-panel { display: none !important; }
+  .page-content { padding: 16px !important; }
+  .admin-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .module-grid { grid-template-columns: 1fr !important; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .progress-ring-container { transform: scale(0.75); transform-origin: left center; }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 13px; }
+  .calendar-grid { font-size: 11px; }
+}
