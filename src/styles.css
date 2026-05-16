@@ -86,7 +86,7 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Arimo', system-ui, sans-serif;
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
