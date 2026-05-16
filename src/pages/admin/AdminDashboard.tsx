@@ -7,8 +7,8 @@ import {
 } from 'lucide-react';
 import { MODULES, MOCK_WHITELIST_ENTRIES } from '../../lib/data';
 import { MockUser, Progress, WhitelistEntry } from '../../lib/types';
-import { TariffBadge } from '../../components/ui/TariffBadge';
-import { ProgressBar } from '../../components/ui/ProgressBar';
+import { TariffBadge } from '../../components/aa/TariffBadge';
+import { ProgressBar } from '../../components/aa/ProgressBar';
 import { getActivity, ActivityEvent, timeAgo, ActivityType } from '../../lib/activity';
 import { getAllQuizAnswers } from '../../lib/quizProfile';
 

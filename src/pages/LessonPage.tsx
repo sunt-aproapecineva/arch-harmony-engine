@@ -8,7 +8,7 @@ import {
 import { MODULES } from '../lib/data';
 import { Lesson, Module } from '../lib/types';
 import { useProgress } from '../hooks/useProgress';
-import { Confetti } from '../components/ui/Confetti';
+import { Confetti } from '../components/aa/Confetti';
 import { useAuthContext } from '../context/AuthContext';
 import { logActivity } from '../lib/activity';
 

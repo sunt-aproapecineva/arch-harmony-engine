@@ -7,8 +7,8 @@ import {
 } from 'lucide-react';
 import { MockUser, Progress } from '../../lib/types';
 import { MODULES } from '../../lib/data';
-import { TariffBadge } from '../../components/ui/TariffBadge';
-import { ProgressBar } from '../../components/ui/ProgressBar';
+import { TariffBadge } from '../../components/aa/TariffBadge';
+import { ProgressBar } from '../../components/aa/ProgressBar';
 import { getActivityForUser, ActivityEvent, timeAgo, ActivityType } from '../../lib/activity';
 import { getQuizAnswersForUser, generateProfile, QuizProfile } from '../../lib/quizProfile';
 import { EXERCISE_TEMPLATES } from '../../lib/exerciseData';

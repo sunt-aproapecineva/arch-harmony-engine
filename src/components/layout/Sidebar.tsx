@@ -4,8 +4,8 @@ import { Lock, CheckCircle2, LogOut } from 'lucide-react';
 import { MODULES } from '../../lib/data';
 import { useProgress } from '../../hooks/useProgress';
 import { useAuthContext } from '../../context/AuthContext';
-import { TariffBadge } from '../ui/TariffBadge';
-import { TelegramButton } from '../ui/TelegramButton';
+import { TariffBadge } from '../aa/TariffBadge';
+import { TelegramButton } from '../aa/TelegramButton';
 import { Tariff } from '../../lib/types';
 
 interface SidebarProps {

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Trash2, ChevronDown, ChevronUp, Shield, User, Search, X, RefreshCw, CheckCircle2, Link2 } from 'lucide-react';
 import { MockUser, Progress, WhitelistEntry, Tariff } from '../../lib/types';
 import { MODULES, MOCK_WHITELIST_ENTRIES } from '../../lib/data';
-import { TariffBadge } from '../../components/ui/TariffBadge';
+import { TariffBadge } from '../../components/aa/TariffBadge';
 import { timeAgo } from '../../lib/activity';
 
 function getStoredUsers(): MockUser[] {

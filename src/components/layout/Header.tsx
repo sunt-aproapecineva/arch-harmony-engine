@@ -4,8 +4,8 @@ import { Sun, Moon, Menu, PanelLeftClose, PanelLeftOpen, ChevronDown, LogOut, Sh
 import { useTheme } from '../../context/ThemeContext';
 import { useAuthContext } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SearchModal } from '../ui/SearchModal';
-import { TariffBadge } from '../ui/TariffBadge';
+import { SearchModal } from '../aa/SearchModal';
+import { TariffBadge } from '../aa/TariffBadge';
 import { Tariff } from '../../lib/types';
 
 interface HeaderProps { onMenuToggle?: () => void; sidebarOpen?: boolean; }

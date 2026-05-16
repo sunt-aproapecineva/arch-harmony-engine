@@ -3,7 +3,7 @@ import { Outlet, NavLink } from '@/lib/router-compat';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { AnimatePresence, motion } from 'framer-motion';
-import { NotificationBanner } from '../ui/NotificationBanner';
+import { NotificationBanner } from '../aa/NotificationBanner';
 import { LayoutDashboard, BookOpen, TrendingUp, ShieldCheck } from 'lucide-react';
 import { useAuthContext } from '../../context/AuthContext';
 

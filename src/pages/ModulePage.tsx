@@ -7,7 +7,7 @@ import {
 import { MODULES } from '../lib/data';
 import { useProgress } from '../hooks/useProgress';
 import { ExerciseBlock } from '../components/exercises/ExerciseBlock';
-import { QuizRequiredModal } from '../components/ui/QuizRequiredModal';
+import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
 import { useAuthContext } from '../context/AuthContext';
 
 export const ModulePage: React.FC = () => {

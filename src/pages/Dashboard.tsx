@@ -5,16 +5,16 @@ import {
   ArrowRight, BookOpen, CheckCircle2, Layers, Video,
   Wrench, Lock, Clock, Zap, TrendingUp, Send, ClipboardList
 } from 'lucide-react';
-import { QuizRequiredModal } from '../components/ui/QuizRequiredModal';
+import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
 import { useAuthContext } from '../context/AuthContext';
 import { useProgress } from '../hooks/useProgress';
 import { MODULES, LIVE_EVENTS } from '../lib/data';
-import { ModuleCard } from '../components/ui/ModuleCard';
-import { ProgressRing } from '../components/ui/ProgressRing';
+import { ModuleCard } from '../components/aa/ModuleCard';
+import { ProgressRing } from '../components/aa/ProgressRing';
 import { useCounter } from '../hooks/useCounter';
-import { Calendar } from '../components/ui/Calendar';
-import { TelegramButton } from '../components/ui/TelegramButton';
-import { TariffBadge } from '../components/ui/TariffBadge';
+import { Calendar } from '../components/aa/Calendar';
+import { TelegramButton } from '../components/aa/TelegramButton';
+import { TariffBadge } from '../components/aa/TariffBadge';
 import { Tariff } from '../lib/types';
 
 /* ── helpers ─────────────────────────────────────── */
