@@ -49,18 +49,16 @@ async function hydrateUser(authUser: any): Promise<User | null> {
   };
 }
 
-// Whitelist helper for register page — reads live from Supabase
+// Whitelist helpers — admin-only direct reads; eligibility check via secure RPC
 export async function fetchWhitelist(): Promise<WhitelistEntry[]> {
   const { data } = await supabase.from('whitelist').select('email,tariff').order('added_at', { ascending: false });
   return (data || []) as WhitelistEntry[];
 }
 
-// Legacy sync helper kept for components that still expect it; returns cached snapshot
 let _cachedWhitelist: WhitelistEntry[] = [];
 export function getWhitelist(): WhitelistEntry[] {
   return _cachedWhitelist;
 }
-fetchWhitelist().then(w => { _cachedWhitelist = w; }).catch(() => {});
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
