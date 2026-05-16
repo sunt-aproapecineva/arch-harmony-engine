@@ -6,7 +6,7 @@
 @custom-variant light (&:where(.light, .light *));
 
 @theme inline {
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: 'Arimo', system-ui, sans-serif;
   --font-aboreto: 'Aboreto', serif;
   --color-bg: var(--bg);
   --color-bg-2: var(--bg-2);
