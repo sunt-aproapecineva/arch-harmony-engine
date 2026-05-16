@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Mail, Lock, User, CheckCircle2, Loader2 } from 'lucide-react';
-import { useAuthContext, fetchWhitelist } from '../context/AuthContext';
+import { useAuthContext } from '../context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface InputFieldProps {
   label: string;
