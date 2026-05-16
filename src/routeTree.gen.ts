@@ -17,6 +17,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppModuleIdRouteImport } from './routes/_app.module.$id'
+import { Route as AppLessonIdRouteImport } from './routes/_app.lesson.$id'
 
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
@@ -57,6 +58,11 @@ const AppModuleIdRoute = AppModuleIdRouteImport.update({
   path: '/module/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLessonIdRoute = AppLessonIdRouteImport.update({
+  id: '/lesson/$id',
+  path: '/lesson/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
+  '/lesson/$id': typeof AppLessonIdRoute
   '/module/$id': typeof AppModuleIdRoute
 }
 export interface FileRoutesByTo {
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
+  '/lesson/$id': typeof AppLessonIdRoute
   '/module/$id': typeof AppModuleIdRoute
 }
 export interface FileRoutesById {
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/welcome': typeof WelcomeRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/lesson/$id': typeof AppLessonIdRoute
   '/_app/module/$id': typeof AppModuleIdRoute
 }
 export interface FileRouteTypes {
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/welcome'
     | '/dashboard'
+    | '/lesson/$id'
     | '/module/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/welcome'
     | '/dashboard'
+    | '/lesson/$id'
     | '/module/$id'
   id:
     | '__root__'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/welcome'
     | '/_app/dashboard'
+    | '/_app/lesson/$id'
     | '/_app/module/$id'
   fileRoutesById: FileRoutesById
 }
@@ -185,16 +197,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppModuleIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/lesson/$id': {
+      id: '/_app/lesson/$id'
+      path: '/lesson/$id'
+      fullPath: '/lesson/$id'
+      preLoaderRoute: typeof AppLessonIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
+  AppLessonIdRoute: typeof AppLessonIdRoute
   AppModuleIdRoute: typeof AppModuleIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
+  AppLessonIdRoute: AppLessonIdRoute,
   AppModuleIdRoute: AppModuleIdRoute,
 }
 
