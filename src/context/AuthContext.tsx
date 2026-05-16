@@ -49,18 +49,16 @@ async function hydrateUser(authUser: any): Promise<User | null> {
   };
 }
 
-// Whitelist helper for register page — reads live from Supabase
+// Whitelist helpers — admin-only direct reads; eligibility check via secure RPC
 export async function fetchWhitelist(): Promise<WhitelistEntry[]> {
   const { data } = await supabase.from('whitelist').select('email,tariff').order('added_at', { ascending: false });
   return (data || []) as WhitelistEntry[];
 }
 
-// Legacy sync helper kept for components that still expect it; returns cached snapshot
 let _cachedWhitelist: WhitelistEntry[] = [];
 export function getWhitelist(): WhitelistEntry[] {
   return _cachedWhitelist;
 }
-fetchWhitelist().then(w => { _cachedWhitelist = w; }).catch(() => {});
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -91,10 +89,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (email: string, password: string, fullName: string) => {
     const cleanEmail = email.trim().toLowerCase();
-    // Pre-check whitelist for nicer UX (DB trigger also enforces)
-    if (cleanEmail !== 'babaradumi@gmail.com') {
-      const { data: wl } = await supabase.from('whitelist').select('email').ilike('email', cleanEmail).maybeSingle();
-      if (!wl) return { error: 'Adresa de email nu este în lista de acces. Contactează administratorul.' };
+    // Pre-check whitelist via secure RPC (DB trigger also enforces)
+    const { data: allowed } = await supabase.rpc('is_email_whitelisted', { _email: cleanEmail });
+    if (allowed !== true) {
+      return { error: 'Adresa de email nu este în lista de acces. Contactează administratorul.' };
     }
     const { error } = await supabase.auth.signUp({
       email: cleanEmail,
@@ -113,8 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return { error: error.message };
     }
-    // Refresh whitelist cache
-    fetchWhitelist().then(w => { _cachedWhitelist = w; }).catch(() => {});
+    // No cache refresh needed — whitelist is admin-only
     return { error: null };
   };
 

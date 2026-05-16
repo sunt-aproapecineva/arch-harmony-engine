@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Mail, Lock, User, CheckCircle2, Loader2 } from 'lucide-react';
-import { useAuthContext, fetchWhitelist } from '../context/AuthContext';
+import { useAuthContext } from '../context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface InputFieldProps {
   label: string;
@@ -62,28 +63,22 @@ export const Register: React.FC = () => {
     if (emailParam) {
       const normalized = emailParam.trim().toLowerCase();
       setEmail(normalized);
-      fetchWhitelist().then(wl => {
-        if (wl.find((e: any) => e.email.toLowerCase() === normalized)) {
-          setStep(2);
-        }
+      supabase.rpc('is_email_whitelisted', { _email: normalized }).then(({ data }) => {
+        if (data === true) setStep(2);
       });
     }
   }, []);
 
-  // Step 1: actually verify against whitelist before proceeding
+  // Step 1: actually verify against whitelist before proceeding (via secure RPC)
   const handleCheckEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (!email.trim()) return;
     setCheckingEmail(true);
-    const wl = await fetchWhitelist();
-    setCheckingEmail(false);
-
     const target = email.trim().toLowerCase();
-    const found = target === 'babaradumi@gmail.com' || wl.find(
-      (entry: any) => entry.email.toLowerCase() === target
-    );
-    if (!found) {
+    const { data, error: rpcErr } = await supabase.rpc('is_email_whitelisted', { _email: target });
+    setCheckingEmail(false);
+    if (rpcErr || data !== true) {
       setError('Acest email nu are acces la platformă. Verifică adresa sau contactează administratorul.');
       return;
     }
