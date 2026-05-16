@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Plus, Trash2, ChevronRight } from 'lucide-react';
 import { getExerciseTemplate, ExerciseTemplate, QuizQuestionItem } from '../../lib/exerciseData';
 import { useAuthContext } from '../../context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ExerciseBlockProps {
   exerciseId: string;
@@ -499,6 +500,48 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
   const template = getExerciseTemplate(exerciseId);
   // Keyed per user so exercises are never shared between accounts
   const storageKey = `aa_ex_${user?.id ?? 'anon'}_${exerciseId}`;
+
+  // Sync localStorage <-> DB (exercise_responses). Sub-components keep writing
+  // to localStorage; this effect mirrors it to Supabase so admins can see it.
+  useEffect(() => {
+    if (!user?.id) return;
+    let lastSent = localStorage.getItem(storageKey) || '';
+    // Initial pull from DB if local is empty
+    supabase
+      .from('exercise_responses')
+      .select('response')
+      .eq('user_id', user.id)
+      .eq('exercise_id', exerciseId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.response !== undefined && data?.response !== null) {
+          const remote = typeof data.response === 'string' ? data.response : JSON.stringify(data.response);
+          const local = localStorage.getItem(storageKey);
+          if (!local || local === '') {
+            localStorage.setItem(storageKey, remote);
+            lastSent = remote;
+            window.dispatchEvent(new Event('aa_ex_synced'));
+          }
+        }
+      });
+    // Push on change (poll localStorage)
+    const interval = setInterval(() => {
+      const current = localStorage.getItem(storageKey) || '';
+      if (current !== lastSent && current !== '') {
+        lastSent = current;
+        let parsed: any = current;
+        try { parsed = JSON.parse(current); } catch {}
+        supabase
+          .from('exercise_responses')
+          .upsert(
+            { user_id: user.id, exercise_id: exerciseId, response: parsed },
+            { onConflict: 'user_id,exercise_id' }
+          )
+          .then(() => {});
+      }
+    }, 1500);
+    return () => clearInterval(interval);
+  }, [user?.id, exerciseId, storageKey]);
 
   if (!template) {
     return (
