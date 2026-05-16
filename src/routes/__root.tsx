@@ -75,11 +75,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Arhitectura Afacerii · Practicum de Sistematizare" },
       { name: "description", content: "Platformă privată de studii pentru participanții la practicumul Arhitectura Afacerii — Victor Morar." },
       { name: "author", content: "Victor Morar" },
-      { property: "og:title", content: "Arhitectura Afacerii" },
-      { property: "og:description", content: "Construiește afacerea care funcționează fără tine." },
+      { property: "og:title", content: "Arhitectura Afacerii · Practicum de Sistematizare" },
+      { property: "og:description", content: "Platformă privată de studii pentru participanții la practicumul Arhitectura Afacerii — Victor Morar." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Arhitectura Afacerii · Practicum de Sistematizare" },
+      { name: "twitter:description", content: "Platformă privată de studii pentru participanții la practicumul Arhitectura Afacerii — Victor Morar." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/hkd098nBXPXpaePUFJTajX7XbFs1/social-images/social-1778954222079-7.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/hkd098nBXPXpaePUFJTajX7XbFs1/social-images/social-1778954222079-7.webp" },
     ],
     links: [
       {
@@ -110,30 +114,14 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
-import { LoadingScreen } from "@/components/aa/LoadingScreen";
-import { useEffect, useState } from "react";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const [booting, setBooting] = useState(true);
-  const [showLoader, setShowLoader] = useState(false);
-
-  useEffect(() => {
-    // Only show loader once per browser session
-    const seen = sessionStorage.getItem('aa_boot_shown');
-    if (!seen) {
-      setShowLoader(true);
-      sessionStorage.setItem('aa_boot_shown', '1');
-    } else {
-      setBooting(false);
-    }
-  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          {showLoader && booting && <LoadingScreen onComplete={() => setBooting(false)} />}
           <Outlet />
         </AuthProvider>
       </ThemeProvider>
