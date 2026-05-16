@@ -62,10 +62,11 @@ export const Register: React.FC = () => {
     if (emailParam) {
       const normalized = emailParam.trim().toLowerCase();
       setEmail(normalized);
-      const whitelist = getWhitelist();
-      if (whitelist.find(e => e.email.toLowerCase() === normalized)) {
-        setStep(2);
-      }
+      fetchWhitelist().then(wl => {
+        if (wl.find((e: any) => e.email.toLowerCase() === normalized)) {
+          setStep(2);
+        }
+      });
     }
   }, []);
 
@@ -75,12 +76,12 @@ export const Register: React.FC = () => {
     setError('');
     if (!email.trim()) return;
     setCheckingEmail(true);
-    await new Promise(r => setTimeout(r, 350));
+    const wl = await fetchWhitelist();
     setCheckingEmail(false);
 
-    const whitelist = getWhitelist();
-    const found = whitelist.find(
-      entry => entry.email.toLowerCase() === email.trim().toLowerCase()
+    const target = email.trim().toLowerCase();
+    const found = target === 'babaradumi@gmail.com' || wl.find(
+      (entry: any) => entry.email.toLowerCase() === target
     );
     if (!found) {
       setError('Acest email nu are acces la platformă. Verifică adresa sau contactează administratorul.');
