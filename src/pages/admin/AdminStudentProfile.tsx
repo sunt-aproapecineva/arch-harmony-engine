@@ -82,14 +82,18 @@ export const AdminStudentProfile: React.FC = () => {
   const [showQuizDetails, setShowQuizDetails] = useState(false);
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>({});
+  const [notesByLesson, setNotesByLesson] = useState<Record<string, string>>({});
+  const [exercisesById, setExercisesById] = useState<Record<string, any>>({});
 
   useEffect(() => {
     if (!userId) return;
     (async () => {
-      const [{ data: profile }, { data: progressRows }, { data: quiz }] = await Promise.all([
+      const [{ data: profile }, { data: progressRows }, { data: quiz }, { data: notesRows }, { data: exRows }] = await Promise.all([
         supabase.from('profiles').select('id,email,full_name,tariff,avatar_url,created_at').eq('id', userId).maybeSingle(),
         supabase.from('progress').select('user_id,lesson_id,completed_at').eq('user_id', userId),
         supabase.from('quiz_responses').select('answers,completed_at').eq('user_id', userId).maybeSingle(),
+        supabase.from('lesson_notes').select('lesson_id,content').eq('user_id', userId),
+        supabase.from('exercise_responses').select('exercise_id,response').eq('user_id', userId),
       ]);
       if (profile) {
         setUser({
@@ -108,6 +112,12 @@ export const AdminStudentProfile: React.FC = () => {
         setQuizAnswers(answers);
         setQuizProfile(generateProfile(answers));
       }
+      const notesMap: Record<string, string> = {};
+      (notesRows || []).forEach((n: any) => { notesMap[n.lesson_id] = n.content || ''; });
+      setNotesByLesson(notesMap);
+      const exMap: Record<string, any> = {};
+      (exRows || []).forEach((e: any) => { exMap[e.exercise_id] = e.response; });
+      setExercisesById(exMap);
     })();
     getActivityForUser(userId).then(setActivity).catch(() => setActivity([]));
   }, [userId]);
