@@ -307,6 +307,7 @@ export const Register: React.FC = () => {
           </p>
         </div>
       </div>
+      <OnboardingGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} />
     </div>
   );
 };
