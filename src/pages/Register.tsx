@@ -57,6 +57,7 @@ export const Register: React.FC = () => {
   const { register } = useAuthContext();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [guideOpen, setGuideOpen] = useState(false);
 
   // Pre-fill email from invite link and auto-advance if whitelisted
   useEffect(() => {
