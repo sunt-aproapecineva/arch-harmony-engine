@@ -117,7 +117,6 @@ export const MODULES: Module[] = [
         duration_min: 20,
         order_index: 1,
         is_published: false,
-        position: 1,
       },
       {
         id: 'l-0-2',
@@ -130,45 +129,88 @@ export const MODULES: Module[] = [
         duration_min: 18,
         order_index: 2,
         is_published: false,
-        position: 3,
+      },
+      {
+        id: 'l-0-ex-1',
+        module_id: 'mod-0',
+        title: 'Auditul Activităților Tale',
+        description: 'Scrie TOT ce faci în firma ta, estimează % din timp și clasifică fiecare activitate ca Specialist (S), Director (D) sau Proprietar (P). Vei vedea negru pe alb câte % din timp ești angajat și nu proprietar.',
+        video_url: '',
+        duration_min: 25,
+        order_index: 3,
+        is_published: true,
+        type: 'exercise',
+        exercise_id: 'e-0-1',
+      },
+      {
+        id: 'l-0-ex-2',
+        module_id: 'mod-0',
+        title: 'Harta Gâturilor de Sticlă',
+        description: 'Listează toate deciziile din ultima săptămână care au ajuns la tine. Clasifică: chiar trebuia să fii tu implicat sau e o scuză a sistemului? Calculezi exact câte minute/săptămână pierzi ca gât de sticlă.',
+        video_url: '',
+        duration_min: 30,
+        order_index: 4,
+        is_published: true,
+        type: 'exercise',
+        exercise_id: 'e-0-2',
+      },
+      {
+        id: 'l-0-ex-3',
+        module_id: 'mod-0',
+        title: 'Testul de Absență',
+        description: 'Dacă ai pleca mâine 2 zile fără telefon — ce s-ar întâmpla? Listezi toate scenariile, le clasifici după gravitate și identifici dacă frica e de lipsa ta sau de lipsa sistemului.',
+        video_url: '',
+        duration_min: 20,
+        order_index: 5,
+        is_published: true,
+        type: 'exercise',
+        exercise_id: 'e-0-3',
+      },
+      {
+        id: 'l-0-ex-4',
+        module_id: 'mod-0',
+        title: 'Diagnosticul Complet · 50 de Întrebări',
+        description: '50 de întrebări pe 6 dimensiuni ale sistematizării, scală 1–5. Îți arată exact pe ce treaptă ești, unde ai găurile și care sunt cele 3 priorități de atacat în practicumul de față.',
+        video_url: '',
+        duration_min: 45,
+        order_index: 6,
+        is_published: true,
+        type: 'exercise',
+        exercise_id: 'e-0-4',
       },
     ],
     exercises: [
       {
         id: 'e-0-1',
         module_id: 'mod-0',
-        title: 'Auditul activităților tale',
+        title: 'Auditul Activităților Tale',
         description:
-          'Scrii TOT ce faci în mod obișnuit în firma ta — nu ce ar trebui, ci ce faci efectiv. Estimezi ce % din timp ocupă fiecare activitate. La final clasifici fiecare: Specialist, Director sau Proprietar. Regula: totalul = 100%. Vezi negru pe alb în ce rol petreci cel mai mult timp.',
+          'Scrie tot ce faci în firma ta și clasifică fiecare activitate ca Specialist, Director sau Proprietar. Vei vedea negru pe alb câte % din timp ești angajat vs proprietar.',
         order_index: 1,
-        position: 2,
       },
       {
         id: 'e-0-2',
         module_id: 'mod-0',
-        title: 'Harta gâturilor de sticlă',
+        title: 'Harta Gâturilor de Sticlă',
         description:
-          'Listezi toate deciziile și situațiile din ultima săptămână care au ajuns la tine. Pentru fiecare răspunzi: chiar trebuia să fii TU sau e o lipsă a sistemului? Și cât timp ți-a luat. Identifici exact unde ești tu blocajul principal.',
+          'Listezi toate deciziile din săptămâna trecută care au trecut prin tine. Le clasifici: chiar trebuia să fii tu? Calculezi exact câte minute/săptămână pierzi ca gât de sticlă.',
         order_index: 2,
-        position: 4,
       },
       {
         id: 'e-0-3',
         module_id: 'mod-0',
-        title: 'Testul de absență',
+        title: 'Testul de Absență',
         description:
-          'Stai la birou și răspunzi sincer: dacă ai pleca mâine 2 zile și nu ai răspunde la niciun mesaj, ce s-ar întâmpla? Scrii TOATE scenariile fără filtru. Pentru fiecare: gravitate și cauza reală. Descoperi că majoritatea fricilor sunt cauzate de lipsă de sisteme, nu de tine.',
+          'Dacă ai pleca 2 zile fără telefon — ce s-ar întâmpla? Listezi toate scenariile și identifici dacă frica e de lipsa ta sau de lipsa sistemului.',
         order_index: 3,
-        position: 5,
       },
       {
         id: 'e-0-4',
         module_id: 'mod-0',
-        title: 'Diagnosticul complet · 50 întrebări',
+        title: 'Diagnosticul Complet · 50 de Întrebări',
         description:
-          'Te evaluezi pe scala 1–5 la 50 de întrebări împărțite pe 6 dimensiuni: Claritate & Rol, Structură & Oameni, Procese, Control & KPI, Delegare, Management & Scalare. Rezultatul: scor pe fiecare dimensiune și cele 3 priorități de unde începi.',
+          '50 de întrebări pe 6 dimensiuni: Claritate, Structură, Procese, Control, Delegare, Scalare. Scala 1–5. Îți arată exact unde ai găurile și care sunt cele 3 priorități de atacat.',
         order_index: 4,
-        position: 6,
       },
     ],
   },
@@ -752,29 +794,3 @@ export const MOCK_ADMIN: User = {
   tariff: 'arhitect',
   created_at: new Date().toISOString(),
 };
-
-// ─────────────────────────────────────────────────────────────
-// Unified module timeline — lessons & exercises are both treated
-// as "lecții" (numbered sequentially by `position`).
-// ─────────────────────────────────────────────────────────────
-export type TimelineEntry =
-  | { kind: 'lesson'; item: Module['lessons'][number]; lessonNo: number; idx: number }
-  | { kind: 'exercise'; item: Module['exercises'][number]; lessonNo: number; idx: number };
-
-export function getModuleTimeline(module: Module): TimelineEntry[] {
-  const lessons = module.lessons.map((item, idx) => ({
-    kind: 'lesson' as const,
-    item,
-    idx,
-    pos: item.position ?? (idx * 2 + 1),
-  }));
-  const exercises = module.exercises.map((item, idx) => ({
-    kind: 'exercise' as const,
-    item,
-    idx,
-    pos: item.position ?? (1000 + idx),
-  }));
-  return [...lessons, ...exercises]
-    .sort((a, b) => a.pos - b.pos)
-    .map((e, i) => ({ kind: e.kind, item: e.item as any, idx: e.idx, lessonNo: i + 1 }));
-}

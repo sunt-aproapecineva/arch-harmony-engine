@@ -45,8 +45,8 @@ export interface Lesson {
   duration_min: number;
   order_index: number;
   is_published: boolean;
-  /** Optional unified ordering used to interleave lessons & exercises in the timeline. */
-  position?: number;
+  type?: 'video' | 'exercise';
+  exercise_id?: string;
 }
 
 export interface Exercise {
@@ -55,8 +55,6 @@ export interface Exercise {
   title: string;
   description: string;
   order_index: number;
-  /** Optional unified ordering used to interleave lessons & exercises in the timeline. */
-  position?: number;
 }
 
 export interface Progress {

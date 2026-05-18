@@ -1,11 +1,8 @@
-// @ts-nocheck
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Plus, Trash2, ChevronRight, CheckCircle2, RotateCcw, AlertCircle } from 'lucide-react';
+import { Check, Plus, Trash2, ChevronRight } from 'lucide-react';
 import { getExerciseTemplate, ExerciseTemplate, QuizQuestionItem } from '../../lib/exerciseData';
 import { useAuthContext } from '../../context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { useExerciseCompletions } from '../../hooks/useExerciseCompletions';
 
 interface ExerciseBlockProps {
   exerciseId: string;
@@ -189,28 +186,18 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
   storageKey,
 }) => {
   const tableField = template.fields?.find(f => f.type === 'dynamic-table');
+  const columns = tableField?.columns || ['Coloana 1', 'Coloana 2', 'Coloana 3'];
   const addLabel = tableField?.addLabel || 'Adaugă rând';
-  const minRows = tableField?.minRows || 1;
-
-  // Normalize columns into {name, options?, width?} list.
-  const colSpecs: { name: string; options?: string[]; width?: string }[] = useMemo(() => {
-    if (tableField?.columnsSpec && tableField.columnsSpec.length) {
-      return tableField.columnsSpec.map(c =>
-        typeof c === 'string' ? { name: c } : c,
-      );
-    }
-    return (tableField?.columns || ['Coloana 1', 'Coloana 2', 'Coloana 3']).map(name => ({ name }));
-  }, [tableField]);
 
   const [rows, setRows] = useState<TableRow[]>(() => {
     try {
       const s = localStorage.getItem(storageKey);
       if (s) {
         const parsed = JSON.parse(s);
-        if (Array.isArray(parsed) && parsed.length) return parsed;
+        return Array.isArray(parsed) ? parsed : [{}];
       }
     } catch {}
-    return Array.from({ length: minRows }, () => ({}));
+    return [{}];
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
@@ -233,9 +220,8 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
 
   const removeRow = (idx: number) => {
     const next = rows.filter((_, i) => i !== idx);
-    const final = next.length ? next : [{}];
-    setRows(final);
-    save(final);
+    setRows(next.length ? next : [{}]);
+    save(next.length ? next : [{}]);
   };
 
   const infoField = template.fields?.find(f => f.type === 'info');
@@ -255,14 +241,13 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
           <thead>
             <tr>
-              {colSpecs.map(col => (
-                <th key={col.name} style={{
+              {columns.map(col => (
+                <th key={col} style={{
                   padding: '8px 10px', textAlign: 'left', fontSize: 10, fontWeight: 600,
                   letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-3)',
                   borderBottom: '1px solid var(--border)',
-                  width: col.width,
                 }}>
-                  {col.name}
+                  {col}
                 </th>
               ))}
               <th style={{ width: 32 }} />
@@ -270,49 +255,21 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
           </thead>
           <tbody>
             {rows.map((row, rowIdx) => (
-              <motion.tr
-                key={rowIdx}
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                style={{ borderBottom: '1px solid var(--border)' }}
-              >
-                {colSpecs.map(col => (
-                  <td key={col.name} style={{ padding: '6px 4px' }}>
-                    {col.options ? (
-                      <select
-                        value={row[col.name] || ''}
-                        onChange={e => updateCell(rowIdx, col.name, e.target.value)}
-                        style={{
-                          width: '100%', padding: '6px 8px', fontSize: 12,
-                          background: 'var(--bg-3)', border: '1px solid var(--border)',
-                          borderRadius: 6, color: row[col.name] ? 'var(--fg)' : 'var(--fg-3)',
-                          boxSizing: 'border-box', cursor: 'pointer',
-                          appearance: 'none',
-                          backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23C9A96E' stroke-width='2'%3e%3cpath d='M6 9l6 6 6-6'/%3e%3c/svg%3e")`,
-                          backgroundRepeat: 'no-repeat',
-                          backgroundPosition: 'right 8px center',
-                          paddingRight: 24,
-                        }}
-                      >
-                        <option value="" disabled>—</option>
-                        {col.options.map(opt => (
-                          <option key={opt} value={opt}>{opt}</option>
-                        ))}
-                      </select>
-                    ) : (
-                      <input
-                        type="text"
-                        value={row[col.name] || ''}
-                        onChange={e => updateCell(rowIdx, col.name, e.target.value)}
-                        style={{
-                          width: '100%', padding: '6px 8px', fontSize: 12,
-                          background: 'var(--bg-3)', border: '1px solid var(--border)',
-                          borderRadius: 6, color: 'var(--fg)', boxSizing: 'border-box',
-                        }}
-                        onFocus={e => (e.target.style.borderColor = 'rgba(196,240,228,0.35)')}
-                        onBlur={e => (e.target.style.borderColor = 'var(--border)')}
-                      />
-                    )}
+              <tr key={rowIdx} style={{ borderBottom: '1px solid var(--border)' }}>
+                {columns.map(col => (
+                  <td key={col} style={{ padding: '6px 4px' }}>
+                    <input
+                      type="text"
+                      value={row[col] || ''}
+                      onChange={e => updateCell(rowIdx, col, e.target.value)}
+                      style={{
+                        width: '100%', padding: '6px 8px', fontSize: 12,
+                        background: 'var(--bg-3)', border: '1px solid var(--border)',
+                        borderRadius: 6, color: 'var(--fg)', boxSizing: 'border-box',
+                      }}
+                      onFocus={e => (e.target.style.borderColor = 'rgba(196,240,228,0.35)')}
+                      onBlur={e => (e.target.style.borderColor = 'var(--border)')}
+                    />
                   </td>
                 ))}
                 <td style={{ padding: '6px 4px', textAlign: 'center' }}>
@@ -325,7 +282,7 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
                     <Trash2 size={12} />
                   </button>
                 </td>
-              </motion.tr>
+              </tr>
             ))}
           </tbody>
         </table>
@@ -346,287 +303,6 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
         </button>
         {savedAt && <span style={{ fontSize: 11, color: 'var(--accent)' }}>Salvat ✓ {savedAt}</span>}
       </div>
-    </div>
-  );
-};
-
-// ─── Diagnostic (50 întrebări, scor pe dimensiuni) ────────────────────────────
-const DiagnosticExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({
-  template,
-  storageKey,
-}) => {
-  const questions: QuizQuestionItem[] = template.questions || [];
-  const dimensions = template.dimensions || [];
-
-  const [answers, setAnswers] = useState<Record<string, number>>(() => {
-    try {
-      const s = localStorage.getItem(storageKey);
-      return s ? JSON.parse(s) : {};
-    } catch {
-      return {};
-    }
-  });
-  const [showResults, setShowResults] = useState(false);
-
-  const setAnswer = (qid: string, val: number) => {
-    const next = { ...answers, [qid]: val };
-    setAnswers(next);
-    localStorage.setItem(storageKey, JSON.stringify(next));
-  };
-
-  const answered = Object.keys(answers).length;
-  const total = questions.length;
-  const pctDone = total ? Math.round((answered / total) * 100) : 0;
-
-  // Group questions by dimension
-  const grouped = useMemo(() => {
-    const g: Record<string, QuizQuestionItem[]> = {};
-    dimensions.forEach(d => (g[d] = []));
-    questions.forEach(q => {
-      const d = q.dimension || 'General';
-      if (!g[d]) g[d] = [];
-      g[d].push(q);
-    });
-    return g;
-  }, [questions, dimensions]);
-
-  // Per-dimension score
-  const dimensionScores = useMemo(() => {
-    return dimensions.map(d => {
-      const qs = grouped[d] || [];
-      const score = qs.reduce((s, q) => s + (answers[q.id] || 0), 0);
-      const max = qs.length * 5;
-      const pct = max ? Math.round((score / max) * 100) : 0;
-      return { dimension: d, score, max, pct, count: qs.length };
-    });
-  }, [grouped, dimensions, answers]);
-
-  // Top 3 weakest dimensions = priorities
-  const priorities = useMemo(() => {
-    return [...dimensionScores]
-      .filter(d => d.count > 0)
-      .sort((a, b) => a.pct - b.pct)
-      .slice(0, 3);
-  }, [dimensionScores]);
-
-  const overallPct = useMemo(() => {
-    const totalScore = dimensionScores.reduce((s, d) => s + d.score, 0);
-    const totalMax = dimensionScores.reduce((s, d) => s + d.max, 0);
-    return totalMax ? Math.round((totalScore / totalMax) * 100) : 0;
-  }, [dimensionScores]);
-
-  if (showResults) {
-    return (
-      <div>
-        {/* Overall */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          style={{
-            textAlign: 'center', padding: '20px 16px', marginBottom: 18,
-            background: 'linear-gradient(180deg, var(--accent-dim) 0%, rgba(196,240,228,0.02) 100%)',
-            border: '1px solid rgba(196,240,228,0.25)', borderRadius: 14,
-          }}
-        >
-          <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.14em', color: 'var(--fg-3)', textTransform: 'uppercase', marginBottom: 6 }}>
-            Scor general
-          </div>
-          <div style={{ fontSize: 48, fontWeight: 700, color: 'var(--accent)', lineHeight: 1 }}>{overallPct}%</div>
-          <p style={{ fontSize: 12, color: 'var(--fg-3)', marginTop: 8, maxWidth: 360, marginLeft: 'auto', marginRight: 'auto' }}>
-            {overallPct >= 75 ? 'Ai fundații solide. Concentrează-te pe rafinare.' :
-             overallPct >= 50 ? 'Progres bun. Zonele slabe sunt clare — atac-le în ordine.' :
-             'Multe zone de construit. Vestea bună: acum ai harta exactă.'}
-          </p>
-        </motion.div>
-
-        {/* Per-dimension bars */}
-        <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--fg-3)', textTransform: 'uppercase', marginBottom: 10 }}>
-          Scor pe dimensiuni
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22 }}>
-          {dimensionScores.map((d, i) => (
-            <motion.div
-              key={d.dimension}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.05 }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
-                <span style={{ color: 'var(--fg)' }}>{d.dimension}</span>
-                <span style={{ color: d.pct >= 70 ? '#4ade80' : d.pct >= 40 ? 'var(--gold)' : '#f87171', fontWeight: 600 }}>
-                  {d.score}/{d.max} · {d.pct}%
-                </span>
-              </div>
-              <div style={{ height: 6, background: 'var(--bg-3)', borderRadius: 3, overflow: 'hidden' }}>
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${d.pct}%` }}
-                  transition={{ duration: 0.7, delay: i * 0.05, ease: 'easeOut' }}
-                  style={{
-                    height: '100%',
-                    background: d.pct >= 70
-                      ? 'linear-gradient(90deg, #4ade80, #86efac)'
-                      : d.pct >= 40
-                      ? 'linear-gradient(90deg, var(--gold), #e0c896)'
-                      : 'linear-gradient(90deg, #f87171, #fca5a5)',
-                    borderRadius: 3,
-                  }}
-                />
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Top 3 priorities */}
-        <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--gold)', textTransform: 'uppercase', marginBottom: 10 }}>
-          Cele 3 priorități ale tale
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 18 }}>
-          {priorities.map((p, i) => (
-            <motion.div
-              key={p.dimension}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + i * 0.08 }}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '10px 14px', background: 'var(--gold-dim)',
-                border: '1px solid rgba(201,169,110,0.25)', borderLeft: '3px solid var(--gold)',
-                borderRadius: 10,
-              }}
-            >
-              <div className="font-aboreto" style={{
-                width: 28, height: 28, borderRadius: '50%',
-                background: 'rgba(201,169,110,0.15)', display: 'flex',
-                alignItems: 'center', justifyContent: 'center',
-                fontSize: 12, fontWeight: 700, color: 'var(--gold)', flexShrink: 0,
-              }}>
-                {i + 1}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)' }}>{p.dimension}</div>
-                <div style={{ fontSize: 11, color: 'var(--fg-3)' }}>Scor actual: {p.pct}% — aici începi.</div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        <button
-          onClick={() => setShowResults(false)}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            background: 'none', border: '1px solid var(--border)', cursor: 'pointer',
-            fontSize: 12, color: 'var(--fg-3)', padding: '7px 14px', borderRadius: 8,
-            transition: 'all 0.15s',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg)'; e.currentTarget.style.borderColor = 'rgba(196,240,228,0.3)'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-3)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
-        >
-          <RotateCcw size={11} /> Revino la întrebări
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      {/* Header progress */}
-      <div style={{ marginBottom: 18 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
-          <span>{answered} / {total} răspunsuri</span>
-          <span style={{ color: 'var(--accent)' }}>{pctDone}%</span>
-        </div>
-        <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
-          <motion.div
-            animate={{ width: `${pctDone}%` }}
-            transition={{ duration: 0.4 }}
-            style={{ height: '100%', background: 'linear-gradient(90deg, var(--accent), var(--gold))', borderRadius: 2 }}
-          />
-        </div>
-      </div>
-
-      {/* Dimensions */}
-      {dimensions.map((dim, dimIdx) => {
-        const qs = grouped[dim] || [];
-        const dimAnswered = qs.filter(q => answers[q.id] !== undefined).length;
-        return (
-          <div key={dim} style={{ marginBottom: 22 }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12,
-              paddingBottom: 8, borderBottom: '1px solid var(--border)',
-            }}>
-              <span className="font-aboreto" style={{
-                fontSize: 10, fontWeight: 700, color: 'var(--gold)',
-                background: 'var(--gold-dim)', border: '1px solid rgba(201,169,110,0.25)',
-                padding: '3px 8px', borderRadius: 4, letterSpacing: '0.08em',
-              }}>
-                {String(dimIdx + 1).padStart(2, '0')}
-              </span>
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)', flex: 1 }}>{dim}</div>
-              <div style={{ fontSize: 11, color: dimAnswered === qs.length ? '#4ade80' : 'var(--fg-3)' }}>
-                {dimAnswered}/{qs.length}
-              </div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {qs.map((q, qIdx) => (
-                <div key={q.id} style={{
-                  padding: '12px 14px',
-                  background: answers[q.id] !== undefined ? 'rgba(196,240,228,0.04)' : 'var(--bg-3)',
-                  border: `1px solid ${answers[q.id] !== undefined ? 'rgba(196,240,228,0.18)' : 'var(--border)'}`,
-                  borderRadius: 10,
-                  transition: 'all 0.2s',
-                }}>
-                  <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
-                    <span style={{ fontSize: 11, color: 'var(--fg-3)', flexShrink: 0, paddingTop: 2 }}>
-                      {qIdx + 1}.
-                    </span>
-                    <p style={{ fontSize: 13, color: 'var(--fg)', lineHeight: 1.5, flex: 1 }}>{q.text}</p>
-                  </div>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    {[1, 2, 3, 4, 5].map(n => (
-                      <button
-                        key={n}
-                        onClick={() => setAnswer(q.id, n)}
-                        style={{
-                          flex: 1, padding: '8px 0', borderRadius: 8,
-                          background: answers[q.id] === n ? 'var(--accent)' : 'transparent',
-                          border: `1px solid ${answers[q.id] === n ? 'var(--accent)' : 'var(--border)'}`,
-                          color: answers[q.id] === n ? '#0D0907' : 'var(--fg-2)',
-                          cursor: 'pointer', fontSize: 13, fontWeight: 600,
-                          transition: 'all 0.15s',
-                        }}
-                      >
-                        {n}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })}
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 11, color: 'var(--fg-3)', marginBottom: 12 }}>
-        <span>1 = Deloc · 5 = Complet</span>
-        <span>Răspunsurile se salvează automat</span>
-      </div>
-
-      <button
-        onClick={() => setShowResults(true)}
-        disabled={answered === 0}
-        style={{
-          width: '100%', padding: '12px 20px', borderRadius: 10,
-          background: answered === total ? 'var(--accent)' : 'var(--bg-3)',
-          color: answered === total ? '#0D0907' : 'var(--fg-2)',
-          border: `1px solid ${answered === total ? 'var(--accent)' : 'var(--border)'}`,
-          cursor: answered === 0 ? 'not-allowed' : 'pointer',
-          fontSize: 13, fontWeight: 700, opacity: answered === 0 ? 0.5 : 1,
-          transition: 'all 0.15s',
-        }}
-      >
-        {answered === total ? 'Vezi rezultatul diagnostic →' : `Vezi rezultatul parțial (${answered}/${total})`}
-      </button>
     </div>
   );
 };
@@ -817,54 +493,564 @@ const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }>
   );
 };
 
+// ─── Activity Audit (Exercițiul 1) ────────────────────────────────────────────
+interface ActivityRow { id: string; activity: string; percentage: string; role: 'S' | 'D' | 'P' | '' }
+
+const ActivityAuditExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+  const defaultRows = (): ActivityRow[] =>
+    Array.from({ length: 8 }, (_, i) => ({ id: `r${i}`, activity: '', percentage: '', role: '' }));
+
+  const [rows, setRows] = useState<ActivityRow[]>(() => {
+    try { const s = localStorage.getItem(storageKey); if (s) return JSON.parse(s).rows || defaultRows(); } catch {}
+    return defaultRows();
+  });
+  const [conclusion, setConclusion] = useState(() => {
+    try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s).conclusion || '' : ''; } catch { return ''; }
+  });
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+
+  const save = (r: ActivityRow[], c: string) => {
+    localStorage.setItem(storageKey, JSON.stringify({ rows: r, conclusion: c }));
+    setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
+  };
+  const updateRow = (id: string, field: keyof ActivityRow, value: string) => {
+    const next = rows.map(r => r.id === id ? { ...r, [field]: value } : r);
+    setRows(next); save(next, conclusion);
+  };
+  const addRow = () => {
+    const next = [...rows, { id: Date.now().toString(), activity: '', percentage: '', role: '' as const }];
+    setRows(next); save(next, conclusion);
+  };
+  const removeRow = (id: string) => {
+    const next = rows.filter(r => r.id !== id);
+    setRows(next); save(next, conclusion);
+  };
+
+  const sTotal = rows.filter(r => r.role === 'S').reduce((a, r) => a + (parseFloat(r.percentage) || 0), 0);
+  const dTotal = rows.filter(r => r.role === 'D').reduce((a, r) => a + (parseFloat(r.percentage) || 0), 0);
+  const pTotal = rows.filter(r => r.role === 'P').reduce((a, r) => a + (parseFloat(r.percentage) || 0), 0);
+  const grandTotal = rows.reduce((a, r) => a + (parseFloat(r.percentage) || 0), 0);
+  const roleColors = { S: 'var(--accent)', D: 'var(--gold)', P: '#a78bfa' };
+
+  return (
+    <div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
+        {(['S', 'D', 'P'] as const).map(r => (
+          <div key={r} style={{ padding: '10px 8px', background: 'var(--bg-3)', border: `1px solid ${roleColors[r]}25`, borderRadius: 10, textAlign: 'center' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: roleColors[r], textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>
+              {r === 'S' ? 'Specialist' : r === 'D' ? 'Director' : 'Proprietar'}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--fg-3)', lineHeight: 1.5 }}>
+              {r === 'S' ? 'Execuți — putea face un angajat' : r === 'D' ? 'Coordonezi — rezolvi operațional' : 'Strategie — viziune, decizii mari'}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 72px 120px 32px', gap: 8, marginBottom: 6, padding: '0 2px' }}>
+        {['Activitatea', '% Timp', 'Rol  S / D / P', ''].map((h, i) => (
+          <div key={i} style={{ fontSize: 10, fontWeight: 700, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{h}</div>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
+        {rows.map((row, idx) => (
+          <div key={row.id} style={{ display: 'grid', gridTemplateColumns: '1fr 72px 120px 32px', gap: 8, alignItems: 'center' }}>
+            <input value={row.activity} onChange={e => updateRow(row.id, 'activity', e.target.value)}
+              placeholder={`Activitate ${idx + 1}...`}
+              style={{ padding: '7px 10px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', width: '100%' }} />
+            <input type="number" min={0} max={100} value={row.percentage} onChange={e => updateRow(row.id, 'percentage', e.target.value)}
+              placeholder="%"
+              style={{ padding: '7px 8px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', textAlign: 'center', width: '100%' }} />
+            <div style={{ display: 'flex', gap: 3 }}>
+              {(['S', 'D', 'P'] as const).map(role => {
+                const active = row.role === role;
+                return (
+                  <button key={role} onClick={() => updateRow(row.id, 'role', role)} style={{
+                    flex: 1, padding: '6px 0', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: 'none', transition: 'all 0.12s',
+                    background: active ? `${roleColors[role]}22` : 'rgba(255,255,255,0.04)',
+                    color: active ? roleColors[role] : 'var(--fg-3)',
+                    outline: active ? `1.5px solid ${roleColors[role]}70` : '1.5px solid transparent',
+                    transform: active ? 'scale(1.05)' : 'scale(1)',
+                  }}>{role}</button>
+                );
+              })}
+            </div>
+            <button onClick={() => removeRow(row.id)} style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(248,113,113,0.08)', border: 'none', cursor: 'pointer', color: '#f87171', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+          </div>
+        ))}
+      </div>
+
+      <button onClick={addRow} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: 'rgba(196,240,228,0.06)', border: '1px dashed rgba(196,240,228,0.2)', borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--accent)', marginBottom: 20 }}>
+        + Adaugă activitate
+      </button>
+
+      <div style={{ background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 12, padding: '16px 18px', marginBottom: 20 }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>Totaluri</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 10 }}>
+          {([['Specialist (S)', sTotal, 'S'], ['Director (D)', dTotal, 'D'], ['Proprietar (P)', pTotal, 'P']] as const).map(([label, val, r]) => (
+            <div key={label} style={{ textAlign: 'center', padding: '12px 8px', background: 'var(--bg)', borderRadius: 10, border: `1px solid ${roleColors[r]}25` }}>
+              <div style={{ fontSize: 26, fontWeight: 700, color: roleColors[r], lineHeight: 1 }}>{Math.round(val as number)}%</div>
+              <div style={{ fontSize: 10, color: 'var(--fg-3)', marginTop: 4 }}>{label}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize: 12, fontWeight: 600, textAlign: 'center', color: grandTotal > 101 ? '#f87171' : grandTotal >= 98 ? '#4ade80' : 'var(--gold)' }}>
+          Total: {Math.round(grandTotal)}%
+          {grandTotal > 101 ? ' — depășești 100%' : grandTotal < 98 && grandTotal > 0 ? ' — mai ai de completat' : grandTotal >= 98 ? ' ✓ Corect' : ''}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: 4 }}>
+        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--fg-2)', marginBottom: 6 }}>Concluzia mea</label>
+        <textarea value={conclusion} onChange={e => { setConclusion(e.target.value); save(rows, e.target.value); }}
+          placeholder="Din 100% din timp — ___% e muncă de Specialist. ___% Director. ___% Proprietar. Ce observ: ..."
+          rows={3} style={{ width: '100%', padding: '10px 12px', fontSize: 13, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--fg)', resize: 'vertical', lineHeight: 1.6 }} />
+      </div>
+      {savedAt && <p style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 6 }}>Salvat la {savedAt}</p>}
+    </div>
+  );
+};
+
+// ─── Bottleneck Map (Exercițiul 2) ────────────────────────────────────────────
+interface BottleneckRow { id: string; situation: string; wasNecessary: 'da' | 'nu' | ''; reason: string; time: string }
+
+const BottleneckMapExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+  const defaultRows = (): BottleneckRow[] =>
+    Array.from({ length: 5 }, (_, i) => ({ id: `r${i}`, situation: '', wasNecessary: '', reason: '', time: '' }));
+
+  const [rows, setRows] = useState<BottleneckRow[]>(() => {
+    try { const s = localStorage.getItem(storageKey); if (s) return JSON.parse(s).rows || defaultRows(); } catch {}
+    return defaultRows();
+  });
+  const [conclusion, setConclusion] = useState(() => {
+    try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s).conclusion || '' : ''; } catch { return ''; }
+  });
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+
+  const save = (r: BottleneckRow[], c: string) => {
+    localStorage.setItem(storageKey, JSON.stringify({ rows: r, conclusion: c }));
+    setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
+  };
+  const updateRow = (id: string, field: keyof BottleneckRow, value: string) => {
+    const next = rows.map(r => r.id === id ? { ...r, [field]: value } : r);
+    setRows(next); save(next, conclusion);
+  };
+  const addRow = () => {
+    const next = [...rows, { id: Date.now().toString(), situation: '', wasNecessary: '' as const, reason: '', time: '' }];
+    setRows(next); save(next, conclusion);
+  };
+  const removeRow = (id: string) => {
+    const next = rows.filter(r => r.id !== id);
+    setRows(next); save(next, conclusion);
+  };
+
+  const notNeeded = rows.filter(r => r.wasNecessary === 'nu');
+  const wastedTime = notNeeded.reduce((a, r) => a + (parseInt(r.time) || 0), 0);
+  const filledRows = rows.filter(r => r.situation.trim() || r.wasNecessary);
+
+  return (
+    <div>
+      <div style={{ background: 'rgba(248,113,113,0.06)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 12, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.6 }}>
+        💡 O sticlă cu gât îngust — oricât de mult lichid ai înăuntru, iese doar cât permite gâtul. La fel afacerea ta: crește doar cât îți permiți tu să gestionezi.
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 1fr 72px 32px', gap: 8, marginBottom: 6, padding: '0 2px' }}>
+        {['Decizia / Situația', 'Chiar tu?', 'Motivul (dacă Nu)', 'Timp (min)', ''].map((h, i) => (
+          <div key={i} style={{ fontSize: 10, fontWeight: 700, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{h}</div>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 12 }}>
+        {rows.map((row, idx) => (
+          <div key={row.id} style={{ display: 'grid', gridTemplateColumns: '1fr 90px 1fr 72px 32px', gap: 8, alignItems: 'center' }}>
+            <input value={row.situation} onChange={e => updateRow(row.id, 'situation', e.target.value)}
+              placeholder={`Situația ${idx + 1}...`}
+              style={{ padding: '7px 10px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', width: '100%' }} />
+            <div style={{ display: 'flex', gap: 3 }}>
+              {(['da', 'nu'] as const).map(val => {
+                const active = row.wasNecessary === val;
+                const c = val === 'da' ? '#4ade80' : '#f87171';
+                return (
+                  <button key={val} onClick={() => updateRow(row.id, 'wasNecessary', val)} style={{
+                    flex: 1, padding: '6px 0', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: 'none', transition: 'all 0.12s',
+                    background: active ? `${c}20` : 'rgba(255,255,255,0.04)',
+                    color: active ? c : 'var(--fg-3)',
+                    outline: active ? `1.5px solid ${c}50` : '1.5px solid transparent',
+                  }}>{val === 'da' ? 'Da' : 'Nu'}</button>
+                );
+              })}
+            </div>
+            <input value={row.reason} onChange={e => updateRow(row.id, 'reason', e.target.value)}
+              placeholder="Lipsă procedură, lipsă responsabil..."
+              disabled={row.wasNecessary !== 'nu'}
+              style={{ padding: '7px 10px', fontSize: 12, background: row.wasNecessary !== 'nu' ? 'rgba(255,255,255,0.02)' : 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', width: '100%', opacity: row.wasNecessary !== 'nu' ? 0.35 : 1 }} />
+            <input type="number" min={0} value={row.time} onChange={e => updateRow(row.id, 'time', e.target.value)}
+              placeholder="min"
+              style={{ padding: '7px 8px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', textAlign: 'center', width: '100%' }} />
+            <button onClick={() => removeRow(row.id)} style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(248,113,113,0.08)', border: 'none', cursor: 'pointer', color: '#f87171', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+          </div>
+        ))}
+      </div>
+
+      <button onClick={addRow} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: 'rgba(196,240,228,0.06)', border: '1px dashed rgba(196,240,228,0.2)', borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--accent)', marginBottom: 20 }}>
+        + Adaugă situație
+      </button>
+
+      {filledRows.length > 0 && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
+          {[
+            { label: 'Situații nu necesare', value: notNeeded.length, color: '#f87171' },
+            { label: 'Minute pierdute', value: wastedTime, color: 'var(--gold)' },
+            { label: '% Nu trebuiau la tine', value: filledRows.length > 0 ? Math.round((notNeeded.length / filledRows.length) * 100) : 0, color: 'var(--accent)', suffix: '%' },
+          ].map(({ label, value, color, suffix }) => (
+            <div key={label} style={{ textAlign: 'center', padding: '12px 8px', background: 'var(--bg-3)', borderRadius: 10, border: `1px solid ${color}25` }}>
+              <div style={{ fontSize: 24, fontWeight: 700, color, lineHeight: 1 }}>{value}{suffix || ''}</div>
+              <div style={{ fontSize: 10, color: 'var(--fg-3)', marginTop: 4 }}>{label}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div style={{ marginBottom: 4 }}>
+        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--fg-2)', marginBottom: 6 }}>Concluzia mea</label>
+        <textarea value={conclusion} onChange={e => { setConclusion(e.target.value); save(rows, e.target.value); }}
+          placeholder="Principalele mele gâturi de sticlă sunt: ___ Pierd aproximativ ___ minute/săptămână în decizii care nu trebuiau să fie la mine."
+          rows={3} style={{ width: '100%', padding: '10px 12px', fontSize: 13, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--fg)', resize: 'vertical', lineHeight: 1.6 }} />
+      </div>
+      {savedAt && <p style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 6 }}>Salvat la {savedAt}</p>}
+    </div>
+  );
+};
+
+// ─── Absence Test (Exercițiul 3) ──────────────────────────────────────────────
+interface AbsenceRow { id: string; scenario: string; gravity: 'Mare' | 'Medie' | 'Mică' | ''; causedBy: string }
+
+const AbsenceTestExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+  const defaultRows = (): AbsenceRow[] =>
+    Array.from({ length: 5 }, (_, i) => ({ id: `r${i}`, scenario: '', gravity: '', causedBy: '' }));
+
+  const [rows, setRows] = useState<AbsenceRow[]>(() => {
+    try { const s = localStorage.getItem(storageKey); if (s) return JSON.parse(s).rows || defaultRows(); } catch {}
+    return defaultRows();
+  });
+  const [conclusion, setConclusion] = useState(() => {
+    try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s).conclusion || '' : ''; } catch { return ''; }
+  });
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+
+  const save = (r: AbsenceRow[], c: string) => {
+    localStorage.setItem(storageKey, JSON.stringify({ rows: r, conclusion: c }));
+    setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
+  };
+  const updateRow = (id: string, field: keyof AbsenceRow, value: string) => {
+    const next = rows.map(r => r.id === id ? { ...r, [field]: value } : r);
+    setRows(next); save(next, conclusion);
+  };
+  const addRow = () => {
+    const next = [...rows, { id: Date.now().toString(), scenario: '', gravity: '' as const, causedBy: '' }];
+    setRows(next); save(next, conclusion);
+  };
+  const removeRow = (id: string) => {
+    const next = rows.filter(r => r.id !== id);
+    setRows(next); save(next, conclusion);
+  };
+
+  const gravColors: Record<string, string> = { Mare: '#f87171', Medie: 'var(--gold)', Mică: '#4ade80' };
+  const count = (g: string) => rows.filter(r => r.gravity === g).length;
+
+  return (
+    <div>
+      <div style={{ background: 'rgba(196,240,228,0.05)', border: '1px solid rgba(196,240,228,0.15)', borderRadius: 12, padding: '14px 18px', marginBottom: 20, fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.6, fontStyle: 'italic', textAlign: 'center' }}>
+        "Dacă aș pleca mâine 2 zile și nu aș răspunde la niciun mesaj — ce s-ar întâmpla?"
+      </div>
+      <p style={{ fontSize: 13, color: 'var(--fg-3)', marginBottom: 16, lineHeight: 1.7 }}>
+        Scrie TOATE scenariile care îți vin în cap. Nu le filtra. Nu le analiza. Scrie-le pe toate — oricât de mici sau catastrofice par.
+      </p>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
+        {rows.map((row, idx) => (
+          <div key={row.id} style={{ display: 'grid', gridTemplateColumns: '1fr 130px 1fr 32px', gap: 8, alignItems: 'start' }}>
+            <textarea value={row.scenario} onChange={e => updateRow(row.id, 'scenario', e.target.value)}
+              placeholder={`Scenariul ${idx + 1}...`} rows={2}
+              style={{ padding: '7px 10px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', resize: 'none', lineHeight: 1.5, width: '100%' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              {(['Mare', 'Medie', 'Mică'] as const).map(g => {
+                const active = row.gravity === g;
+                return (
+                  <button key={g} onClick={() => updateRow(row.id, 'gravity', g)} style={{
+                    padding: '5px 8px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: 'none', transition: 'all 0.12s',
+                    background: active ? `${gravColors[g]}20` : 'rgba(255,255,255,0.04)',
+                    color: active ? gravColors[g] : 'var(--fg-3)',
+                    outline: active ? `1.5px solid ${gravColors[g]}50` : '1.5px solid transparent',
+                  }}>{g}</button>
+                );
+              })}
+            </div>
+            <textarea value={row.causedBy} onChange={e => updateRow(row.id, 'causedBy', e.target.value)}
+              placeholder="Cauzat de: lipsă procedură, lipsă responsabil..." rows={2}
+              style={{ padding: '7px 10px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', resize: 'none', lineHeight: 1.5, width: '100%' }} />
+            <button onClick={() => removeRow(row.id)} style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(248,113,113,0.08)', border: 'none', cursor: 'pointer', color: '#f87171', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 4 }}>×</button>
+          </div>
+        ))}
+      </div>
+
+      <button onClick={addRow} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: 'rgba(196,240,228,0.06)', border: '1px dashed rgba(196,240,228,0.2)', borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--accent)', marginBottom: 20 }}>
+        + Adaugă scenariu
+      </button>
+
+      {rows.some(r => r.gravity) && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
+          {(['Mare', 'Medie', 'Mică'] as const).map(g => (
+            <div key={g} style={{ textAlign: 'center', padding: '12px 8px', background: 'var(--bg-3)', borderRadius: 10, border: `1px solid ${gravColors[g]}25` }}>
+              <div style={{ fontSize: 24, fontWeight: 700, color: gravColors[g], lineHeight: 1 }}>{count(g)}</div>
+              <div style={{ fontSize: 10, color: 'var(--fg-3)', marginTop: 4 }}>Gravitate {g}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div style={{ marginBottom: 4 }}>
+        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--fg-2)', marginBottom: 6 }}>Concluzia mea</label>
+        <textarea value={conclusion} onChange={e => { setConclusion(e.target.value); save(rows, e.target.value); }}
+          placeholder="Cele mai mari 3 temeri ale mele sunt cauzate de: ___ Dacă aș construi sistemul — ___ din ___ scenarii ar dispărea."
+          rows={3} style={{ width: '100%', padding: '10px 12px', fontSize: 13, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--fg)', resize: 'vertical', lineHeight: 1.6 }} />
+      </div>
+      {savedAt && <p style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 6 }}>Salvat la {savedAt}</p>}
+    </div>
+  );
+};
+
+// ─── Diagnostic Grid (Exercițiul 4 · 50 întrebări) ────────────────────────────
+const DIAG_DIMENSIONS = [
+  { id: 'dim1', name: 'Claritate & Rol', color: 'var(--accent)', questions: [
+    { id: 'd1', text: 'Știu exact ce fac EU și ce NU mai fac eu în afacerea mea' },
+    { id: 'd2', text: 'Am scris în mod explicit funcțiile mele ca proprietar — nu doar le știu în cap' },
+    { id: 'd3', text: 'Compania are o misiune clară pe care o știu toți angajații' },
+    { id: 'd4', text: 'Am o viziune pe 3 ani cu cifre concrete — nu o declarație vagă' },
+    { id: 'd5', text: 'Valorile companiei sunt scrise și se reflectă în deciziile zilnice' },
+    { id: 'd6', text: 'Angajații înțeleg de ce există firma și unde merge' },
+    { id: 'd7', text: 'Știu clar care sunt deciziile pe care nu le voi delega niciodată' },
+    { id: 'd8', text: 'Rolul meu în companie s-a schimbat față de acum 2 ani — în bine' },
+  ]},
+  { id: 'dim2', name: 'Structură & Oameni', color: 'var(--gold)', questions: [
+    { id: 'd9',  text: 'Am o organigramă clară pe care o știu toți angajații' },
+    { id: 'd10', text: 'Fiecare om din echipă știe cui raportează și cine raportează lui' },
+    { id: 'd11', text: 'Fiecare poziție are o fișă de rol scrisă cu responsabilități clare' },
+    { id: 'd12', text: 'Știu care e produsul final al fiecărui rol din compania mea' },
+    { id: 'd13', text: 'Angajații pot lua decizii în aria lor fără să vină la mine' },
+    { id: 'd14', text: 'Când angajez pe cineva nou știu exact ce caut și cum îl evaluez' },
+    { id: 'd15', text: 'Nu am oameni care fac același lucru fără să știe unul de altul' },
+    { id: 'd16', text: 'Știu care sunt cei 3 oameni cheie fără de care afacerea s-ar opri' },
+    { id: 'd17', text: 'Organigrama mea actuală reflectă realitatea, nu ce ar trebui să fie' },
+    { id: 'd18', text: 'Am deja gândit organigrama companiei pentru următorii 2-3 ani' },
+  ]},
+  { id: 'dim3', name: 'Procese', color: '#a78bfa', questions: [
+    { id: 'd19', text: 'Procesele principale ale afacerii mele sunt scrise pas cu pas' },
+    { id: 'd20', text: 'Un angajat nou poate executa un proces citind documentul, fără să mă întrebe' },
+    { id: 'd21', text: 'Știu care sunt cele 5-7 procese fără de care afacerea nu funcționează' },
+    { id: 'd22', text: 'Procesele sunt actualizate când ceva se schimbă în realitate' },
+    { id: 'd23', text: 'Angajații urmează procesele scrise, nu fiecare pe varianta lui' },
+    { id: 'd24', text: 'Am instrucțiuni clare pentru situațiile de excepție și urgență' },
+    { id: 'd25', text: 'Știu exact câți pași trec obligatoriu prin mine în procesele principale' },
+    { id: 'd26', text: 'Când pleacă un angajat cheie, procesul lui rămâne — nu pleacă cu el' },
+    { id: 'd27', text: 'Am o matrice clară: ce poate decide angajatul singur și ce escaladează' },
+    { id: 'd28', text: 'Procesele mele produc același rezultat indiferent cine le execută' },
+  ]},
+  { id: 'dim4', name: 'Control & KPI', color: '#93c5fd', questions: [
+    { id: 'd29', text: 'Știu în orice moment cum merge afacerea fără să sun pe nimeni' },
+    { id: 'd30', text: 'Am 3-5 indicatori clari pentru fiecare rol important din companie' },
+    { id: 'd31', text: 'Primesc rapoarte regulate de la echipă — nu cer eu informația' },
+    { id: 'd32', text: 'Tabloul meu de bord are maxim 10 cifre și îl citesc în 5 minute' },
+    { id: 'd33', text: 'Indicatorii mei sunt cifre reale — nu sentimente sau impresii' },
+    { id: 'd34', text: 'Ritmul de raportare e fix — nu "când are timp" sau "când cer eu"' },
+    { id: 'd35', text: 'Știu imediat când ceva deviază de la plan fără să fiu prezent fizic' },
+    { id: 'd36', text: 'Am putut lipsi cel puțin 3 zile fără să sune nimeni cu probleme urgente' },
+  ]},
+  { id: 'dim5', name: 'Delegare', color: '#fca5a5', questions: [
+    { id: 'd37', text: 'Am delegat responsabilitate reală — nu doar sarcini punctuale' },
+    { id: 'd38', text: 'Oamenii mei au autoritate de decizie în zona lor, nu doar execuție' },
+    { id: 'd39', text: 'Când deleghez ceva nu îl preiau înapoi după prima greșeală' },
+    { id: 'd40', text: 'Am un acord clar cu fiecare responsabil: ce rezultat, până când, cum raportează' },
+    { id: 'd41', text: 'Știu diferența dintre o greșeală acceptabilă și o linie roșie în delegare' },
+    { id: 'd42', text: 'Am un plan de retragere treptată pentru fiecare zonă delegată' },
+    { id: 'd43', text: 'Numărul de decizii care trec prin mine a scăzut față de acum 6 luni' },
+    { id: 'd44', text: 'Pot fi invizibil o săptămână și lucrurile merg fără intervenția mea' },
+  ]},
+  { id: 'dim6', name: 'Management & Scalare', color: '#6ee7b7', questions: [
+    { id: 'd45', text: 'Am un nivel de management între mine și angajații de execuție' },
+    { id: 'd46', text: 'Managerii mei conduc echipele lor fără să vină la mine pentru fiecare problemă' },
+    { id: 'd47', text: 'Revizuiesc procesele și sistemele cel puțin o dată pe trimestru' },
+    { id: 'd48', text: 'Rolul meu s-a mutat pe strategie și viziune, nu pe operațional zilnic' },
+    { id: 'd49', text: 'Afacerea mea ar putea funcționa 2 săptămâni fără mine complet' },
+    { id: 'd50', text: 'Am un plan clar de scalare pentru următoarele 12 luni' },
+  ]},
+];
+
+const SCORE_COLORS: Record<number, string> = { 1: '#f87171', 2: '#fb923c', 3: 'var(--gold)', 4: '#86efac', 5: '#4ade80' };
+
+const DiagnosticGridExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+  const [answers, setAnswers] = useState<Record<string, number>>(() => {
+    try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s).answers || {} : {}; } catch { return {}; }
+  });
+  const [commitment, setCommitment] = useState(() => {
+    try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s).commitment || '' : ''; } catch { return ''; }
+  });
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+
+  const save = (a: Record<string, number>, c: string) => {
+    localStorage.setItem(storageKey, JSON.stringify({ answers: a, commitment: c }));
+    setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
+  };
+  const setAnswer = (qId: string, val: number) => {
+    const next = { ...answers, [qId]: val };
+    setAnswers(next); save(next, commitment);
+  };
+
+  const totalQuestions = DIAG_DIMENSIONS.reduce((a, d) => a + d.questions.length, 0);
+  const totalAnswered = DIAG_DIMENSIONS.flatMap(d => d.questions).filter(q => answers[q.id] !== undefined).length;
+
+  const dimScores = DIAG_DIMENSIONS.map(dim => {
+    const answered = dim.questions.filter(q => answers[q.id] !== undefined);
+    const avg = answered.length > 0 ? answered.reduce((a, q) => a + answers[q.id], 0) / answered.length : 0;
+    return { ...dim, avg, answeredCount: answered.length };
+  });
+
+  const sorted = [...dimScores].sort((a, b) => a.avg - b.avg);
+
+  let globalIdx = 0;
+
+  return (
+    <div>
+      {/* Progress */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+        <div style={{ flex: 1, height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${(totalAnswered / totalQuestions) * 100}%`, background: 'var(--accent)', borderRadius: 3, transition: 'width 0.4s ease' }} />
+        </div>
+        <span style={{ fontSize: 12, color: 'var(--fg-3)', flexShrink: 0 }}>{totalAnswered}/{totalQuestions}</span>
+      </div>
+
+      {/* Scale legend */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 24, flexWrap: 'wrap' }}>
+        {([1, 2, 3, 4, 5] as const).map(n => {
+          const labels: Record<number, string> = { 1: 'Nu există', 2: 'Există slab', 3: 'Există, nu funcț.', 4: 'Funcț. bine', 5: 'Funcț. excelent' };
+          return (
+            <div key={n} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <div style={{ width: 20, height: 20, borderRadius: 6, background: `${SCORE_COLORS[n]}25`, border: `1.5px solid ${SCORE_COLORS[n]}60`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: SCORE_COLORS[n] }}>{n}</div>
+              <span style={{ fontSize: 10, color: 'var(--fg-3)' }}>{labels[n]}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Questions by dimension */}
+      {DIAG_DIMENSIONS.map((dim, dimIdx) => {
+        const ds = dimScores[dimIdx];
+        return (
+          <div key={dim.id} style={{ marginBottom: 32 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, padding: '12px 16px', background: `${dim.color}0e`, border: `1px solid ${dim.color}28`, borderRadius: 12 }}>
+              <div>
+                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: dim.color, marginBottom: 2 }}>Dimensiunea {dimIdx + 1} · {dim.questions.length} întrebări</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--fg)' }}>{dim.name}</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 26, fontWeight: 700, color: ds.avg > 0 ? SCORE_COLORS[Math.round(ds.avg) as 1|2|3|4|5] : 'var(--fg-3)', lineHeight: 1 }}>
+                  {ds.avg > 0 ? ds.avg.toFixed(1) : '—'}
+                </div>
+                <div style={{ fontSize: 9, color: 'var(--fg-3)' }}>{ds.answeredCount}/{dim.questions.length} răsp.</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {dim.questions.map(q => {
+                globalIdx++;
+                const gi = globalIdx;
+                const val = answers[q.id];
+                return (
+                  <div key={q.id} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '10px 14px', background: val ? `${SCORE_COLORS[val]}06` : 'rgba(255,255,255,0.02)', border: `1px solid ${val ? SCORE_COLORS[val] + '30' : 'var(--border)'}`, borderRadius: 10, transition: 'all 0.15s' }}>
+                    <span style={{ fontSize: 10, color: 'var(--fg-3)', minWidth: 20, flexShrink: 0, fontWeight: 600, textAlign: 'right' }}>{gi}</span>
+                    <span style={{ flex: 1, fontSize: 13, color: val ? 'var(--fg)' : 'var(--fg-2)', lineHeight: 1.5 }}>{q.text}</span>
+                    <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                      {([1, 2, 3, 4, 5] as const).map(n => {
+                        const active = val === n;
+                        return (
+                          <button key={n} onClick={() => setAnswer(q.id, n)} style={{
+                            width: 34, height: 34, borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, transition: 'all 0.12s',
+                            background: active ? `${SCORE_COLORS[n]}28` : 'rgba(255,255,255,0.04)',
+                            color: active ? SCORE_COLORS[n] : 'var(--fg-3)',
+                            outline: active ? `2px solid ${SCORE_COLORS[n]}70` : '2px solid transparent',
+                            transform: active ? 'scale(1.1)' : 'scale(1)',
+                          }}>{n}</button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Score summary */}
+      {totalAnswered >= 10 && (
+        <div style={{ background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 16, padding: '20px 22px', marginBottom: 24 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--fg)', marginBottom: 16 }}>Scorul tău pe dimensiuni</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {dimScores.map(ds => (
+              <div key={ds.id}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, color: 'var(--fg-2)' }}>{ds.name}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: ds.avg > 0 ? SCORE_COLORS[Math.round(ds.avg) as 1|2|3|4|5] : 'var(--fg-3)' }}>
+                    {ds.avg > 0 ? `${ds.avg.toFixed(1)} / 5` : '—'}
+                  </span>
+                </div>
+                <div style={{ height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${(ds.avg / 5) * 100}%`, background: ds.color, borderRadius: 3, transition: 'width 0.6s ease' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Top 3 priorities */}
+      {totalAnswered >= 25 && (
+        <div style={{ background: 'var(--bg-3)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: 14, padding: '18px 20px', marginBottom: 24 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--fg)', marginBottom: 4 }}>Cele 3 priorități ale tale</div>
+          <p style={{ fontSize: 11, color: 'var(--fg-3)', marginBottom: 14 }}>Dimensiunile cu scorul cel mai mic = unde construiești primul</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {sorted.slice(0, 3).map((ds, i) => (
+              <div key={ds.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'var(--bg)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                <div style={{ width: 26, height: 26, borderRadius: 8, background: 'rgba(248,113,113,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 12, fontWeight: 700, color: '#f87171' }}>{i + 1}</div>
+                <span style={{ flex: 1, fontSize: 13, color: 'var(--fg)', fontWeight: 500 }}>{ds.name}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: ds.avg > 0 ? SCORE_COLORS[Math.round(ds.avg) as 1|2|3|4|5] : 'var(--fg-3)' }}>
+                  {ds.avg > 0 ? `${ds.avg.toFixed(1)}/5` : '—'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Commitment */}
+      <div style={{ background: 'rgba(196,240,228,0.04)', border: '1px solid rgba(196,240,228,0.15)', borderRadius: 14, padding: '18px 20px' }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', marginBottom: 10 }}>Angajamentul meu</div>
+        <textarea value={commitment} onChange={e => { setCommitment(e.target.value); save(answers, e.target.value); }}
+          placeholder="În aceste 8 săptămâni vreau să schimb: ___"
+          rows={3} style={{ width: '100%', padding: '10px 12px', fontSize: 13, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--fg)', resize: 'vertical', lineHeight: 1.6 }} />
+      </div>
+      {savedAt && <p style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 8 }}>Salvat la {savedAt}</p>}
+    </div>
+  );
+};
+
 // ─── Main ExerciseBlock ───────────────────────────────────────────────────────
 export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
   const { user } = useAuthContext();
   const template = getExerciseTemplate(exerciseId);
   // Keyed per user so exercises are never shared between accounts
   const storageKey = `aa_ex_${user?.id ?? 'anon'}_${exerciseId}`;
-
-  // Sync localStorage <-> DB (exercise_responses). Sub-components keep writing
-  // to localStorage; this effect mirrors it to Supabase so admins can see it.
-  useEffect(() => {
-    if (!user?.id) return;
-    let lastSent = localStorage.getItem(storageKey) || '';
-    // Initial pull from DB if local is empty
-    supabase
-      .from('exercise_responses')
-      .select('response')
-      .eq('user_id', user.id)
-      .eq('exercise_id', exerciseId)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data?.response !== undefined && data?.response !== null) {
-          const remote = typeof data.response === 'string' ? data.response : JSON.stringify(data.response);
-          const local = localStorage.getItem(storageKey);
-          if (!local || local === '') {
-            localStorage.setItem(storageKey, remote);
-            lastSent = remote;
-            window.dispatchEvent(new Event('aa_ex_synced'));
-          }
-        }
-      });
-    // Push on change (poll localStorage)
-    const interval = setInterval(() => {
-      const current = localStorage.getItem(storageKey) || '';
-      if (current !== lastSent && current !== '') {
-        lastSent = current;
-        let parsed: any = current;
-        try { parsed = JSON.parse(current); } catch {}
-        supabase
-          .from('exercise_responses')
-          .upsert(
-            { user_id: user.id, exercise_id: exerciseId, response: parsed },
-            { onConflict: 'user_id,exercise_id' }
-          )
-          .then(() => {});
-      }
-    }, 1500);
-    return () => clearInterval(interval);
-  }, [user?.id, exerciseId, storageKey]);
 
   if (!template) {
     return (
@@ -884,8 +1070,14 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
         return <DynamicTableExercise template={template} storageKey={storageKey} />;
       case 'quiz':
         return <QuizExercise template={template} storageKey={storageKey} />;
-      case 'diagnostic':
-        return <DiagnosticExercise template={template} storageKey={storageKey} />;
+      case 'activity-audit':
+        return <ActivityAuditExercise storageKey={storageKey} />;
+      case 'bottleneck-map':
+        return <BottleneckMapExercise storageKey={storageKey} />;
+      case 'absence-test':
+        return <AbsenceTestExercise storageKey={storageKey} />;
+      case 'diagnostic-grid':
+        return <DiagnosticGridExercise storageKey={storageKey} />;
       default:
         return <FormFieldsExercise template={template} storageKey={storageKey} />;
     }
@@ -896,76 +1088,13 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
     'form-fields': 'Formular',
     'dynamic-table': 'Tabel interactiv',
     quiz: 'Chestionar',
-    diagnostic: 'Diagnostic',
     'text-input': 'Formular',
     'rating-grid': 'Evaluare',
   };
 
-  // ─── Completion control (Marchez ca finalizat) ──────────────────────────────
-  const { isExerciseCompleted, markExerciseComplete, unmarkExerciseComplete } = useExerciseCompletions();
-  const completed = isExerciseCompleted(exerciseId);
-  const [validationError, setValidationError] = useState<string | null>(null);
-  const [shakeKey, setShakeKey] = useState(0);
-  const errorTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Returns true when the student has actually written/picked something.
-  const hasMeaningfulContent = useCallback((): boolean => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (!raw) return false;
-      const data = JSON.parse(raw);
-      if (data == null) return false;
-
-      switch (template.type) {
-        case 'checklist':
-          // object {id: bool} — at least one true
-          return Object.values(data).some(v => v === true);
-        case 'form-fields':
-          // object {id: string} — at least one non-empty trimmed string
-          return Object.values(data).some(
-            v => typeof v === 'string' && v.trim().length > 0,
-          );
-        case 'dynamic-table':
-          // array of row objects — at least one cell with content
-          if (!Array.isArray(data)) return false;
-          return data.some(row =>
-            row && typeof row === 'object' &&
-            Object.values(row).some(v => typeof v === 'string' && v.trim().length > 0),
-          );
-        case 'diagnostic':
-        case 'quiz':
-          // object {qid: answer} — at least one answer
-          return Object.keys(data).length > 0;
-        default:
-          // Fallback: any truthy content counts
-          if (Array.isArray(data)) return data.length > 0;
-          if (typeof data === 'object') return Object.keys(data).length > 0;
-          return Boolean(data);
-      }
-    } catch {
-      return false;
-    }
-  }, [storageKey, template.type]);
-
-  const handleMarkComplete = () => {
-    if (!hasMeaningfulContent()) {
-      setValidationError(
-        'Nu poți finaliza un exercițiu gol. Completează cel puțin un câmp înainte de a-l marca ca finalizat.',
-      );
-      setShakeKey(k => k + 1);
-      if (errorTimer.current) clearTimeout(errorTimer.current);
-      errorTimer.current = setTimeout(() => setValidationError(null), 5000);
-      return;
-    }
-    setValidationError(null);
-    markExerciseComplete(exerciseId);
-  };
-
-  useEffect(() => () => { if (errorTimer.current) clearTimeout(errorTimer.current); }, []);
-
   return (
     <div style={{ padding: '0 0 4px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
         <span style={{
           fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
           color: 'var(--gold)', background: 'rgba(201,169,110,0.12)',
@@ -975,113 +1104,10 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
           {typeLabels[template.type] || 'Interactiv'}
         </span>
         <span style={{ fontSize: 12, color: 'var(--fg-3)', display: 'flex', alignItems: 'center', gap: 4 }}>
-          <ChevronRight size={11} /> Progresul se salvează automat
+          <ChevronRight size={11} /> Progresul se salvează automat local
         </span>
-        {completed && (
-          <span style={{
-            marginLeft: 'auto',
-            fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
-            color: '#4ade80', background: 'rgba(74,222,128,0.1)',
-            border: '1px solid rgba(74,222,128,0.25)',
-            padding: '3px 9px', borderRadius: 4,
-            display: 'inline-flex', alignItems: 'center', gap: 5,
-          }}>
-            <CheckCircle2 size={11} /> Finalizat
-          </span>
-        )}
       </div>
-
       {renderContent()}
-
-      {/* Inline validation error */}
-      <AnimatePresence>
-        {validationError && (
-          <motion.div
-            key={`err-${shakeKey}`}
-            initial={{ opacity: 0, y: -4 }}
-            animate={{
-              opacity: 1, y: 0,
-              x: [0, -8, 8, -6, 6, -3, 3, 0],
-            }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{
-              opacity: { duration: 0.18 },
-              y: { duration: 0.18 },
-              x: { duration: 0.5, ease: 'easeInOut' },
-            }}
-            role="alert"
-            style={{
-              marginTop: 18,
-              display: 'flex', alignItems: 'flex-start', gap: 10,
-              padding: '12px 14px',
-              background: 'rgba(248,113,113,0.08)',
-              border: '1px solid rgba(248,113,113,0.35)',
-              borderRadius: 10,
-              color: '#fca5a5',
-              fontSize: 12.5, lineHeight: 1.55,
-            }}
-          >
-            <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
-            <span>{validationError}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Mark complete control */}
-      <div style={{
-        marginTop: 22, paddingTop: 18,
-        borderTop: '1px dashed var(--border)',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
-      }}>
-        <div style={{ fontSize: 11, color: 'var(--fg-3)', maxWidth: 320, lineHeight: 1.5 }}>
-          {completed
-            ? 'Exercițiul e marcat ca finalizat. Contează pentru deblocarea modulului următor.'
-            : 'Când ai terminat, marchează exercițiul ca finalizat ca să poți trece la următoarea etapă.'}
-        </div>
-        {completed ? (
-          <button
-            onClick={() => unmarkExerciseComplete(exerciseId)}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              padding: '8px 14px', background: 'transparent',
-              border: '1px solid var(--border)', borderRadius: 8,
-              cursor: 'pointer', fontSize: 12, color: 'var(--fg-3)',
-              fontWeight: 500, transition: 'all 0.15s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg)'; e.currentTarget.style.borderColor = 'rgba(196,240,228,0.3)'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-3)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
-          >
-            <RotateCcw size={12} /> Anulează finalizarea
-          </button>
-        ) : (
-          <motion.button
-            key={`mark-${shakeKey}`}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            animate={validationError ? { x: [0, -6, 6, -4, 4, 0] } : { x: 0 }}
-            transition={validationError ? { duration: 0.45, ease: 'easeInOut' } : { duration: 0.15 }}
-            onClick={handleMarkComplete}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '10px 18px',
-              background: validationError
-                ? 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)'
-                : 'linear-gradient(135deg, var(--accent) 0%, #b8e8d8 100%)',
-              color: validationError ? '#fff' : '#0D0907',
-              border: 'none', borderRadius: 10,
-              cursor: 'pointer', fontSize: 12, fontWeight: 700,
-              letterSpacing: '0.02em',
-              boxShadow: validationError
-                ? '0 4px 16px -6px rgba(248,113,113,0.5)'
-                : '0 4px 16px -6px rgba(196,240,228,0.4)',
-              transition: 'background 0.25s, box-shadow 0.25s, color 0.25s',
-            }}
-          >
-            <CheckCircle2 size={14} /> Marchez ca finalizat
-          </motion.button>
-        )}
-      </div>
     </div>
   );
 };
-
