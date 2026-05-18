@@ -385,6 +385,9 @@ export const LessonPage: React.FC = () => {
                     showConfetti={showConfetti} onComplete={handleComplete}
                     onConfettiDone={() => setShowConfetti(false)} isExercise
                   />
+                  {completeError && (
+                    <p style={{ marginTop: 10, fontSize: 13, color: '#f87171' }}>{completeError}</p>
+                  )}
                 </div>
                 <NavButtons prev={prevLesson} next={nextLesson} nextModuleLesson={nextModuleLesson} nextModuleTitle={nextModule?.title} module={module} />
               </motion.div>
