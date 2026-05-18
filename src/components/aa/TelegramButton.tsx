@@ -6,7 +6,7 @@ interface TelegramButtonProps {
 
 export const TelegramButton: React.FC<TelegramButtonProps> = ({ compact = false }) => (
   <a
-    href="https://t.me/arhitecturaafacerii"
+    href="https://t.me/+f2YYXZlVWjVhMzcy"
     target="_blank"
     rel="noopener noreferrer"
     style={{
