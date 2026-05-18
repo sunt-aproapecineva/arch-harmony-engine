@@ -68,7 +68,7 @@ export const AdminDashboard: React.FC = () => {
 
   const todayStr = new Date().toDateString();
   const activeToday = new Set(
-    activity.filter(e => e.type === 'login' && new Date(e.timestamp).toDateString() === todayStr).map(e => e.userId)
+    activity.filter(e => new Date(e.timestamp).toDateString() === todayStr).map(e => e.userId)
   ).size;
   const totalCompletions = progress.length;
   const quizPct = users.length > 0 ? Math.round((quizCount / users.length) * 100) : 0;
