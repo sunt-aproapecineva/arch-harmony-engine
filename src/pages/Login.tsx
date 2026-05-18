@@ -53,6 +53,7 @@ export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuthContext();
   const navigate = useNavigate();
+  const [guideOpen, setGuideOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
