@@ -488,9 +488,9 @@ export const LessonPage: React.FC = () => {
           {/* Navigation */}
           <div style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'space-between', gap: 12, paddingTop: 20, borderTop: '1px solid var(--border)' }}>
             <div style={{ flex: 1 }}>
-              {prevLesson ? (
+              {prevEntry ? (
                 <button
-                  onClick={() => navigate(`/lesson/${prevLesson.id}`)}
+                  onClick={() => navigate(linkForEntry(prevEntry))}
                   style={{
                     width: '100%', display: 'flex', alignItems: 'center', gap: 10,
                     padding: '12px 14px', background: 'var(--bg-card)', border: '1px solid var(--border)',
@@ -502,8 +502,8 @@ export const LessonPage: React.FC = () => {
                 >
                   <ChevronLeft size={16} style={{ color: 'var(--fg-3)', flexShrink: 0 }} />
                   <span>
-                    <div style={{ fontSize: 10, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Anterior</div>
-                    <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>{prevLesson.title}</div>
+                    <div style={{ fontSize: 10, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Anterior · Lecția {prevEntry.lessonNo}</div>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>{(prevEntry.item as any).title}</div>
                   </span>
                 </button>
               ) : (
@@ -524,9 +524,9 @@ export const LessonPage: React.FC = () => {
             </div>
 
             <div style={{ flex: 1 }}>
-              {nextLesson ? (
+              {nextEntry ? (
                 <button
-                  onClick={() => navigate(`/lesson/${nextLesson.id}`)}
+                  onClick={() => navigate(linkForEntry(nextEntry))}
                   style={{
                     width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10,
                     padding: '12px 14px', background: 'var(--bg-card)', border: '1px solid var(--border)',
@@ -537,8 +537,8 @@ export const LessonPage: React.FC = () => {
                   onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}
                 >
                   <span>
-                    <div style={{ fontSize: 10, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Următor</div>
-                    <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>{nextLesson.title}</div>
+                    <div style={{ fontSize: 10, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Următor · Lecția {nextEntry.lessonNo}</div>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>{(nextEntry.item as any).title}</div>
                   </span>
                   <ChevronRight size={16} style={{ color: 'var(--fg-3)', flexShrink: 0 }} />
                 </button>
@@ -556,14 +556,12 @@ export const LessonPage: React.FC = () => {
                 >
                   <span>
                     <div style={{ fontSize: 10, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Modul următor</div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>{nextModule?.title}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>{nextModule?.title}</div>
                   </span>
                   <ChevronRight size={16} style={{ color: 'var(--accent)', flexShrink: 0 }} />
                 </button>
               ) : null}
             </div>
-          </div>
-        </div>
 
         {/* Sidebar: module lesson list */}
         <div className="hidden lg:block" style={{ width: 220, flexShrink: 0 }}>
