@@ -42,65 +42,167 @@ export interface ExerciseTemplate {
 
 
 export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
-  // e-0-1: Chestionarul de Diagnostic → quiz
+  // ─── ETAPA 0 — PROIECTUL CASEI ───────────────────────────────────────────────
+
+  // e-0-1: Auditul activităților tale → dynamic-table cu select pe Categorie
   {
     exerciseId: 'e-0-1',
-    type: 'quiz',
-    title: 'Chestionarul de Diagnostic',
-    instructions:
-      'Răspunde sincer la fiecare întrebare. Răspunsurile incomode sunt cele mai valoroase. Completezi singur, fără ajutor.',
-    questions: [
-      { id: 'dq1', text: 'Am roluri clare definite pentru fiecare angajat?', type: 'scale5' },
-      { id: 'dq2', text: 'Angajații știu ce decizii pot lua singuri?', type: 'scale5' },
-      { id: 'dq3', text: 'Am un tablou de bord cu cifre cheie pe care îl verific săptămânal?', type: 'scale5' },
-      { id: 'dq4', text: 'Pot lipsi 2 săptămâni fără să se oprească operațiunile?', type: 'yesno' },
-      { id: 'dq5', text: 'Există procese scrise pentru activitățile repetitive?', type: 'scale5' },
-      { id: 'dq6', text: 'Angajații noi pot învăța rolul lor fără să mă implice pe mine?', type: 'scale5' },
-      { id: 'dq7', text: 'Știu exact care linii de business sunt profitabile?', type: 'yesno' },
-      { id: 'dq8', text: 'Am delegat cel puțin o zonă completă (cu responsabilitate, nu doar sarcini)?', type: 'yesno' },
-      { id: 'dq9', text: 'Misiunea și viziunea companiei sunt scrise și comunicate echipei?', type: 'yesno' },
-      { id: 'dq10', text: 'Echipa poate lua decizii operaționale fără aprobarea mea zilnică?', type: 'scale5' },
-    ],
-  },
-
-  // e-0-2: Auditul de Timp → checklist
-  {
-    exerciseId: 'e-0-2',
-    type: 'checklist',
-    title: 'Auditul de Timp (5 zile)',
-    instructions:
-      '5 zile lucrătoare îți notezi TOT ce faci, în blocuri de 30 minute. La final marchezi fiecare activitate: 5€/oră, 50€/oră sau 100€/oră.',
-    items: [
-      { id: 'at1', label: 'Ziua 1 — Am notat activitățile în blocuri de 30 minute' },
-      { id: 'at2', label: 'Ziua 2 — Am notat activitățile în blocuri de 30 minute' },
-      { id: 'at3', label: 'Ziua 3 — Am notat activitățile în blocuri de 30 minute' },
-      { id: 'at4', label: 'Ziua 4 — Am notat activitățile în blocuri de 30 minute' },
-      { id: 'at5', label: 'Ziua 5 — Am notat activitățile în blocuri de 30 minute' },
-      { id: 'at6', label: 'Am clasificat fiecare activitate: 5€/h, 50€/h sau 100€/h' },
-      { id: 'at7', label: 'Am calculat câte ore/săptămână sunt la nivel 5€/h' },
-      { id: 'at8', label: 'Am identificat primele 3 activități de delegat' },
-    ],
-  },
-
-  // e-0-3: Harta Gâturilor de Sticlă → dynamic-table
-  {
-    exerciseId: 'e-0-3',
     type: 'dynamic-table',
-    title: 'Harta Gâturilor de Sticlă',
+    title: 'Auditul activităților tale',
     instructions:
-      'Listează deciziile din săptămâna trecută care au trecut prin tine. Pentru fiecare, răspunde dacă chiar trebuia să fii tu implicat.',
+      'Scrii TOT ce faci în mod obișnuit în firma ta — nu ce ar trebui, ci ce faci efectiv. Estimezi % din timp pentru fiecare. La final clasifici: Specialist, Director sau Proprietar. Regula: totalul = 100%.',
     fields: [
       {
-        id: 'hg_intro',
+        id: 'aa_info',
         type: 'info',
-        text: 'Listează deciziile din săptămâna trecută care au trecut prin tine. Pentru fiecare, răspunde dacă chiar trebuia să fii tu implicat.',
+        text: 'Specialist = execuți tu (livrezi munca). Director = coordonezi și decizi pe operațional. Proprietar = strategie, oameni cheie, viziune. Totalul % trebuie să dea 100.',
+      },
+      {
+        id: 'aa_table',
+        type: 'dynamic-table',
+        columnsSpec: [
+          { name: 'Activitatea', width: '46%' },
+          { name: '% din timp', width: '16%' },
+          { name: 'Categorie', width: '32%', options: ['Specialist', 'Director', 'Proprietar'] },
+        ],
+        addLabel: 'Adaugă activitate',
+        minRows: 5,
+      },
+    ],
+  },
+
+  // e-0-2: Harta gâturilor de sticlă → dynamic-table cu select Da/Nu
+  {
+    exerciseId: 'e-0-2',
+    type: 'dynamic-table',
+    title: 'Harta gâturilor de sticlă',
+    instructions:
+      'Listezi toate deciziile și situațiile din ultima săptămână care au ajuns la tine. Pentru fiecare: chiar trebuia să fii TU sau e o lipsă a sistemului? Și cât timp ți-a luat.',
+    fields: [
+      {
+        id: 'hg_info',
+        type: 'info',
+        text: 'Notează tot ce a trecut prin tine — aprobări, întrebări, decizii mici. Cu cât lista e mai lungă, cu atât diagnosticul e mai precis.',
       },
       {
         id: 'hg_table',
         type: 'dynamic-table',
-        columns: ['Decizia', 'Chiar trebuia să fii tu?', 'Timp pierdut (min)'],
-        addLabel: 'Adaugă decizie',
+        columnsSpec: [
+          { name: 'Decizia / situația', width: '40%' },
+          { name: 'Chiar trebuia tu?', width: '18%', options: ['Da', 'Nu'] },
+          { name: 'Cauza reală', width: '28%' },
+          { name: 'Timp (min)', width: '14%' },
+        ],
+        addLabel: 'Adaugă rând',
+        minRows: 5,
       },
+    ],
+  },
+
+  // e-0-3: Testul de absență → dynamic-table cu select gravitate
+  {
+    exerciseId: 'e-0-3',
+    type: 'dynamic-table',
+    title: 'Testul de absență',
+    instructions:
+      'Dacă ai pleca mâine 2 zile și nu ai răspunde la niciun mesaj — ce s-ar întâmpla? Scrii TOATE scenariile fără filtru. Pentru fiecare: gravitatea și cauza reală.',
+    fields: [
+      {
+        id: 'ta_info',
+        type: 'info',
+        text: 'Vei vedea că majoritatea fricilor sunt cauzate de lipsă de sisteme, nu de tine personal. Asta e exact ce vrem să descoperi.',
+      },
+      {
+        id: 'ta_table',
+        type: 'dynamic-table',
+        columnsSpec: [
+          { name: 'Scenariul (ce s-ar întâmpla)', width: '50%' },
+          { name: 'Gravitate', width: '20%', options: ['1 – minor', '2 – mic', '3 – mediu', '4 – mare', '5 – critic'] },
+          { name: 'Cauza reală (sistem sau persoană?)', width: '30%' },
+        ],
+        addLabel: 'Adaugă scenariu',
+        minRows: 5,
+      },
+    ],
+  },
+
+  // e-0-4: Diagnosticul complet → 50 întrebări pe 6 dimensiuni
+  {
+    exerciseId: 'e-0-4',
+    type: 'diagnostic',
+    title: 'Diagnosticul complet · 50 întrebări',
+    instructions:
+      'Te evaluezi pe scala 1–5 la 50 de întrebări împărțite pe 6 dimensiuni. Rezultatul: scor pe fiecare dimensiune și cele 3 priorități de unde începi.',
+    dimensions: [
+      'Claritate & Rol',
+      'Structură & Oameni',
+      'Procese',
+      'Control & KPI',
+      'Delegare',
+      'Management & Scalare',
+    ],
+    questions: [
+      // Claritate & Rol (8)
+      { id: 'd1', dimension: 'Claritate & Rol', type: 'scale5', text: 'Știu exact care e rolul meu de proprietar (nu de operator) în firmă.' },
+      { id: 'd2', dimension: 'Claritate & Rol', type: 'scale5', text: 'Misiunea companiei e scrisă și o cunoaște toată echipa.' },
+      { id: 'd3', dimension: 'Claritate & Rol', type: 'scale5', text: 'Viziunea la 3 ani e scrisă cu cifre concrete (CA, oameni, profit).' },
+      { id: 'd4', dimension: 'Claritate & Rol', type: 'scale5', text: 'Valorile companiei sunt traduse în comportamente clare, nu doar slogane.' },
+      { id: 'd5', dimension: 'Claritate & Rol', type: 'scale5', text: 'Pot răspunde în 2 propoziții la întrebarea „de ce există firma ta?".' },
+      { id: 'd6', dimension: 'Claritate & Rol', type: 'scale5', text: 'Echipa știe ce NU faci tu (și ce nu trebuie să-mi mai aducă).' },
+      { id: 'd7', dimension: 'Claritate & Rol', type: 'scale5', text: 'Identitatea companiei e clară și folosită în recrutare și vânzări.' },
+      { id: 'd8', dimension: 'Claritate & Rol', type: 'scale5', text: 'Am criterii clare după care iau deciziile mari (nu „pe simțite").' },
+
+      // Structură & Oameni (9)
+      { id: 'd9', dimension: 'Structură & Oameni', type: 'scale5', text: 'Există o organigramă actualizată cu nume reale, nu doar titluri.' },
+      { id: 'd10', dimension: 'Structură & Oameni', type: 'scale5', text: 'Există o organigramă-țintă la 3 ani (cu rolurile încă neacoperite).' },
+      { id: 'd11', dimension: 'Structură & Oameni', type: 'scale5', text: 'Cele 7 funcții obligatorii (vânzări, operațional, financiar, HR, marketing, livrare, conducere) sunt acoperite, fie și parțial.' },
+      { id: 'd12', dimension: 'Structură & Oameni', type: 'scale5', text: 'Fiecare angajat cheie are o fișă de rol scrisă, cu scop și indicatori.' },
+      { id: 'd13', dimension: 'Structură & Oameni', type: 'scale5', text: 'Angajații știu exact ce decizii pot lua singuri, fără mine.' },
+      { id: 'd14', dimension: 'Structură & Oameni', type: 'scale5', text: 'Am identificat oamenii cheie pe care nu mi-i permit să-i pierd.' },
+      { id: 'd15', dimension: 'Structură & Oameni', type: 'scale5', text: 'Recrutarea pentru roluri-cheie se face pe baza unor criterii scrise.' },
+      { id: 'd16', dimension: 'Structură & Oameni', type: 'scale5', text: 'Angajații noi învață rolul fără să fie nevoie de mine.' },
+      { id: 'd17', dimension: 'Structură & Oameni', type: 'scale5', text: 'Există un manager intermediar real (nu doar pe hârtie).' },
+
+      // Procese (8)
+      { id: 'd18', dimension: 'Procese', type: 'scale5', text: 'Procesele cheie (vânzare, livrare, facturare) sunt documentate în scris.' },
+      { id: 'd19', dimension: 'Procese', type: 'scale5', text: 'Documentația e scrisă „cum SE face", nu „cum ar trebui".' },
+      { id: 'd20', dimension: 'Procese', type: 'scale5', text: 'Un coleg nou ar putea executa procesul citind doar documentul.' },
+      { id: 'd21', dimension: 'Procese', type: 'scale5', text: 'Există o matrice decizională: cine decide ce, până la ce nivel.' },
+      { id: 'd22', dimension: 'Procese', type: 'scale5', text: 'Excepțiile (situațiile speciale) sunt documentate, nu rezolvate ad-hoc.' },
+      { id: 'd23', dimension: 'Procese', type: 'scale5', text: 'Procesele sunt revizuite periodic și actualizate.' },
+      { id: 'd24', dimension: 'Procese', type: 'scale5', text: 'Reclamațiile / problemele au un flux standard de tratare.' },
+      { id: 'd25', dimension: 'Procese', type: 'scale5', text: 'Există un onboarding standardizat pentru clienți noi.' },
+
+      // Control & KPI (9)
+      { id: 'd26', dimension: 'Control & KPI', type: 'scale5', text: 'Am un tablou de bord cu maxim 10 cifre cheie pe care îl verific săptămânal.' },
+      { id: 'd27', dimension: 'Control & KPI', type: 'scale5', text: 'Fiecare rol cheie are 3–5 indicatori măsurabili.' },
+      { id: 'd28', dimension: 'Control & KPI', type: 'scale5', text: 'Indicatorii sunt cifre verificabile, asupra cărora omul are control real.' },
+      { id: 'd29', dimension: 'Control & KPI', type: 'scale5', text: 'Există un raport săptămânal standard pe care îl primesc.' },
+      { id: 'd30', dimension: 'Control & KPI', type: 'scale5', text: 'Știu în orice moment care linii de business sunt profitabile și care nu.' },
+      { id: 'd31', dimension: 'Control & KPI', type: 'scale5', text: 'Am cifre clare pe cash-flow la 30, 60, 90 zile.' },
+      { id: 'd32', dimension: 'Control & KPI', type: 'scale5', text: 'Pot vedea performanța oamenilor fără să-i întreb.' },
+      { id: 'd33', dimension: 'Control & KPI', type: 'scale5', text: 'Există un ritm fix de raportare (zi/oră prestabilite).' },
+      { id: 'd34', dimension: 'Control & KPI', type: 'scale5', text: 'Deciziile mari le iau pe baza cifrelor, nu a impresiilor.' },
+
+      // Delegare (8)
+      { id: 'd35', dimension: 'Delegare', type: 'scale5', text: 'Am delegat cel puțin o zonă completă (responsabilitate, nu doar sarcini).' },
+      { id: 'd36', dimension: 'Delegare', type: 'scale5', text: 'Persoana căreia i-am delegat are autoritatea de decizie scrisă.' },
+      { id: 'd37', dimension: 'Delegare', type: 'scale5', text: 'Există un acord de responsabilitate semnat pentru zona delegată.' },
+      { id: 'd38', dimension: 'Delegare', type: 'scale5', text: 'Am stabilit explicit ce greșeli sunt acceptabile și care sunt linii roșii.' },
+      { id: 'd39', dimension: 'Delegare', type: 'scale5', text: 'Când apare o greșeală, repar sistemul, nu cert omul.' },
+      { id: 'd40', dimension: 'Delegare', type: 'scale5', text: 'Nu mă mai implic în operațional pe zona delegată.' },
+      { id: 'd41', dimension: 'Delegare', type: 'scale5', text: 'Am un plan scris pentru următoarele 2 zone pe care le voi deleg.' },
+      { id: 'd42', dimension: 'Delegare', type: 'scale5', text: 'Pot lipsi 2 săptămâni fără să se oprească operațiunile.' },
+
+      // Management & Scalare (8)
+      { id: 'd43', dimension: 'Management & Scalare', type: 'scale5', text: 'Am o săptămână tipică de proprietar (nu de operator) scrisă în calendar.' },
+      { id: 'd44', dimension: 'Management & Scalare', type: 'scale5', text: 'Petrec cel puțin 20% din timp pe strategie și oameni cheie.' },
+      { id: 'd45', dimension: 'Management & Scalare', type: 'scale5', text: 'Există ședințe trimestriale fixe de revizuire procese și indicatori.' },
+      { id: 'd46', dimension: 'Management & Scalare', type: 'scale5', text: 'Am un plan clar pentru creștere pe următoarele 12 luni.' },
+      { id: 'd47', dimension: 'Management & Scalare', type: 'scale5', text: 'Echipa poate funcționa și crește fără implicarea mea zilnică.' },
+      { id: 'd48', dimension: 'Management & Scalare', type: 'scale5', text: 'Am un sistem de feedback colectat de la echipă în mod regulat.' },
+      { id: 'd49', dimension: 'Management & Scalare', type: 'scale5', text: 'Pot să-mi planific o vacanță-test de 1–2 săptămâni fără frică.' },
+      { id: 'd50', dimension: 'Management & Scalare', type: 'scale5', text: 'Firma e construită să poată fi vândută sau condusă de altcineva.' },
     ],
   },
 
