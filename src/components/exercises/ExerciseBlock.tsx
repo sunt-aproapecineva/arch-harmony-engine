@@ -803,7 +803,7 @@ const BottleneckMapExercise: React.FC<{ storageKey: string; exerciseId: string }
 // ─── Absence Test (Exercițiul 3) ──────────────────────────────────────────────
 interface AbsenceRow { id: string; scenario: string; gravity: 'Mare' | 'Medie' | 'Mică' | ''; causedBy: string }
 
-const AbsenceTestExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+const AbsenceTestExercise: React.FC<{ storageKey: string; exerciseId: string }> = ({ storageKey, exerciseId }) => {
   const defaultRows = (): AbsenceRow[] =>
     Array.from({ length: 5 }, (_, i) => ({ id: `r${i}`, scenario: '', gravity: '', causedBy: '' }));
 
@@ -816,8 +816,22 @@ const AbsenceTestExercise: React.FC<{ storageKey: string }> = ({ storageKey }) =
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
+  useEffect(() => {
+    loadExerciseResponse(exerciseId).then(cloud => {
+      if (cloud && typeof cloud === 'object' && !Array.isArray(cloud)) {
+        const c: any = cloud;
+        if (Array.isArray(c.rows)) setRows(c.rows);
+        if (typeof c.conclusion === 'string') setConclusion(c.conclusion);
+        localStorage.setItem(storageKey, JSON.stringify(cloud));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exerciseId]);
+
   const save = (r: AbsenceRow[], c: string) => {
-    localStorage.setItem(storageKey, JSON.stringify({ rows: r, conclusion: c }));
+    const payload = { rows: r, conclusion: c };
+    localStorage.setItem(storageKey, JSON.stringify(payload));
+    pushExerciseResponse(exerciseId, payload);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updateRow = (id: string, field: keyof AbsenceRow, value: string) => {
