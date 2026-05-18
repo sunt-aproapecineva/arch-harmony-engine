@@ -2,6 +2,8 @@ export interface QuizQuestionItem {
   id: string;
   text: string;
   type: 'scale5' | 'yesno';
+  /** Optional grouping (used by 'diagnostic' templates to render dimension headers and scores). */
+  dimension?: string;
 }
 
 export interface ChecklistItem {
@@ -9,25 +11,33 @@ export interface ChecklistItem {
   label: string;
 }
 
+/** Column for a dynamic-table field. Either a plain string label, or an object with select options. */
+export type DynamicTableColumn = string | { name: string; options?: string[]; width?: string };
+
 export interface FormField {
   id: string;
   type: 'info' | 'textarea' | 'input' | 'dynamic-table';
   label?: string;
   placeholder?: string;
   text?: string;
-  columns?: string[];
+  /** For dynamic-table: column specs. Strings = free text columns; objects can declare select options. */
+  columns?: DynamicTableColumn[];
   addLabel?: string;
+  minRows?: number;
 }
 
 export interface ExerciseTemplate {
   exerciseId: string;
-  type: 'checklist' | 'form-fields' | 'quiz' | 'text-input' | 'rating-grid' | 'dynamic-table';
+  type: 'checklist' | 'form-fields' | 'quiz' | 'text-input' | 'rating-grid' | 'dynamic-table' | 'diagnostic';
   title: string;
   instructions: string;
   items?: ChecklistItem[];
   fields?: FormField[];
   questions?: QuizQuestionItem[];
+  /** Diagnostic-specific: ordered list of dimension labels. */
+  dimensions?: string[];
 }
+
 
 export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
   // e-0-1: Chestionarul de Diagnostic → quiz
