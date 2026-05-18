@@ -45,6 +45,7 @@ export function useExerciseCompletions() {
       await supabase
         .from('exercise_completions')
         .insert({ user_id: user.id, exercise_id: exerciseId });
+      window.dispatchEvent(new Event('aa_ex_completion_changed'));
     },
     [user, rows],
   );
@@ -58,6 +59,7 @@ export function useExerciseCompletions() {
         .delete()
         .eq('user_id', user.id)
         .eq('exercise_id', exerciseId);
+      window.dispatchEvent(new Event('aa_ex_completion_changed'));
     },
     [user],
   );
