@@ -781,6 +781,14 @@ export const AdminStudentProfile: React.FC = () => {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     {missingResponses.map((l: any) => <span key={l.id} style={{ fontSize: 12, color: 'var(--fg-2)' }}>• {l.title}</span>)}
                   </div>
+                  <button
+                    onClick={handleRecoverLocalDrafts}
+                    disabled={recoveringDrafts}
+                    style={{ marginTop: 10, padding: '8px 12px', background: 'var(--bg-3)', border: '1px solid rgba(248,113,113,0.28)', borderRadius: 8, color: 'var(--fg)', cursor: recoveringDrafts ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 600 }}
+                  >
+                    {recoveringDrafts ? 'Se recuperează...' : 'Recuperează drafturi locale'}
+                  </button>
+                  {recoveryMessage && <p style={{ marginTop: 8, fontSize: 12, color: 'var(--fg-3)', lineHeight: 1.5 }}>{recoveryMessage}</p>}
                 </div>
               )}
             </div>
