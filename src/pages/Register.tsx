@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Mail, Lock, User, CheckCircle2, Loader2 } from 'lucide-react';
+import { ArrowRight, Mail, Lock, User, CheckCircle2, Loader2, HelpCircle } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { OnboardingGuideModal } from '@/components/aa/OnboardingGuideModal';
 
 interface InputFieldProps {
   label: string;
@@ -56,6 +57,7 @@ export const Register: React.FC = () => {
   const { register } = useAuthContext();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [guideOpen, setGuideOpen] = useState(false);
 
   // Pre-fill email from invite link and auto-advance if whitelisted
   useEffect(() => {
@@ -162,6 +164,24 @@ export const Register: React.FC = () => {
             </div>
             <span className="font-aboreto" style={{ fontSize: 11, letterSpacing: '0.1em', color: 'var(--fg)' }}>ARHITECTURA AFACERII</span>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setGuideOpen(true)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '8px 14px', marginBottom: 20,
+              background: 'rgba(196,240,228,0.06)',
+              border: '1px solid rgba(196,240,228,0.18)',
+              color: 'var(--accent)', borderRadius: 9,
+              fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,240,228,0.1)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,240,228,0.06)'; }}
+          >
+            <HelpCircle size={14} /> Cum funcționează platforma? Vezi ghidul
+          </button>
 
           {/* Step indicators */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24 }}>
@@ -287,6 +307,7 @@ export const Register: React.FC = () => {
           </p>
         </div>
       </div>
+      <OnboardingGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} />
     </div>
   );
 };
