@@ -189,18 +189,28 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
   storageKey,
 }) => {
   const tableField = template.fields?.find(f => f.type === 'dynamic-table');
-  const columns = tableField?.columns || ['Coloana 1', 'Coloana 2', 'Coloana 3'];
   const addLabel = tableField?.addLabel || 'Adaugă rând';
+  const minRows = tableField?.minRows || 1;
+
+  // Normalize columns into {name, options?, width?} list.
+  const colSpecs: { name: string; options?: string[]; width?: string }[] = useMemo(() => {
+    if (tableField?.columnsSpec && tableField.columnsSpec.length) {
+      return tableField.columnsSpec.map(c =>
+        typeof c === 'string' ? { name: c } : c,
+      );
+    }
+    return (tableField?.columns || ['Coloana 1', 'Coloana 2', 'Coloana 3']).map(name => ({ name }));
+  }, [tableField]);
 
   const [rows, setRows] = useState<TableRow[]>(() => {
     try {
       const s = localStorage.getItem(storageKey);
       if (s) {
         const parsed = JSON.parse(s);
-        return Array.isArray(parsed) ? parsed : [{}];
+        if (Array.isArray(parsed) && parsed.length) return parsed;
       }
     } catch {}
-    return [{}];
+    return Array.from({ length: minRows }, () => ({}));
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
@@ -223,8 +233,9 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
 
   const removeRow = (idx: number) => {
     const next = rows.filter((_, i) => i !== idx);
-    setRows(next.length ? next : [{}]);
-    save(next.length ? next : [{}]);
+    const final = next.length ? next : [{}];
+    setRows(final);
+    save(final);
   };
 
   const infoField = template.fields?.find(f => f.type === 'info');
@@ -244,13 +255,14 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
           <thead>
             <tr>
-              {columns.map(col => (
-                <th key={col} style={{
+              {colSpecs.map(col => (
+                <th key={col.name} style={{
                   padding: '8px 10px', textAlign: 'left', fontSize: 10, fontWeight: 600,
                   letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-3)',
                   borderBottom: '1px solid var(--border)',
+                  width: col.width,
                 }}>
-                  {col}
+                  {col.name}
                 </th>
               ))}
               <th style={{ width: 32 }} />
@@ -258,21 +270,49 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
           </thead>
           <tbody>
             {rows.map((row, rowIdx) => (
-              <tr key={rowIdx} style={{ borderBottom: '1px solid var(--border)' }}>
-                {columns.map(col => (
-                  <td key={col} style={{ padding: '6px 4px' }}>
-                    <input
-                      type="text"
-                      value={row[col] || ''}
-                      onChange={e => updateCell(rowIdx, col, e.target.value)}
-                      style={{
-                        width: '100%', padding: '6px 8px', fontSize: 12,
-                        background: 'var(--bg-3)', border: '1px solid var(--border)',
-                        borderRadius: 6, color: 'var(--fg)', boxSizing: 'border-box',
-                      }}
-                      onFocus={e => (e.target.style.borderColor = 'rgba(196,240,228,0.35)')}
-                      onBlur={e => (e.target.style.borderColor = 'var(--border)')}
-                    />
+              <motion.tr
+                key={rowIdx}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{ borderBottom: '1px solid var(--border)' }}
+              >
+                {colSpecs.map(col => (
+                  <td key={col.name} style={{ padding: '6px 4px' }}>
+                    {col.options ? (
+                      <select
+                        value={row[col.name] || ''}
+                        onChange={e => updateCell(rowIdx, col.name, e.target.value)}
+                        style={{
+                          width: '100%', padding: '6px 8px', fontSize: 12,
+                          background: 'var(--bg-3)', border: '1px solid var(--border)',
+                          borderRadius: 6, color: row[col.name] ? 'var(--fg)' : 'var(--fg-3)',
+                          boxSizing: 'border-box', cursor: 'pointer',
+                          appearance: 'none',
+                          backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23C9A96E' stroke-width='2'%3e%3cpath d='M6 9l6 6 6-6'/%3e%3c/svg%3e")`,
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'right 8px center',
+                          paddingRight: 24,
+                        }}
+                      >
+                        <option value="" disabled>—</option>
+                        {col.options.map(opt => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        value={row[col.name] || ''}
+                        onChange={e => updateCell(rowIdx, col.name, e.target.value)}
+                        style={{
+                          width: '100%', padding: '6px 8px', fontSize: 12,
+                          background: 'var(--bg-3)', border: '1px solid var(--border)',
+                          borderRadius: 6, color: 'var(--fg)', boxSizing: 'border-box',
+                        }}
+                        onFocus={e => (e.target.style.borderColor = 'rgba(196,240,228,0.35)')}
+                        onBlur={e => (e.target.style.borderColor = 'var(--border)')}
+                      />
+                    )}
                   </td>
                 ))}
                 <td style={{ padding: '6px 4px', textAlign: 'center' }}>
@@ -285,7 +325,7 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
                     <Trash2 size={12} />
                   </button>
                 </td>
-              </tr>
+              </motion.tr>
             ))}
           </tbody>
         </table>
@@ -306,6 +346,287 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
         </button>
         {savedAt && <span style={{ fontSize: 11, color: 'var(--accent)' }}>Salvat ✓ {savedAt}</span>}
       </div>
+    </div>
+  );
+};
+
+// ─── Diagnostic (50 întrebări, scor pe dimensiuni) ────────────────────────────
+const DiagnosticExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({
+  template,
+  storageKey,
+}) => {
+  const questions: QuizQuestionItem[] = template.questions || [];
+  const dimensions = template.dimensions || [];
+
+  const [answers, setAnswers] = useState<Record<string, number>>(() => {
+    try {
+      const s = localStorage.getItem(storageKey);
+      return s ? JSON.parse(s) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [showResults, setShowResults] = useState(false);
+
+  const setAnswer = (qid: string, val: number) => {
+    const next = { ...answers, [qid]: val };
+    setAnswers(next);
+    localStorage.setItem(storageKey, JSON.stringify(next));
+  };
+
+  const answered = Object.keys(answers).length;
+  const total = questions.length;
+  const pctDone = total ? Math.round((answered / total) * 100) : 0;
+
+  // Group questions by dimension
+  const grouped = useMemo(() => {
+    const g: Record<string, QuizQuestionItem[]> = {};
+    dimensions.forEach(d => (g[d] = []));
+    questions.forEach(q => {
+      const d = q.dimension || 'General';
+      if (!g[d]) g[d] = [];
+      g[d].push(q);
+    });
+    return g;
+  }, [questions, dimensions]);
+
+  // Per-dimension score
+  const dimensionScores = useMemo(() => {
+    return dimensions.map(d => {
+      const qs = grouped[d] || [];
+      const score = qs.reduce((s, q) => s + (answers[q.id] || 0), 0);
+      const max = qs.length * 5;
+      const pct = max ? Math.round((score / max) * 100) : 0;
+      return { dimension: d, score, max, pct, count: qs.length };
+    });
+  }, [grouped, dimensions, answers]);
+
+  // Top 3 weakest dimensions = priorities
+  const priorities = useMemo(() => {
+    return [...dimensionScores]
+      .filter(d => d.count > 0)
+      .sort((a, b) => a.pct - b.pct)
+      .slice(0, 3);
+  }, [dimensionScores]);
+
+  const overallPct = useMemo(() => {
+    const totalScore = dimensionScores.reduce((s, d) => s + d.score, 0);
+    const totalMax = dimensionScores.reduce((s, d) => s + d.max, 0);
+    return totalMax ? Math.round((totalScore / totalMax) * 100) : 0;
+  }, [dimensionScores]);
+
+  if (showResults) {
+    return (
+      <div>
+        {/* Overall */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          style={{
+            textAlign: 'center', padding: '20px 16px', marginBottom: 18,
+            background: 'linear-gradient(180deg, var(--accent-dim) 0%, rgba(196,240,228,0.02) 100%)',
+            border: '1px solid rgba(196,240,228,0.25)', borderRadius: 14,
+          }}
+        >
+          <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.14em', color: 'var(--fg-3)', textTransform: 'uppercase', marginBottom: 6 }}>
+            Scor general
+          </div>
+          <div style={{ fontSize: 48, fontWeight: 700, color: 'var(--accent)', lineHeight: 1 }}>{overallPct}%</div>
+          <p style={{ fontSize: 12, color: 'var(--fg-3)', marginTop: 8, maxWidth: 360, marginLeft: 'auto', marginRight: 'auto' }}>
+            {overallPct >= 75 ? 'Ai fundații solide. Concentrează-te pe rafinare.' :
+             overallPct >= 50 ? 'Progres bun. Zonele slabe sunt clare — atac-le în ordine.' :
+             'Multe zone de construit. Vestea bună: acum ai harta exactă.'}
+          </p>
+        </motion.div>
+
+        {/* Per-dimension bars */}
+        <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--fg-3)', textTransform: 'uppercase', marginBottom: 10 }}>
+          Scor pe dimensiuni
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22 }}>
+          {dimensionScores.map((d, i) => (
+            <motion.div
+              key={d.dimension}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.05 }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+                <span style={{ color: 'var(--fg)' }}>{d.dimension}</span>
+                <span style={{ color: d.pct >= 70 ? '#4ade80' : d.pct >= 40 ? 'var(--gold)' : '#f87171', fontWeight: 600 }}>
+                  {d.score}/{d.max} · {d.pct}%
+                </span>
+              </div>
+              <div style={{ height: 6, background: 'var(--bg-3)', borderRadius: 3, overflow: 'hidden' }}>
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${d.pct}%` }}
+                  transition={{ duration: 0.7, delay: i * 0.05, ease: 'easeOut' }}
+                  style={{
+                    height: '100%',
+                    background: d.pct >= 70
+                      ? 'linear-gradient(90deg, #4ade80, #86efac)'
+                      : d.pct >= 40
+                      ? 'linear-gradient(90deg, var(--gold), #e0c896)'
+                      : 'linear-gradient(90deg, #f87171, #fca5a5)',
+                    borderRadius: 3,
+                  }}
+                />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Top 3 priorities */}
+        <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--gold)', textTransform: 'uppercase', marginBottom: 10 }}>
+          Cele 3 priorități ale tale
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 18 }}>
+          {priorities.map((p, i) => (
+            <motion.div
+              key={p.dimension}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + i * 0.08 }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '10px 14px', background: 'var(--gold-dim)',
+                border: '1px solid rgba(201,169,110,0.25)', borderLeft: '3px solid var(--gold)',
+                borderRadius: 10,
+              }}
+            >
+              <div className="font-aboreto" style={{
+                width: 28, height: 28, borderRadius: '50%',
+                background: 'rgba(201,169,110,0.15)', display: 'flex',
+                alignItems: 'center', justifyContent: 'center',
+                fontSize: 12, fontWeight: 700, color: 'var(--gold)', flexShrink: 0,
+              }}>
+                {i + 1}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)' }}>{p.dimension}</div>
+                <div style={{ fontSize: 11, color: 'var(--fg-3)' }}>Scor actual: {p.pct}% — aici începi.</div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <button
+          onClick={() => setShowResults(false)}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            background: 'none', border: '1px solid var(--border)', cursor: 'pointer',
+            fontSize: 12, color: 'var(--fg-3)', padding: '7px 14px', borderRadius: 8,
+            transition: 'all 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg)'; e.currentTarget.style.borderColor = 'rgba(196,240,228,0.3)'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-3)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
+        >
+          <RotateCcw size={11} /> Revino la întrebări
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* Header progress */}
+      <div style={{ marginBottom: 18 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
+          <span>{answered} / {total} răspunsuri</span>
+          <span style={{ color: 'var(--accent)' }}>{pctDone}%</span>
+        </div>
+        <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
+          <motion.div
+            animate={{ width: `${pctDone}%` }}
+            transition={{ duration: 0.4 }}
+            style={{ height: '100%', background: 'linear-gradient(90deg, var(--accent), var(--gold))', borderRadius: 2 }}
+          />
+        </div>
+      </div>
+
+      {/* Dimensions */}
+      {dimensions.map((dim, dimIdx) => {
+        const qs = grouped[dim] || [];
+        const dimAnswered = qs.filter(q => answers[q.id] !== undefined).length;
+        return (
+          <div key={dim} style={{ marginBottom: 22 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12,
+              paddingBottom: 8, borderBottom: '1px solid var(--border)',
+            }}>
+              <span className="font-aboreto" style={{
+                fontSize: 10, fontWeight: 700, color: 'var(--gold)',
+                background: 'var(--gold-dim)', border: '1px solid rgba(201,169,110,0.25)',
+                padding: '3px 8px', borderRadius: 4, letterSpacing: '0.08em',
+              }}>
+                {String(dimIdx + 1).padStart(2, '0')}
+              </span>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)', flex: 1 }}>{dim}</div>
+              <div style={{ fontSize: 11, color: dimAnswered === qs.length ? '#4ade80' : 'var(--fg-3)' }}>
+                {dimAnswered}/{qs.length}
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {qs.map((q, qIdx) => (
+                <div key={q.id} style={{
+                  padding: '12px 14px',
+                  background: answers[q.id] !== undefined ? 'rgba(196,240,228,0.04)' : 'var(--bg-3)',
+                  border: `1px solid ${answers[q.id] !== undefined ? 'rgba(196,240,228,0.18)' : 'var(--border)'}`,
+                  borderRadius: 10,
+                  transition: 'all 0.2s',
+                }}>
+                  <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
+                    <span style={{ fontSize: 11, color: 'var(--fg-3)', flexShrink: 0, paddingTop: 2 }}>
+                      {qIdx + 1}.
+                    </span>
+                    <p style={{ fontSize: 13, color: 'var(--fg)', lineHeight: 1.5, flex: 1 }}>{q.text}</p>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    {[1, 2, 3, 4, 5].map(n => (
+                      <button
+                        key={n}
+                        onClick={() => setAnswer(q.id, n)}
+                        style={{
+                          flex: 1, padding: '8px 0', borderRadius: 8,
+                          background: answers[q.id] === n ? 'var(--accent)' : 'transparent',
+                          border: `1px solid ${answers[q.id] === n ? 'var(--accent)' : 'var(--border)'}`,
+                          color: answers[q.id] === n ? '#0D0907' : 'var(--fg-2)',
+                          cursor: 'pointer', fontSize: 13, fontWeight: 600,
+                          transition: 'all 0.15s',
+                        }}
+                      >
+                        {n}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 11, color: 'var(--fg-3)', marginBottom: 12 }}>
+        <span>1 = Deloc · 5 = Complet</span>
+        <span>Răspunsurile se salvează automat</span>
+      </div>
+
+      <button
+        onClick={() => setShowResults(true)}
+        disabled={answered === 0}
+        style={{
+          width: '100%', padding: '12px 20px', borderRadius: 10,
+          background: answered === total ? 'var(--accent)' : 'var(--bg-3)',
+          color: answered === total ? '#0D0907' : 'var(--fg-2)',
+          border: `1px solid ${answered === total ? 'var(--accent)' : 'var(--border)'}`,
+          cursor: answered === 0 ? 'not-allowed' : 'pointer',
+          fontSize: 13, fontWeight: 700, opacity: answered === 0 ? 0.5 : 1,
+          transition: 'all 0.15s',
+        }}
+      >
+        {answered === total ? 'Vezi rezultatul diagnostic →' : `Vezi rezultatul parțial (${answered}/${total})`}
+      </button>
     </div>
   );
 };
