@@ -1174,23 +1174,23 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
   const renderContent = () => {
     switch (template.type) {
       case 'checklist':
-        return <ChecklistExercise template={template} storageKey={storageKey} />;
+        return <ChecklistExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
       case 'form-fields':
-        return <FormFieldsExercise template={template} storageKey={storageKey} />;
+        return <FormFieldsExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
       case 'dynamic-table':
-        return <DynamicTableExercise template={template} storageKey={storageKey} />;
+        return <DynamicTableExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
       case 'quiz':
-        return <QuizExercise template={template} storageKey={storageKey} />;
+        return <QuizExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
       case 'activity-audit':
-        return <ActivityAuditExercise storageKey={storageKey} />;
+        return <ActivityAuditExercise storageKey={storageKey} exerciseId={exerciseId} />;
       case 'bottleneck-map':
-        return <BottleneckMapExercise storageKey={storageKey} />;
+        return <BottleneckMapExercise storageKey={storageKey} exerciseId={exerciseId} />;
       case 'absence-test':
-        return <AbsenceTestExercise storageKey={storageKey} />;
+        return <AbsenceTestExercise storageKey={storageKey} exerciseId={exerciseId} />;
       case 'diagnostic-grid':
-        return <DiagnosticGridExercise storageKey={storageKey} />;
+        return <DiagnosticGridExercise storageKey={storageKey} exerciseId={exerciseId} />;
       default:
-        return <FormFieldsExercise template={template} storageKey={storageKey} />;
+        return <FormFieldsExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
     }
   };
 
