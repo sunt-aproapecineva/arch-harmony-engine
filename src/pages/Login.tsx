@@ -196,6 +196,7 @@ export const Login: React.FC = () => {
           </div>
         </motion.div>
       </div>
+      <OnboardingGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} />
     </div>
   );
 };
