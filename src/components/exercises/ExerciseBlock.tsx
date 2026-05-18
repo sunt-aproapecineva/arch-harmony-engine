@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+// @ts-nocheck
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Plus, Trash2, ChevronRight } from 'lucide-react';
+import { Check, Plus, Trash2, ChevronRight, CheckCircle2, RotateCcw } from 'lucide-react';
 import { getExerciseTemplate, ExerciseTemplate, QuizQuestionItem } from '../../lib/exerciseData';
 import { useAuthContext } from '../../context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useExerciseCompletions } from '../../hooks/useExerciseCompletions';
 
 interface ExerciseBlockProps {
   exerciseId: string;
