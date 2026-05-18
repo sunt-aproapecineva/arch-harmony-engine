@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Plus, Trash2, ChevronRight } from 'lucide-react';
 import { getExerciseTemplate, ExerciseTemplate, QuizQuestionItem } from '../../lib/exerciseData';
 import { useAuthContext } from '../../context/AuthContext';
-import { pushExerciseResponse, loadExerciseResponse } from '../../lib/exerciseSync';
+import { pushExerciseResponse, loadExerciseResponse, flushExerciseResponse, getStoredExerciseResponse } from '../../lib/exerciseSync';
 
 interface ExerciseBlockProps {
   exerciseId: string;
@@ -1162,6 +1162,16 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
   const template = getExerciseTemplate(exerciseId);
   // Keyed per user so exercises are never shared between accounts
   const storageKey = `aa_ex_${user?.id ?? 'anon'}_${exerciseId}`;
+
+  useEffect(() => {
+    if (!user) return;
+    const localDraft = getStoredExerciseResponse(storageKey);
+    if (localDraft !== null) {
+      flushExerciseResponse(exerciseId, localDraft).catch((error) => {
+        console.error('[exerciseSync] initial local draft sync failed', error);
+      });
+    }
+  }, [exerciseId, storageKey, user]);
 
   if (!template) {
     return (
