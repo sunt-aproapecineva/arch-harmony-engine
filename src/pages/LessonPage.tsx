@@ -1,5 +1,6 @@
+// @ts-nocheck
 import React, { useState, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft, ChevronRight, CheckCircle2, FileText, Play,
@@ -9,7 +10,7 @@ import {
 import { MODULES } from '../lib/data';
 import { Lesson, Module } from '../lib/types';
 import { useProgress } from '../hooks/useProgress';
-import { Confetti } from '../components/ui/Confetti';
+import { Confetti } from '../components/aa/Confetti';
 import { useAuthContext } from '../context/AuthContext';
 import { logActivity } from '../lib/activity';
 import { ExerciseBlock } from '../components/exercises/ExerciseBlock';

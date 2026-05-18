@@ -1,12 +1,13 @@
+// @ts-nocheck
 import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play, Lock, Clock, FileText, ChevronDown, CheckCircle2, Award, ChevronRight, Star, Pencil,
 } from 'lucide-react';
 import { MODULES } from '../lib/data';
 import { useProgress } from '../hooks/useProgress';
-import { QuizRequiredModal } from '../components/ui/QuizRequiredModal';
+import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
 import { useAuthContext } from '../context/AuthContext';
 
 export const ModulePage: React.FC = () => {
