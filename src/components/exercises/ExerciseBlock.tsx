@@ -1,8 +1,9 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Plus, Trash2, ChevronRight } from 'lucide-react';
 import { getExerciseTemplate, ExerciseTemplate, QuizQuestionItem } from '../../lib/exerciseData';
 import { useAuthContext } from '../../context/AuthContext';
+import { pushExerciseResponse, loadExerciseResponse } from '../../lib/exerciseSync';
 
 interface ExerciseBlockProps {
   exerciseId: string;
