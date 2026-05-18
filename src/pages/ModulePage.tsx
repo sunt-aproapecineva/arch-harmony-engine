@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play, Lock, Clock, FileText, ChevronDown, CheckCircle2, Award, ChevronRight, Star,
 } from 'lucide-react';
-import { MODULES } from '../lib/data';
+import { MODULES, getModuleTimeline } from '../lib/data';
 import { useProgress } from '../hooks/useProgress';
 import { ExerciseBlock } from '../components/exercises/ExerciseBlock';
 import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
@@ -17,6 +17,17 @@ export const ModulePage: React.FC = () => {
   const { user } = useAuthContext();
   const { getModuleProgress, isModuleLocked, isCompleted, isExerciseDone } = useProgress();
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#ex-')) {
+      const exId = hash.slice(4);
+      setExpandedExercise(exId);
+      setTimeout(() => {
+        const el = document.getElementById(`ex-${exId}`);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 200);
+    }
+  }, []);
   const quizDone = user
     ? !!localStorage.getItem(`aa_quiz_done_${user.id}`)
     : false;
@@ -39,14 +50,14 @@ export const ModulePage: React.FC = () => {
 
   const statusColor = done ? '#4ade80' : 'var(--accent)';
 
-  // Build timeline items interleaved by `position` (lessons + exercises mixed), then deliverable.
-  const lessonEntries = module.lessons.map((lesson, idx) => ({ type: 'lesson' as const, item: lesson, idx, pos: lesson.position ?? (idx * 2 + 1) }));
-  const exerciseEntries = module.exercises.map((ex, idx) => ({ type: 'exercise' as const, item: ex, idx, pos: ex.position ?? (1000 + idx) }));
-  const sorted = [...lessonEntries, ...exerciseEntries].sort((a, b) => a.pos - b.pos);
+  // Unified timeline — lessons & exercises share the "Lecția N" numbering.
+  const unifiedTimeline = getModuleTimeline(module);
+  const sorted = unifiedTimeline.map(e => ({ type: e.kind as 'lesson' | 'exercise', item: e.item as any, idx: e.idx, lessonNo: e.lessonNo, pos: 0 }));
   const timelineItems = [
     ...sorted,
-    { type: 'deliverable' as const, item: null as null, idx: 0, pos: Infinity },
+    { type: 'deliverable' as const, item: null as null, idx: 0, lessonNo: 0, pos: Infinity },
   ];
+  const totalSteps = sorted.length;
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
@@ -107,7 +118,7 @@ export const ModulePage: React.FC = () => {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
             <span>{done ? 'Modul finalizat' : `${progress}% completat`}</span>
-            <span>{module.lessons.filter(l => isCompleted(l.id)).length}/{module.lessons.length} lecții</span>
+            <span>{module.lessons.filter(l => isCompleted(l.id)).length + module.exercises.filter(e => isExerciseDone(e.id)).length}/{module.lessons.length + module.exercises.length} lecții</span>
           </div>
           <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
             <motion.div
@@ -256,7 +267,7 @@ export const ModulePage: React.FC = () => {
                       }}
                     >
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 10, color: 'var(--fg-3)', marginBottom: 2 }}>Lecția {lesson.order_index}</div>
+                        <div style={{ fontSize: 10, color: 'var(--fg-3)', marginBottom: 2 }}>Lecția {entry.lessonNo} <span style={{ opacity: 0.6 }}>· Video</span> · {totalSteps} total</div>
                         <div style={{ fontSize: 13, fontWeight: 500, color: lessonDone ? 'var(--fg-2)' : 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {lesson.title}
                         </div>
@@ -295,6 +306,7 @@ export const ModulePage: React.FC = () => {
                 return (
                   <motion.div
                     key={ex.id}
+                    id={`ex-${ex.id}`}
                     initial={{ opacity: 0, x: -16 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay }}
@@ -311,7 +323,7 @@ export const ModulePage: React.FC = () => {
                       }}>
                         {exDone
                           ? <CheckCircle2 size={14} style={{ color: '#4ade80' }} />
-                          : <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--gold)' }}>{ex.order_index}</span>
+                          : <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--gold)' }}>{entry.lessonNo}</span>
                         }
                       </div>
                     </div>
@@ -330,7 +342,7 @@ export const ModulePage: React.FC = () => {
                       >
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontSize: 10, color: exDone ? '#4ade80' : 'var(--gold)', marginBottom: 2, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                            Exercițiu {ex.order_index}
+                            Lecția {entry.lessonNo} · Exercițiu practic
                           </div>
                           <p style={{ fontSize: 13, fontWeight: 500, color: exDone ? 'var(--fg-2)' : 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {ex.title}

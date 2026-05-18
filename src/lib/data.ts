@@ -752,3 +752,29 @@ export const MOCK_ADMIN: User = {
   tariff: 'arhitect',
   created_at: new Date().toISOString(),
 };
+
+// ─────────────────────────────────────────────────────────────
+// Unified module timeline — lessons & exercises are both treated
+// as "lecții" (numbered sequentially by `position`).
+// ─────────────────────────────────────────────────────────────
+export type TimelineEntry =
+  | { kind: 'lesson'; item: Module['lessons'][number]; lessonNo: number; idx: number }
+  | { kind: 'exercise'; item: Module['exercises'][number]; lessonNo: number; idx: number };
+
+export function getModuleTimeline(module: Module): TimelineEntry[] {
+  const lessons = module.lessons.map((item, idx) => ({
+    kind: 'lesson' as const,
+    item,
+    idx,
+    pos: item.position ?? (idx * 2 + 1),
+  }));
+  const exercises = module.exercises.map((item, idx) => ({
+    kind: 'exercise' as const,
+    item,
+    idx,
+    pos: item.position ?? (1000 + idx),
+  }));
+  return [...lessons, ...exercises]
+    .sort((a, b) => a.pos - b.pos)
+    .map((e, i) => ({ kind: e.kind, item: e.item as any, idx: e.idx, lessonNo: i + 1 }));
+}
