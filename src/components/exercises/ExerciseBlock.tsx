@@ -904,6 +904,64 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
   // ─── Completion control (Marchez ca finalizat) ──────────────────────────────
   const { isExerciseCompleted, markExerciseComplete, unmarkExerciseComplete } = useExerciseCompletions();
   const completed = isExerciseCompleted(exerciseId);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [shakeKey, setShakeKey] = useState(0);
+  const errorTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Returns true when the student has actually written/picked something.
+  const hasMeaningfulContent = useCallback((): boolean => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (!raw) return false;
+      const data = JSON.parse(raw);
+      if (data == null) return false;
+
+      switch (template.type) {
+        case 'checklist':
+          // object {id: bool} — at least one true
+          return Object.values(data).some(v => v === true);
+        case 'form-fields':
+          // object {id: string} — at least one non-empty trimmed string
+          return Object.values(data).some(
+            v => typeof v === 'string' && v.trim().length > 0,
+          );
+        case 'dynamic-table':
+          // array of row objects — at least one cell with content
+          if (!Array.isArray(data)) return false;
+          return data.some(row =>
+            row && typeof row === 'object' &&
+            Object.values(row).some(v => typeof v === 'string' && v.trim().length > 0),
+          );
+        case 'diagnostic':
+        case 'quiz':
+          // object {qid: answer} — at least one answer
+          return Object.keys(data).length > 0;
+        default:
+          // Fallback: any truthy content counts
+          if (Array.isArray(data)) return data.length > 0;
+          if (typeof data === 'object') return Object.keys(data).length > 0;
+          return Boolean(data);
+      }
+    } catch {
+      return false;
+    }
+  }, [storageKey, template.type]);
+
+  const handleMarkComplete = () => {
+    if (!hasMeaningfulContent()) {
+      setValidationError(
+        'Nu poți finaliza un exercițiu gol. Completează cel puțin un câmp înainte de a-l marca ca finalizat.',
+      );
+      setShakeKey(k => k + 1);
+      if (errorTimer.current) clearTimeout(errorTimer.current);
+      errorTimer.current = setTimeout(() => setValidationError(null), 5000);
+      return;
+    }
+    setValidationError(null);
+    markExerciseComplete(exerciseId);
+  };
+
+  useEffect(() => () => { if (errorTimer.current) clearTimeout(errorTimer.current); }, []);
 
   return (
     <div style={{ padding: '0 0 4px' }}>
@@ -935,6 +993,40 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
 
       {renderContent()}
 
+      {/* Inline validation error */}
+      <AnimatePresence>
+        {validationError && (
+          <motion.div
+            key={`err-${shakeKey}`}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{
+              opacity: 1, y: 0,
+              x: [0, -8, 8, -6, 6, -3, 3, 0],
+            }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{
+              opacity: { duration: 0.18 },
+              y: { duration: 0.18 },
+              x: { duration: 0.5, ease: 'easeInOut' },
+            }}
+            role="alert"
+            style={{
+              marginTop: 18,
+              display: 'flex', alignItems: 'flex-start', gap: 10,
+              padding: '12px 14px',
+              background: 'rgba(248,113,113,0.08)',
+              border: '1px solid rgba(248,113,113,0.35)',
+              borderRadius: 10,
+              color: '#fca5a5',
+              fontSize: 12.5, lineHeight: 1.55,
+            }}
+          >
+            <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
+            <span>{validationError}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Mark complete control */}
       <div style={{
         marginTop: 22, paddingTop: 18,
@@ -963,17 +1055,26 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
           </button>
         ) : (
           <motion.button
+            key={`mark-${shakeKey}`}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => markExerciseComplete(exerciseId)}
+            animate={validationError ? { x: [0, -6, 6, -4, 4, 0] } : { x: 0 }}
+            transition={validationError ? { duration: 0.45, ease: 'easeInOut' } : { duration: 0.15 }}
+            onClick={handleMarkComplete}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               padding: '10px 18px',
-              background: 'linear-gradient(135deg, var(--accent) 0%, #b8e8d8 100%)',
-              color: '#0D0907', border: 'none', borderRadius: 10,
+              background: validationError
+                ? 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)'
+                : 'linear-gradient(135deg, var(--accent) 0%, #b8e8d8 100%)',
+              color: validationError ? '#fff' : '#0D0907',
+              border: 'none', borderRadius: 10,
               cursor: 'pointer', fontSize: 12, fontWeight: 700,
               letterSpacing: '0.02em',
-              boxShadow: '0 4px 16px -6px rgba(196,240,228,0.4)',
+              boxShadow: validationError
+                ? '0 4px 16px -6px rgba(248,113,113,0.5)'
+                : '0 4px 16px -6px rgba(196,240,228,0.4)',
+              transition: 'background 0.25s, box-shadow 0.25s, color 0.25s',
             }}
           >
             <CheckCircle2 size={14} /> Marchez ca finalizat
@@ -983,3 +1084,4 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
     </div>
   );
 };
+
