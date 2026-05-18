@@ -114,6 +114,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { LiveContentProvider } from "@/context/LiveContentContext";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
@@ -122,7 +123,9 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <Outlet />
+          <LiveContentProvider>
+            <Outlet />
+          </LiveContentProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
