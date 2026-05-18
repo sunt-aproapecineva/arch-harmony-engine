@@ -291,7 +291,9 @@ export const LessonPage: React.FC = () => {
     setCompleting(true);
     try {
       if (lesson!.type === 'exercise' && lesson!.exercise_id) {
-        const exerciseDraft = getStoredExerciseResponse(`aa_ex_${user?.id ?? 'anon'}_${lesson!.exercise_id}`);
+        const userDraft = user?.id ? getStoredExerciseResponse(`aa_ex_${user.id}_${lesson!.exercise_id}`) : null;
+        const anonDraft = getStoredExerciseResponse(`aa_ex_anon_${lesson!.exercise_id}`);
+        const exerciseDraft = userDraft ?? anonDraft;
         if (exerciseDraft !== null) {
           await flushExerciseResponse(lesson!.exercise_id, exerciseDraft);
         }
