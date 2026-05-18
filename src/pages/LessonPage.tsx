@@ -562,6 +562,8 @@ export const LessonPage: React.FC = () => {
                 </button>
               ) : null}
             </div>
+          </div>
+        </div>
 
         {/* Sidebar: module lesson list */}
         <div className="hidden lg:block" style={{ width: 220, flexShrink: 0 }}>
