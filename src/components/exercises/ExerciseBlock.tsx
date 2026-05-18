@@ -10,9 +10,10 @@ interface ExerciseBlockProps {
 }
 
 // ─── Checklist ────────────────────────────────────────────────────────────────
-const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({
+const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; exerciseId: string }> = ({
   template,
   storageKey,
+  exerciseId,
 }) => {
   const [checked, setChecked] = useState<Record<string, boolean>>(() => {
     try {
@@ -24,10 +25,21 @@ const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: stri
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
+  useEffect(() => {
+    loadExerciseResponse(exerciseId).then(cloud => {
+      if (cloud && typeof cloud === 'object') {
+        setChecked(cloud as Record<string, boolean>);
+        localStorage.setItem(storageKey, JSON.stringify(cloud));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exerciseId]);
+
   const toggle = (id: string) => {
     const next = { ...checked, [id]: !checked[id] };
     setChecked(next);
     localStorage.setItem(storageKey, JSON.stringify(next));
+    pushExerciseResponse(exerciseId, next);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
 
