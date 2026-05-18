@@ -124,11 +124,11 @@ export const MODULES: Module[] = [
         title: 'Unde ești și de ce ești blocat acolo',
         description:
           'Cele 3 roluri (Specialist, Director, Proprietar), cele 5 stadii de maturitate ale unei afaceri și de ce nu ieși din operațional.',
-        video_url: '',
+        video_url: 'https://youtu.be/nWW0xHxytgs',
         pdf_url: '',
         duration_min: 18,
         order_index: 2,
-        is_published: false,
+        is_published: true,
       },
       {
         id: 'l-0-ex-1',
