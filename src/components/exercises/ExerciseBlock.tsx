@@ -345,9 +345,10 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
 };
 
 // ─── Quiz ─────────────────────────────────────────────────────────────────────
-const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({
+const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; exerciseId: string }> = ({
   template,
   storageKey,
+  exerciseId,
 }) => {
   const questions: QuizQuestionItem[] = template.questions || [];
   const [answers, setAnswers] = useState<Record<string, string | number>>(() => {
@@ -361,6 +362,16 @@ const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }>
   const [currentIdx, setCurrentIdx] = useState(0);
   const [finished, setFinished] = useState(false);
 
+  useEffect(() => {
+    loadExerciseResponse(exerciseId).then(cloud => {
+      if (cloud && typeof cloud === 'object' && !Array.isArray(cloud)) {
+        setAnswers(cloud as Record<string, string | number>);
+        localStorage.setItem(storageKey, JSON.stringify(cloud));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exerciseId]);
+
   const savedCount = Object.keys(answers).length;
   const allAnswered = questions.every(q => answers[q.id] !== undefined);
 
@@ -368,6 +379,7 @@ const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }>
     const next = { ...answers, [questionId]: val };
     setAnswers(next);
     localStorage.setItem(storageKey, JSON.stringify(next));
+    pushExerciseResponse(exerciseId, next);
     setTimeout(() => {
       if (currentIdx < questions.length - 1) {
         setCurrentIdx(i => i + 1);
