@@ -114,7 +114,25 @@ export const Login: React.FC = () => {
           </div>
 
           <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--fg)', marginBottom: 6 }}>Intră în cont</h2>
-          <p style={{ fontSize: 14, color: 'var(--fg-3)', marginBottom: 28 }}>Acces restricționat — doar pentru participanți.</p>
+          <p style={{ fontSize: 14, color: 'var(--fg-3)', marginBottom: 16 }}>Acces restricționat — doar pentru participanți.</p>
+
+          <button
+            type="button"
+            onClick={() => setGuideOpen(true)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '8px 14px', marginBottom: 22,
+              background: 'rgba(196,240,228,0.06)',
+              border: '1px solid rgba(196,240,228,0.18)',
+              color: 'var(--accent)', borderRadius: 9,
+              fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
+              transition: 'background 0.15s, border-color 0.15s',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,240,228,0.1)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,240,228,0.06)'; }}
+          >
+            <HelpCircle size={14} /> Cum funcționează platforma? Vezi ghidul
+          </button>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <InputField label="Email" icon={<Mail size={15} />} type="email" value={email} onChange={setEmail} placeholder="email@exemplu.ro" autoComplete="email" />
