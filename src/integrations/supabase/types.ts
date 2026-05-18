@@ -47,6 +47,27 @@ export type Database = {
         }
         Relationships: []
       }
+      exercise_completions: {
+        Row: {
+          completed_at: string
+          exercise_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          exercise_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          exercise_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       exercise_responses: {
         Row: {
           created_at: string

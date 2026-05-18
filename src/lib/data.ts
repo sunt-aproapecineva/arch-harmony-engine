@@ -117,6 +117,7 @@ export const MODULES: Module[] = [
         duration_min: 20,
         order_index: 1,
         is_published: false,
+        position: 1,
       },
       {
         id: 'l-0-2',
@@ -129,32 +130,45 @@ export const MODULES: Module[] = [
         duration_min: 18,
         order_index: 2,
         is_published: false,
+        position: 3,
       },
     ],
     exercises: [
       {
         id: 'e-0-1',
         module_id: 'mod-0',
-        title: 'Chestionarul de Diagnostic',
+        title: 'Auditul activităților tale',
         description:
-          '50 de întrebări despre afacerea ta reală. Îți arată pe ce treaptă ești și pe ce dimensiuni stai cel mai prost. Completezi singur, fără ajutor — răspunsurile incomode sunt cele mai valoroase. Timp estimat: 45–60 minute.',
+          'Scrii TOT ce faci în mod obișnuit în firma ta — nu ce ar trebui, ci ce faci efectiv. Estimezi ce % din timp ocupă fiecare activitate. La final clasifici fiecare: Specialist, Director sau Proprietar. Regula: totalul = 100%. Vezi negru pe alb în ce rol petreci cel mai mult timp.',
         order_index: 1,
+        position: 2,
       },
       {
         id: 'e-0-2',
         module_id: 'mod-0',
-        title: 'Auditul de Timp (5 zile)',
+        title: 'Harta gâturilor de sticlă',
         description:
-          '5 zile lucrătoare îți notezi TOT ce faci, în blocuri de 30 minute. La final marchezi fiecare activitate: 5€/oră, 50€/oră sau 100€/oră. Vezi negru pe alb câte ore pe săptămână ești angajat, nu proprietar.',
+          'Listezi toate deciziile și situațiile din ultima săptămână care au ajuns la tine. Pentru fiecare răspunzi: chiar trebuia să fii TU sau e o lipsă a sistemului? Și cât timp ți-a luat. Identifici exact unde ești tu blocajul principal.',
         order_index: 2,
+        position: 4,
       },
       {
         id: 'e-0-3',
         module_id: 'mod-0',
-        title: 'Harta Gâturilor de Sticlă',
+        title: 'Testul de absență',
         description:
-          'Listezi toate deciziile din săptămâna trecută care au trecut prin tine. Le clasifici: chiar trebuia să fii tu, sau e o scuză a sistemului? Rezultatul: știi exact unde pierzi cel mai mult timp și bani.',
+          'Stai la birou și răspunzi sincer: dacă ai pleca mâine 2 zile și nu ai răspunde la niciun mesaj, ce s-ar întâmpla? Scrii TOATE scenariile fără filtru. Pentru fiecare: gravitate și cauza reală. Descoperi că majoritatea fricilor sunt cauzate de lipsă de sisteme, nu de tine.',
         order_index: 3,
+        position: 5,
+      },
+      {
+        id: 'e-0-4',
+        module_id: 'mod-0',
+        title: 'Diagnosticul complet · 50 întrebări',
+        description:
+          'Te evaluezi pe scala 1–5 la 50 de întrebări împărțite pe 6 dimensiuni: Claritate & Rol, Structură & Oameni, Procese, Control & KPI, Delegare, Management & Scalare. Rezultatul: scor pe fiecare dimensiune și cele 3 priorități de unde începi.',
+        order_index: 4,
+        position: 6,
       },
     ],
   },
