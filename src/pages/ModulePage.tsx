@@ -1,11 +1,11 @@
 // @ts-nocheck
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from '@/lib/router-compat';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Play, Lock, Clock, FileText, CheckCircle2, ChevronRight, Star, Sparkles,
+  Play, Lock, Clock, FileText, ChevronDown, CheckCircle2, Award, ChevronRight, Star, Pencil,
 } from 'lucide-react';
-import { MODULES, getModuleTimeline } from '../lib/data';
+import { MODULES } from '../lib/data';
 import { useProgress } from '../hooks/useProgress';
 import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
 import { useAuthContext } from '../context/AuthContext';
@@ -14,7 +14,7 @@ export const ModulePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuthContext();
-  const { getModuleProgress, isModuleLocked, isCompleted, isExerciseDone } = useProgress();
+  const { getModuleProgress, isModuleLocked, isCompleted } = useProgress();
   const quizDone = user
     ? !!localStorage.getItem(`aa_quiz_done_${user.id}`)
     : false;
@@ -37,14 +37,11 @@ export const ModulePage: React.FC = () => {
 
   const statusColor = done ? '#4ade80' : 'var(--accent)';
 
-  // Unified timeline — lessons & exercises share the "Lecția N" numbering.
-  const unifiedTimeline = getModuleTimeline(module);
-  const sorted = unifiedTimeline.map(e => ({ type: e.kind as 'lesson' | 'exercise', item: e.item as any, idx: e.idx, lessonNo: e.lessonNo, pos: 0 }));
+  // All lessons (video + exercise) + deliverable
   const timelineItems = [
-    ...sorted,
-    { type: 'deliverable' as const, item: null as null, idx: 0, lessonNo: 0, pos: Infinity },
+    ...module.lessons.map((lesson, idx) => ({ type: 'lesson' as const, item: lesson, idx })),
+    { type: 'deliverable' as const, item: null as null, idx: 0 },
   ];
-  const totalSteps = sorted.length;
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
@@ -105,7 +102,7 @@ export const ModulePage: React.FC = () => {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
             <span>{done ? 'Modul finalizat' : `${progress}% completat`}</span>
-            <span>{module.lessons.filter(l => isCompleted(l.id)).length + module.exercises.filter(e => isExerciseDone(e.id)).length}/{module.lessons.length + module.exercises.length} lecții</span>
+            <span>{module.lessons.filter(l => isCompleted(l.id)).length}/{module.lessons.length} lecții + exerciții</span>
           </div>
           <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
             <motion.div
@@ -199,168 +196,67 @@ export const ModulePage: React.FC = () => {
 
               if (entry.type === 'lesson') {
                 const lesson = entry.item;
+                const isExLesson = lesson.type === 'exercise';
                 const lessonDone = isCompleted(lesson.id);
                 const isCurrentLesson = !lessonDone && module.lessons.slice(0, entry.idx).every(l => isCompleted(l.id));
-                const nodeColor = lessonDone ? '#4ade80' : isCurrentLesson ? 'var(--accent)' : 'var(--border)';
-                const nodeBg = lessonDone ? 'rgba(74,222,128,0.15)' : isCurrentLesson ? 'var(--accent-dim)' : 'var(--bg-3)';
+                const accentCol = isExLesson ? 'var(--gold)' : 'var(--accent)';
+                const nodeColor = lessonDone ? '#4ade80' : isCurrentLesson ? accentCol : 'var(--border)';
+                const nodeBg = lessonDone ? 'rgba(74,222,128,0.15)' : isCurrentLesson ? (isExLesson ? 'var(--gold-dim)' : 'var(--accent-dim)') : 'var(--bg-3)';
+                const borderColor = lessonDone ? 'rgba(74,222,128,0.2)' : isCurrentLesson ? (isExLesson ? 'rgba(201,169,110,0.25)' : 'rgba(196,240,228,0.2)') : 'var(--border)';
 
                 return (
-                  <motion.div
-                    key={lesson.id}
-                    initial={{ opacity: 0, x: -16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay }}
-                    style={{ display: 'flex', alignItems: 'flex-start', gap: 16, paddingBottom: 16 }}
-                  >
+                  <motion.div key={lesson.id} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay }}
+                    style={{ display: 'flex', alignItems: 'flex-start', gap: 16, paddingBottom: 16 }}>
                     {/* Node */}
                     <div style={{ position: 'relative', flexShrink: 0, zIndex: 1 }}>
-                      <div style={{
-                        width: 32, height: 32, borderRadius: '50%',
-                        background: nodeBg,
-                        border: `2px solid ${nodeColor}`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        transition: 'all 0.2s',
-                        boxShadow: isCurrentLesson ? '0 0 10px rgba(196,240,228,0.2)' : 'none',
-                      }}>
+                      <div style={{ width: 32, height: 32, borderRadius: isExLesson ? 8 : '50%', background: nodeBg, border: `2px solid ${nodeColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', boxShadow: isCurrentLesson ? `0 0 10px ${isExLesson ? 'rgba(201,169,110,0.25)' : 'rgba(196,240,228,0.2)'}` : 'none' }}>
                         {locked
                           ? <Lock size={12} style={{ color: 'var(--fg-3)' }} />
                           : lessonDone
                           ? <CheckCircle2 size={14} style={{ color: '#4ade80' }} />
-                          : <Play size={12} style={{ color: isCurrentLesson ? 'var(--accent)' : 'var(--fg-3)', marginLeft: 2 }} />
-                        }
+                          : isExLesson
+                          ? <Pencil size={12} style={{ color: isCurrentLesson ? 'var(--gold)' : 'var(--fg-3)' }} />
+                          : <Play size={12} style={{ color: isCurrentLesson ? 'var(--accent)' : 'var(--fg-3)', marginLeft: 2 }} />}
                       </div>
                     </div>
 
-                    {/* Content */}
-                    <div
-                      onClick={() => {
+                    {/* Card */}
+                    <div onClick={() => {
                         if (locked) return;
                         if (!quizDone) { setQuizModalOpen(true); return; }
                         navigate(`/lesson/${lesson.id}`);
                       }}
-                      style={{
-                        flex: 1, marginBottom: 0, padding: '11px 16px',
-                        background: 'var(--bg-card)',
-                        border: `1px solid ${lessonDone ? 'rgba(74,222,128,0.2)' : isCurrentLesson ? 'rgba(196,240,228,0.2)' : 'var(--border)'}`,
-                        borderRadius: 12, cursor: locked ? 'not-allowed' : 'pointer',
-                        opacity: locked ? 0.5 : 1,
-                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-                        transition: 'border-color 0.15s, background 0.15s',
-                      }}
-                      onMouseEnter={e => { if (!locked) { (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(196,240,228,0.3)'; (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-3)'; }}}
-                      onMouseLeave={e => {
-                        (e.currentTarget as HTMLDivElement).style.borderColor = lessonDone ? 'rgba(74,222,128,0.2)' : isCurrentLesson ? 'rgba(196,240,228,0.2)' : 'var(--border)';
-                        (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-card)';
-                      }}
-                    >
+                      style={{ flex: 1, marginBottom: 0, padding: '11px 16px', background: 'var(--bg-card)', border: `1px solid ${borderColor}`, borderRadius: 12, cursor: locked ? 'not-allowed' : 'pointer', opacity: locked ? 0.5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, transition: 'border-color 0.15s, background 0.15s' }}
+                      onMouseEnter={e => { if (!locked) { (e.currentTarget as HTMLDivElement).style.borderColor = isExLesson ? 'rgba(201,169,110,0.35)' : 'rgba(196,240,228,0.3)'; (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-3)'; }}}
+                      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = borderColor; (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-card)'; }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 10, color: 'var(--fg-3)', marginBottom: 2 }}>Lecția {entry.lessonNo} <span style={{ opacity: 0.6 }}>· Video</span> · {totalSteps} total</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                          <span style={{ fontSize: 10, color: isExLesson ? 'var(--gold)' : 'var(--fg-3)', fontWeight: isExLesson ? 700 : 400 }}>
+                            {isExLesson ? `✦ Exercițiu practic` : `Lecția ${lesson.order_index}`}
+                          </span>
+                        </div>
                         <div style={{ fontSize: 13, fontWeight: 500, color: lessonDone ? 'var(--fg-2)' : 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {lesson.title}
                         </div>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--fg-3)' }}>
                           <Clock size={11} />{lesson.duration_min}min
                         </div>
-                        {lesson.pdf_url && (
-                          <div style={{
-                            fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
-                            color: 'var(--accent)', background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)',
-                            padding: '2px 6px', borderRadius: 4,
-                          }}>
-                            PDF
+                        {isExLesson && (
+                          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--gold)', background: 'var(--gold-dim)', border: '1px solid rgba(201,169,110,0.2)', padding: '2px 6px', borderRadius: 4 }}>
+                            Interactiv
                           </div>
+                        )}
+                        {lesson.pdf_url && !isExLesson && (
+                          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--accent)', background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)', padding: '2px 6px', borderRadius: 4 }}>PDF</div>
                         )}
                         {lessonDone
                           ? <CheckCircle2 size={15} style={{ color: '#4ade80' }} />
-                          : locked
-                          ? <Lock size={13} style={{ color: 'var(--fg-3)' }} />
-                          : <Play size={13} style={{ color: isCurrentLesson ? 'var(--accent)' : 'var(--border)' }} />
-                        }
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              }
-
-              if (entry.type === 'exercise') {
-                const ex = entry.item;
-                const exDone = isExerciseDone(ex.id);
-                const nodeBorder = exDone ? '#4ade80' : 'var(--gold)';
-                const nodeBg = exDone ? 'rgba(74,222,128,0.15)' : 'var(--gold-dim)';
-                const cardBorder = exDone ? 'rgba(74,222,128,0.25)' : 'rgba(201,169,110,0.2)';
-                return (
-                  <motion.div
-                    key={ex.id}
-                    id={`ex-${ex.id}`}
-                    initial={{ opacity: 0, x: -16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay }}
-                    style={{ display: 'flex', alignItems: 'flex-start', gap: 16, paddingBottom: 16 }}
-                  >
-                    {/* Node — green when done, gold otherwise */}
-                    <div style={{ position: 'relative', flexShrink: 0, zIndex: 1 }}>
-                      <div style={{
-                        width: 32, height: 32, borderRadius: '50%',
-                        background: nodeBg,
-                        border: `2px solid ${nodeBorder}`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        transition: 'all 0.25s',
-                      }}>
-                        {exDone
-                          ? <CheckCircle2 size={14} style={{ color: '#4ade80' }} />
-                          : <Sparkles size={13} style={{ color: 'var(--gold)' }} />
-                        }
-                      </div>
-                    </div>
-
-                    {/* Exercise card — navigates to dedicated page */}
-                    <div
-                      onClick={() => {
-                        if (locked) return;
-                        if (!quizDone) { setQuizModalOpen(true); return; }
-                        navigate(`/exercise/${ex.id}`);
-                      }}
-                      style={{
-                        flex: 1, padding: '11px 16px',
-                        background: 'var(--bg-card)',
-                        border: `1px solid ${cardBorder}`,
-                        borderRadius: 12, cursor: locked ? 'not-allowed' : 'pointer',
-                        opacity: locked ? 0.5 : 1,
-                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-                        transition: 'border-color 0.15s, background 0.15s, transform 0.15s',
-                      }}
-                      onMouseEnter={e => { if (!locked) { (e.currentTarget as HTMLDivElement).style.borderColor = exDone ? 'rgba(74,222,128,0.4)' : 'rgba(201,169,110,0.4)'; (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-3)'; }}}
-                      onMouseLeave={e => {
-                        (e.currentTarget as HTMLDivElement).style.borderColor = cardBorder;
-                        (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-card)';
-                      }}
-                    >
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 10, color: exDone ? '#4ade80' : 'var(--gold)', marginBottom: 2, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                          Lecția {entry.lessonNo} · Exercițiu practic
-                        </div>
-                        <div style={{ fontSize: 13, fontWeight: 500, color: exDone ? 'var(--fg-2)' : 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {ex.title}
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                        <span style={{
-                          fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
-                          color: exDone ? '#4ade80' : 'var(--gold)',
-                          background: exDone ? 'rgba(74,222,128,0.1)' : 'var(--gold-dim)',
-                          border: `1px solid ${exDone ? 'rgba(74,222,128,0.25)' : 'rgba(201,169,110,0.2)'}`,
-                          padding: '2px 7px', borderRadius: 4,
-                        }}>
-                          {exDone ? 'Finalizat' : 'Interactiv'}
-                        </span>
-                        {exDone
-                          ? <CheckCircle2 size={15} style={{ color: '#4ade80' }} />
-                          : locked
-                          ? <Lock size={13} style={{ color: 'var(--fg-3)' }} />
-                          : <ChevronRight size={15} style={{ color: 'var(--gold)' }} />
-                        }
+                          : locked ? <Lock size={13} style={{ color: 'var(--fg-3)' }} />
+                          : isExLesson
+                          ? <Pencil size={13} style={{ color: isCurrentLesson ? 'var(--gold)' : 'var(--border)' }} />
+                          : <Play size={13} style={{ color: isCurrentLesson ? 'var(--accent)' : 'var(--border)' }} />}
                       </div>
                     </div>
                   </motion.div>
