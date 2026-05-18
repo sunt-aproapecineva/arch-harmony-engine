@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from '@/lib/router-compat';
 import { motion } from 'framer-motion';
-import { ArrowRight, Mail, Lock } from 'lucide-react';
+import { ArrowRight, Mail, Lock, HelpCircle } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
+import { OnboardingGuideModal } from '@/components/aa/OnboardingGuideModal';
 
 interface InputFieldProps {
   label: string;
