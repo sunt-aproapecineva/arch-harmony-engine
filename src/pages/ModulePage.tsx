@@ -306,6 +306,7 @@ export const ModulePage: React.FC = () => {
                 return (
                   <motion.div
                     key={ex.id}
+                    id={`ex-${ex.id}`}
                     initial={{ opacity: 0, x: -16 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay }}
