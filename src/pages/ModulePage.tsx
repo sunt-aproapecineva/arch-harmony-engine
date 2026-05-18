@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play, Lock, Clock, FileText, ChevronDown, CheckCircle2, Award, ChevronRight, Star,
 } from 'lucide-react';
-import { MODULES } from '../lib/data';
+import { MODULES, getModuleTimeline } from '../lib/data';
 import { useProgress } from '../hooks/useProgress';
 import { ExerciseBlock } from '../components/exercises/ExerciseBlock';
 import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
@@ -39,14 +39,14 @@ export const ModulePage: React.FC = () => {
 
   const statusColor = done ? '#4ade80' : 'var(--accent)';
 
-  // Build timeline items interleaved by `position` (lessons + exercises mixed), then deliverable.
-  const lessonEntries = module.lessons.map((lesson, idx) => ({ type: 'lesson' as const, item: lesson, idx, pos: lesson.position ?? (idx * 2 + 1) }));
-  const exerciseEntries = module.exercises.map((ex, idx) => ({ type: 'exercise' as const, item: ex, idx, pos: ex.position ?? (1000 + idx) }));
-  const sorted = [...lessonEntries, ...exerciseEntries].sort((a, b) => a.pos - b.pos);
+  // Unified timeline — lessons & exercises share the "Lecția N" numbering.
+  const unifiedTimeline = getModuleTimeline(module);
+  const sorted = unifiedTimeline.map(e => ({ type: e.kind as 'lesson' | 'exercise', item: e.item as any, idx: e.idx, lessonNo: e.lessonNo, pos: 0 }));
   const timelineItems = [
     ...sorted,
-    { type: 'deliverable' as const, item: null as null, idx: 0, pos: Infinity },
+    { type: 'deliverable' as const, item: null as null, idx: 0, lessonNo: 0, pos: Infinity },
   ];
+  const totalSteps = sorted.length;
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
