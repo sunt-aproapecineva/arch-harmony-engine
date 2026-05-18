@@ -213,7 +213,7 @@ export const LessonPage: React.FC = () => {
           {module.title}
         </Link>
         <ChevronRight size={12} />
-        <span style={{ color: 'var(--fg)' }}>Lecția {lesson.order_index}</span>
+        <span style={{ color: 'var(--fg)' }}>Lecția {unifiedNo}</span>
       </div>
 
       {/* Module progress bar — Feature 3 */}
@@ -224,7 +224,7 @@ export const LessonPage: React.FC = () => {
         style={{ marginBottom: 24 }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
-          <span>Lecția {lesson.order_index} din {totalCount} · Modul: {module.title}</span>
+          <span>Lecția {unifiedNo} din {totalCount} · Modul: {module.title}</span>
           <span style={{ color: progressPct === 100 ? '#4ade80' : 'var(--accent)' }}>{progressPct}%</span>
         </div>
         <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
@@ -303,7 +303,7 @@ export const LessonPage: React.FC = () => {
             {/* Badges row */}
             <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 11, color: 'var(--fg-3)', background: 'var(--bg-3)', border: '1px solid var(--border)', padding: '3px 10px', borderRadius: 99 }}>
-                Lecția {lesson.order_index}
+                Lecția {unifiedNo} · Video
               </span>
               <span style={{ fontSize: 11, color: 'var(--accent)', background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)', padding: '3px 10px', borderRadius: 99 }}>
                 {lesson.duration_min} min
@@ -570,31 +570,62 @@ export const LessonPage: React.FC = () => {
               {module.etapa} · {module.title}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {module.lessons.map(l => {
-                const isActive = l.id === lesson.id;
-                const isDone = isCompleted(l.id);
+              {timeline.map(entry => {
+                const item: any = entry.item;
+                if (entry.kind === 'lesson') {
+                  const isActive = item.id === lesson.id;
+                  const isDone = isCompleted(item.id);
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => navigate(`/lesson/${item.id}`)}
+                      style={{
+                        width: '100%', display: 'flex', alignItems: 'center', gap: 8,
+                        padding: '7px 10px', borderRadius: 8, cursor: 'pointer', textAlign: 'left',
+                        background: isActive ? 'var(--accent-dim)' : 'transparent',
+                        border: isActive ? '1px solid rgba(196,240,228,0.2)' : '1px solid transparent',
+                        transition: 'background 0.15s',
+                      }}
+                      onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-3)'; }}
+                      onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+                    >
+                      <div style={{ flexShrink: 0 }}>
+                        {isDone
+                          ? <CheckCircle2 size={13} style={{ color: '#4ade80' }} />
+                          : <div style={{ width: 13, height: 13, borderRadius: '50%', border: `1.5px solid ${isActive ? 'var(--accent)' : 'var(--border)'}` }} />
+                        }
+                      </div>
+                      <span style={{ fontSize: 11, color: isActive ? 'var(--fg)' : 'var(--fg-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {entry.lessonNo}. {item.title}
+                      </span>
+                    </button>
+                  );
+                }
+                // exercise
+                const isDone = isExerciseDone(item.id);
                 return (
                   <button
-                    key={l.id}
-                    onClick={() => navigate(`/lesson/${l.id}`)}
+                    key={item.id}
+                    onClick={() => navigate(`/module/${module.id}#ex-${item.id}`)}
+                    title="Exercițiu practic"
                     style={{
                       width: '100%', display: 'flex', alignItems: 'center', gap: 8,
                       padding: '7px 10px', borderRadius: 8, cursor: 'pointer', textAlign: 'left',
-                      background: isActive ? 'var(--accent-dim)' : 'transparent',
-                      border: isActive ? '1px solid rgba(196,240,228,0.2)' : '1px solid transparent',
+                      background: 'transparent',
+                      border: '1px solid transparent',
                       transition: 'background 0.15s',
                     }}
-                    onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-3)'; }}
-                    onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+                    onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-3)')}
+                    onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = 'transparent')}
                   >
                     <div style={{ flexShrink: 0 }}>
                       {isDone
                         ? <CheckCircle2 size={13} style={{ color: '#4ade80' }} />
-                        : <div style={{ width: 13, height: 13, borderRadius: '50%', border: `1.5px solid ${isActive ? 'var(--accent)' : 'var(--border)'}` }} />
+                        : <div style={{ width: 13, height: 13, borderRadius: '50%', border: `1.5px solid var(--gold)`, background: 'var(--gold-dim)' }} />
                       }
                     </div>
-                    <span style={{ fontSize: 11, color: isActive ? 'var(--fg)' : 'var(--fg-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {l.order_index}. {l.title}
+                    <span style={{ fontSize: 11, color: 'var(--fg-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {entry.lessonNo}. {item.title}
                     </span>
                   </button>
                 );
