@@ -39,11 +39,13 @@ export const ModulePage: React.FC = () => {
 
   const statusColor = done ? '#4ade80' : 'var(--accent)';
 
-  // Build timeline items: lessons first, then exercises, then deliverable
+  // Build timeline items interleaved by `position` (lessons + exercises mixed), then deliverable.
+  const lessonEntries = module.lessons.map((lesson, idx) => ({ type: 'lesson' as const, item: lesson, idx, pos: lesson.position ?? (idx * 2 + 1) }));
+  const exerciseEntries = module.exercises.map((ex, idx) => ({ type: 'exercise' as const, item: ex, idx, pos: ex.position ?? (1000 + idx) }));
+  const sorted = [...lessonEntries, ...exerciseEntries].sort((a, b) => a.pos - b.pos);
   const timelineItems = [
-    ...module.lessons.map((lesson, idx) => ({ type: 'lesson' as const, item: lesson, idx })),
-    ...module.exercises.map((ex, idx) => ({ type: 'exercise' as const, item: ex, idx })),
-    { type: 'deliverable' as const, item: null as null, idx: 0 },
+    ...sorted,
+    { type: 'deliverable' as const, item: null as null, idx: 0, pos: Infinity },
   ];
 
   return (
