@@ -288,6 +288,10 @@ export const ModulePage: React.FC = () => {
 
               if (entry.type === 'exercise') {
                 const ex = entry.item;
+                const exDone = isExerciseDone(ex.id);
+                const nodeBorder = exDone ? '#4ade80' : 'var(--gold)';
+                const nodeBg = exDone ? 'rgba(74,222,128,0.15)' : 'var(--gold-dim)';
+                const cardBorder = exDone ? 'rgba(74,222,128,0.25)' : 'rgba(201,169,110,0.2)';
                 return (
                   <motion.div
                     key={ex.id}
@@ -296,20 +300,24 @@ export const ModulePage: React.FC = () => {
                     transition={{ delay }}
                     style={{ display: 'flex', alignItems: 'flex-start', gap: 16, paddingBottom: 16 }}
                   >
-                    {/* Gold node for exercises */}
+                    {/* Node — green when done, gold otherwise */}
                     <div style={{ position: 'relative', flexShrink: 0, zIndex: 1 }}>
                       <div style={{
                         width: 32, height: 32, borderRadius: '50%',
-                        background: 'var(--gold-dim)',
-                        border: '2px solid var(--gold)',
+                        background: nodeBg,
+                        border: `2px solid ${nodeBorder}`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'all 0.25s',
                       }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--gold)' }}>{ex.order_index}</span>
+                        {exDone
+                          ? <CheckCircle2 size={14} style={{ color: '#4ade80' }} />
+                          : <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--gold)' }}>{ex.order_index}</span>
+                        }
                       </div>
                     </div>
 
                     {/* Exercise accordion */}
-                    <div style={{ flex: 1, background: 'var(--bg-card)', border: '1px solid rgba(201,169,110,0.2)', borderRadius: 12, overflow: 'hidden' }}>
+                    <div style={{ flex: 1, background: 'var(--bg-card)', border: `1px solid ${cardBorder}`, borderRadius: 12, overflow: 'hidden' }}>
                       <button
                         style={{
                           width: '100%', display: 'flex', alignItems: 'center', gap: 12,
@@ -321,20 +329,22 @@ export const ModulePage: React.FC = () => {
                         onMouseLeave={e => (e.currentTarget.style.background = 'none')}
                       >
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 10, color: 'var(--gold)', marginBottom: 2, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                          <div style={{ fontSize: 10, color: exDone ? '#4ade80' : 'var(--gold)', marginBottom: 2, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                             Exercițiu {ex.order_index}
                           </div>
-                          <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <p style={{ fontSize: 13, fontWeight: 500, color: exDone ? 'var(--fg-2)' : 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {ex.title}
                           </p>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                           <span style={{
                             fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
-                            color: 'var(--gold)', background: 'var(--gold-dim)', border: '1px solid rgba(201,169,110,0.2)',
+                            color: exDone ? '#4ade80' : 'var(--gold)',
+                            background: exDone ? 'rgba(74,222,128,0.1)' : 'var(--gold-dim)',
+                            border: `1px solid ${exDone ? 'rgba(74,222,128,0.25)' : 'rgba(201,169,110,0.2)'}`,
                             padding: '2px 7px', borderRadius: 4,
                           }}>
-                            Interactiv
+                            {exDone ? 'Finalizat' : 'Interactiv'}
                           </span>
                           <ChevronDown
                             size={15}
