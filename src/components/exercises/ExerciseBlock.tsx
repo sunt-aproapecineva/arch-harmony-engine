@@ -89,9 +89,10 @@ const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: stri
 };
 
 // ─── Form Fields ──────────────────────────────────────────────────────────────
-const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({
+const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; exerciseId: string }> = ({
   template,
   storageKey,
+  exerciseId,
 }) => {
   const [values, setValues] = useState<Record<string, string>>(() => {
     try {
@@ -104,10 +105,21 @@ const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: str
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  useEffect(() => {
+    loadExerciseResponse(exerciseId).then(cloud => {
+      if (cloud && typeof cloud === 'object') {
+        setValues(cloud as Record<string, string>);
+        localStorage.setItem(storageKey, JSON.stringify(cloud));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exerciseId]);
+
   const save = useCallback((newVals: Record<string, string>) => {
     localStorage.setItem(storageKey, JSON.stringify(newVals));
+    pushExerciseResponse(exerciseId, newVals);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
-  }, [storageKey]);
+  }, [storageKey, exerciseId]);
 
   const handleChange = (id: string, val: string) => {
     const next = { ...values, [id]: val };
