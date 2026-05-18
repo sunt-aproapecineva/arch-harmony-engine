@@ -306,6 +306,7 @@ export const LessonPage: React.FC = () => {
   const isExercise = lesson.type === 'exercise';
   const youtubeId = !isExercise ? getYouTubeId(lesson.video_url) : null;
   const justCompleted = justCompletedLessonId === lesson.id;
+  const scopedShowConfetti = showConfetti && justCompleted;
 
   // ── EXERCISE PAGE ──────────────────────────────────────────────────────────
   if (isExercise && lesson.exercise_id) {
@@ -390,7 +391,7 @@ export const LessonPage: React.FC = () => {
                 <div ref={completeRef} style={{ marginBottom: 24 }}>
                   <CompleteButton
                     done={done} justCompleted={justCompleted} completing={completing}
-                    showConfetti={showConfetti} onComplete={handleComplete}
+                    showConfetti={scopedShowConfetti} onComplete={handleComplete}
                     onConfettiDone={() => setShowConfetti(false)} isExercise
                   />
                   {completeError && (
@@ -497,7 +498,7 @@ export const LessonPage: React.FC = () => {
 
           {/* Complete button */}
           <motion.div ref={completeRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} style={{ marginBottom: 24 }}>
-            <CompleteButton done={done} justCompleted={justCompleted} completing={completing} showConfetti={showConfetti} onComplete={handleComplete} onConfettiDone={() => setShowConfetti(false)} />
+            <CompleteButton done={done} justCompleted={justCompleted} completing={completing} showConfetti={scopedShowConfetti} onComplete={handleComplete} onConfettiDone={() => setShowConfetti(false)} />
             {completeError && (
               <p style={{ marginTop: 10, fontSize: 13, color: '#f87171' }}>{completeError}</p>
             )}
