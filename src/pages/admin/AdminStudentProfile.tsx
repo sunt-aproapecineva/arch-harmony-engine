@@ -324,19 +324,44 @@ export const AdminStudentProfile: React.FC = () => {
 
   return (
     <div style={{ maxWidth: 880, margin: '0 auto', padding: '32px 24px' }}>
-      {/* Back link */}
-      <Link
-        to="/admin/users"
-        style={{
-          display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13,
-          color: 'var(--fg-3)', textDecoration: 'none', marginBottom: 24,
-          transition: 'color 0.15s',
-        }}
-        onMouseEnter={e => (e.currentTarget.style.color = 'var(--fg)')}
-        onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-3)')}
-      >
-        <ArrowLeft size={14} /> Înapoi la utilizatori
-      </Link>
+      {/* Back link + Refresh */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
+        <Link
+          to="/admin/users"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13,
+            color: 'var(--fg-3)', textDecoration: 'none',
+            transition: 'color 0.15s',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.color = 'var(--fg)')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-3)')}
+        >
+          <ArrowLeft size={14} /> Înapoi la utilizatori
+        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {lastRefreshed && (
+            <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>
+              Actualizat: {lastRefreshed.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </span>
+          )}
+          <button
+            onClick={loadAll}
+            disabled={refreshing}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              fontSize: 12, fontWeight: 600,
+              background: 'var(--bg-card)', border: '1px solid var(--border)',
+              color: 'var(--fg)', padding: '6px 12px', borderRadius: 8,
+              cursor: refreshing ? 'wait' : 'pointer',
+              opacity: refreshing ? 0.6 : 1,
+              transition: 'all 0.15s',
+            }}
+          >
+            <RefreshCw size={13} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
+            {refreshing ? 'Se actualizează…' : 'Reîmprospătează'}
+          </button>
+        </div>
+      </div>
 
       {/* ── Section 1: Header ── */}
       <motion.div
