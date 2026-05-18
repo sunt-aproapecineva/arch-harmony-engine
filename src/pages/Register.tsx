@@ -165,6 +165,24 @@ export const Register: React.FC = () => {
             <span className="font-aboreto" style={{ fontSize: 11, letterSpacing: '0.1em', color: 'var(--fg)' }}>ARHITECTURA AFACERII</span>
           </div>
 
+          <button
+            type="button"
+            onClick={() => setGuideOpen(true)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '8px 14px', marginBottom: 20,
+              background: 'rgba(196,240,228,0.06)',
+              border: '1px solid rgba(196,240,228,0.18)',
+              color: 'var(--accent)', borderRadius: 9,
+              fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,240,228,0.1)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,240,228,0.06)'; }}
+          >
+            <HelpCircle size={14} /> Cum funcționează platforma? Vezi ghidul
+          </button>
+
           {/* Step indicators */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24 }}>
             {[1, 2].map(s => (
