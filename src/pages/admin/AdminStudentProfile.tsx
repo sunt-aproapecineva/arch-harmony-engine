@@ -4,7 +4,7 @@ import { useParams, useNavigate, Link } from '@/lib/router-compat';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, LogIn, CheckCircle, FileText, Award, UserPlus, Pencil,
-  AlertTriangle, ChevronDown, ChevronUp,
+  AlertTriangle, ChevronDown, ChevronUp, RefreshCw,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { MockUser, Progress } from '../../lib/types';
@@ -227,10 +227,13 @@ export const AdminStudentProfile: React.FC = () => {
   const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>({});
   const [notesByLesson, setNotesByLesson] = useState<Record<string, string>>({});
   const [exercisesById, setExercisesById] = useState<Record<string, any>>({});
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
 
-  useEffect(() => {
+  const loadAll = React.useCallback(async () => {
     if (!userId) return;
-    (async () => {
+    setRefreshing(true);
+    try {
       const [{ data: profile }, { data: progressRows }, { data: quiz }, { data: notesRows }, { data: exRows }] = await Promise.all([
         supabase.from('profiles').select('id,email,full_name,tariff,avatar_url,created_at').eq('id', userId).maybeSingle(),
         supabase.from('progress').select('user_id,lesson_id,completed_at').eq('user_id', userId),
@@ -254,6 +257,9 @@ export const AdminStudentProfile: React.FC = () => {
         const answers = quiz.answers as Record<string, string | string[]>;
         setQuizAnswers(answers);
         setQuizProfile(generateProfile(answers));
+      } else {
+        setQuizAnswers(null);
+        setQuizProfile(null);
       }
       const notesMap: Record<string, string> = {};
       (notesRows || []).forEach((n: any) => { notesMap[n.lesson_id] = n.content || ''; });
@@ -261,9 +267,21 @@ export const AdminStudentProfile: React.FC = () => {
       const exMap: Record<string, any> = {};
       (exRows || []).forEach((e: any) => { exMap[e.exercise_id] = e.response; });
       setExercisesById(exMap);
-    })();
-    getActivityForUser(userId).then(setActivity).catch(() => setActivity([]));
+      try {
+        const acts = await getActivityForUser(userId);
+        setActivity(acts);
+      } catch {
+        setActivity([]);
+      }
+      setLastRefreshed(new Date());
+    } finally {
+      setRefreshing(false);
+    }
   }, [userId]);
+
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
 
   if (!user) {
     return (
@@ -306,19 +324,44 @@ export const AdminStudentProfile: React.FC = () => {
 
   return (
     <div style={{ maxWidth: 880, margin: '0 auto', padding: '32px 24px' }}>
-      {/* Back link */}
-      <Link
-        to="/admin/users"
-        style={{
-          display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13,
-          color: 'var(--fg-3)', textDecoration: 'none', marginBottom: 24,
-          transition: 'color 0.15s',
-        }}
-        onMouseEnter={e => (e.currentTarget.style.color = 'var(--fg)')}
-        onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-3)')}
-      >
-        <ArrowLeft size={14} /> Înapoi la utilizatori
-      </Link>
+      {/* Back link + Refresh */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
+        <Link
+          to="/admin/users"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13,
+            color: 'var(--fg-3)', textDecoration: 'none',
+            transition: 'color 0.15s',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.color = 'var(--fg)')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-3)')}
+        >
+          <ArrowLeft size={14} /> Înapoi la utilizatori
+        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {lastRefreshed && (
+            <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>
+              Actualizat: {lastRefreshed.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </span>
+          )}
+          <button
+            onClick={loadAll}
+            disabled={refreshing}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              fontSize: 12, fontWeight: 600,
+              background: 'var(--bg-card)', border: '1px solid var(--border)',
+              color: 'var(--fg)', padding: '6px 12px', borderRadius: 8,
+              cursor: refreshing ? 'wait' : 'pointer',
+              opacity: refreshing ? 0.6 : 1,
+              transition: 'all 0.15s',
+            }}
+          >
+            <RefreshCw size={13} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
+            {refreshing ? 'Se actualizează…' : 'Reîmprospătează'}
+          </button>
+        </div>
+      </div>
 
       {/* ── Section 1: Header ── */}
       <motion.div
