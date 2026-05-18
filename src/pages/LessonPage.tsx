@@ -276,15 +276,23 @@ export const LessonPage: React.FC = () => {
   const totalCount = module.lessons.length;
   const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
+  const [completeError, setCompleteError] = useState<string | null>(null);
+
   const handleComplete = async () => {
     if (done || completing) return;
+    setCompleteError(null);
     setCompleting(true);
-    await markComplete(lesson!.id);
-    setJustCompleted(true);
-    setCompleting(false);
-    setShowConfetti(true);
-    if (user && lesson) {
-      logActivity({ userId: user.id, userEmail: user.email, userName: user.full_name, type: 'lesson_complete', label: `${user.full_name} a finalizat "${lesson.title}"`, data: { lessonId: lesson.id, lessonTitle: lesson.title, moduleId: lesson.module_id } });
+    try {
+      await markComplete(lesson!.id);
+      setJustCompleted(true);
+      setShowConfetti(true);
+      if (user && lesson) {
+        logActivity({ userId: user.id, userEmail: user.email, userName: user.full_name, type: 'lesson_complete', label: `${user.full_name} a finalizat "${lesson.title}"`, data: { lessonId: lesson.id, lessonTitle: lesson.title, moduleId: lesson.module_id } });
+      }
+    } catch (err: any) {
+      setCompleteError(err?.message || 'Eroare la salvare. Încearcă din nou.');
+    } finally {
+      setCompleting(false);
     }
   };
 
@@ -377,6 +385,9 @@ export const LessonPage: React.FC = () => {
                     showConfetti={showConfetti} onComplete={handleComplete}
                     onConfettiDone={() => setShowConfetti(false)} isExercise
                   />
+                  {completeError && (
+                    <p style={{ marginTop: 10, fontSize: 13, color: '#f87171' }}>{completeError}</p>
+                  )}
                 </div>
                 <NavButtons prev={prevLesson} next={nextLesson} nextModuleLesson={nextModuleLesson} nextModuleTitle={nextModule?.title} module={module} />
               </motion.div>
@@ -479,6 +490,9 @@ export const LessonPage: React.FC = () => {
           {/* Complete button */}
           <motion.div ref={completeRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} style={{ marginBottom: 24 }}>
             <CompleteButton done={done} justCompleted={justCompleted} completing={completing} showConfetti={showConfetti} onComplete={handleComplete} onConfettiDone={() => setShowConfetti(false)} />
+            {completeError && (
+              <p style={{ marginTop: 10, fontSize: 13, color: '#f87171' }}>{completeError}</p>
+            )}
           </motion.div>
 
           {/* Notes */}

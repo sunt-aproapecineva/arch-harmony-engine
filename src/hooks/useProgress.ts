@@ -75,7 +75,7 @@ export function useProgress() {
 
   const markComplete = useCallback(
     async (lessonId: string) => {
-      if (!user) return;
+      if (!user) throw new Error('Trebuie să fii autentificat pentru a finaliza lecția.');
 
       const already = progress.find(
         (p) => p.lesson_id === lessonId && p.user_id === user.id
@@ -88,14 +88,36 @@ export function useProgress() {
         completed_at: new Date().toISOString(),
       };
 
-      const updated = [...progress, newEntry];
-      setProgress(updated);
-
       if (isMockMode) {
+        const updated = [...progress, newEntry];
+        setProgress(updated);
         saveMockProgress(updated);
-      } else {
-        await supabase!.from('progress').insert(newEntry);
+        return;
       }
+
+      // Persist FIRST — confirm cloud save before updating UI state.
+      // Verify session is hydrated so the bearer token is attached.
+      const { data: sessionData } = await supabase!.auth.getSession();
+      if (!sessionData.session) {
+        throw new Error('Sesiunea nu este activă. Reîmprospătează pagina și încearcă din nou.');
+      }
+
+      const { error } = await supabase!
+        .from('progress')
+        .insert(newEntry)
+        .select()
+        .single();
+
+      // Ignore unique-violation (already saved from another tab)
+      if (error && error.code !== '23505') {
+        throw new Error(error.message || 'Nu am putut salva finalizarea. Încearcă din nou.');
+      }
+
+      setProgress((prev) =>
+        prev.some((p) => p.lesson_id === lessonId && p.user_id === user.id)
+          ? prev
+          : [...prev, newEntry]
+      );
     },
     [user, progress]
   );
