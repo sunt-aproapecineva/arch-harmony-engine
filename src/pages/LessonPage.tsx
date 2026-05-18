@@ -6,7 +6,7 @@ import {
   ChevronLeft, ChevronRight, CheckCircle2, FileText, Play, ExternalLink, ChevronDown,
   Lock, ClipboardList, ArrowRight,
 } from 'lucide-react';
-import { MODULES } from '../lib/data';
+import { MODULES, getModuleTimeline } from '../lib/data';
 import { Lesson, Module } from '../lib/types';
 import { useProgress } from '../hooks/useProgress';
 import { Confetti } from '../components/aa/Confetti';
@@ -160,9 +160,17 @@ export const LessonPage: React.FC = () => {
   const nextModuleLesson = nextModule?.lessons[0] || null;
   const youtubeId = getYouTubeId(lesson.video_url);
 
-  // Module progress bar data
-  const completedCount = module.lessons.filter(l => isCompleted(l.id)).length;
-  const totalCount = module.lessons.length;
+  // Unified module timeline — lessons & exercises counted together.
+  const timeline = getModuleTimeline(module);
+  const myEntry = timeline.find(e => e.kind === 'lesson' && (e.item as any).id === lesson.id);
+  const unifiedNo = myEntry?.lessonNo ?? lesson.order_index;
+  const totalSteps = timeline.length;
+
+  // Combined progress (lessons + exercises)
+  const completedCount =
+    module.lessons.filter(l => isCompleted(l.id)).length +
+    module.exercises.filter(e => isExerciseDone(e.id)).length;
+  const totalCount = totalSteps;
   const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   const handleMarkComplete = async () => {
