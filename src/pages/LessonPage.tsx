@@ -31,7 +31,7 @@ function getYouTubeId(url: string): string | null {
 export const LessonPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { markComplete, isCompleted, isModuleLocked } = useProgress();
+  const { markComplete, isCompleted, isModuleLocked, isExerciseDone } = useProgress();
   const { user } = useAuthContext();
   const [completing, setCompleting] = useState(false);
   const [justCompleted, setJustCompleted] = useState(false);
