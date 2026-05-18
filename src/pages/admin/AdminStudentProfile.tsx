@@ -512,11 +512,22 @@ export const AdminStudentProfile: React.FC = () => {
       {/* ── Section 6: Exercise Answers ── */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} style={cardStyle}>
         <div style={sectionLabel}>Răspunsuri exerciții</div>
+
+        {(() => {
+          const totalEx = MODULES.flatMap(m => (m as any).exercises || []).length;
+          const completedEx = Object.keys(exercisesById).length;
+          return (
+            <p style={{ fontSize: 12, color: 'var(--fg-3)', marginBottom: 16 }}>
+              <strong style={{ color: 'var(--accent)' }}>{completedEx}</strong> din <strong style={{ color: 'var(--fg)' }}>{totalEx}</strong> exerciții completate
+            </p>
+          );
+        })()}
+
         {MODULES.map(mod => {
-          const exWithAnswers = mod.exercises.map(ex => ({
+          const exWithAnswers = ((mod as any).exercises || []).map((ex: any) => ({
             ex,
             parsed: exercisesById[ex.id],
-          })).filter(x => x.parsed !== undefined);
+          })).filter((x: any) => x.parsed !== undefined);
 
           if (exWithAnswers.length === 0) return null;
 
@@ -526,21 +537,15 @@ export const AdminStudentProfile: React.FC = () => {
                 {mod.etapa} — {mod.title}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {exWithAnswers.map(({ ex, parsed }) => {
+                {exWithAnswers.map(({ ex, parsed }: any) => {
                   const template = EXERCISE_TEMPLATES.find(t => t.exerciseId === ex.id);
-                  const typeLabel = template?.type || 'unknown';
-
-                  let completionPct: number | null = null;
-                  if (typeLabel === 'checklist' && parsed && typeof parsed === 'object') {
-                    const values = Object.values(parsed as Record<string, boolean>);
-                    const checked = values.filter(Boolean).length;
-                    completionPct = template?.items ? Math.round((checked / template.items.length) * 100) : null;
-                  }
+                  const typeLabel = template?.type || 'form';
+                  const summary = renderReadableAnswer(parsed, template);
 
                   return (
                     <div key={ex.id} style={{ background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: 13, color: 'var(--fg)', fontWeight: 500, flex: 1 }}>{ex.title}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+                        <span style={{ fontSize: 13, color: 'var(--fg)', fontWeight: 600, flex: 1 }}>{ex.title}</span>
                         <span style={{
                           fontSize: 10, padding: '2px 8px', borderRadius: 99,
                           background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)',
@@ -548,15 +553,13 @@ export const AdminStudentProfile: React.FC = () => {
                         }}>
                           {typeLabel}
                         </span>
-                        {completionPct !== null && (
-                          <span style={{ fontSize: 11, color: completionPct === 100 ? '#4ade80' : 'var(--fg-3)' }}>
-                            {completionPct}% completat
+                        {summary.metric && (
+                          <span style={{ fontSize: 11, color: summary.metricColor || 'var(--fg-3)', fontWeight: 600 }}>
+                            {summary.metric}
                           </span>
                         )}
                       </div>
-                      <pre style={{ marginTop: 8, padding: '8px 10px', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, fontSize: 11, color: 'var(--fg-2)', whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: 200, overflow: 'auto' }}>
-                        {typeof parsed === 'string' ? parsed : JSON.stringify(parsed, null, 2)}
-                      </pre>
+                      {summary.node}
                     </div>
                   );
                 })}
