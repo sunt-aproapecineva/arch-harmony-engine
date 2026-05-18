@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
+import { useServerFn } from '@tanstack/react-start';
 import { useParams, useNavigate, Link } from '@/lib/router-compat';
 import { motion } from 'framer-motion';
 import {
@@ -14,6 +15,7 @@ import { ProgressBar } from '../../components/aa/ProgressBar';
 import { getActivityForUser, ActivityEvent, timeAgo, ActivityType } from '../../lib/activity';
 import { generateProfile, QuizProfile } from '../../lib/quizProfile';
 import { EXERCISE_TEMPLATES } from '../../lib/exerciseData';
+import { recoverStudentExerciseResponses } from '../../lib/adminRecovery.functions';
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: 'numeric' });
