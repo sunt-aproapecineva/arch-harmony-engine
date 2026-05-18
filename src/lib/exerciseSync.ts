@@ -41,27 +41,34 @@ export function pushExerciseResponse(exerciseId: string, response: unknown, dela
   );
 }
 
+export function getStoredExerciseResponse(storageKey: string): unknown | null {
+  try {
+    const raw = localStorage.getItem(storageKey);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Force-flush any pending debounce immediately (best-effort). */
 export async function flushExerciseResponse(exerciseId: string, response: unknown) {
   const t = timers.get(exerciseId);
   if (t) clearTimeout(t);
   timers.delete(exerciseId);
-  try {
-    const { data: sess } = await supabase.auth.getSession();
-    const userId = sess.session?.user?.id;
-    if (!userId) return;
-    await supabase.from('exercise_responses').upsert(
-      {
-        user_id: userId,
-        exercise_id: exerciseId,
-        response: response as any,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'user_id,exercise_id' }
-    );
-  } catch (e) {
-    console.error('[exerciseSync] flush failed', e);
-  }
+  const { data: sess } = await supabase.auth.getSession();
+  const userId = sess.session?.user?.id;
+  if (!userId) throw new Error('Sesiunea nu este activă. Reîmprospătează pagina și încearcă din nou.');
+
+  const { error } = await supabase.from('exercise_responses').upsert(
+    {
+      user_id: userId,
+      exercise_id: exerciseId,
+      response: response as any,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id,exercise_id' }
+  );
+  if (error) throw new Error(error.message || 'Nu am putut salva răspunsul exercițiului.');
 }
 
 /** Load saved response from Supabase (returns null if none or not signed in). */
