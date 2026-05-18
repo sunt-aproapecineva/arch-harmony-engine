@@ -206,9 +206,10 @@ const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: str
 // ─── Dynamic Table ─────────────────────────────────────────────────────────────
 type TableRow = Record<string, string>;
 
-const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({
+const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; exerciseId: string }> = ({
   template,
   storageKey,
+  exerciseId,
 }) => {
   const tableField = template.fields?.find(f => f.type === 'dynamic-table');
   const columns = tableField?.columns || ['Coloana 1', 'Coloana 2', 'Coloana 3'];
@@ -226,8 +227,19 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
+  useEffect(() => {
+    loadExerciseResponse(exerciseId).then(cloud => {
+      if (Array.isArray(cloud)) {
+        setRows(cloud as TableRow[]);
+        localStorage.setItem(storageKey, JSON.stringify(cloud));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exerciseId]);
+
   const save = (newRows: TableRow[]) => {
     localStorage.setItem(storageKey, JSON.stringify(newRows));
+    pushExerciseResponse(exerciseId, newRows);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
 
