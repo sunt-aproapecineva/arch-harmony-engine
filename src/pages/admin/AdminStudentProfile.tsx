@@ -256,6 +256,44 @@ export const AdminStudentProfile: React.FC = () => {
   const [exercisesById, setExercisesById] = useState<Record<string, any>>({});
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const [recoveringDrafts, setRecoveringDrafts] = useState(false);
+  const [recoveryMessage, setRecoveryMessage] = useState<string | null>(null);
+  const recoverResponses = useServerFn(recoverStudentExerciseResponses);
+
+  const handleRecoverLocalDrafts = async () => {
+    if (!userId) return;
+    setRecoveringDrafts(true);
+    setRecoveryMessage(null);
+    try {
+      const exerciseIds = MODULES.flatMap((m: any) => (m.exercises || []).map((ex: any) => ex.id));
+      const responses: { exercise_id: string; response: any }[] = [];
+      exerciseIds.forEach((exerciseId: string) => {
+        const candidateKeys = [`aa_ex_${userId}_${exerciseId}`, `aa_ex_anon_${exerciseId}`, `aa_ex_${exerciseId}`];
+        const matchingKeys: string[] = [];
+        for (let i = 0; i < localStorage.length; i += 1) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('aa_ex_') && key.endsWith(`_${exerciseId}`)) matchingKeys.push(key);
+        }
+        const key = [...candidateKeys, ...matchingKeys].find((k) => localStorage.getItem(k));
+        if (!key) return;
+        try {
+          const parsed = JSON.parse(localStorage.getItem(key) || 'null');
+          if (parsed !== null) responses.push({ exercise_id: exerciseId, response: parsed });
+        } catch {}
+      });
+      if (responses.length === 0) {
+        setRecoveryMessage('Nu am găsit drafturi locale în acest browser pentru acest student. Studentul trebuie să redeschidă exercițiile sau să le completeze din nou.');
+        return;
+      }
+      const result = await recoverResponses({ data: { studentId: userId, responses } });
+      setRecoveryMessage(`Am recuperat ${result.saved} răspunsuri locale și le-am salvat în cloud.`);
+      await loadAll();
+    } catch (err: any) {
+      setRecoveryMessage(err?.message || 'Nu am putut recupera drafturile locale.');
+    } finally {
+      setRecoveringDrafts(false);
+    }
+  };
 
   const loadAll = React.useCallback(async () => {
     if (!userId) return;
