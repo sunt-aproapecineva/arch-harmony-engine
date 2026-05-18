@@ -227,10 +227,13 @@ export const AdminStudentProfile: React.FC = () => {
   const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>({});
   const [notesByLesson, setNotesByLesson] = useState<Record<string, string>>({});
   const [exercisesById, setExercisesById] = useState<Record<string, any>>({});
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
 
-  useEffect(() => {
+  const loadAll = React.useCallback(async () => {
     if (!userId) return;
-    (async () => {
+    setRefreshing(true);
+    try {
       const [{ data: profile }, { data: progressRows }, { data: quiz }, { data: notesRows }, { data: exRows }] = await Promise.all([
         supabase.from('profiles').select('id,email,full_name,tariff,avatar_url,created_at').eq('id', userId).maybeSingle(),
         supabase.from('progress').select('user_id,lesson_id,completed_at').eq('user_id', userId),
@@ -254,6 +257,9 @@ export const AdminStudentProfile: React.FC = () => {
         const answers = quiz.answers as Record<string, string | string[]>;
         setQuizAnswers(answers);
         setQuizProfile(generateProfile(answers));
+      } else {
+        setQuizAnswers(null);
+        setQuizProfile(null);
       }
       const notesMap: Record<string, string> = {};
       (notesRows || []).forEach((n: any) => { notesMap[n.lesson_id] = n.content || ''; });
@@ -261,9 +267,21 @@ export const AdminStudentProfile: React.FC = () => {
       const exMap: Record<string, any> = {};
       (exRows || []).forEach((e: any) => { exMap[e.exercise_id] = e.response; });
       setExercisesById(exMap);
-    })();
-    getActivityForUser(userId).then(setActivity).catch(() => setActivity([]));
+      try {
+        const acts = await getActivityForUser(userId);
+        setActivity(acts);
+      } catch {
+        setActivity([]);
+      }
+      setLastRefreshed(new Date());
+    } finally {
+      setRefreshing(false);
+    }
   }, [userId]);
+
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
 
   if (!user) {
     return (
