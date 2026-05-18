@@ -292,13 +292,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "progress_lesson_id_fkey"
-            columns: ["lesson_id"]
-            isOneToOne: false
-            referencedRelation: "lessons"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "progress_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
