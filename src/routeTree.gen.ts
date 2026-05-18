@@ -25,6 +25,7 @@ import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AdminStudentUserIdRouteImport } from './routes/admin.student.$userId'
 import { Route as AppModuleIdRouteImport } from './routes/_app.module.$id'
 import { Route as AppLessonIdRouteImport } from './routes/_app.lesson.$id'
+import { Route as AppExerciseIdRouteImport } from './routes/_app.exercise.$id'
 
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
@@ -105,6 +106,11 @@ const AppLessonIdRoute = AppLessonIdRouteImport.update({
   path: '/lesson/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const AppExerciseIdRoute = AppExerciseIdRouteImport.update({
+  id: '/exercise/$id',
+  path: '/exercise/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/admin/progress': typeof AdminProgressRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
+  '/exercise/$id': typeof AppExerciseIdRoute
   '/lesson/$id': typeof AppLessonIdRoute
   '/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/admin/progress': typeof AdminProgressRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin': typeof AdminIndexRoute
+  '/exercise/$id': typeof AppExerciseIdRoute
   '/lesson/$id': typeof AppLessonIdRoute
   '/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/admin/progress': typeof AdminProgressRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
+  '/_app/exercise/$id': typeof AppExerciseIdRoute
   '/_app/lesson/$id': typeof AppLessonIdRoute
   '/_app/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
@@ -173,6 +182,7 @@ export interface FileRouteTypes {
     | '/admin/progress'
     | '/admin/users'
     | '/admin/'
+    | '/exercise/$id'
     | '/lesson/$id'
     | '/module/$id'
     | '/admin/student/$userId'
@@ -189,6 +199,7 @@ export interface FileRouteTypes {
     | '/admin/progress'
     | '/admin/users'
     | '/admin'
+    | '/exercise/$id'
     | '/lesson/$id'
     | '/module/$id'
     | '/admin/student/$userId'
@@ -207,6 +218,7 @@ export interface FileRouteTypes {
     | '/admin/progress'
     | '/admin/users'
     | '/admin/'
+    | '/_app/exercise/$id'
     | '/_app/lesson/$id'
     | '/_app/module/$id'
     | '/admin/student/$userId'
@@ -336,17 +348,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLessonIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/exercise/$id': {
+      id: '/_app/exercise/$id'
+      path: '/exercise/$id'
+      fullPath: '/exercise/$id'
+      preLoaderRoute: typeof AppExerciseIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
+  AppExerciseIdRoute: typeof AppExerciseIdRoute
   AppLessonIdRoute: typeof AppLessonIdRoute
   AppModuleIdRoute: typeof AppModuleIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
+  AppExerciseIdRoute: AppExerciseIdRoute,
   AppLessonIdRoute: AppLessonIdRoute,
   AppModuleIdRoute: AppModuleIdRoute,
 }

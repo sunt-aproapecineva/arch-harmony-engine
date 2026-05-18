@@ -1,13 +1,12 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from '@/lib/router-compat';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-  Play, Lock, Clock, FileText, ChevronDown, CheckCircle2, Award, ChevronRight, Star,
+  Play, Lock, Clock, FileText, CheckCircle2, ChevronRight, Star, Sparkles,
 } from 'lucide-react';
 import { MODULES, getModuleTimeline } from '../lib/data';
 import { useProgress } from '../hooks/useProgress';
-import { ExerciseBlock } from '../components/exercises/ExerciseBlock';
 import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
 import { useAuthContext } from '../context/AuthContext';
 
@@ -16,18 +15,6 @@ export const ModulePage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuthContext();
   const { getModuleProgress, isModuleLocked, isCompleted, isExerciseDone } = useProgress();
-  const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.startsWith('#ex-')) {
-      const exId = hash.slice(4);
-      setExpandedExercise(exId);
-      setTimeout(() => {
-        const el = document.getElementById(`ex-${exId}`);
-        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 200);
-    }
-  }, []);
   const quizDone = user
     ? !!localStorage.getItem(`aa_quiz_done_${user.id}`)
     : false;
@@ -323,68 +310,58 @@ export const ModulePage: React.FC = () => {
                       }}>
                         {exDone
                           ? <CheckCircle2 size={14} style={{ color: '#4ade80' }} />
-                          : <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--gold)' }}>{entry.lessonNo}</span>
+                          : <Sparkles size={13} style={{ color: 'var(--gold)' }} />
                         }
                       </div>
                     </div>
 
-                    {/* Exercise accordion */}
-                    <div style={{ flex: 1, background: 'var(--bg-card)', border: `1px solid ${cardBorder}`, borderRadius: 12, overflow: 'hidden' }}>
-                      <button
-                        style={{
-                          width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                          padding: '11px 16px', background: 'none', border: 'none', cursor: 'pointer',
-                          textAlign: 'left', transition: 'background 0.15s',
-                        }}
-                        onClick={() => setExpandedExercise(expandedExercise === ex.id ? null : ex.id)}
-                        onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-3)')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-                      >
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 10, color: exDone ? '#4ade80' : 'var(--gold)', marginBottom: 2, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                            Lecția {entry.lessonNo} · Exercițiu practic
-                          </div>
-                          <p style={{ fontSize: 13, fontWeight: 500, color: exDone ? 'var(--fg-2)' : 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {ex.title}
-                          </p>
+                    {/* Exercise card — navigates to dedicated page */}
+                    <div
+                      onClick={() => {
+                        if (locked) return;
+                        if (!quizDone) { setQuizModalOpen(true); return; }
+                        navigate(`/exercise/${ex.id}`);
+                      }}
+                      style={{
+                        flex: 1, padding: '11px 16px',
+                        background: 'var(--bg-card)',
+                        border: `1px solid ${cardBorder}`,
+                        borderRadius: 12, cursor: locked ? 'not-allowed' : 'pointer',
+                        opacity: locked ? 0.5 : 1,
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+                        transition: 'border-color 0.15s, background 0.15s, transform 0.15s',
+                      }}
+                      onMouseEnter={e => { if (!locked) { (e.currentTarget as HTMLDivElement).style.borderColor = exDone ? 'rgba(74,222,128,0.4)' : 'rgba(201,169,110,0.4)'; (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-3)'; }}}
+                      onMouseLeave={e => {
+                        (e.currentTarget as HTMLDivElement).style.borderColor = cardBorder;
+                        (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-card)';
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 10, color: exDone ? '#4ade80' : 'var(--gold)', marginBottom: 2, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                          Lecția {entry.lessonNo} · Exercițiu practic
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                          <span style={{
-                            fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
-                            color: exDone ? '#4ade80' : 'var(--gold)',
-                            background: exDone ? 'rgba(74,222,128,0.1)' : 'var(--gold-dim)',
-                            border: `1px solid ${exDone ? 'rgba(74,222,128,0.25)' : 'rgba(201,169,110,0.2)'}`,
-                            padding: '2px 7px', borderRadius: 4,
-                          }}>
-                            {exDone ? 'Finalizat' : 'Interactiv'}
-                          </span>
-                          <ChevronDown
-                            size={15}
-                            style={{
-                              color: 'var(--fg-3)', flexShrink: 0,
-                              transform: expandedExercise === ex.id ? 'rotate(180deg)' : 'none',
-                              transition: 'transform 0.2s',
-                            }}
-                          />
+                        <div style={{ fontSize: 13, fontWeight: 500, color: exDone ? 'var(--fg-2)' : 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {ex.title}
                         </div>
-                      </button>
-
-                      <AnimatePresence initial={false}>
-                        {expandedExercise === ex.id && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.25 }}
-                            style={{ overflow: 'hidden' }}
-                          >
-                            <div style={{ borderTop: '1px solid rgba(201,169,110,0.15)', padding: '4px 16px 16px' }}>
-                              <p style={{ fontSize: 12, color: 'var(--fg-3)', lineHeight: 1.6, margin: '10px 0 14px' }}>{ex.description}</p>
-                              <ExerciseBlock exerciseId={ex.id} />
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                        <span style={{
+                          fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+                          color: exDone ? '#4ade80' : 'var(--gold)',
+                          background: exDone ? 'rgba(74,222,128,0.1)' : 'var(--gold-dim)',
+                          border: `1px solid ${exDone ? 'rgba(74,222,128,0.25)' : 'rgba(201,169,110,0.2)'}`,
+                          padding: '2px 7px', borderRadius: 4,
+                        }}>
+                          {exDone ? 'Finalizat' : 'Interactiv'}
+                        </span>
+                        {exDone
+                          ? <CheckCircle2 size={15} style={{ color: '#4ade80' }} />
+                          : locked
+                          ? <Lock size={13} style={{ color: 'var(--fg-3)' }} />
+                          : <ChevronRight size={15} style={{ color: 'var(--gold)' }} />
+                        }
+                      </div>
                     </div>
                   </motion.div>
                 );

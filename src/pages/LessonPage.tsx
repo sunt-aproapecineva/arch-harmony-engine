@@ -153,8 +153,6 @@ export const LessonPage: React.FC = () => {
   }
 
   const done = isCompleted(lesson.id);
-  const prevLesson = lessonIndex > 0 ? module.lessons[lessonIndex - 1] : null;
-  const nextLesson = lessonIndex < module.lessons.length - 1 ? module.lessons[lessonIndex + 1] : null;
   const moduleIndex = MODULES.findIndex(m => m.id === module!.id);
   const nextModule = moduleIndex < MODULES.length - 1 ? MODULES[moduleIndex + 1] : null;
   const nextModuleLesson = nextModule?.lessons[0] || null;
@@ -162,9 +160,16 @@ export const LessonPage: React.FC = () => {
 
   // Unified module timeline — lessons & exercises counted together.
   const timeline = getModuleTimeline(module);
-  const myEntry = timeline.find(e => e.kind === 'lesson' && (e.item as any).id === lesson.id);
+  const myTimelineIdx = timeline.findIndex(e => e.kind === 'lesson' && (e.item as any).id === lesson.id);
+  const myEntry = timeline[myTimelineIdx];
   const unifiedNo = myEntry?.lessonNo ?? lesson.order_index;
   const totalSteps = timeline.length;
+
+  // prev/next derived from unified timeline (lesson <-> exercise flow)
+  const prevEntry = myTimelineIdx > 0 ? timeline[myTimelineIdx - 1] : null;
+  const nextEntry = myTimelineIdx >= 0 && myTimelineIdx < timeline.length - 1 ? timeline[myTimelineIdx + 1] : null;
+  const linkForEntry = (e: any) =>
+    e.kind === 'lesson' ? `/lesson/${(e.item as any).id}` : `/exercise/${(e.item as any).id}`;
 
   // Combined progress (lessons + exercises)
   const completedCount =
@@ -483,9 +488,9 @@ export const LessonPage: React.FC = () => {
           {/* Navigation */}
           <div style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'space-between', gap: 12, paddingTop: 20, borderTop: '1px solid var(--border)' }}>
             <div style={{ flex: 1 }}>
-              {prevLesson ? (
+              {prevEntry ? (
                 <button
-                  onClick={() => navigate(`/lesson/${prevLesson.id}`)}
+                  onClick={() => navigate(linkForEntry(prevEntry))}
                   style={{
                     width: '100%', display: 'flex', alignItems: 'center', gap: 10,
                     padding: '12px 14px', background: 'var(--bg-card)', border: '1px solid var(--border)',
@@ -497,8 +502,8 @@ export const LessonPage: React.FC = () => {
                 >
                   <ChevronLeft size={16} style={{ color: 'var(--fg-3)', flexShrink: 0 }} />
                   <span>
-                    <div style={{ fontSize: 10, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Anterior</div>
-                    <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>{prevLesson.title}</div>
+                    <div style={{ fontSize: 10, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Anterior · Lecția {prevEntry.lessonNo}</div>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>{(prevEntry.item as any).title}</div>
                   </span>
                 </button>
               ) : (
@@ -519,9 +524,9 @@ export const LessonPage: React.FC = () => {
             </div>
 
             <div style={{ flex: 1 }}>
-              {nextLesson ? (
+              {nextEntry ? (
                 <button
-                  onClick={() => navigate(`/lesson/${nextLesson.id}`)}
+                  onClick={() => navigate(linkForEntry(nextEntry))}
                   style={{
                     width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10,
                     padding: '12px 14px', background: 'var(--bg-card)', border: '1px solid var(--border)',
@@ -532,8 +537,8 @@ export const LessonPage: React.FC = () => {
                   onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}
                 >
                   <span>
-                    <div style={{ fontSize: 10, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Următor</div>
-                    <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>{nextLesson.title}</div>
+                    <div style={{ fontSize: 10, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Următor · Lecția {nextEntry.lessonNo}</div>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>{(nextEntry.item as any).title}</div>
                   </span>
                   <ChevronRight size={16} style={{ color: 'var(--fg-3)', flexShrink: 0 }} />
                 </button>
@@ -551,7 +556,7 @@ export const LessonPage: React.FC = () => {
                 >
                   <span>
                     <div style={{ fontSize: 10, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Modul următor</div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>{nextModule?.title}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>{nextModule?.title}</div>
                   </span>
                   <ChevronRight size={16} style={{ color: 'var(--accent)', flexShrink: 0 }} />
                 </button>
@@ -606,7 +611,7 @@ export const LessonPage: React.FC = () => {
                 return (
                   <button
                     key={item.id}
-                    onClick={() => navigate(`/module/${module.id}#ex-${item.id}`)}
+                    onClick={() => navigate(`/exercise/${item.id}`)}
                     title="Exercițiu practic"
                     style={{
                       width: '100%', display: 'flex', alignItems: 'center', gap: 8,
