@@ -980,7 +980,7 @@ const DIAG_DIMENSIONS = [
 
 const SCORE_COLORS: Record<number, string> = { 1: '#f87171', 2: '#fb923c', 3: 'var(--gold)', 4: '#86efac', 5: '#4ade80' };
 
-const DiagnosticGridExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+const DiagnosticGridExercise: React.FC<{ storageKey: string; exerciseId: string }> = ({ storageKey, exerciseId }) => {
   const [answers, setAnswers] = useState<Record<string, number>>(() => {
     try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s).answers || {} : {}; } catch { return {}; }
   });
@@ -989,8 +989,28 @@ const DiagnosticGridExercise: React.FC<{ storageKey: string }> = ({ storageKey }
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
+  useEffect(() => {
+    loadExerciseResponse(exerciseId).then(cloud => {
+      if (cloud && typeof cloud === 'object' && !Array.isArray(cloud)) {
+        const c: any = cloud;
+        // Support both new shape { answers, commitment } and legacy bare answers object
+        if (c.answers && typeof c.answers === 'object') {
+          setAnswers(c.answers);
+          if (typeof c.commitment === 'string') setCommitment(c.commitment);
+          localStorage.setItem(storageKey, JSON.stringify(cloud));
+        } else if (Object.values(c).every(v => typeof v === 'number')) {
+          setAnswers(c);
+          localStorage.setItem(storageKey, JSON.stringify({ answers: c, commitment: '' }));
+        }
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exerciseId]);
+
   const save = (a: Record<string, number>, c: string) => {
-    localStorage.setItem(storageKey, JSON.stringify({ answers: a, commitment: c }));
+    const payload = { answers: a, commitment: c };
+    localStorage.setItem(storageKey, JSON.stringify(payload));
+    pushExerciseResponse(exerciseId, payload);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const setAnswer = (qId: string, val: number) => {
