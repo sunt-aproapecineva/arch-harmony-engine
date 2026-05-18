@@ -256,7 +256,7 @@ export const ModulePage: React.FC = () => {
                       }}
                     >
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 10, color: 'var(--fg-3)', marginBottom: 2 }}>Lecția {lesson.order_index}</div>
+                        <div style={{ fontSize: 10, color: 'var(--fg-3)', marginBottom: 2 }}>Lecția {entry.lessonNo} <span style={{ opacity: 0.6 }}>· Video</span> · {totalSteps} total</div>
                         <div style={{ fontSize: 13, fontWeight: 500, color: lessonDone ? 'var(--fg-2)' : 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {lesson.title}
                         </div>
@@ -311,7 +311,7 @@ export const ModulePage: React.FC = () => {
                       }}>
                         {exDone
                           ? <CheckCircle2 size={14} style={{ color: '#4ade80' }} />
-                          : <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--gold)' }}>{ex.order_index}</span>
+                          : <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--gold)' }}>{entry.lessonNo}</span>
                         }
                       </div>
                     </div>
@@ -330,7 +330,7 @@ export const ModulePage: React.FC = () => {
                       >
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontSize: 10, color: exDone ? '#4ade80' : 'var(--gold)', marginBottom: 2, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                            Exercițiu {ex.order_index}
+                            Lecția {entry.lessonNo} · Exercițiu practic
                           </div>
                           <p style={{ fontSize: 13, fontWeight: 500, color: exDone ? 'var(--fg-2)' : 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {ex.title}
