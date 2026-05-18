@@ -14,6 +14,7 @@ import { Confetti } from '../components/aa/Confetti';
 import { useAuthContext } from '../context/AuthContext';
 import { logActivity } from '../lib/activity';
 import { ExerciseBlock } from '../components/exercises/ExerciseBlock';
+import { flushExerciseResponse, getStoredExerciseResponse } from '../lib/exerciseSync';
 
 function getYouTubeId(url: string): string | null {
   if (!url) return null;
@@ -289,6 +290,14 @@ export const LessonPage: React.FC = () => {
     setCompleteError(null);
     setCompleting(true);
     try {
+      if (lesson!.type === 'exercise' && lesson!.exercise_id) {
+        const userDraft = user?.id ? getStoredExerciseResponse(`aa_ex_${user.id}_${lesson!.exercise_id}`) : null;
+        const anonDraft = getStoredExerciseResponse(`aa_ex_anon_${lesson!.exercise_id}`);
+        const exerciseDraft = userDraft ?? anonDraft;
+        if (exerciseDraft !== null) {
+          await flushExerciseResponse(lesson!.exercise_id, exerciseDraft);
+        }
+      }
       await markComplete(lesson!.id);
       setJustCompletedLessonId(lesson!.id);
       setShowConfetti(true);

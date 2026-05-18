@@ -114,6 +114,31 @@ function renderReadableAnswer(
 
   // Object
   if (typeof parsed === 'object') {
+    if (Array.isArray(parsed.rows)) {
+      const rows = parsed.rows.filter((r: any) => r && typeof r === 'object' && Object.values(r).some(v => String(v ?? '').trim() !== ''));
+      const conclusion = typeof parsed.conclusion === 'string' ? parsed.conclusion.trim() : '';
+      return {
+        metric: `${rows.length} ${rows.length === 1 ? 'rând' : 'rânduri'}${conclusion ? ' • concluzie' : ''}`,
+        metricColor: rows.length > 0 || conclusion ? '#4ade80' : 'var(--fg-3)',
+        node: (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {rows.map((row: any, i: number) => (
+              <div key={i} style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 10px' }}>
+                <div style={{ fontSize: 10, color: 'var(--fg-3)', marginBottom: 4 }}>#{i + 1}</div>
+                {Object.entries(row).filter(([, v]) => String(v ?? '').trim() !== '').map(([k, v]) => (
+                  <div key={k} style={{ display: 'flex', gap: 8, fontSize: 12, marginBottom: 2 }}>
+                    <span style={{ color: 'var(--fg-3)', minWidth: 130, flexShrink: 0 }}>{k}:</span>
+                    <span style={{ color: 'var(--fg)', whiteSpace: 'pre-wrap' }}>{String(v ?? '—')}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+            {conclusion && <div style={{ fontSize: 13, color: 'var(--fg)', whiteSpace: 'pre-wrap', lineHeight: 1.5, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 10px' }}>{conclusion}</div>}
+          </div>
+        ),
+      };
+    }
+
     const entries = Object.entries(parsed);
     const values = entries.map(([, v]) => v);
 
@@ -700,12 +725,25 @@ export const AdminStudentProfile: React.FC = () => {
         <div style={sectionLabel}>Răspunsuri exerciții</div>
 
         {(() => {
-          const totalEx = MODULES.flatMap(m => (m as any).exercises || []).length;
+          const exerciseLessons = MODULES.flatMap(m => m.lessons.filter((l: any) => l.type === 'exercise' && l.exercise_id));
+          const totalEx = exerciseLessons.length;
+          const completedLessons = exerciseLessons.filter((l: any) => progress.some(p => p.lesson_id === l.id));
           const completedEx = Object.keys(exercisesById).length;
+          const missingResponses = completedLessons.filter((l: any) => exercisesById[l.exercise_id] === undefined);
           return (
-            <p style={{ fontSize: 12, color: 'var(--fg-3)', marginBottom: 16 }}>
-              <strong style={{ color: 'var(--accent)' }}>{completedEx}</strong> din <strong style={{ color: 'var(--fg)' }}>{totalEx}</strong> exerciții completate
-            </p>
+            <div style={{ marginBottom: 16 }}>
+              <p style={{ fontSize: 12, color: 'var(--fg-3)', marginBottom: missingResponses.length ? 10 : 0 }}>
+                <strong style={{ color: 'var(--accent)' }}>{completedEx}</strong> răspunsuri salvate din <strong style={{ color: 'var(--fg)' }}>{totalEx}</strong> exerciții · <strong style={{ color: 'var(--fg)' }}>{completedLessons.length}</strong> exerciții marcate finalizate
+              </p>
+              {missingResponses.length > 0 && (
+                <div style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.22)', borderRadius: 8, padding: '10px 12px' }}>
+                  <p style={{ fontSize: 12, color: '#fca5a5', marginBottom: 6, fontWeight: 600 }}>Finalizate, dar fără răspuns salvat în cloud:</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {missingResponses.map((l: any) => <span key={l.id} style={{ fontSize: 12, color: 'var(--fg-2)' }}>• {l.title}</span>)}
+                  </div>
+                </div>
+              )}
+            </div>
           );
         })()}
 

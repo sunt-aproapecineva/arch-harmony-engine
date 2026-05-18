@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Plus, Trash2, ChevronRight } from 'lucide-react';
 import { getExerciseTemplate, ExerciseTemplate, QuizQuestionItem } from '../../lib/exerciseData';
 import { useAuthContext } from '../../context/AuthContext';
-import { pushExerciseResponse, loadExerciseResponse } from '../../lib/exerciseSync';
+import { pushExerciseResponse, loadExerciseResponse, flushExerciseResponse, getStoredExerciseResponse } from '../../lib/exerciseSync';
 
 interface ExerciseBlockProps {
   exerciseId: string;
@@ -1158,15 +1158,33 @@ const DiagnosticGridExercise: React.FC<{ storageKey: string; exerciseId: string 
 
 // ─── Main ExerciseBlock ───────────────────────────────────────────────────────
 export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
-  const { user } = useAuthContext();
+  const { user, loading } = useAuthContext();
   const template = getExerciseTemplate(exerciseId);
   // Keyed per user so exercises are never shared between accounts
   const storageKey = `aa_ex_${user?.id ?? 'anon'}_${exerciseId}`;
+
+  useEffect(() => {
+    if (!user) return;
+    const localDraft = getStoredExerciseResponse(storageKey);
+    if (localDraft !== null) {
+      flushExerciseResponse(exerciseId, localDraft).catch((error) => {
+        console.error('[exerciseSync] initial local draft sync failed', error);
+      });
+    }
+  }, [exerciseId, storageKey, user]);
 
   if (!template) {
     return (
       <div style={{ padding: '16px', fontSize: 13, color: 'var(--fg-3)' }}>
         Exercițiul interactiv va fi disponibil în curând.
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div style={{ padding: '16px', fontSize: 13, color: 'var(--fg-3)' }}>
+        Se încarcă exercițiul...
       </div>
     );
   }
@@ -1204,7 +1222,7 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
   };
 
   return (
-    <div style={{ padding: '0 0 4px' }}>
+    <div key={storageKey} style={{ padding: '0 0 4px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
         <span style={{
           fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
