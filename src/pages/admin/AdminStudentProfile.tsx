@@ -4,7 +4,7 @@ import { useParams, useNavigate, Link } from '@/lib/router-compat';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, LogIn, CheckCircle, FileText, Award, UserPlus, Pencil,
-  AlertTriangle, ChevronDown, ChevronUp,
+  AlertTriangle, ChevronDown, ChevronUp, RefreshCw,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { MockUser, Progress } from '../../lib/types';
