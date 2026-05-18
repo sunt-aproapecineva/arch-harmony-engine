@@ -11,7 +11,7 @@ export interface ChecklistItem {
   label: string;
 }
 
-/** Column for a dynamic-table field. Either a plain string label, or an object with select options. */
+/** Column for a dynamic-table field. Plain string label (free-text column) or object spec with select options. */
 export type DynamicTableColumn = string | { name: string; options?: string[]; width?: string };
 
 export interface FormField {
@@ -20,8 +20,10 @@ export interface FormField {
   label?: string;
   placeholder?: string;
   text?: string;
-  /** For dynamic-table: column specs. Strings = free text columns; objects can declare select options. */
-  columns?: DynamicTableColumn[];
+  /** For dynamic-table: simple list of column labels. */
+  columns?: string[];
+  /** For dynamic-table: richer column specs (select options, custom width). When set, overrides `columns`. */
+  columnsSpec?: DynamicTableColumn[];
   addLabel?: string;
   minRows?: number;
 }
