@@ -1,13 +1,12 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from '@/lib/router-compat';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-  Play, Lock, Clock, FileText, ChevronDown, CheckCircle2, Award, ChevronRight, Star,
+  Play, Lock, Clock, FileText, CheckCircle2, ChevronRight, Star, Sparkles,
 } from 'lucide-react';
 import { MODULES, getModuleTimeline } from '../lib/data';
 import { useProgress } from '../hooks/useProgress';
-import { ExerciseBlock } from '../components/exercises/ExerciseBlock';
 import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
 import { useAuthContext } from '../context/AuthContext';
 
@@ -16,18 +15,6 @@ export const ModulePage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuthContext();
   const { getModuleProgress, isModuleLocked, isCompleted, isExerciseDone } = useProgress();
-  const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.startsWith('#ex-')) {
-      const exId = hash.slice(4);
-      setExpandedExercise(exId);
-      setTimeout(() => {
-        const el = document.getElementById(`ex-${exId}`);
-        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 200);
-    }
-  }, []);
   const quizDone = user
     ? !!localStorage.getItem(`aa_quiz_done_${user.id}`)
     : false;
