@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate, Link } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -187,9 +187,17 @@ export const LessonPage: React.FC = () => {
   const { markComplete, isCompleted, isModuleLocked } = useProgress();
   const { user } = useAuthContext();
   const [completing, setCompleting] = useState(false);
-  const [justCompleted, setJustCompleted] = useState(false);
+  const [justCompletedLessonId, setJustCompletedLessonId] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [completeError, setCompleteError] = useState<string | null>(null);
   const completeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setCompleting(false);
+    setJustCompletedLessonId(null);
+    setShowConfetti(false);
+    setCompleteError(null);
+  }, [id]);
 
   const NOTES_KEY = `aa_note_${user?.id ?? 'anon'}_${id}`;
   const [note, setNote] = useState(() => localStorage.getItem(NOTES_KEY) || '');
@@ -276,20 +284,19 @@ export const LessonPage: React.FC = () => {
   const totalCount = module.lessons.length;
   const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
-  const [completeError, setCompleteError] = useState<string | null>(null);
-
   const handleComplete = async () => {
     if (done || completing) return;
     setCompleteError(null);
     setCompleting(true);
     try {
       await markComplete(lesson!.id);
-      setJustCompleted(true);
+      setJustCompletedLessonId(lesson!.id);
       setShowConfetti(true);
       if (user && lesson) {
         logActivity({ userId: user.id, userEmail: user.email, userName: user.full_name, type: 'lesson_complete', label: `${user.full_name} a finalizat "${lesson.title}"`, data: { lessonId: lesson.id, lessonTitle: lesson.title, moduleId: lesson.module_id } });
       }
     } catch (err: any) {
+      setJustCompletedLessonId(null);
       setCompleteError(err?.message || 'Eroare la salvare. Încearcă din nou.');
     } finally {
       setCompleting(false);
@@ -298,6 +305,7 @@ export const LessonPage: React.FC = () => {
 
   const isExercise = lesson.type === 'exercise';
   const youtubeId = !isExercise ? getYouTubeId(lesson.video_url) : null;
+  const justCompleted = justCompletedLessonId === lesson.id;
 
   // ── EXERCISE PAGE ──────────────────────────────────────────────────────────
   if (isExercise && lesson.exercise_id) {
