@@ -606,7 +606,7 @@ export const LessonPage: React.FC = () => {
                 return (
                   <button
                     key={item.id}
-                    onClick={() => navigate(`/module/${module.id}#ex-${item.id}`)}
+                    onClick={() => navigate(`/exercise/${item.id}`)}
                     title="Exercițiu practic"
                     style={{
                       width: '100%', display: 'flex', alignItems: 'center', gap: 8,
