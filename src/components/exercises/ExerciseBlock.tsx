@@ -1158,7 +1158,7 @@ const DiagnosticGridExercise: React.FC<{ storageKey: string; exerciseId: string 
 
 // ─── Main ExerciseBlock ───────────────────────────────────────────────────────
 export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
-  const { user } = useAuthContext();
+  const { user, loading } = useAuthContext();
   const template = getExerciseTemplate(exerciseId);
   // Keyed per user so exercises are never shared between accounts
   const storageKey = `aa_ex_${user?.id ?? 'anon'}_${exerciseId}`;
@@ -1177,6 +1177,14 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
     return (
       <div style={{ padding: '16px', fontSize: 13, color: 'var(--fg-3)' }}>
         Exercițiul interactiv va fi disponibil în curând.
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div style={{ padding: '16px', fontSize: 13, color: 'var(--fg-3)' }}>
+        Se încarcă exercițiul...
       </div>
     );
   }
@@ -1214,7 +1222,7 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
   };
 
   return (
-    <div style={{ padding: '0 0 4px' }}>
+    <div key={storageKey} style={{ padding: '0 0 4px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
         <span style={{
           fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
