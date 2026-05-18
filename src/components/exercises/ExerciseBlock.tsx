@@ -1,17 +1,19 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Plus, Trash2, ChevronRight } from 'lucide-react';
 import { getExerciseTemplate, ExerciseTemplate, QuizQuestionItem } from '../../lib/exerciseData';
 import { useAuthContext } from '../../context/AuthContext';
+import { pushExerciseResponse, loadExerciseResponse } from '../../lib/exerciseSync';
 
 interface ExerciseBlockProps {
   exerciseId: string;
 }
 
 // ─── Checklist ────────────────────────────────────────────────────────────────
-const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({
+const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; exerciseId: string }> = ({
   template,
   storageKey,
+  exerciseId,
 }) => {
   const [checked, setChecked] = useState<Record<string, boolean>>(() => {
     try {
@@ -23,10 +25,21 @@ const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: stri
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
+  useEffect(() => {
+    loadExerciseResponse(exerciseId).then(cloud => {
+      if (cloud && typeof cloud === 'object') {
+        setChecked(cloud as Record<string, boolean>);
+        localStorage.setItem(storageKey, JSON.stringify(cloud));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exerciseId]);
+
   const toggle = (id: string) => {
     const next = { ...checked, [id]: !checked[id] };
     setChecked(next);
     localStorage.setItem(storageKey, JSON.stringify(next));
+    pushExerciseResponse(exerciseId, next);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
 
@@ -76,9 +89,10 @@ const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: stri
 };
 
 // ─── Form Fields ──────────────────────────────────────────────────────────────
-const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({
+const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; exerciseId: string }> = ({
   template,
   storageKey,
+  exerciseId,
 }) => {
   const [values, setValues] = useState<Record<string, string>>(() => {
     try {
@@ -91,10 +105,21 @@ const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: str
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  useEffect(() => {
+    loadExerciseResponse(exerciseId).then(cloud => {
+      if (cloud && typeof cloud === 'object') {
+        setValues(cloud as Record<string, string>);
+        localStorage.setItem(storageKey, JSON.stringify(cloud));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exerciseId]);
+
   const save = useCallback((newVals: Record<string, string>) => {
     localStorage.setItem(storageKey, JSON.stringify(newVals));
+    pushExerciseResponse(exerciseId, newVals);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
-  }, [storageKey]);
+  }, [storageKey, exerciseId]);
 
   const handleChange = (id: string, val: string) => {
     const next = { ...values, [id]: val };
@@ -181,9 +206,10 @@ const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: str
 // ─── Dynamic Table ─────────────────────────────────────────────────────────────
 type TableRow = Record<string, string>;
 
-const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({
+const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; exerciseId: string }> = ({
   template,
   storageKey,
+  exerciseId,
 }) => {
   const tableField = template.fields?.find(f => f.type === 'dynamic-table');
   const columns = tableField?.columns || ['Coloana 1', 'Coloana 2', 'Coloana 3'];
@@ -201,8 +227,19 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
+  useEffect(() => {
+    loadExerciseResponse(exerciseId).then(cloud => {
+      if (Array.isArray(cloud)) {
+        setRows(cloud as TableRow[]);
+        localStorage.setItem(storageKey, JSON.stringify(cloud));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exerciseId]);
+
   const save = (newRows: TableRow[]) => {
     localStorage.setItem(storageKey, JSON.stringify(newRows));
+    pushExerciseResponse(exerciseId, newRows);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
 
@@ -308,9 +345,10 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
 };
 
 // ─── Quiz ─────────────────────────────────────────────────────────────────────
-const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({
+const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; exerciseId: string }> = ({
   template,
   storageKey,
+  exerciseId,
 }) => {
   const questions: QuizQuestionItem[] = template.questions || [];
   const [answers, setAnswers] = useState<Record<string, string | number>>(() => {
@@ -324,6 +362,16 @@ const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }>
   const [currentIdx, setCurrentIdx] = useState(0);
   const [finished, setFinished] = useState(false);
 
+  useEffect(() => {
+    loadExerciseResponse(exerciseId).then(cloud => {
+      if (cloud && typeof cloud === 'object' && !Array.isArray(cloud)) {
+        setAnswers(cloud as Record<string, string | number>);
+        localStorage.setItem(storageKey, JSON.stringify(cloud));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exerciseId]);
+
   const savedCount = Object.keys(answers).length;
   const allAnswered = questions.every(q => answers[q.id] !== undefined);
 
@@ -331,6 +379,7 @@ const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }>
     const next = { ...answers, [questionId]: val };
     setAnswers(next);
     localStorage.setItem(storageKey, JSON.stringify(next));
+    pushExerciseResponse(exerciseId, next);
     setTimeout(() => {
       if (currentIdx < questions.length - 1) {
         setCurrentIdx(i => i + 1);
@@ -496,7 +545,7 @@ const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }>
 // ─── Activity Audit (Exercițiul 1) ────────────────────────────────────────────
 interface ActivityRow { id: string; activity: string; percentage: string; role: 'S' | 'D' | 'P' | '' }
 
-const ActivityAuditExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+const ActivityAuditExercise: React.FC<{ storageKey: string; exerciseId: string }> = ({ storageKey, exerciseId }) => {
   const defaultRows = (): ActivityRow[] =>
     Array.from({ length: 8 }, (_, i) => ({ id: `r${i}`, activity: '', percentage: '', role: '' }));
 
@@ -509,8 +558,22 @@ const ActivityAuditExercise: React.FC<{ storageKey: string }> = ({ storageKey })
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
+  useEffect(() => {
+    loadExerciseResponse(exerciseId).then(cloud => {
+      if (cloud && typeof cloud === 'object' && !Array.isArray(cloud)) {
+        const c: any = cloud;
+        if (Array.isArray(c.rows)) setRows(c.rows);
+        if (typeof c.conclusion === 'string') setConclusion(c.conclusion);
+        localStorage.setItem(storageKey, JSON.stringify(cloud));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exerciseId]);
+
   const save = (r: ActivityRow[], c: string) => {
-    localStorage.setItem(storageKey, JSON.stringify({ rows: r, conclusion: c }));
+    const payload = { rows: r, conclusion: c };
+    localStorage.setItem(storageKey, JSON.stringify(payload));
+    pushExerciseResponse(exerciseId, payload);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updateRow = (id: string, field: keyof ActivityRow, value: string) => {
@@ -615,7 +678,7 @@ const ActivityAuditExercise: React.FC<{ storageKey: string }> = ({ storageKey })
 // ─── Bottleneck Map (Exercițiul 2) ────────────────────────────────────────────
 interface BottleneckRow { id: string; situation: string; wasNecessary: 'da' | 'nu' | ''; reason: string; time: string }
 
-const BottleneckMapExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+const BottleneckMapExercise: React.FC<{ storageKey: string; exerciseId: string }> = ({ storageKey, exerciseId }) => {
   const defaultRows = (): BottleneckRow[] =>
     Array.from({ length: 5 }, (_, i) => ({ id: `r${i}`, situation: '', wasNecessary: '', reason: '', time: '' }));
 
@@ -628,8 +691,22 @@ const BottleneckMapExercise: React.FC<{ storageKey: string }> = ({ storageKey })
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
+  useEffect(() => {
+    loadExerciseResponse(exerciseId).then(cloud => {
+      if (cloud && typeof cloud === 'object' && !Array.isArray(cloud)) {
+        const c: any = cloud;
+        if (Array.isArray(c.rows)) setRows(c.rows);
+        if (typeof c.conclusion === 'string') setConclusion(c.conclusion);
+        localStorage.setItem(storageKey, JSON.stringify(cloud));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exerciseId]);
+
   const save = (r: BottleneckRow[], c: string) => {
-    localStorage.setItem(storageKey, JSON.stringify({ rows: r, conclusion: c }));
+    const payload = { rows: r, conclusion: c };
+    localStorage.setItem(storageKey, JSON.stringify(payload));
+    pushExerciseResponse(exerciseId, payload);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updateRow = (id: string, field: keyof BottleneckRow, value: string) => {
@@ -726,7 +803,7 @@ const BottleneckMapExercise: React.FC<{ storageKey: string }> = ({ storageKey })
 // ─── Absence Test (Exercițiul 3) ──────────────────────────────────────────────
 interface AbsenceRow { id: string; scenario: string; gravity: 'Mare' | 'Medie' | 'Mică' | ''; causedBy: string }
 
-const AbsenceTestExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+const AbsenceTestExercise: React.FC<{ storageKey: string; exerciseId: string }> = ({ storageKey, exerciseId }) => {
   const defaultRows = (): AbsenceRow[] =>
     Array.from({ length: 5 }, (_, i) => ({ id: `r${i}`, scenario: '', gravity: '', causedBy: '' }));
 
@@ -739,8 +816,22 @@ const AbsenceTestExercise: React.FC<{ storageKey: string }> = ({ storageKey }) =
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
+  useEffect(() => {
+    loadExerciseResponse(exerciseId).then(cloud => {
+      if (cloud && typeof cloud === 'object' && !Array.isArray(cloud)) {
+        const c: any = cloud;
+        if (Array.isArray(c.rows)) setRows(c.rows);
+        if (typeof c.conclusion === 'string') setConclusion(c.conclusion);
+        localStorage.setItem(storageKey, JSON.stringify(cloud));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exerciseId]);
+
   const save = (r: AbsenceRow[], c: string) => {
-    localStorage.setItem(storageKey, JSON.stringify({ rows: r, conclusion: c }));
+    const payload = { rows: r, conclusion: c };
+    localStorage.setItem(storageKey, JSON.stringify(payload));
+    pushExerciseResponse(exerciseId, payload);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updateRow = (id: string, field: keyof AbsenceRow, value: string) => {
@@ -889,7 +980,7 @@ const DIAG_DIMENSIONS = [
 
 const SCORE_COLORS: Record<number, string> = { 1: '#f87171', 2: '#fb923c', 3: 'var(--gold)', 4: '#86efac', 5: '#4ade80' };
 
-const DiagnosticGridExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+const DiagnosticGridExercise: React.FC<{ storageKey: string; exerciseId: string }> = ({ storageKey, exerciseId }) => {
   const [answers, setAnswers] = useState<Record<string, number>>(() => {
     try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s).answers || {} : {}; } catch { return {}; }
   });
@@ -898,8 +989,28 @@ const DiagnosticGridExercise: React.FC<{ storageKey: string }> = ({ storageKey }
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
+  useEffect(() => {
+    loadExerciseResponse(exerciseId).then(cloud => {
+      if (cloud && typeof cloud === 'object' && !Array.isArray(cloud)) {
+        const c: any = cloud;
+        // Support both new shape { answers, commitment } and legacy bare answers object
+        if (c.answers && typeof c.answers === 'object') {
+          setAnswers(c.answers);
+          if (typeof c.commitment === 'string') setCommitment(c.commitment);
+          localStorage.setItem(storageKey, JSON.stringify(cloud));
+        } else if (Object.values(c).every(v => typeof v === 'number')) {
+          setAnswers(c);
+          localStorage.setItem(storageKey, JSON.stringify({ answers: c, commitment: '' }));
+        }
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exerciseId]);
+
   const save = (a: Record<string, number>, c: string) => {
-    localStorage.setItem(storageKey, JSON.stringify({ answers: a, commitment: c }));
+    const payload = { answers: a, commitment: c };
+    localStorage.setItem(storageKey, JSON.stringify(payload));
+    pushExerciseResponse(exerciseId, payload);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const setAnswer = (qId: string, val: number) => {
@@ -1063,23 +1174,23 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
   const renderContent = () => {
     switch (template.type) {
       case 'checklist':
-        return <ChecklistExercise template={template} storageKey={storageKey} />;
+        return <ChecklistExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
       case 'form-fields':
-        return <FormFieldsExercise template={template} storageKey={storageKey} />;
+        return <FormFieldsExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
       case 'dynamic-table':
-        return <DynamicTableExercise template={template} storageKey={storageKey} />;
+        return <DynamicTableExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
       case 'quiz':
-        return <QuizExercise template={template} storageKey={storageKey} />;
+        return <QuizExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
       case 'activity-audit':
-        return <ActivityAuditExercise storageKey={storageKey} />;
+        return <ActivityAuditExercise storageKey={storageKey} exerciseId={exerciseId} />;
       case 'bottleneck-map':
-        return <BottleneckMapExercise storageKey={storageKey} />;
+        return <BottleneckMapExercise storageKey={storageKey} exerciseId={exerciseId} />;
       case 'absence-test':
-        return <AbsenceTestExercise storageKey={storageKey} />;
+        return <AbsenceTestExercise storageKey={storageKey} exerciseId={exerciseId} />;
       case 'diagnostic-grid':
-        return <DiagnosticGridExercise storageKey={storageKey} />;
+        return <DiagnosticGridExercise storageKey={storageKey} exerciseId={exerciseId} />;
       default:
-        return <FormFieldsExercise template={template} storageKey={storageKey} />;
+        return <FormFieldsExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
     }
   };
 
