@@ -294,9 +294,10 @@ export const LessonPage: React.FC = () => {
         const userDraft = user?.id ? getStoredExerciseResponse(`aa_ex_${user.id}_${lesson!.exercise_id}`) : null;
         const anonDraft = getStoredExerciseResponse(`aa_ex_anon_${lesson!.exercise_id}`);
         const exerciseDraft = userDraft ?? anonDraft;
-        if (exerciseDraft !== null) {
-          await flushExerciseResponse(lesson!.exercise_id, exerciseDraft);
+        if (exerciseDraft === null) {
+          throw new Error('Completează exercițiul înainte să îl marchezi ca finalizat.');
         }
+        await flushExerciseResponse(lesson!.exercise_id, exerciseDraft);
       }
       await markComplete(lesson!.id);
       setJustCompletedLessonId(lesson!.id);
