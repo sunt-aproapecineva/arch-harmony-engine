@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
+import { useServerFn } from '@tanstack/react-start';
 import { useParams, useNavigate, Link } from '@/lib/router-compat';
 import { motion } from 'framer-motion';
 import {
@@ -14,6 +15,7 @@ import { ProgressBar } from '../../components/aa/ProgressBar';
 import { getActivityForUser, ActivityEvent, timeAgo, ActivityType } from '../../lib/activity';
 import { generateProfile, QuizProfile } from '../../lib/quizProfile';
 import { EXERCISE_TEMPLATES } from '../../lib/exerciseData';
+import { recoverStudentExerciseResponses } from '../../lib/adminRecovery.functions';
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -254,6 +256,44 @@ export const AdminStudentProfile: React.FC = () => {
   const [exercisesById, setExercisesById] = useState<Record<string, any>>({});
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const [recoveringDrafts, setRecoveringDrafts] = useState(false);
+  const [recoveryMessage, setRecoveryMessage] = useState<string | null>(null);
+  const recoverResponses = useServerFn(recoverStudentExerciseResponses);
+
+  const handleRecoverLocalDrafts = async () => {
+    if (!userId) return;
+    setRecoveringDrafts(true);
+    setRecoveryMessage(null);
+    try {
+      const exerciseIds = MODULES.flatMap((m: any) => (m.exercises || []).map((ex: any) => ex.id));
+      const responses: { exercise_id: string; response: any }[] = [];
+      exerciseIds.forEach((exerciseId: string) => {
+        const candidateKeys = [`aa_ex_${userId}_${exerciseId}`, `aa_ex_anon_${exerciseId}`, `aa_ex_${exerciseId}`];
+        const matchingKeys: string[] = [];
+        for (let i = 0; i < localStorage.length; i += 1) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('aa_ex_') && key.endsWith(`_${exerciseId}`)) matchingKeys.push(key);
+        }
+        const key = [...candidateKeys, ...matchingKeys].find((k) => localStorage.getItem(k));
+        if (!key) return;
+        try {
+          const parsed = JSON.parse(localStorage.getItem(key) || 'null');
+          if (parsed !== null) responses.push({ exercise_id: exerciseId, response: parsed });
+        } catch {}
+      });
+      if (responses.length === 0) {
+        setRecoveryMessage('Nu am găsit drafturi locale în acest browser pentru acest student. Studentul trebuie să redeschidă exercițiile sau să le completeze din nou.');
+        return;
+      }
+      const result = await recoverResponses({ data: { studentId: userId, responses } });
+      setRecoveryMessage(`Am recuperat ${result.saved} răspunsuri locale și le-am salvat în cloud.`);
+      await loadAll();
+    } catch (err: any) {
+      setRecoveryMessage(err?.message || 'Nu am putut recupera drafturile locale.');
+    } finally {
+      setRecoveringDrafts(false);
+    }
+  };
 
   const loadAll = React.useCallback(async () => {
     if (!userId) return;
@@ -741,6 +781,14 @@ export const AdminStudentProfile: React.FC = () => {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     {missingResponses.map((l: any) => <span key={l.id} style={{ fontSize: 12, color: 'var(--fg-2)' }}>• {l.title}</span>)}
                   </div>
+                  <button
+                    onClick={handleRecoverLocalDrafts}
+                    disabled={recoveringDrafts}
+                    style={{ marginTop: 10, padding: '8px 12px', background: 'var(--bg-3)', border: '1px solid rgba(248,113,113,0.28)', borderRadius: 8, color: 'var(--fg)', cursor: recoveringDrafts ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 600 }}
+                  >
+                    {recoveringDrafts ? 'Se recuperează...' : 'Recuperează drafturi locale'}
+                  </button>
+                  {recoveryMessage && <p style={{ marginTop: 8, fontSize: 12, color: 'var(--fg-3)', lineHeight: 1.5 }}>{recoveryMessage}</p>}
                 </div>
               )}
             </div>
