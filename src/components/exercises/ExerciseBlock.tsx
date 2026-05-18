@@ -884,6 +884,8 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
         return <DynamicTableExercise template={template} storageKey={storageKey} />;
       case 'quiz':
         return <QuizExercise template={template} storageKey={storageKey} />;
+      case 'diagnostic':
+        return <DiagnosticExercise template={template} storageKey={storageKey} />;
       default:
         return <FormFieldsExercise template={template} storageKey={storageKey} />;
     }
@@ -894,13 +896,18 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
     'form-fields': 'Formular',
     'dynamic-table': 'Tabel interactiv',
     quiz: 'Chestionar',
+    diagnostic: 'Diagnostic',
     'text-input': 'Formular',
     'rating-grid': 'Evaluare',
   };
 
+  // ─── Completion control (Marchez ca finalizat) ──────────────────────────────
+  const { isExerciseCompleted, markExerciseComplete, unmarkExerciseComplete } = useExerciseCompletions();
+  const completed = isExerciseCompleted(exerciseId);
+
   return (
     <div style={{ padding: '0 0 4px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
         <span style={{
           fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
           color: 'var(--gold)', background: 'rgba(201,169,110,0.12)',
@@ -910,10 +917,69 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
           {typeLabels[template.type] || 'Interactiv'}
         </span>
         <span style={{ fontSize: 12, color: 'var(--fg-3)', display: 'flex', alignItems: 'center', gap: 4 }}>
-          <ChevronRight size={11} /> Progresul se salvează automat local
+          <ChevronRight size={11} /> Progresul se salvează automat
         </span>
+        {completed && (
+          <span style={{
+            marginLeft: 'auto',
+            fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+            color: '#4ade80', background: 'rgba(74,222,128,0.1)',
+            border: '1px solid rgba(74,222,128,0.25)',
+            padding: '3px 9px', borderRadius: 4,
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+          }}>
+            <CheckCircle2 size={11} /> Finalizat
+          </span>
+        )}
       </div>
+
       {renderContent()}
+
+      {/* Mark complete control */}
+      <div style={{
+        marginTop: 22, paddingTop: 18,
+        borderTop: '1px dashed var(--border)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
+      }}>
+        <div style={{ fontSize: 11, color: 'var(--fg-3)', maxWidth: 320, lineHeight: 1.5 }}>
+          {completed
+            ? 'Exercițiul e marcat ca finalizat. Contează pentru deblocarea modulului următor.'
+            : 'Când ai terminat, marchează exercițiul ca finalizat ca să poți trece la următoarea etapă.'}
+        </div>
+        {completed ? (
+          <button
+            onClick={() => unmarkExerciseComplete(exerciseId)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '8px 14px', background: 'transparent',
+              border: '1px solid var(--border)', borderRadius: 8,
+              cursor: 'pointer', fontSize: 12, color: 'var(--fg-3)',
+              fontWeight: 500, transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'var(--fg)'; e.currentTarget.style.borderColor = 'rgba(196,240,228,0.3)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'var(--fg-3)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
+          >
+            <RotateCcw size={12} /> Anulează finalizarea
+          </button>
+        ) : (
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => markExerciseComplete(exerciseId)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '10px 18px',
+              background: 'linear-gradient(135deg, var(--accent) 0%, #b8e8d8 100%)',
+              color: '#0D0907', border: 'none', borderRadius: 10,
+              cursor: 'pointer', fontSize: 12, fontWeight: 700,
+              letterSpacing: '0.02em',
+              boxShadow: '0 4px 16px -6px rgba(196,240,228,0.4)',
+            }}
+          >
+            <CheckCircle2 size={14} /> Marchez ca finalizat
+          </motion.button>
+        )}
+      </div>
     </div>
   );
 };
