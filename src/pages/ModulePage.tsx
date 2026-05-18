@@ -107,7 +107,7 @@ export const ModulePage: React.FC = () => {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
             <span>{done ? 'Modul finalizat' : `${progress}% completat`}</span>
-            <span>{module.lessons.filter(l => isCompleted(l.id)).length}/{module.lessons.length} lecții</span>
+            <span>{module.lessons.filter(l => isCompleted(l.id)).length + module.exercises.filter(e => isExerciseDone(e.id)).length}/{module.lessons.length + module.exercises.length} lecții</span>
           </div>
           <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
             <motion.div
