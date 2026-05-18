@@ -15,7 +15,7 @@ export const ModulePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuthContext();
-  const { getModuleProgress, isModuleLocked, isCompleted } = useProgress();
+  const { getModuleProgress, isModuleLocked, isCompleted, isExerciseDone } = useProgress();
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
   const quizDone = user
     ? !!localStorage.getItem(`aa_quiz_done_${user.id}`)
