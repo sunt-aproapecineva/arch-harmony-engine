@@ -153,8 +153,6 @@ export const LessonPage: React.FC = () => {
   }
 
   const done = isCompleted(lesson.id);
-  const prevLesson = lessonIndex > 0 ? module.lessons[lessonIndex - 1] : null;
-  const nextLesson = lessonIndex < module.lessons.length - 1 ? module.lessons[lessonIndex + 1] : null;
   const moduleIndex = MODULES.findIndex(m => m.id === module!.id);
   const nextModule = moduleIndex < MODULES.length - 1 ? MODULES[moduleIndex + 1] : null;
   const nextModuleLesson = nextModule?.lessons[0] || null;
@@ -162,9 +160,16 @@ export const LessonPage: React.FC = () => {
 
   // Unified module timeline — lessons & exercises counted together.
   const timeline = getModuleTimeline(module);
-  const myEntry = timeline.find(e => e.kind === 'lesson' && (e.item as any).id === lesson.id);
+  const myTimelineIdx = timeline.findIndex(e => e.kind === 'lesson' && (e.item as any).id === lesson.id);
+  const myEntry = timeline[myTimelineIdx];
   const unifiedNo = myEntry?.lessonNo ?? lesson.order_index;
   const totalSteps = timeline.length;
+
+  // prev/next derived from unified timeline (lesson <-> exercise flow)
+  const prevEntry = myTimelineIdx > 0 ? timeline[myTimelineIdx - 1] : null;
+  const nextEntry = myTimelineIdx >= 0 && myTimelineIdx < timeline.length - 1 ? timeline[myTimelineIdx + 1] : null;
+  const linkForEntry = (e: any) =>
+    e.kind === 'lesson' ? `/lesson/${(e.item as any).id}` : `/exercise/${(e.item as any).id}`;
 
   // Combined progress (lessons + exercises)
   const completedCount =
