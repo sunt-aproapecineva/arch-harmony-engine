@@ -184,7 +184,7 @@ export const MODULES: Module[] = [
         description: '50 de întrebări pe 6 dimensiuni ale sistematizării, scală 1–5. Îți arată exact pe ce treaptă ești, unde ai găurile și care sunt cele 3 priorități de atacat în practicumul de față.',
         video_url: '',
         duration_min: 45,
-        order_index: 6,
+        order_index: 7,
         is_published: true,
         type: 'exercise',
         exercise_id: 'e-0-4',
