@@ -99,7 +99,7 @@ export const Layout: React.FC = () => {
             {[
               { to: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Acasă' },
               { to: '/module/mod-0', icon: <BookOpen size={20} />, label: 'Lecții' },
-              { to: '/dashboard', icon: <TrendingUp size={20} />, label: 'Progres' },
+              { to: '/documents', icon: <FolderOpen size={20} />, label: 'Documente' },
               ...(isAdmin ? [{ to: '/admin', icon: <ShieldCheck size={20} />, label: 'Admin' }] : []),
             ].map(({ to, icon, label }) => (
               <NavLink
