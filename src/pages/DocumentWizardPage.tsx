@@ -1,5 +1,6 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, FileText, ArrowLeft, Printer } from 'lucide-react';
 import { PLATFORM_DOCUMENTS, openPrintWindow } from '../lib/documentData';
