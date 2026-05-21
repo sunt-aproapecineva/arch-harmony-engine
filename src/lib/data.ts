@@ -160,7 +160,7 @@ export const MODULES: Module[] = [
         description: 'Listează toate deciziile din ultima săptămână care au ajuns la tine. Clasifică: chiar trebuia să fii tu implicat sau e o scuză a sistemului? Calculezi exact câte minute/săptămână pierzi ca gât de sticlă.',
         video_url: '',
         duration_min: 30,
-        order_index: 4,
+        order_index: 5,
         is_published: true,
         type: 'exercise',
         exercise_id: 'e-0-2',
