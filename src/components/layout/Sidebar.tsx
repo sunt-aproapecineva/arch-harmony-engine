@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 import { NavLink, useNavigate } from '@/lib/router-compat';
-import { Lock, CheckCircle2, LogOut } from 'lucide-react';
+import { Lock, CheckCircle2, LogOut, FolderOpen } from 'lucide-react';
 import { MODULES } from '../../lib/data';
 import { useProgress } from '../../hooks/useProgress';
 import { useAuthContext } from '../../context/AuthContext';
