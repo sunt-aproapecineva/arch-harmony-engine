@@ -140,6 +140,26 @@ export const MODULES: Module[] = [
         duration_min: 0,
         order_index: 3,
         is_published: true,
+        documents: [
+          {
+            docNumber: 'DOC 1',
+            title: 'Cele 10 Conversații Obligatorii Înainte de Orice Parteneriat',
+            description: 'Șablon oficial · 7 pagini A4',
+            url: '/docs/AA_Doc1_Inainte_Parteneriat.pdf',
+          },
+          {
+            docNumber: 'DOC 2',
+            title: 'Protocol de Ieșire sau Restructurare a Parteneriatului',
+            description: 'Șablon oficial · 5 pagini A4',
+            url: '/docs/AA_Doc2_Iesire_Parteneriat.pdf',
+          },
+          {
+            docNumber: 'DOC 3',
+            title: 'Acord de Parteneriat Minimal',
+            description: 'Șablon oficial · 4 pagini A4',
+            url: '/docs/AA_Doc3_Acord_Parteneriat_Minimal.pdf',
+          },
+        ],
       },
       {
         id: 'l-0-ex-1',
