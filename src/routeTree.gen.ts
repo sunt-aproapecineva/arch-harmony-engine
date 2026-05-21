@@ -26,6 +26,7 @@ import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AdminStudentUserIdRouteImport } from './routes/admin.student.$userId'
 import { Route as AppModuleIdRouteImport } from './routes/_app.module.$id'
 import { Route as AppLessonIdRouteImport } from './routes/_app.lesson.$id'
+import { Route as AppDocumentsDocIdFillRouteImport } from './routes/_app.documents.$docId.fill'
 
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
@@ -111,6 +112,11 @@ const AppLessonIdRoute = AppLessonIdRouteImport.update({
   path: '/lesson/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDocumentsDocIdFillRoute = AppDocumentsDocIdFillRouteImport.update({
+  id: '/$docId/fill',
+  path: '/$docId/fill',
+  getParentRoute: () => AppDocumentsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -120,7 +126,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
-  '/documents': typeof AppDocumentsRoute
+  '/documents': typeof AppDocumentsRouteWithChildren
   '/admin/activity': typeof AdminActivityRoute
   '/admin/lessons': typeof AdminLessonsRoute
   '/admin/progress': typeof AdminProgressRoute
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/lesson/$id': typeof AppLessonIdRoute
   '/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
+  '/documents/$docId/fill': typeof AppDocumentsDocIdFillRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -137,7 +144,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
-  '/documents': typeof AppDocumentsRoute
+  '/documents': typeof AppDocumentsRouteWithChildren
   '/admin/activity': typeof AdminActivityRoute
   '/admin/lessons': typeof AdminLessonsRoute
   '/admin/progress': typeof AdminProgressRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByTo {
   '/lesson/$id': typeof AppLessonIdRoute
   '/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
+  '/documents/$docId/fill': typeof AppDocumentsDocIdFillRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -157,7 +165,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/welcome': typeof WelcomeRoute
   '/_app/dashboard': typeof AppDashboardRoute
-  '/_app/documents': typeof AppDocumentsRoute
+  '/_app/documents': typeof AppDocumentsRouteWithChildren
   '/admin/activity': typeof AdminActivityRoute
   '/admin/lessons': typeof AdminLessonsRoute
   '/admin/progress': typeof AdminProgressRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/_app/lesson/$id': typeof AppLessonIdRoute
   '/_app/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
+  '/_app/documents/$docId/fill': typeof AppDocumentsDocIdFillRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -186,6 +195,7 @@ export interface FileRouteTypes {
     | '/lesson/$id'
     | '/module/$id'
     | '/admin/student/$userId'
+    | '/documents/$docId/fill'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/lesson/$id'
     | '/module/$id'
     | '/admin/student/$userId'
+    | '/documents/$docId/fill'
   id:
     | '__root__'
     | '/'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/_app/lesson/$id'
     | '/_app/module/$id'
     | '/admin/student/$userId'
+    | '/_app/documents/$docId/fill'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -355,19 +367,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLessonIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/documents/$docId/fill': {
+      id: '/_app/documents/$docId/fill'
+      path: '/$docId/fill'
+      fullPath: '/documents/$docId/fill'
+      preLoaderRoute: typeof AppDocumentsDocIdFillRouteImport
+      parentRoute: typeof AppDocumentsRoute
+    }
   }
 }
 
+interface AppDocumentsRouteChildren {
+  AppDocumentsDocIdFillRoute: typeof AppDocumentsDocIdFillRoute
+}
+
+const AppDocumentsRouteChildren: AppDocumentsRouteChildren = {
+  AppDocumentsDocIdFillRoute: AppDocumentsDocIdFillRoute,
+}
+
+const AppDocumentsRouteWithChildren = AppDocumentsRoute._addFileChildren(
+  AppDocumentsRouteChildren,
+)
+
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
-  AppDocumentsRoute: typeof AppDocumentsRoute
+  AppDocumentsRoute: typeof AppDocumentsRouteWithChildren
   AppLessonIdRoute: typeof AppLessonIdRoute
   AppModuleIdRoute: typeof AppModuleIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
-  AppDocumentsRoute: AppDocumentsRoute,
+  AppDocumentsRoute: AppDocumentsRouteWithChildren,
   AppLessonIdRoute: AppLessonIdRoute,
   AppModuleIdRoute: AppModuleIdRoute,
 }
