@@ -5,7 +5,7 @@ import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { AnimatePresence, motion } from 'framer-motion';
 import { NotificationBanner } from '../aa/NotificationBanner';
-import { LayoutDashboard, BookOpen, TrendingUp, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, BookOpen, FolderOpen, ShieldCheck } from 'lucide-react';
 import { useAuthContext } from '../../context/AuthContext';
 
 const SIDEBAR_KEY = 'aa_sidebar_open';
@@ -99,7 +99,7 @@ export const Layout: React.FC = () => {
             {[
               { to: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Acasă' },
               { to: '/module/mod-0', icon: <BookOpen size={20} />, label: 'Lecții' },
-              { to: '/dashboard', icon: <TrendingUp size={20} />, label: 'Progres' },
+              { to: '/documents', icon: <FolderOpen size={20} />, label: 'Documente' },
               ...(isAdmin ? [{ to: '/admin', icon: <ShieldCheck size={20} />, label: 'Admin' }] : []),
             ].map(({ to, icon, label }) => (
               <NavLink

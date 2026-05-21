@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 import { NavLink, useNavigate } from '@/lib/router-compat';
-import { Lock, CheckCircle2, LogOut } from 'lucide-react';
+import { Lock, CheckCircle2, LogOut, FolderOpen } from 'lucide-react';
 import { MODULES } from '../../lib/data';
 import { useProgress } from '../../hooks/useProgress';
 import { useAuthContext } from '../../context/AuthContext';
@@ -45,6 +45,34 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
 
       {/* Module nav */}
       <nav style={{ flex: 1, overflowY: 'auto', padding: '12px 8px' }}>
+        {/* Documents link */}
+        <NavLink
+          to="/documents"
+          onClick={onClose}
+          style={({ isActive }) => ({
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '7px 10px', borderRadius: 8, marginBottom: 8,
+            background: isActive ? 'rgba(201,169,110,0.1)' : 'transparent',
+            border: isActive ? '1px solid rgba(201,169,110,0.22)' : '1px solid transparent',
+            transition: 'all 0.15s', textDecoration: 'none',
+          })}
+        >
+          {({ isActive }) => (
+            <>
+              <div style={{
+                width: 22, height: 22, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                background: isActive ? 'rgba(201,169,110,0.15)' : 'var(--bg-3)',
+                border: `1px solid ${isActive ? 'rgba(201,169,110,0.3)' : 'var(--border)'}`,
+              }}>
+                <FolderOpen size={11} style={{ color: isActive ? 'var(--gold, #C9A96E)' : 'var(--fg-3)' }} />
+              </div>
+              <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, color: isActive ? 'var(--gold, #C9A96E)' : 'var(--fg-2)' }}>
+                Documente
+              </span>
+            </>
+          )}
+        </NavLink>
+
         <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-3)', padding: '4px 8px 8px' }}>
           Curriculum
         </div>

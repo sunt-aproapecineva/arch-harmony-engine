@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AA · Protocol de Ieșire sau Restructurare a Parteneriatului</title>
+<link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Arimo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ── TOKENS ── */
+  :root {
+    --ink:       #1C1410;
+    --ink-2:     #4A3D35;
+    --ink-3:     #7A6A60;
+    --green:     #1A5C38;
+    --green-mid: #2D7A4F;
+    --green-dim: #E8F5EE;
+    --gold:      #C9A96E;
+    --gold-dim:  #FDF6EC;
+    --cream:     #FDFAF7;
+    --border:    #E0D8D0;
+    --border-hi: #C9A96E;
+    --paper:     #FFFFFF;
+    --red-soft:  #FFF2F0;
+    --red-mid:   #C0392B;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body {
+    font-family: 'Arimo', sans-serif;
+    background: #F0EDE8;
+    color: var(--ink);
+    font-size: 9.5pt;
+    line-height: 1.6;
+  }
+
+  /* ── PAGE ── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto 24px;
+    background: var(--paper);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--ink);
+    padding: 22px 32px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-brand { display: flex; align-items: center; gap: 10px; }
+  .header-logo {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: linear-gradient(135deg, #1A5C38, #0D3520);
+    border: 1px solid rgba(196,240,228,0.3);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .header-logo span { font-family: 'Aboreto', serif; font-size: 10px; color: #C4F0E4; letter-spacing: 0.04em; }
+  .header-name { font-family: 'Aboreto', serif; font-size: 8.5pt; color: rgba(255,255,255,0.72); letter-spacing: 0.22em; text-transform: uppercase; }
+  .header-tag { font-family: 'Arimo', sans-serif; font-size: 7pt; color: rgba(196,240,228,0.6); letter-spacing: 0.18em; text-transform: uppercase; border: 1px solid rgba(196,240,228,0.2); padding: 3px 10px; border-radius: 99px; }
+
+  /* ── TITLE BAND ── */
+  .title-band {
+    background: linear-gradient(135deg, #8B1A1A 0%, #6B1414 100%);
+    padding: 28px 32px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .title-band::after {
+    content: 'AA';
+    position: absolute; right: -10px; bottom: -22px;
+    font-family: 'Aboreto', serif;
+    font-size: 120px; color: rgba(255,255,255,0.05);
+    line-height: 1; pointer-events: none; letter-spacing: -0.04em;
+  }
+  .doc-number { font-size: 7.5pt; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255,200,180,0.75); margin-bottom: 8px; display: block; }
+  .doc-title { font-family: 'Aboreto', serif; font-size: 20pt; color: #FFFFFF; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 8px; }
+  .doc-lead { font-size: 9pt; color: rgba(255,255,255,0.68); max-width: 480px; line-height: 1.65; }
+
+  /* ── WARNING BOX ── */
+  .warning-box {
+    margin: 22px 32px 0;
+    padding: 14px 18px;
+    background: #FFF8F0;
+    border-left: 3px solid var(--gold);
+    border-radius: 0 6px 6px 0;
+  }
+  .warning-box strong { color: var(--ink); font-size: 8.5pt; text-transform: uppercase; letter-spacing: 0.1em; }
+  .warning-box p { font-size: 8.5pt; color: var(--ink-2); margin-top: 4px; line-height: 1.6; }
+
+  /* ── BODY ── */
+  .body { padding: 20px 32px 28px; }
+
+  /* ── PHASE BLOCK ── */
+  .phase-block {
+    margin-bottom: 28px;
+    break-inside: avoid;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .phase-header.red    { background: #FFF2F0; border-bottom-color: #F5C6C0; }
+  .phase-header.gold   { background: var(--gold-dim); border-bottom-color: #EBDBC0; }
+  .phase-header.green  { background: var(--green-dim); border-bottom-color: #BCDDC8; }
+
+  .phase-num {
+    font-family: 'Aboreto', serif;
+    font-size: 22pt;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .phase-num.red   { color: #C0392B; }
+  .phase-num.gold  { color: var(--gold); }
+  .phase-num.green { color: var(--green); }
+
+  .phase-meta {}
+  .phase-label { font-size: 7pt; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 3px; }
+  .phase-title { font-family: 'Aboreto', serif; font-size: 11.5pt; color: var(--ink); line-height: 1.2; letter-spacing: -0.01em; }
+  .phase-sub   { font-size: 8.5pt; color: var(--ink-2); margin-top: 4px; line-height: 1.5; }
+
+  .phase-body { padding: 14px 18px; }
+
+  /* ── STEPS ── */
+  .step-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 9pt;
+    color: var(--ink-2);
+    line-height: 1.55;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: #fff;
+    font-size: 8pt;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .step-num.accent { background: var(--green); }
+
+  /* ── WRITE LINES ── */
+  .write-section { margin-top: 12px; }
+  .write-label { font-size: 8pt; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 6px; }
+  .write-line { height: 1px; background: var(--border); margin-bottom: 10px; }
+  .write-line-wide { height: 1px; background: var(--border); margin-bottom: 9px; }
+
+  /* ── CHECKLIST ── */
+  .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 18px; margin-top: 10px; }
+  .check-item { display: flex; align-items: center; gap: 7px; font-size: 8.5pt; color: var(--ink-2); }
+  .check-box  { width: 13px; height: 13px; border: 1.5px solid var(--border); border-radius: 3px; flex-shrink: 0; }
+
+  /* ── TIMELINE ROW ── */
+  .timeline-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .timeline-table th { font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-3); text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--border); }
+  .timeline-table td { font-size: 8.5pt; color: var(--ink-2); padding: 7px 8px; border-bottom: 1px solid #F0EBE4; vertical-align: top; }
+  .timeline-table td .fill { border-bottom: 1px solid var(--border); min-height: 14px; display: block; }
+
+  /* ── DIVIDER ── */
+  .section-divider { display: flex; align-items: center; gap: 10px; margin: 20px 0 16px; }
+  .section-divider span { font-size: 7.5pt; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+  .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── TYPE CARDS ── */
+  .type-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
+  .type-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    position: relative;
+  }
+  .type-card-num { font-family: 'Aboreto', serif; font-size: 16pt; color: var(--border); line-height: 1; margin-bottom: 4px; }
+  .type-card-title { font-size: 8pt; font-weight: 700; color: var(--ink); line-height: 1.35; margin-bottom: 3px; }
+  .type-card-desc  { font-size: 7.5pt; color: var(--ink-3); line-height: 1.4; }
+  .type-card-check { position: absolute; top: 8px; right: 8px; width: 14px; height: 14px; border: 1.5px solid var(--border); border-radius: 3px; }
+
+  /* ── TYPE SECTION ── */
+  .type-section { margin-bottom: 32px; break-inside: avoid; }
+  .type-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 12px 5px 8px;
+    border-radius: 99px;
+    margin-bottom: 12px;
+    font-size: 8pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .type-badge.red   { background: #FFF2F0; color: #C0392B; border: 1px solid #F5C6C0; }
+  .type-badge.gold  { background: var(--gold-dim); color: #8B6A30; border: 1px solid #EBDBC0; }
+  .type-badge.green { background: var(--green-dim); color: var(--green); border: 1px solid #BCDDC8; }
+  .type-badge-dot   { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+  .type-title { font-family: 'Aboreto', serif; font-size: 13pt; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 4px; }
+  .type-desc  { font-size: 9pt; color: var(--ink-2); line-height: 1.65; margin-bottom: 14px; }
+
+  .cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+  .cols-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
+
+  .mini-card { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+  .mini-card-title { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); margin-bottom: 8px; }
+  .mini-card-title.gold  { color: #8B6A30; }
+  .mini-card-title.red   { color: #C0392B; }
+  .mini-card-title.green { color: var(--green); }
+
+  /* ── SIGNATURE ── */
+  .sig-block { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 10px; }
+  .sig-col { }
+  .sig-label { font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); margin-bottom: 20px; }
+  .sig-line  { height: 1px; background: var(--ink); margin-bottom: 6px; }
+  .sig-name  { font-size: 8pt; color: var(--ink-2); }
+
+  /* ── COMMITMENT BOX ── */
+  .commitment-box {
+    margin-top: 18px;
+    padding: 16px 20px;
+    background: var(--green-dim);
+    border: 1px solid #BCDDC8;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .commitment-box p { font-size: 8.5pt; color: var(--green); line-height: 1.7; font-style: italic; }
+  .commitment-box strong { color: var(--ink); font-style: normal; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--ink);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-left  { font-family: 'Aboreto', serif; font-size: 8pt; color: rgba(255,255,255,0.35); letter-spacing: 0.15em; }
+  .footer-right { font-size: 7.5pt; color: rgba(255,255,255,0.3); letter-spacing: 0.06em; }
+
+  /* ── SEPARATOR BAND ── */
+  .sep-band { height: 4px; background: linear-gradient(90deg, var(--green), var(--gold)); }
+
+  /* ── PRINT ── */
+  @media print {
+    body { background: white; }
+    .page { box-shadow: none; margin: 0; width: 100%; min-height: auto; page-break-after: always; }
+    .page:last-child { page-break-after: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════ PAGE 1 — INDEX + FAZE ══ -->
+<div class="page">
+  <div class="header">
+    <div class="header-brand">
+      <div class="header-logo"><span>AA</span></div>
+      <div>
+        <div class="header-name">Arhitectura Afacerii</div>
+        <div style="font-size:7pt;color:rgba(255,255,255,0.38);letter-spacing:0.08em;margin-top:2px;">Victor Morar · Program de Mentorat</div>
+      </div>
+    </div>
+    <div class="header-tag">Doc 2 · Parteneriatul</div>
+  </div>
+
+  <div class="title-band">
+    <span class="doc-number">AA · Document Oficial · Serie Parteneriate</span>
+    <div class="doc-title">Protocol de Ieșire<br>sau Restructurare</div>
+    <p class="doc-lead">Pași clari pentru fiecare tip de parteneriat — de la diagnosticare la decizia finală. Folosește acest document înainte ca situația să devină ireversibilă.</p>
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Important</strong>
+    <p>Ieșirea dintr-un parteneriat nu înseamnă eșec. Înseamnă maturitate antreprenorială. Cel mai periculos parteneriat este cel în care nimeni nu îndrăznește să spună adevărul. Acest protocol îți dă structura pentru o conversație adultă și o separare sau restructurare decentă.</p>
+  </div>
+
+  <div class="body">
+
+    <!-- Index tipuri -->
+    <div class="section-divider"><span>Identifică tipul tău de parteneriat</span></div>
+
+    <div class="type-cards">
+      <div class="type-card">
+        <div class="type-card-num">01</div>
+        <div class="type-card-title">Ambii Activi, Fără CEO Clar</div>
+        <div class="type-card-desc">Doi lideri, decizii blocate, conflict constant de autoritate</div>
+        <div class="type-card-check"></div>
+      </div>
+      <div class="type-card">
+        <div class="type-card-num">02</div>
+        <div class="type-card-title">CEO Activ + Investitor Pasiv</div>
+        <div class="type-card-desc">Unul conduce, altul finanțează — fără implicare operațională</div>
+        <div class="type-card-check"></div>
+      </div>
+      <div class="type-card">
+        <div class="type-card-num">03</div>
+        <div class="type-card-title">CEO + Partener Operațional</div>
+        <div class="type-card-desc">Rol clar de execuție, dar frontierele se suprapun în timp</div>
+        <div class="type-card-check"></div>
+      </div>
+      <div class="type-card">
+        <div class="type-card-num">04</div>
+        <div class="type-card-title">Parteneriat de Familie</div>
+        <div class="type-card-desc">Afacere + relație personală — cel mai greu de separat</div>
+        <div class="type-card-check"></div>
+      </div>
+      <div class="type-card">
+        <div class="type-card-num">05</div>
+        <div class="type-card-title">Inegal ca Implicare</div>
+        <div class="type-card-desc">Unul muncește mai mult, celălalt profită la fel — resentiment acumulat</div>
+        <div class="type-card-check"></div>
+      </div>
+      <div class="type-card">
+        <div class="type-card-num">06</div>
+        <div class="type-card-title">Viziuni Divergente</div>
+        <div class="type-card-desc">Afacerea a crescut, dar fiecare vrea să meargă în direcție diferită</div>
+        <div class="type-card-check"></div>
+      </div>
+    </div>
+
+    <!-- Fazele universale -->
+    <div class="section-divider"><span>Cele 3 faze universale ale oricărui protocol</span></div>
+
+    <!-- Faza 1 -->
+    <div class="phase-block">
+      <div class="phase-header red">
+        <div class="phase-num red">I</div>
+        <div class="phase-meta">
+          <div class="phase-label">Faza 1 · Diagnostic</div>
+          <div class="phase-title">Confirmă că problema este reală și persistentă</div>
+          <div class="phase-sub">Nu porni niciun protocol fără să parcurgi această fază. Multe conflicte sunt rezolvabile înainte de ieșire.</div>
+        </div>
+      </div>
+      <div class="phase-body">
+        <ul class="step-list">
+          <li class="step-item"><div class="step-num">1</div><span><strong>Documentează incidentele</strong> — notează 3 situații concrete din ultimele 90 de zile care demonstrează problema (nu sentimente, ci fapte: data, context, ce s-a întâmplat, consecința).</span></li>
+          <li class="step-item"><div class="step-num">2</div><span><strong>Separă problema de persoană</strong> — întrebarea nu e "el/ea e o persoană rea?" ci "structura parteneriatului mai funcționează?"</span></li>
+          <li class="step-item"><div class="step-num">3</div><span><strong>Aplică testul celor 6 luni</strong> — dacă situația rămâne identică 6 luni, unde va fi afacerea? Pune răspunsul în scris.</span></li>
+          <li class="step-item"><div class="step-num">4</div><span><strong>Consultă un terț neutru</strong> — un mentor, un consultant extern sau un avocat de business. Nu un prieten comun.</span></li>
+        </ul>
+        <div class="write-section">
+          <div class="write-label">Notele mele din Faza 1</div>
+          <div class="write-line-wide"></div>
+          <div class="write-line-wide"></div>
+          <div class="write-line-wide"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faza 2 -->
+    <div class="phase-block">
+      <div class="phase-header gold">
+        <div class="phase-num gold">II</div>
+        <div class="phase-meta">
+          <div class="phase-label">Faza 2 · Conversația Directă</div>
+          <div class="phase-title">Spune adevărul cu demnitate, nu cu emoție</div>
+          <div class="phase-sub">Această conversație trebuie purtată față în față, fără presiune de timp și fără martori neinvitați.</div>
+        </div>
+      </div>
+      <div class="phase-body">
+        <ul class="step-list">
+          <li class="step-item"><div class="step-num accent">1</div><span><strong>Deschide cu intenție clară:</strong> <em>"Vreau să avem o conversație serioasă despre viitorul parteneriatului nostru. Nu e o acuză, e o analiză."</em></span></li>
+          <li class="step-item"><div class="step-num accent">2</div><span><strong>Prezintă faptele</strong> (din Faza 1), nu sentimentele. Evită cuvintele "mereu", "niciodată", "tu ești".</span></li>
+          <li class="step-item"><div class="step-num accent">3</div><span><strong>Propune 3 opțiuni:</strong> Restructurare completă a rolurilor / Răscumpărarea părților / Dizolvarea voluntară.</span></li>
+          <li class="step-item"><div class="step-num accent">4</div><span><strong>Stabilește un termen de răspuns</strong> — minim 7 zile, maxim 30 de zile. Pune în scris că ai avut această conversație și data ei.</span></li>
+        </ul>
+        <div class="write-section">
+          <div class="write-label">Data conversației &amp; persoanele prezente</div>
+          <div class="write-line"></div>
+          <div class="write-label" style="margin-top:8px;">Decizia agreată (sau termenul de răspuns)</div>
+          <div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faza 3 -->
+    <div class="phase-block">
+      <div class="phase-header green">
+        <div class="phase-num green">III</div>
+        <div class="phase-meta">
+          <div class="phase-label">Faza 3 · Execuție Legală și Operațională</div>
+          <div class="phase-title">Separă curat — fără răni deschise în afacere</div>
+          <div class="phase-sub">Orice ieșire nefinalizată legal devine o bombă cu ceas. Grăbește-te cu inima, dar ia-o ușor cu actele.</div>
+        </div>
+      </div>
+      <div class="phase-body">
+        <div class="check-grid">
+          <div class="check-item"><div class="check-box"></div><span>Avocat specializat în drept societar contactat</span></div>
+          <div class="check-item"><div class="check-box"></div><span>Evaluare independentă a afacerii realizată</span></div>
+          <div class="check-item"><div class="check-box"></div><span>Act adițional / hotărâre AGA pregătit(ă)</span></div>
+          <div class="check-item"><div class="check-box"></div><span>Plan de tranziție operațională agreat (min 30 zile)</span></div>
+          <div class="check-item"><div class="check-box"></div><span>Comunicare internă (angajați) planificată</span></div>
+          <div class="check-item"><div class="check-box"></div><span>Comunicare externă (clienți cheie) planificată</span></div>
+          <div class="check-item"><div class="check-box"></div><span>Clauza de non-concurență discutată și semnată</span></div>
+          <div class="check-item"><div class="check-box"></div><span>Acces la conturi bancare / platforme transferat</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /body -->
+
+  <div class="sep-band"></div>
+  <div class="footer">
+    <div class="footer-left">Arhitectura Afacerii · Victor Morar</div>
+    <div class="footer-right">Document Confidențial · Uz Personal · Pagina 1 / 2</div>
+  </div>
+</div><!-- /page 1 -->
+
+
+<!-- ══════════════════════════════════════════════ PAGE 2 — TIPURI ══ -->
+<div class="page">
+  <div class="header">
+    <div class="header-brand">
+      <div class="header-logo"><span>AA</span></div>
+      <div>
+        <div class="header-name">Arhitectura Afacerii</div>
+        <div style="font-size:7pt;color:rgba(255,255,255,0.38);letter-spacing:0.08em;margin-top:2px;">Victor Morar · Program de Mentorat</div>
+      </div>
+    </div>
+    <div class="header-tag">Doc 2 · Ghid pe Tipuri</div>
+  </div>
+
+  <div class="body" style="padding-top:24px;">
+
+    <div class="section-divider" style="margin-top:0;"><span>Protocol specific pe fiecare tip de parteneriat</span></div>
+
+    <!-- TIP 1 -->
+    <div class="type-section">
+      <div class="type-badge red"><div class="type-badge-dot"></div>Tip 01</div>
+      <div class="type-title">Ambii Activi, Fără CEO Clar</div>
+      <div class="type-desc">Simptome: decizii blocate sau contradictorii, fiecare "șef" în departamentul lui, conflict frecvent de autoritate, angajații nu știu pe cine să asculte.</div>
+      <div class="cols-2">
+        <div class="mini-card">
+          <div class="mini-card-title gold">Restructurare (Prima opțiune)</div>
+          <ul class="step-list">
+            <li class="step-item"><div class="step-num" style="background:#8B6A30">1</div><span>Definești în scris <strong>cine este CEO</strong> (decizie finală, veto, angajări).</span></li>
+            <li class="step-item"><div class="step-num" style="background:#8B6A30">2</div><span>Celălalt preia un titlu clar: Director Comercial, COO, etc. — cu domeniu distinct.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#8B6A30">3</div><span>Test de 90 de zile: fiecare respectă granița. La final, evaluare scrisă.</span></li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title red">Ieșire (Dacă restructurarea eșuează)</div>
+          <ul class="step-list">
+            <li class="step-item"><div class="step-num" style="background:#C0392B">1</div><span>Evaluați afacerea la valoare de piață — ambii de acord cu metoda.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#C0392B">2</div><span>Primul care vrea să iasă oferă partea sa la prețul evaluat.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#C0392B">3</div><span>Termen de 60 de zile pentru răscumpărare sau vânzare către terț.</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="write-section" style="margin-top:10px;">
+        <div class="write-label">Cine este CEO-ul definit &amp; de la ce dată:</div>
+        <div class="write-line"></div>
+      </div>
+    </div>
+
+    <!-- TIP 2 -->
+    <div class="type-section">
+      <div class="type-badge gold"><div class="type-badge-dot"></div>Tip 02</div>
+      <div class="type-title">CEO Activ + Investitor Pasiv</div>
+      <div class="type-desc">Simptome: investitorul intervine în decizii operaționale, CEO se simte sufocat sau subevaluat, dividendele devin subiect de conflict.</div>
+      <div class="cols-2">
+        <div class="mini-card">
+          <div class="mini-card-title gold">Restructurare</div>
+          <ul class="step-list">
+            <li class="step-item"><div class="step-num" style="background:#8B6A30">1</div><span>Clarificați în scris: <strong>investitorul nu are vot operațional</strong>, doar raport trimestrial și dividende.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#8B6A30">2</div><span>CEO primește salariu + bonus de performanță, separat de dividende.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#8B6A30">3</div><span>Întâlnire formală trimestrială cu agendă fixă — singura interfață.</span></li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title red">Ieșire</div>
+          <ul class="step-list">
+            <li class="step-item"><div class="step-num" style="background:#C0392B">1</div><span>CEO negociază răscumpărarea la multiplul de EBITDA agreat la intrare (sau re-negociat).</span></li>
+            <li class="step-item"><div class="step-num" style="background:#C0392B">2</div><span>Plan de plată în rate pe 12–36 luni din profitul afacerii.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#C0392B">3</div><span>Clauză de non-interferență pe perioada plăților.</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="write-section" style="margin-top:10px;">
+        <div class="write-label">Multiplul de evaluare agreat &amp; structura de plată:</div>
+        <div class="write-line"></div>
+      </div>
+    </div>
+
+    <!-- TIP 3 -->
+    <div class="type-section">
+      <div class="type-badge gold"><div class="type-badge-dot"></div>Tip 03</div>
+      <div class="type-title">CEO Activ + Partener cu Rol Operațional</div>
+      <div class="type-desc">Simptome: granițele de rol s-au estompat, unul simte că face munca altuia, sau că celălalt nu livrează la nivelul așteptat.</div>
+      <div class="cols-3">
+        <div class="mini-card">
+          <div class="mini-card-title gold">Pasul 1 — Diagnoza</div>
+          <ul class="step-list" style="gap:6px;">
+            <li class="step-item"><div class="step-num" style="background:#8B6A30;width:16px;height:16px;font-size:7pt;">1</div><span style="font-size:8.5pt;">Fiecare listează top 5 responsabilități reale (nu cele din fișa postului).</span></li>
+            <li class="step-item"><div class="step-num" style="background:#8B6A30;width:16px;height:16px;font-size:7pt;">2</div><span style="font-size:8.5pt;">Compară listele — unde se suprapun, unde sunt goluri.</span></li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title gold">Pasul 2 — Redefinirea</div>
+          <ul class="step-list" style="gap:6px;">
+            <li class="step-item"><div class="step-num" style="background:#8B6A30;width:16px;height:16px;font-size:7pt;">1</div><span style="font-size:8.5pt;">Redesenați organigrama cu responsabilități exclusive.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#8B6A30;width:16px;height:16px;font-size:7pt;">2</div><span style="font-size:8.5pt;">KPIs individuale agreate și măsurate lunar.</span></li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title red">Pasul 3 — Ieșire</div>
+          <ul class="step-list" style="gap:6px;">
+            <li class="step-item"><div class="step-num" style="background:#C0392B;width:16px;height:16px;font-size:7pt;">1</div><span style="font-size:8.5pt;">Partenerul cu rol operațional poate fi convertit în angajat cheie + profit sharing.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#C0392B;width:16px;height:16px;font-size:7pt;">2</div><span style="font-size:8.5pt;">Dacă refuză, ieșire standard la valoare evaluată.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIP 4 -->
+    <div class="type-section">
+      <div class="type-badge red"><div class="type-badge-dot"></div>Tip 04</div>
+      <div class="type-title">Parteneriat de Familie</div>
+      <div class="type-desc">Simptome: lucrurile personale intră în afacere, decizii luate la masa de prânz în familie, resentimentele se acumulează fără voie să fie exprimate.</div>
+      <div class="cols-2">
+        <div class="mini-card">
+          <div class="mini-card-title red">Regula de Aur — Separă Mereu</div>
+          <ul class="step-list">
+            <li class="step-item"><div class="step-num" style="background:#C0392B">1</div><span>Nicio decizie de afacere la masa de prânz sau în vacanță. Ședință formală sau nimic.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#C0392B">2</div><span>Fiecare are un salariu clar. Dividendele nu sunt "bani ai familiei".</span></li>
+            <li class="step-item"><div class="step-num" style="background:#C0392B">3</div><span>Un terț neutru (consultant extern) participă la deciziile majore.</span></li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title red">Protocol de Ieșire (Cel mai delicat)</div>
+          <ul class="step-list">
+            <li class="step-item"><div class="step-num" style="background:#C0392B">1</div><span><strong>Separă afacerea de relație</strong>: "Indiferent ce se întâmplă cu afacerea, relația noastră de familie rămâne."</span></li>
+            <li class="step-item"><div class="step-num" style="background:#C0392B">2</div><span>Evaluare realizată de o firmă externă — nu "cât credem noi că merită".</span></li>
+            <li class="step-item"><div class="step-num" style="background:#C0392B">3</div><span>Mediator profesionist pentru negocierea termenilor.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#C0392B">4</div><span>Plan de comunicare în familie — cine știe ce și când.</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="write-section" style="margin-top:10px;">
+        <div class="write-label">Mediator / consultant terț identificat:</div>
+        <div class="write-line"></div>
+      </div>
+    </div>
+
+    <!-- TIP 5 -->
+    <div class="type-section">
+      <div class="type-badge gold"><div class="type-badge-dot"></div>Tip 05</div>
+      <div class="type-title">Inegal ca Implicare în Timp</div>
+      <div class="type-desc">Simptome: unul dintre parteneri face 70–80% din muncă dar deține 50% din profit. Resentimentul crește lent, explodează brusc.</div>
+      <div class="cols-2">
+        <div class="mini-card">
+          <div class="mini-card-title gold">Restructurare — Recalibrare</div>
+          <ul class="step-list">
+            <li class="step-item"><div class="step-num" style="background:#8B6A30">1</div><span>Cuantifică implicarea reală a fiecăruia în ultimele 6 luni (ore/săptămână, responsabilități).</span></li>
+            <li class="step-item"><div class="step-num" style="background:#8B6A30">2</div><span>Renegociați structura: salariu diferențiat + dividende proporționale cu implicarea.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#8B6A30">3</div><span>Sau: convertirea parteneriatului în CEO + investitor pasiv (Tipul 02).</span></li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title red">Ieșire</div>
+          <ul class="step-list">
+            <li class="step-item"><div class="step-num" style="background:#C0392B">1</div><span>Cel mai implicat are drept de preempțiune la răscumpărare.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#C0392B">2</div><span>Prețul de răscumpărare poate include o reducere negociată pentru "sweat equity" neremunerat.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#C0392B">3</div><span>Termen de tranziție de 60–90 de zile pentru transfer de cunoștințe.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIP 6 -->
+    <div class="type-section">
+      <div class="type-badge green"><div class="type-badge-dot"></div>Tip 06</div>
+      <div class="type-title">Parteneri cu Viziuni Divergente</div>
+      <div class="type-desc">Simptome: dezacord pe direcția strategică, unul vrea să crească rapid, altul vrea stabilitate, deciziile mari sunt mereu amânate.</div>
+      <div class="cols-2">
+        <div class="mini-card">
+          <div class="mini-card-title green">Restructurare — Splits strategice</div>
+          <ul class="step-list">
+            <li class="step-item"><div class="step-num" style="background:var(--green)">1</div><span>Puneți în scris viziunea fiecăruia pentru 3 ani. Comparați — unde se suprapun, unde nu.</span></li>
+            <li class="step-item"><div class="step-num" style="background:var(--green)">2</div><span>Poate afacerea să satisfacă ambele viziuni prin divizare de linii de business?</span></li>
+            <li class="step-item"><div class="step-num" style="background:var(--green)">3</div><span>Dacă nu: cel cu viziunea mai aliniată cu misiunea actuală preia controlul.</span></li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title red">Ieșire Agreată (Cel mai civilizat)</div>
+          <ul class="step-list">
+            <li class="step-item"><div class="step-num" style="background:#C0392B">1</div><span>Spin-off: fiecare pleacă cu o linie de business sau segment de piață.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#C0392B">2</div><span>Cel care rămâne răscumpără participația celuilalt la evaluare corectă.</span></li>
+            <li class="step-item"><div class="step-num" style="background:#C0392B">3</div><span>Clauza de non-concurență pe 2 ani în același segment de piață.</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="write-section" style="margin-top:10px;">
+        <div class="write-label">Viziunea mea pentru afacere în 3 ani:</div>
+        <div class="write-line-wide"></div>
+        <div class="write-label">Viziunea partenerului (cum o înțeleg eu):</div>
+        <div class="write-line-wide"></div>
+      </div>
+    </div>
+
+    <!-- Semnătură -->
+    <div class="section-divider"><span>Angajamentul meu față de acest protocol</span></div>
+    <div class="commitment-box">
+      <p>Prin completarea acestui document, mă angajez să abordez situația cu <strong>claritate, demnitate și responsabilitate</strong>. Știu că o separare sau restructurare corectă protejează nu doar afacerea, ci și omul de lângă mine.</p>
+    </div>
+
+    <div class="sig-block" style="margin-top:20px;">
+      <div class="sig-col">
+        <div class="sig-label">Completat de</div>
+        <div class="sig-line"></div>
+        <div class="sig-name">Nume complet &amp; funcție</div>
+      </div>
+      <div class="sig-col">
+        <div class="sig-label">Data</div>
+        <div class="sig-line"></div>
+        <div class="sig-name">ZZ / LL / AAAA</div>
+      </div>
+    </div>
+
+  </div><!-- /body -->
+
+  <div class="sep-band"></div>
+  <div class="footer">
+    <div class="footer-left">Arhitectura Afacerii · Victor Morar</div>
+    <div class="footer-right">Document Confidențial · Uz Personal · Pagina 2 / 2</div>
+  </div>
+</div><!-- /page 2 -->
+
+</body>
+</html>

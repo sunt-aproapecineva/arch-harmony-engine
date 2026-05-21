@@ -506,6 +506,60 @@ export const LessonPage: React.FC = () => {
             </motion.div>
           )}
 
+          {/* Documents section — official AA templates attached to lesson */}
+          {(lesson as any).documents && (lesson as any).documents.length > 0 && (
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
+              style={{ marginBottom: 24, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 18 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                <FileText size={14} style={{ color: '#C9A96E' }} />
+                <span className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#C9A96E' }}>
+                  Documente Oficiale
+                </span>
+                <div style={{ flex: 1, height: 1, background: 'rgba(201,169,110,0.18)' }} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {(lesson as any).documents.map((d: any) => (
+                  <div key={d.url} style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '10px 12px', borderRadius: 10,
+                    background: 'var(--bg-3)', border: '1px solid var(--border)',
+                  }}>
+                    <div style={{
+                      width: 34, height: 34, flexShrink: 0, borderRadius: 7,
+                      background: 'rgba(201,169,110,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <span className="font-aboreto" style={{ fontSize: 9, fontWeight: 700, color: '#C9A96E' }}>
+                        {d.docNumber}
+                      </span>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)', marginBottom: 2 }}>
+                        {d.title}
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--fg-3)' }}>
+                        {d.description}
+                      </div>
+                    </div>
+                    <a href={d.url} target="_blank" rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 5,
+                        padding: '7px 12px', fontSize: 11, fontWeight: 700,
+                        borderRadius: 8, textDecoration: 'none',
+                        background: '#C9A96E', color: '#1C1410',
+                        whiteSpace: 'nowrap',
+                      }}>
+                      <FileText size={11} /> Descarcă PDF
+                    </a>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)', fontSize: 11, color: 'var(--fg-3)' }}>
+                Poți completa aceste documente direct pe platformă din pagina <a href="/documents" style={{ color: '#C9A96E', textDecoration: 'underline' }}>Documente</a>.
+              </div>
+            </motion.div>
+          )}
+
+
           {/* Complete button */}
           <motion.div ref={completeRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} style={{ marginBottom: 24 }}>
             <CompleteButton done={done} justCompleted={justCompleted} completing={completing} showConfetti={scopedShowConfetti} onComplete={handleComplete} onConfettiDone={() => setShowConfetti(false)} />

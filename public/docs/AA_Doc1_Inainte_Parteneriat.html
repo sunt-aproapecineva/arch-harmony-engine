@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AA · Cele 10 Conversații Obligatorii Înainte de Orice Parteneriat</title>
+<link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Arimo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ── TOKENS ── */
+  :root {
+    --ink:       #1C1410;
+    --ink-2:     #4A3D35;
+    --ink-3:     #7A6A60;
+    --green:     #1A5C38;
+    --green-mid: #2D7A4F;
+    --green-dim: #E8F5EE;
+    --gold:      #C9A96E;
+    --gold-dim:  #FDF6EC;
+    --cream:     #FDFAF7;
+    --border:    #E0D8D0;
+    --border-hi: #C9A96E;
+    --paper:     #FFFFFF;
+  }
+
+  /* ── RESET ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body {
+    font-family: 'Arimo', sans-serif;
+    background: #F0EDE8;
+    color: var(--ink);
+    font-size: 9.5pt;
+    line-height: 1.6;
+  }
+
+  /* ── PAGE ── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: var(--paper);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--ink);
+    padding: 22px 32px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-logo {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #1A5C38, #0D3520);
+    border: 1px solid rgba(196,240,228,0.3);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .header-logo span {
+    font-family: 'Aboreto', serif;
+    font-size: 10px; color: #C4F0E4;
+    letter-spacing: 0.04em;
+  }
+  .header-name {
+    font-family: 'Aboreto', serif;
+    font-size: 8.5pt;
+    color: rgba(255,255,255,0.72);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .header-tag {
+    font-family: 'Arimo', sans-serif;
+    font-size: 7pt;
+    color: rgba(196,240,228,0.6);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border: 1px solid rgba(196,240,228,0.2);
+    padding: 3px 10px;
+    border-radius: 99px;
+  }
+
+  /* ── TITLE BAND ── */
+  .title-band {
+    background: var(--green);
+    padding: 28px 32px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .title-band::after {
+    content: 'AA';
+    position: absolute; right: -10px; bottom: -22px;
+    font-family: 'Aboreto', serif;
+    font-size: 120px; color: rgba(255,255,255,0.04);
+    line-height: 1; pointer-events: none;
+    letter-spacing: -0.04em;
+  }
+  .doc-number {
+    font-size: 7.5pt;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(196,240,228,0.7);
+    margin-bottom: 8px;
+    display: block;
+  }
+  .doc-title {
+    font-family: 'Aboreto', serif;
+    font-size: 20pt;
+    color: #FFFFFF;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .doc-lead {
+    font-size: 9pt;
+    color: rgba(255,255,255,0.68);
+    max-width: 480px;
+    line-height: 1.65;
+  }
+
+  /* ── INSTRUCTION BOX ── */
+  .instruction-box {
+    margin: 22px 32px 0;
+    padding: 14px 18px;
+    background: var(--gold-dim);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 6px 6px 0;
+  }
+  .instruction-box strong {
+    color: var(--ink);
+    font-size: 8.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .instruction-box p {
+    font-size: 8.5pt;
+    color: var(--ink-2);
+    margin-top: 4px;
+    line-height: 1.6;
+  }
+
+  /* ── BODY ── */
+  .body {
+    padding: 20px 32px 28px;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 20px;
+    break-inside: avoid;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .section-num {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    background: var(--green);
+    color: #fff;
+    font-family: 'Aboreto', serif;
+    font-size: 10pt;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0;
+  }
+  .section-title {
+    font-family: 'Aboreto', serif;
+    font-size: 11pt;
+    color: var(--green);
+    letter-spacing: -0.01em;
+    flex: 1;
+  }
+  .section-sub {
+    font-size: 7.5pt;
+    color: var(--ink-3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── QUESTION ── */
+  .q-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .q-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: start;
+  }
+  .q-dot {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    border: 1.5px solid var(--gold);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 7pt;
+    color: var(--gold);
+    font-weight: 700;
+  }
+  .q-body { flex: 1; }
+  .q-text {
+    font-size: 9pt;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+  .q-note {
+    font-size: 8pt;
+    color: var(--ink-3);
+    font-style: italic;
+    line-height: 1.5;
+    margin-bottom: 5px;
+  }
+
+  /* ── FILL LINE ── */
+  .fill-area {
+    border-bottom: 1px solid var(--border);
+    min-height: 16px;
+    margin-bottom: 3px;
+    width: 100%;
+  }
+  .fill-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .fill-col label {
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    display: block;
+    margin-bottom: 3px;
+  }
+  .fill-col .fill-area { margin-bottom: 0; }
+
+  /* ── RULE BOX — critical rule ── */
+  .rule-box {
+    margin: 14px 0 10px;
+    padding: 12px 16px;
+    background: var(--green-dim);
+    border: 1px solid rgba(26,92,56,0.2);
+    border-left: 3px solid var(--green);
+    border-radius: 0 6px 6px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .rule-box-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .rule-box p {
+    font-size: 8.5pt;
+    color: var(--green);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  .rule-box span {
+    font-weight: 400;
+    color: var(--ink-2);
+  }
+
+  /* ── SIGNATURE BLOCK ── */
+  .sig-block {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 2px solid var(--ink);
+  }
+  .sig-title {
+    font-family: 'Aboreto', serif;
+    font-size: 9pt;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 14px;
+  }
+  .sig-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .sig-col label {
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+    display: block;
+    margin-bottom: 24px;
+  }
+  .sig-line {
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: 6px;
+  }
+  .sig-sub {
+    font-size: 7pt;
+    color: var(--ink-3);
+  }
+
+  /* ── COMMITMENT BOX ── */
+  .commit-box {
+    margin-top: 14px;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border-hi);
+    border-radius: 6px;
+    background: var(--gold-dim);
+  }
+  .commit-label {
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    margin-bottom: 8px;
+    display: block;
+  }
+  .commit-lines { display: flex; flex-direction: column; gap: 6px; }
+  .commit-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 8.5pt;
+    color: var(--ink-2);
+  }
+  .commit-row .fill-area { flex: 1; margin: 0; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--cream);
+    border-top: 1px solid var(--border);
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-left {
+    font-size: 7pt;
+    color: var(--ink-3);
+    letter-spacing: 0.06em;
+  }
+  .footer-left strong { color: var(--ink-2); }
+  .footer-right {
+    font-family: 'Aboreto', serif;
+    font-size: 7.5pt;
+    color: var(--green);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* ── ALERT / IMPORTANT ── */
+  .alert {
+    background: #FFF5F5;
+    border: 1px solid rgba(200,60,60,0.2);
+    border-left: 3px solid #C84040;
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    margin: 10px 0;
+    font-size: 8.5pt;
+    color: #6A2020;
+    line-height: 1.6;
+  }
+  .alert strong { color: #C84040; }
+
+  /* ── PRINT ── */
+  @media print {
+    body { background: white; }
+    .page { box-shadow: none; margin: 0; width: 100%; }
+    .section { break-inside: avoid; }
+  }
+
+  @media screen {
+    .page { margin: 24px auto; }
+    body { padding-bottom: 48px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-brand">
+      <div class="header-logo"><span>AA</span></div>
+      <span class="header-name">Arhitectura Afacerii</span>
+    </div>
+    <span class="header-tag">Document oficial · Etapa 0</span>
+  </div>
+
+  <!-- TITLE BAND -->
+  <div class="title-band">
+    <span class="doc-number">Document #01 · Parteneriate · Victor Morar</span>
+    <h1 class="doc-title">Cele 10 Conversații Obligatorii<br>Înainte de Orice Parteneriat</h1>
+    <p class="doc-lead">Completați fiecare secțiune separat, fără să vă consultați. Abia după ce amândoi ați terminat — comparați răspunsurile. Diferențele sunt exact conversațiile pe care trebuie să le aveți.</p>
+  </div>
+
+  <!-- INSTRUCTION -->
+  <div class="instruction-box">
+    <strong>⚠ Regula de bază — citiți înainte de orice altceva</strong>
+    <p>O firmă nu poate fi condusă de doi oameni simultan. CEO-ul este unul singur. Orice parteneriat care ignoră această regulă se va destrăma — mai devreme sau mai târziu. Decideți cine e CEO-ul <em>înainte</em> să semnați orice.</p>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- 1. VIZIUNEA -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <div>
+          <div class="section-title">Viziunea</div>
+          <div class="section-sub">Completați separat · Nu vă consultați</div>
+        </div>
+      </div>
+      <div class="q-grid">
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Unde vrei să ajungă firma în 3 ani? (cu cifre concrete: cifră de afaceri, număr angajați, piețe)</p>
+            <div class="fill-2col">
+              <div class="fill-col">
+                <label>Partenerul A</label>
+                <div class="fill-area"></div>
+                <div class="fill-area"></div>
+              </div>
+              <div class="fill-col">
+                <label>Partenerul B</label>
+                <div class="fill-area"></div>
+                <div class="fill-area"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Care sunt obiectivele tale personale din acest parteneriat? (libertate financiară, creștere, siguranță, altceva?)</p>
+            <div class="fill-2col">
+              <div class="fill-col"><label>Partenerul A</label><div class="fill-area"></div></div>
+              <div class="fill-col"><label>Partenerul B</label><div class="fill-area"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Vrei să crești agresiv sau să menții stabil? Vrei să reinvestești profitul sau să scoți dividende?</p>
+            <div class="fill-2col">
+              <div class="fill-col"><label>Partenerul A</label><div class="fill-area"></div></div>
+              <div class="fill-col"><label>Partenerul B</label><div class="fill-area"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. STRUCTURA -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <div>
+          <div class="section-title">Structura & Autoritatea</div>
+          <div class="section-sub">Cel mai important capitol din document</div>
+        </div>
+      </div>
+      <div class="rule-box">
+        <span class="rule-box-icon">⚡</span>
+        <p>Cine e CEO-ul? <span>Decideți acum, bazat pe competențe și disponibilitate — nu pe ego sau pe % din acțiuni. Scrieți un nume.</span></p>
+      </div>
+      <div class="q-grid">
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">CEO-ul firmei este: <span style="display:inline-block;border-bottom:1px solid #ccc;width:140px;margin-left:4px;"></span> pentru că: <span style="display:inline-block;border-bottom:1px solid #ccc;width:180px;margin-left:4px;"></span></p>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Rolul operațional al fiecărui partener în firmă:</p>
+            <div class="fill-2col">
+              <div class="fill-col">
+                <label>Partenerul A — Rolul</label>
+                <div class="fill-area"></div>
+                <div class="fill-area"></div>
+              </div>
+              <div class="fill-col">
+                <label>Partenerul B — Rolul</label>
+                <div class="fill-area"></div>
+                <div class="fill-area"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Ce decizii poate lua fiecare singur (fără să întrebe)?</p>
+            <div class="fill-2col">
+              <div class="fill-col"><label>Partenerul A poate decide singur</label><div class="fill-area"></div><div class="fill-area"></div></div>
+              <div class="fill-col"><label>Partenerul B poate decide singur</label><div class="fill-area"></div><div class="fill-area"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Ce decizii necesită acordul amândurora? (lista de maxim 5 — nu băgați nimic operațional)</p>
+            <div class="fill-area"></div>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. CONTRIBUȚIA -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <div>
+          <div class="section-title">Contribuția Fiecăruia</div>
+          <div class="section-sub">Bani · Timp · Relații · Expertiză</div>
+        </div>
+      </div>
+      <div class="q-grid">
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Ce aduce fiecare partener concret? (capital inițial, relații-cheie, expertiză, timp, altele)</p>
+            <div class="fill-2col">
+              <div class="fill-col"><label>Partenerul A aduce</label><div class="fill-area"></div><div class="fill-area"></div></div>
+              <div class="fill-col"><label>Partenerul B aduce</label><div class="fill-area"></div><div class="fill-area"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Câte ore/săptămână se angajează fiecare să aloce firmei?</p>
+            <div class="fill-2col">
+              <div class="fill-col"><label>Partenerul A</label><div class="fill-area"></div></div>
+              <div class="fill-col"><label>Partenerul B</label><div class="fill-area"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Cum se măsoară contribuția — în ore sau în rezultate aduse? Ce se întâmplă dacă contribuția unui partener scade dramatic?</p>
+            <div class="fill-area"></div>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. BANII -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <div>
+          <div class="section-title">Banii & Dividendele</div>
+          <div class="section-sub">Nu lăsați asta la "vedem noi mai târziu"</div>
+        </div>
+      </div>
+      <div class="q-grid">
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Fiecare partener primește salariu? Cât? Ce se întâmplă dacă firma nu are bani de salarii?</p>
+            <div class="fill-2col">
+              <div class="fill-col"><label>Partenerul A — Salariu</label><div class="fill-area"></div></div>
+              <div class="fill-col"><label>Partenerul B — Salariu</label><div class="fill-area"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Ce procent din profit se reinvestește vs. se distribuie ca dividende? Cine decide când și cât se distribuie?</p>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. FAMILIA -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <div>
+          <div class="section-title">Familia în Firmă</div>
+          <div class="section-sub">Stabilit clar — înainte să apară tensiunile</div>
+        </div>
+      </div>
+      <div class="q-grid">
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Ce membri de familie pot fi angajați în firmă? Cu ce condiții? Cine aprobă angajarea lor?</p>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Dacă un partener aduce un membru de familie în firmă — are același standard de performanță ca orice angajat?</p>
+            <p class="q-note">Da / Nu — scrieți răspunsul și motivul:</p>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. CONFLICTELE -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">6</div>
+        <div>
+          <div class="section-title">Rezolvarea Conflictelor</div>
+          <div class="section-sub">Decis calm acum — nu în mijlocul unui conflict</div>
+        </div>
+      </div>
+      <div class="q-grid">
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Cum rezolvăm un dezacord operațional? (CEO decide final / vot / altceva)</p>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Cum rezolvăm un dezacord strategic? (vot paritar / mediator extern / alt mecanism)</p>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Când apelăm la un mediator extern? Cine îl alege? Cine plătește?</p>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. IEȘIREA -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">7</div>
+        <div>
+          <div class="section-title">Ieșirea din Parteneriat</div>
+          <div class="section-sub">Scenariile pe care nimeni nu vrea să le discute — dar trebuie</div>
+        </div>
+      </div>
+      <div class="alert">
+        <strong>Nu sariți această secțiune.</strong> Un parteneriat fără clauze de ieșire clare devine o capcană legală și emoțională. Discutați asta acum, când vă iubiți — nu când vă certați.
+      </div>
+      <div class="q-grid">
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Dacă un partener vrea să iasă din asociere — cum se evaluează firma? Cine poate cumpăra partea lui?</p>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Există clauze de non-concurență? Pe ce perioadă? Pe ce piețe?</p>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Ce se întâmplă dacă parteneriatul se destramă din cauza unui conflict major? Cum protejăm firma față de parteneri?</p>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. SCENARIILE DE CRIZĂ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">8</div>
+        <div>
+          <div class="section-title">Scenariile de Criză</div>
+          <div class="section-sub">Ce se întâmplă dacă...</div>
+        </div>
+      </div>
+      <div class="q-grid">
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Dacă firma pierde 50% din venituri — cum decidem să tăiem costurile? CEO decide singur sau amândoi?</p>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Dacă un partener devine incapacitat (boală gravă, accident) — ce se întâmplă cu rolul lui? Cu acțiunile?</p>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. ANGAJAȚII -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">9</div>
+        <div>
+          <div class="section-title">Angajații & Echipa</div>
+          <div class="section-sub">Partenerii stabiliți — angajații respectă</div>
+        </div>
+      </div>
+      <div class="q-grid">
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Cum comunicăm angajaților structura de autoritate? Cine e CEO-ul față de care raportează? Cum gestionăm situația când un angajat vine la amândoi?</p>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">Partenerii nu discută dezacordurile în fața angajaților. Cum gestionăm asta practic? (ședințe separate de parteneri?)</p>
+            <div class="fill-area"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. ANGAJAMENTUL -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">10</div>
+        <div>
+          <div class="section-title">Revizuirea Anuală</div>
+          <div class="section-sub">Un parteneriat e un organism viu — se revizuiește</div>
+        </div>
+      </div>
+      <div class="q-grid">
+        <div class="q-item">
+          <div class="q-dot">→</div>
+          <div class="q-body">
+            <p class="q-text">La ce dată fixă în fiecare an facem revizuirea parteneriatului? (viziune actualizată, structură, contribuție, satisfacție)</p>
+            <p class="q-note">Data anuală de revizuire: <span style="display:inline-block;border-bottom:1px solid #ccc;width:120px;"></span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANGAJAMENT FINAL -->
+    <div class="commit-box">
+      <span class="commit-label">✦ Angajamentul Parteneriatului</span>
+      <div class="commit-lines">
+        <div class="commit-row">Am discutat toate cele 10 secțiuni și suntem aliniați în privința: <div class="fill-area"></div></div>
+        <div class="commit-row">Principala diferență de viziune pe care am identificat-o este: <div class="fill-area"></div></div>
+        <div class="commit-row">Am convenit că o vom rezolva prin: <div class="fill-area"></div></div>
+      </div>
+    </div>
+
+    <!-- SEMNĂTURI -->
+    <div class="sig-block">
+      <p class="sig-title">Semnătura partenerilor · Confirmare că am discutat și suntem de acord</p>
+      <div class="sig-grid">
+        <div class="sig-col">
+          <label>Partenerul A</label>
+          <div class="sig-line"></div>
+          <div class="sig-sub">Nume · Rol · Data</div>
+        </div>
+        <div class="sig-col">
+          <label>Partenerul B</label>
+          <div class="sig-line"></div>
+          <div class="sig-sub">Nume · Rol · Data</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /body -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-left">
+      <strong>Victor Morar</strong> · Arhitectura Afacerii · Practicum de Sistematizare · Etapa 0 · Diagnostica<br>
+      Documentul nu înlocuiește consilierea juridică. Consultați un avocat pentru acordul de asociere.
+    </div>
+    <div class="footer-right">Construiește cu Proiect</div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
