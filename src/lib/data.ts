@@ -172,7 +172,7 @@ export const MODULES: Module[] = [
         description: 'Dacă ai pleca mâine 2 zile fără telefon — ce s-ar întâmpla? Listezi toate scenariile, le clasifici după gravitate și identifici dacă frica e de lipsa ta sau de lipsa sistemului.',
         video_url: '',
         duration_min: 20,
-        order_index: 5,
+        order_index: 6,
         is_published: true,
         type: 'exercise',
         exercise_id: 'e-0-3',
