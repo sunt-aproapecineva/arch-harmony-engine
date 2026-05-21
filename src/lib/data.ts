@@ -131,6 +131,17 @@ export const MODULES: Module[] = [
         is_published: true,
       },
       {
+        id: 'l-0-3',
+        module_id: 'mod-0',
+        title: 'Parteneriate',
+        description: '',
+        video_url: 'https://youtu.be/J-J-U8pGoqE',
+        pdf_url: '',
+        duration_min: 0,
+        order_index: 3,
+        is_published: true,
+      },
+      {
         id: 'l-0-ex-1',
         module_id: 'mod-0',
         title: 'Auditul Activităților Tale',
