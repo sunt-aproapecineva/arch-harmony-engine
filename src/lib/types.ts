@@ -35,6 +35,13 @@ export interface Module {
   deliverable: string;
 }
 
+export interface LessonDocument {
+  title: string;
+  description: string;
+  url: string;
+  docNumber: string;
+}
+
 export interface Lesson {
   id: string;
   module_id: string;
@@ -47,6 +54,7 @@ export interface Lesson {
   is_published: boolean;
   type?: 'video' | 'exercise';
   exercise_id?: string;
+  documents?: LessonDocument[];
 }
 
 export interface Exercise {
