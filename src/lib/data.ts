@@ -148,7 +148,7 @@ export const MODULES: Module[] = [
         description: 'Scrie TOT ce faci în firma ta, estimează % din timp și clasifică fiecare activitate ca Specialist (S), Director (D) sau Proprietar (P). Vei vedea negru pe alb câte % din timp ești angajat și nu proprietar.',
         video_url: '',
         duration_min: 25,
-        order_index: 3,
+        order_index: 4,
         is_published: true,
         type: 'exercise',
         exercise_id: 'e-0-1',
