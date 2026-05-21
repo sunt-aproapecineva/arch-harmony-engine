@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AA · Acord de Parteneriat Minimal</title>
+<link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Arimo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:       #1C1410;
+    --ink-2:     #4A3D35;
+    --ink-3:     #7A6A60;
+    --green:     #1A5C38;
+    --green-mid: #2D7A4F;
+    --green-dim: #E8F5EE;
+    --gold:      #C9A96E;
+    --gold-dim:  #FDF6EC;
+    --border:    #E0D8D0;
+    --paper:     #FFFFFF;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body {
+    font-family: 'Arimo', sans-serif;
+    background: #F0EDE8;
+    color: var(--ink);
+    font-size: 9pt;
+    line-height: 1.6;
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: var(--paper);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--ink);
+    padding: 20px 32px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .header-brand { display: flex; align-items: center; gap: 10px; }
+  .header-logo {
+    width: 32px; height: 32px; border-radius: 7px;
+    background: linear-gradient(135deg, #1A5C38, #0D3520);
+    border: 1px solid rgba(196,240,228,0.3);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .header-logo span { font-family: 'Aboreto', serif; font-size: 9px; color: #C4F0E4; }
+  .header-name { font-family: 'Aboreto', serif; font-size: 8pt; color: rgba(255,255,255,0.7); letter-spacing: 0.22em; text-transform: uppercase; }
+  .header-sub  { font-size: 6.5pt; color: rgba(255,255,255,0.35); letter-spacing: 0.08em; margin-top: 2px; }
+  .header-tag  { font-size: 6.5pt; color: rgba(196,240,228,0.55); letter-spacing: 0.16em; text-transform: uppercase; border: 1px solid rgba(196,240,228,0.18); padding: 2px 9px; border-radius: 99px; }
+
+  /* ACCENT LINE */
+  .accent-line { height: 3px; background: linear-gradient(90deg, var(--green) 0%, var(--gold) 60%, transparent 100%); flex-shrink: 0; }
+
+  /* TITLE BLOCK */
+  .title-block {
+    padding: 22px 32px 18px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .title-block::after {
+    content: 'ACORD';
+    position: absolute; right: -4px; top: 50%; transform: translateY(-50%);
+    font-family: 'Aboreto', serif; font-size: 72px;
+    color: rgba(0,0,0,0.025); pointer-events: none; line-height: 1;
+  }
+  .doc-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 7pt; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--green); background: var(--green-dim);
+    border: 1px solid rgba(26,92,56,0.2); padding: 3px 10px; border-radius: 99px;
+    margin-bottom: 10px;
+  }
+  .doc-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+  .doc-title { font-family: 'Aboreto', serif; font-size: 22pt; color: var(--ink); letter-spacing: -0.02em; line-height: 1.05; margin-bottom: 6px; }
+  .doc-sub   { font-size: 9pt; color: var(--ink-2); line-height: 1.6; max-width: 500px; }
+
+  /* PARTIES BLOCK */
+  .parties-block {
+    margin: 0 32px;
+    padding: 14px 18px;
+    background: var(--gold-dim);
+    border: 1px solid #EBDBC0;
+    border-radius: 8px;
+    margin-top: 18px;
+    flex-shrink: 0;
+  }
+  .parties-label { font-size: 7pt; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px; }
+  .parties-grid  { display: grid; grid-template-columns: 1fr 24px 1fr; gap: 0; align-items: center; }
+  .party-col {}
+  .party-role    { font-size: 7pt; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 4px; }
+  .party-field   { height: 1px; background: var(--ink-2); margin-bottom: 5px; }
+  .party-hint    { font-size: 7.5pt; color: var(--ink-3); }
+  .parties-and   { text-align: center; font-family: 'Aboreto', serif; font-size: 9pt; color: var(--gold); }
+
+  /* BODY */
+  .body { padding: 16px 32px 14px; flex: 1; }
+
+  /* CLAUSE */
+  .clause { margin-bottom: 14px; break-inside: avoid; }
+  .clause-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px;
+  }
+  .clause-num {
+    font-family: 'Aboreto', serif; font-size: 14pt; color: var(--green);
+    line-height: 1; flex-shrink: 0; width: 24px;
+  }
+  .clause-title { font-size: 9.5pt; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .clause-body  { padding-left: 34px; }
+
+  .field-row {
+    display: flex; align-items: flex-end; gap: 10px;
+    margin-bottom: 8px; font-size: 8.5pt; color: var(--ink-2);
+  }
+  .field-label { white-space: nowrap; flex-shrink: 0; }
+  .field-line  { flex: 1; height: 1px; background: var(--border); }
+  .field-unit  { white-space: nowrap; flex-shrink: 0; color: var(--ink-3); font-size: 8pt; }
+
+  .option-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px; font-size: 8.5pt; color: var(--ink-2);
+  }
+  .opt-box { width: 13px; height: 13px; border: 1.5px solid var(--border); border-radius: 3px; flex-shrink: 0; }
+
+  .inline-fill {
+    display: inline-block; border-bottom: 1px solid var(--border);
+    min-width: 120px; margin: 0 4px;
+  }
+
+  .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; }
+
+  .clause-note {
+    font-size: 7.5pt; color: var(--ink-3); font-style: italic;
+    padding-left: 34px; margin-top: -4px; margin-bottom: 10px;
+  }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+  /* COMMITMENT */
+  .commitment {
+    margin: 0 0 14px;
+    padding: 12px 16px;
+    background: var(--green-dim);
+    border: 1px solid rgba(26,92,56,0.18);
+    border-left: 3px solid var(--green);
+    border-radius: 0 6px 6px 0;
+    font-size: 8pt; color: var(--green); line-height: 1.65;
+  }
+  .commitment strong { color: var(--ink); }
+
+  /* DISCLAIMER */
+  .disclaimer {
+    margin: 0 32px 14px;
+    padding: 10px 14px;
+    background: #FFF8F0;
+    border-left: 3px solid var(--gold);
+    border-radius: 0 6px 6px 0;
+    font-size: 7.5pt; color: var(--ink-3); line-height: 1.55;
+    flex-shrink: 0;
+  }
+
+  /* SIGNATURE */
+  .sig-section { padding: 0 32px 16px; flex-shrink: 0; }
+  .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .sig-col {}
+  .sig-role  { font-size: 7pt; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink-3); margin-bottom: 18px; }
+  .sig-line  { height: 1px; background: var(--ink); margin-bottom: 5px; }
+  .sig-name  { height: 1px; background: var(--border); margin-bottom: 5px; margin-top: 10px; }
+  .sig-hint  { font-size: 7.5pt; color: var(--ink-3); }
+  .sig-date  { font-size: 7.5pt; color: var(--ink-3); margin-top: 8px; }
+  .sig-date span { display: inline-block; border-bottom: 1px solid var(--border); min-width: 80px; margin-left: 6px; }
+
+  /* FOOTER */
+  .footer {
+    background: var(--ink);
+    padding: 12px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .footer-left  { font-family: 'Aboreto', serif; font-size: 7.5pt; color: rgba(255,255,255,0.32); letter-spacing: 0.14em; }
+  .footer-center { font-size: 7pt; color: rgba(255,255,255,0.22); letter-spacing: 0.06em; text-align: center; }
+  .footer-right { font-size: 7pt; color: rgba(255,255,255,0.28); letter-spacing: 0.06em; }
+
+  /* ACCENT STRIPE */
+  .sep-band { height: 3px; background: linear-gradient(90deg, var(--green), var(--gold)); flex-shrink: 0; }
+
+  @media print {
+    body { background: white; }
+    .page { box-shadow: none; margin: 0; width: 100%; min-height: 297mm; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="header">
+    <div class="header-brand">
+      <div class="header-logo"><span>AA</span></div>
+      <div>
+        <div class="header-name">Arhitectura Afacerii</div>
+        <div class="header-sub">Victor Morar · Program de Mentorat</div>
+      </div>
+    </div>
+    <div class="header-tag">Doc 3 · Parteneriatul</div>
+  </div>
+  <div class="accent-line"></div>
+
+  <!-- TITLE -->
+  <div class="title-block">
+    <div class="doc-badge"><div class="doc-badge-dot"></div>Acord Pre-Legal · Uz Personal</div>
+    <div class="doc-title">Acord de Parteneriat<br>Minimal</div>
+    <div class="doc-sub">Un document simplu, semnat înainte de notar, care forțează conversațiile esențiale. Nu înlocuiește actul constitutiv — îl pregătește.</div>
+  </div>
+
+  <!-- PARTIES -->
+  <div class="parties-block">
+    <div class="parties-label">Între părțile semnatare</div>
+    <div class="parties-grid">
+      <div class="party-col">
+        <div class="party-role">Partenerul A</div>
+        <div class="party-field"></div>
+        <div class="party-hint">Nume complet</div>
+        <div class="party-field" style="margin-top:8px;"></div>
+        <div class="party-hint">Rol propus în afacere</div>
+      </div>
+      <div class="parties-and">&amp;</div>
+      <div class="party-col">
+        <div class="party-role">Partenerul B</div>
+        <div class="party-field"></div>
+        <div class="party-hint">Nume complet</div>
+        <div class="party-field" style="margin-top:8px;"></div>
+        <div class="party-hint">Rol propus în afacere</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;">
+      <div class="field-row">
+        <div class="field-label">Afacerea / proiectul:</div>
+        <div class="field-line"></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">Data semnării:</div>
+        <div class="field-line"></div>
+        <div class="field-unit">ZZ / LL / AAAA</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- Clauza 1 -->
+    <div class="clause" style="margin-top:14px;">
+      <div class="clause-header">
+        <div class="clause-num">1</div>
+        <div class="clause-title">Cine este CEO — și ce înseamnă asta concret</div>
+      </div>
+      <div class="clause-body">
+        <div class="field-row">
+          <div class="field-label">CEO al afacerii este:</div>
+          <div class="field-line"></div>
+          <div class="field-unit">(Partenerul A / B)</div>
+        </div>
+        <div style="font-size:8.5pt;color:var(--ink-2);margin-bottom:6px;">CEO are drept de decizie finală în: angajări/concedieri, prețuri și oferte, cheltuieli operaționale, direcție strategică. Veto-ul celuilalt partener se aplică <em>doar</em> pentru:</div>
+        <div class="sub-grid">
+          <div class="option-row"><div class="opt-box"></div><span>Investiții peste <span class="inline-fill">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> RON</span></div>
+          <div class="option-row"><div class="opt-box"></div><span>Vânzarea afacerii sau a unui activ major</span></div>
+          <div class="option-row"><div class="opt-box"></div><span>Intrarea unui nou asociat / investitor</span></div>
+          <div class="option-row"><div class="opt-box"></div><span>Modificarea obiectului de activitate</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="clause-note">Orice altă decizie este responsabilitatea exclusivă a CEO-ului și nu necesită aprobare.</div>
+
+    <div class="divider"></div>
+
+    <!-- Clauza 2 -->
+    <div class="clause">
+      <div class="clause-header">
+        <div class="clause-num">2</div>
+        <div class="clause-title">Contribuția fiecărui partener</div>
+      </div>
+      <div class="clause-body">
+        <div class="sub-grid" style="margin-bottom:6px;">
+          <div>
+            <div class="party-role" style="font-size:7.5pt;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:5px;">Partenerul A contribuie cu:</div>
+            <div class="field-row"><div class="field-label">Capital:</div><div class="field-line"></div><div class="field-unit">RON</div></div>
+            <div class="field-row"><div class="field-label">Timp:</div><div class="field-line"></div><div class="field-unit">ore/săpt.</div></div>
+            <div class="field-row"><div class="field-label">Expertiză / active:</div><div class="field-line"></div></div>
+          </div>
+          <div>
+            <div class="party-role" style="font-size:7.5pt;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:5px;">Partenerul B contribuie cu:</div>
+            <div class="field-row"><div class="field-label">Capital:</div><div class="field-line"></div><div class="field-unit">RON</div></div>
+            <div class="field-row"><div class="field-label">Timp:</div><div class="field-line"></div><div class="field-unit">ore/săpt.</div></div>
+            <div class="field-row"><div class="field-label">Expertiză / active:</div><div class="field-line"></div></div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Distribuția profitului (dividende): A —</div>
+          <div class="field-line" style="max-width:50px;"></div>
+          <div class="field-unit">%&nbsp;&nbsp;·&nbsp;&nbsp;B —</div>
+          <div class="field-line" style="max-width:50px;"></div>
+          <div class="field-unit">%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Clauza 3 -->
+    <div class="clause">
+      <div class="clause-header">
+        <div class="clause-num">3</div>
+        <div class="clause-title">Ce se întâmplă dacă un partener vrea să iasă</div>
+      </div>
+      <div class="clause-body">
+        <div class="option-row" style="margin-bottom:5px;"><div class="opt-box"></div><span>Partenerul care iese oferă participația sa celuilalt partener <strong>primul</strong>, la prețul evaluat (drept de preempțiune).</span></div>
+        <div class="option-row" style="margin-bottom:5px;"><div class="opt-box"></div><span>Evaluarea se face de un expert contabil independent, agreat de ambii.</span></div>
+        <div class="option-row" style="margin-bottom:5px;"><div class="opt-box"></div><span>Termenul de răscumpărare este de <span class="inline-fill">&nbsp;&nbsp;&nbsp;</span> zile de la notificare.</span></div>
+        <div class="field-row" style="margin-top:4px;">
+          <div class="field-label">Preavizul minim obligatoriu pentru intenția de ieșire:</div>
+          <div class="field-line"></div>
+          <div class="field-unit">zile</div>
+        </div>
+        <div class="option-row"><div class="opt-box"></div><span>Clauza de non-concurență post-ieșire: <span class="inline-fill">&nbsp;&nbsp;&nbsp;</span> ani, în același segment de piață.</span></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Clauza 4 -->
+    <div class="clause">
+      <div class="clause-header">
+        <div class="clause-num">4</div>
+        <div class="clause-title">Ce se întâmplă dacă afacerea pierde bani 3 luni consecutiv</div>
+      </div>
+      <div class="clause-body">
+        <div style="font-size:8.5pt;color:var(--ink-2);margin-bottom:7px;">Dacă afacerea înregistrează pierderi nete timp de 3 luni consecutive, partenerii se întâlnesc obligatoriu în <strong>maxim 7 zile</strong> și aleg una din variantele de mai jos:</div>
+        <div class="option-row"><div class="opt-box"></div><span>Injectare de capital suplimentar (proporțional cu participațiile) — în termen de <span class="inline-fill">&nbsp;&nbsp;&nbsp;</span> zile.</span></div>
+        <div class="option-row"><div class="opt-box"></div><span>Reducere imediată a cheltuielilor fixe cu minim <span class="inline-fill">&nbsp;&nbsp;&nbsp;</span>% și plan de redresare în scris.</span></div>
+        <div class="option-row"><div class="opt-box"></div><span>Vânzarea afacerii sau activelor non-esențiale.</span></div>
+        <div class="option-row"><div class="opt-box"></div><span>Dizolvarea voluntară și lichidarea ordonată.</span></div>
+        <div style="font-size:8pt;color:var(--ink-3);font-style:italic;margin-top:6px;">Dacă nu se ajunge la acord în 30 de zile de la prima întâlnire, se aplică automat clauza de ieșire din §3.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Clauzele 5 & 6 pe două coloane -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <!-- Clauza 5 -->
+      <div class="clause" style="margin-bottom:0;">
+        <div class="clause-header">
+          <div class="clause-num">5</div>
+          <div class="clause-title">Remunerație</div>
+        </div>
+        <div class="clause-body">
+          <div class="field-row"><div class="field-label">Salariu lunar A:</div><div class="field-line"></div><div class="field-unit">RON</div></div>
+          <div class="field-row"><div class="field-label">Salariu lunar B:</div><div class="field-line"></div><div class="field-unit">RON</div></div>
+          <div style="font-size:8pt;color:var(--ink-3);margin-top:4px;">Salariile se revizuiesc <strong>anual</strong>. Dividendele se distribuie <span class="inline-fill">&nbsp;&nbsp;&nbsp;</span> (lunar/trimestrial/anual) doar dacă există profit net.</div>
+        </div>
+      </div>
+      <!-- Clauza 6 -->
+      <div class="clause" style="margin-bottom:0;">
+        <div class="clause-header">
+          <div class="clause-num">6</div>
+          <div class="clause-title">Revizuire Anuală Obligatorie</div>
+        </div>
+        <div class="clause-body">
+          <div style="font-size:8.5pt;color:var(--ink-2);margin-bottom:6px;">Partenerii se întâlnesc obligatoriu o dată pe an, în prima lună a anului fiscal, pentru a revizui:</div>
+          <div class="option-row"><div class="opt-box"></div><span>Rolurile și responsabilitățile</span></div>
+          <div class="option-row"><div class="opt-box"></div><span>Distribuția profitului</span></div>
+          <div class="option-row"><div class="opt-box"></div><span>Viziunea și direcția pe 12 luni</span></div>
+          <div class="option-row"><div class="opt-box"></div><span>Clauze care necesită actualizare</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /body -->
+
+  <!-- DISCLAIMER -->
+  <div class="disclaimer">
+    <strong>Notă legală:</strong> Acest document are valoare ca angajament personal între parteneri și nu substituie actul constitutiv, contractul de societate sau orice alt document juridic. Se recomandă consultarea unui avocat specializat înainte de semnarea documentelor oficiale.
+  </div>
+
+  <!-- COMMITMENT -->
+  <div style="padding: 0 32px 12px; flex-shrink:0;">
+    <div class="commitment">
+      Prin semnarea acestui document, ambii parteneri confirmă că au discutat deschis fiecare clauză și că înțeleg consecințele. <strong>Dezacordul pe orice punct semnat astăzi va fi tratat cu bună credință, nu ca atac personal.</strong>
+    </div>
+  </div>
+
+  <!-- SIGNATURES -->
+  <div class="sig-section">
+    <div class="sig-grid">
+      <div class="sig-col">
+        <div class="sig-role">Partenerul A</div>
+        <div class="sig-line"></div>
+        <div class="sig-hint">Semnătură</div>
+        <div class="sig-name"></div>
+        <div class="sig-hint">Nume complet (scris de mână)</div>
+        <div class="sig-date">Data: <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+      </div>
+      <div class="sig-col">
+        <div class="sig-role">Partenerul B</div>
+        <div class="sig-line"></div>
+        <div class="sig-hint">Semnătură</div>
+        <div class="sig-name"></div>
+        <div class="sig-hint">Nume complet (scris de mână)</div>
+        <div class="sig-date">Data: <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sep-band"></div>
+  <div class="footer">
+    <div class="footer-left">Arhitectura Afacerii · Victor Morar</div>
+    <div class="footer-center">Document Confidențial · Uz Personal</div>
+    <div class="footer-right">Doc 3 · Serie Parteneriate</div>
+  </div>
+
+</div><!-- /page -->
+
+</body>
+</html>
