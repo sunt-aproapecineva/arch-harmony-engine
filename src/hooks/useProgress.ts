@@ -177,11 +177,9 @@ export function useProgress() {
       if (!mod) return true;
 
       if (mod.unlockDate) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const unlock = new Date(mod.unlockDate);
-        unlock.setHours(0, 0, 0, 0);
-        if (today < unlock) return true;
+        // Unlock la 12:00 ora Bucurestiului (EEST = UTC+3 in mai)
+        const unlock = new Date(mod.unlockDate + 'T09:00:00Z');
+        if (new Date() < unlock) return true;
       }
 
       if (moduleIndex === 0) return false;
