@@ -22,7 +22,9 @@ export interface FormField {
 export interface ExerciseTemplate {
   exerciseId: string;
   type: 'checklist' | 'form-fields' | 'quiz' | 'text-input' | 'rating-grid' | 'dynamic-table'
-      | 'activity-audit' | 'bottleneck-map' | 'absence-test' | 'diagnostic-grid';
+      | 'activity-audit' | 'bottleneck-map' | 'absence-test' | 'diagnostic-grid'
+      | 'partnership-diagnostic'
+      | 'foundation-manifest' | 'quality-checklist' | 'team-feedback-report' | 'manifest-preview';
   title: string;
   instructions: string;
   items?: ChecklistItem[];
@@ -65,6 +67,15 @@ export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
     title: 'Diagnosticul Complet · 50 de Întrebări',
     instructions:
       '50 de întrebări pe 6 dimensiuni ale sistematizării. Scala 1–5. Fii sincer — răspunsurile incomode sunt cele mai valoroase. Nu cum vrei să fie — cum e acum.',
+  },
+
+  // e-0-5: Diagnosticul Parteneriatului → partnership-diagnostic
+  {
+    exerciseId: 'e-0-5',
+    type: 'partnership-diagnostic',
+    title: 'Diagnosticul Parteneriatului',
+    instructions:
+      'Dacă ești singur în afacere, poți sări acest exercițiu. Dacă ai un partener — acesta e exercițiul cel mai important din Etapa 0.',
   },
 
   // e-1-1: Lista Rolului Tău → form-fields
@@ -690,6 +701,44 @@ export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
       { id: 'vt_contact', type: 'textarea', label: 'Persoana de contact în absența mea (și pentru ce)', placeholder: 'Persoana: ...\nPentru situații de tip: ...' },
       { id: 'vt_rezultat', type: 'textarea', label: 'La întoarcere: ce s-a întâmplat (completezi după)', placeholder: 'Ce decizii s-au luat fără mine, ce a mers, ce a crăpat...' },
     ],
+  },
+
+  // ─── SĂPTĂMÂNA 2 — Etapa 1 · Fundația ────────────────────────────────────────
+
+  // e-1-s2-1: Misiunea · Viziunea · Valorile → foundation-manifest
+  {
+    exerciseId: 'e-1-s2-1',
+    type: 'foundation-manifest',
+    title: 'Misiunea · Viziunea · Valorile',
+    instructions:
+      'Construiești cei 3 piloni ai Fundației afacerii tale. Răspunsuri concrete, nu generice. Scrie cum e acum sau cum vrei să fie cu adevărat — răspunsurile oneste sunt mai valoroase decât cele care sună bine.',
+  },
+
+  // e-1-s2-2: Checklist de Calitate → quality-checklist
+  {
+    exerciseId: 'e-1-s2-2',
+    type: 'quality-checklist',
+    title: 'Checklist de Calitate',
+    instructions:
+      'Parcurgi fiecare punct. Dacă nu poți bifa — revizuiești înainte să mergi mai departe.',
+  },
+
+  // e-1-s2-3: Feedback din Ședința cu Echipa → team-feedback-report
+  {
+    exerciseId: 'e-1-s2-3',
+    type: 'team-feedback-report',
+    title: 'Feedback-ul din Ședința cu Echipa',
+    instructions:
+      'Completezi după ședința cu echipa ta. Prezinți Manifestul element cu element și notezi imediat ce s-a întâmplat.',
+  },
+
+  // e-1-s2-liv: Manifestul Fundației · Livrabil → manifest-preview
+  {
+    exerciseId: 'e-1-s2-liv',
+    type: 'manifest-preview',
+    title: 'Manifestul Fundației · Livrabil Final',
+    instructions:
+      'Aceasta este pagina ta A4. Se populează automat din răspunsurile tale din Exercițiul 1. Tipărește-o. Pune-o pe peretele biroului tău. E fundația pe care construim tot ce urmează.',
   },
 ];
 

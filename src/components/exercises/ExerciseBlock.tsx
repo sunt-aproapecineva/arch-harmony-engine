@@ -1,19 +1,17 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Plus, Trash2, ChevronRight } from 'lucide-react';
+import { Check, Plus, Trash2, ChevronRight, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { getExerciseTemplate, ExerciseTemplate, QuizQuestionItem } from '../../lib/exerciseData';
 import { useAuthContext } from '../../context/AuthContext';
-import { pushExerciseResponse, loadExerciseResponse, flushExerciseResponse, getStoredExerciseResponse } from '../../lib/exerciseSync';
 
 interface ExerciseBlockProps {
   exerciseId: string;
 }
 
 // ─── Checklist ────────────────────────────────────────────────────────────────
-const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; exerciseId: string }> = ({
+const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({
   template,
   storageKey,
-  exerciseId,
 }) => {
   const [checked, setChecked] = useState<Record<string, boolean>>(() => {
     try {
@@ -25,21 +23,10 @@ const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: stri
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadExerciseResponse(exerciseId).then(cloud => {
-      if (cloud && typeof cloud === 'object') {
-        setChecked(cloud as Record<string, boolean>);
-        localStorage.setItem(storageKey, JSON.stringify(cloud));
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exerciseId]);
-
   const toggle = (id: string) => {
     const next = { ...checked, [id]: !checked[id] };
     setChecked(next);
     localStorage.setItem(storageKey, JSON.stringify(next));
-    pushExerciseResponse(exerciseId, next);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
 
@@ -89,10 +76,9 @@ const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: stri
 };
 
 // ─── Form Fields ──────────────────────────────────────────────────────────────
-const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; exerciseId: string }> = ({
+const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({
   template,
   storageKey,
-  exerciseId,
 }) => {
   const [values, setValues] = useState<Record<string, string>>(() => {
     try {
@@ -105,21 +91,10 @@ const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: str
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    loadExerciseResponse(exerciseId).then(cloud => {
-      if (cloud && typeof cloud === 'object') {
-        setValues(cloud as Record<string, string>);
-        localStorage.setItem(storageKey, JSON.stringify(cloud));
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exerciseId]);
-
   const save = useCallback((newVals: Record<string, string>) => {
     localStorage.setItem(storageKey, JSON.stringify(newVals));
-    pushExerciseResponse(exerciseId, newVals);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
-  }, [storageKey, exerciseId]);
+  }, [storageKey]);
 
   const handleChange = (id: string, val: string) => {
     const next = { ...values, [id]: val };
@@ -206,10 +181,9 @@ const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: str
 // ─── Dynamic Table ─────────────────────────────────────────────────────────────
 type TableRow = Record<string, string>;
 
-const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; exerciseId: string }> = ({
+const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({
   template,
   storageKey,
-  exerciseId,
 }) => {
   const tableField = template.fields?.find(f => f.type === 'dynamic-table');
   const columns = tableField?.columns || ['Coloana 1', 'Coloana 2', 'Coloana 3'];
@@ -227,19 +201,8 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadExerciseResponse(exerciseId).then(cloud => {
-      if (Array.isArray(cloud)) {
-        setRows(cloud as TableRow[]);
-        localStorage.setItem(storageKey, JSON.stringify(cloud));
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exerciseId]);
-
   const save = (newRows: TableRow[]) => {
     localStorage.setItem(storageKey, JSON.stringify(newRows));
-    pushExerciseResponse(exerciseId, newRows);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
 
@@ -345,10 +308,9 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
 };
 
 // ─── Quiz ─────────────────────────────────────────────────────────────────────
-const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; exerciseId: string }> = ({
+const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({
   template,
   storageKey,
-  exerciseId,
 }) => {
   const questions: QuizQuestionItem[] = template.questions || [];
   const [answers, setAnswers] = useState<Record<string, string | number>>(() => {
@@ -362,16 +324,6 @@ const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; e
   const [currentIdx, setCurrentIdx] = useState(0);
   const [finished, setFinished] = useState(false);
 
-  useEffect(() => {
-    loadExerciseResponse(exerciseId).then(cloud => {
-      if (cloud && typeof cloud === 'object' && !Array.isArray(cloud)) {
-        setAnswers(cloud as Record<string, string | number>);
-        localStorage.setItem(storageKey, JSON.stringify(cloud));
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exerciseId]);
-
   const savedCount = Object.keys(answers).length;
   const allAnswered = questions.every(q => answers[q.id] !== undefined);
 
@@ -379,7 +331,6 @@ const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; e
     const next = { ...answers, [questionId]: val };
     setAnswers(next);
     localStorage.setItem(storageKey, JSON.stringify(next));
-    pushExerciseResponse(exerciseId, next);
     setTimeout(() => {
       if (currentIdx < questions.length - 1) {
         setCurrentIdx(i => i + 1);
@@ -545,7 +496,7 @@ const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string; e
 // ─── Activity Audit (Exercițiul 1) ────────────────────────────────────────────
 interface ActivityRow { id: string; activity: string; percentage: string; role: 'S' | 'D' | 'P' | '' }
 
-const ActivityAuditExercise: React.FC<{ storageKey: string; exerciseId: string }> = ({ storageKey, exerciseId }) => {
+const ActivityAuditExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
   const defaultRows = (): ActivityRow[] =>
     Array.from({ length: 8 }, (_, i) => ({ id: `r${i}`, activity: '', percentage: '', role: '' }));
 
@@ -558,22 +509,8 @@ const ActivityAuditExercise: React.FC<{ storageKey: string; exerciseId: string }
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadExerciseResponse(exerciseId).then(cloud => {
-      if (cloud && typeof cloud === 'object' && !Array.isArray(cloud)) {
-        const c: any = cloud;
-        if (Array.isArray(c.rows)) setRows(c.rows);
-        if (typeof c.conclusion === 'string') setConclusion(c.conclusion);
-        localStorage.setItem(storageKey, JSON.stringify(cloud));
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exerciseId]);
-
   const save = (r: ActivityRow[], c: string) => {
-    const payload = { rows: r, conclusion: c };
-    localStorage.setItem(storageKey, JSON.stringify(payload));
-    pushExerciseResponse(exerciseId, payload);
+    localStorage.setItem(storageKey, JSON.stringify({ rows: r, conclusion: c }));
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updateRow = (id: string, field: keyof ActivityRow, value: string) => {
@@ -678,7 +615,7 @@ const ActivityAuditExercise: React.FC<{ storageKey: string; exerciseId: string }
 // ─── Bottleneck Map (Exercițiul 2) ────────────────────────────────────────────
 interface BottleneckRow { id: string; situation: string; wasNecessary: 'da' | 'nu' | ''; reason: string; time: string }
 
-const BottleneckMapExercise: React.FC<{ storageKey: string; exerciseId: string }> = ({ storageKey, exerciseId }) => {
+const BottleneckMapExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
   const defaultRows = (): BottleneckRow[] =>
     Array.from({ length: 5 }, (_, i) => ({ id: `r${i}`, situation: '', wasNecessary: '', reason: '', time: '' }));
 
@@ -691,22 +628,8 @@ const BottleneckMapExercise: React.FC<{ storageKey: string; exerciseId: string }
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadExerciseResponse(exerciseId).then(cloud => {
-      if (cloud && typeof cloud === 'object' && !Array.isArray(cloud)) {
-        const c: any = cloud;
-        if (Array.isArray(c.rows)) setRows(c.rows);
-        if (typeof c.conclusion === 'string') setConclusion(c.conclusion);
-        localStorage.setItem(storageKey, JSON.stringify(cloud));
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exerciseId]);
-
   const save = (r: BottleneckRow[], c: string) => {
-    const payload = { rows: r, conclusion: c };
-    localStorage.setItem(storageKey, JSON.stringify(payload));
-    pushExerciseResponse(exerciseId, payload);
+    localStorage.setItem(storageKey, JSON.stringify({ rows: r, conclusion: c }));
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updateRow = (id: string, field: keyof BottleneckRow, value: string) => {
@@ -803,7 +726,7 @@ const BottleneckMapExercise: React.FC<{ storageKey: string; exerciseId: string }
 // ─── Absence Test (Exercițiul 3) ──────────────────────────────────────────────
 interface AbsenceRow { id: string; scenario: string; gravity: 'Mare' | 'Medie' | 'Mică' | ''; causedBy: string }
 
-const AbsenceTestExercise: React.FC<{ storageKey: string; exerciseId: string }> = ({ storageKey, exerciseId }) => {
+const AbsenceTestExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
   const defaultRows = (): AbsenceRow[] =>
     Array.from({ length: 5 }, (_, i) => ({ id: `r${i}`, scenario: '', gravity: '', causedBy: '' }));
 
@@ -816,22 +739,8 @@ const AbsenceTestExercise: React.FC<{ storageKey: string; exerciseId: string }> 
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadExerciseResponse(exerciseId).then(cloud => {
-      if (cloud && typeof cloud === 'object' && !Array.isArray(cloud)) {
-        const c: any = cloud;
-        if (Array.isArray(c.rows)) setRows(c.rows);
-        if (typeof c.conclusion === 'string') setConclusion(c.conclusion);
-        localStorage.setItem(storageKey, JSON.stringify(cloud));
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exerciseId]);
-
   const save = (r: AbsenceRow[], c: string) => {
-    const payload = { rows: r, conclusion: c };
-    localStorage.setItem(storageKey, JSON.stringify(payload));
-    pushExerciseResponse(exerciseId, payload);
+    localStorage.setItem(storageKey, JSON.stringify({ rows: r, conclusion: c }));
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updateRow = (id: string, field: keyof AbsenceRow, value: string) => {
@@ -980,7 +889,7 @@ const DIAG_DIMENSIONS = [
 
 const SCORE_COLORS: Record<number, string> = { 1: '#f87171', 2: '#fb923c', 3: 'var(--gold)', 4: '#86efac', 5: '#4ade80' };
 
-const DiagnosticGridExercise: React.FC<{ storageKey: string; exerciseId: string }> = ({ storageKey, exerciseId }) => {
+const DiagnosticGridExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
   const [answers, setAnswers] = useState<Record<string, number>>(() => {
     try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s).answers || {} : {}; } catch { return {}; }
   });
@@ -989,28 +898,8 @@ const DiagnosticGridExercise: React.FC<{ storageKey: string; exerciseId: string 
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadExerciseResponse(exerciseId).then(cloud => {
-      if (cloud && typeof cloud === 'object' && !Array.isArray(cloud)) {
-        const c: any = cloud;
-        // Support both new shape { answers, commitment } and legacy bare answers object
-        if (c.answers && typeof c.answers === 'object') {
-          setAnswers(c.answers);
-          if (typeof c.commitment === 'string') setCommitment(c.commitment);
-          localStorage.setItem(storageKey, JSON.stringify(cloud));
-        } else if (Object.values(c).every(v => typeof v === 'number')) {
-          setAnswers(c);
-          localStorage.setItem(storageKey, JSON.stringify({ answers: c, commitment: '' }));
-        }
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exerciseId]);
-
   const save = (a: Record<string, number>, c: string) => {
-    const payload = { answers: a, commitment: c };
-    localStorage.setItem(storageKey, JSON.stringify(payload));
-    pushExerciseResponse(exerciseId, payload);
+    localStorage.setItem(storageKey, JSON.stringify({ answers: a, commitment: c }));
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const setAnswer = (qId: string, val: number) => {
@@ -1156,22 +1045,955 @@ const DiagnosticGridExercise: React.FC<{ storageKey: string; exerciseId: string 
   );
 };
 
+// ─── Partnership Diagnostic (Lecția 2) ───────────────────────────────────────
+const PTYPES = [
+  { num: 1, title: 'Ambii activi, fără CEO clar', desc: 'Amândoi conduc simultan. Angajații nu știu pe cine să asculte. Nimeni nu răspunde de nimic.', color: '#f87171' },
+  { num: 2, title: 'CEO activ + partener pasiv / investitor', desc: 'Unul conduce zilnic, celălalt a investit bani sau aduce relații. Probleme când investitorul vrea mai mult control.', color: 'var(--gold)' },
+  { num: 3, title: 'CEO activ + partener cu rol operațional', desc: 'Structura există pe hârtie dar partenerul-Director nu se subordonează real CEO-ului.', color: '#a78bfa' },
+  { num: 4, title: 'Parteneriat de familie', desc: 'Soț/soție, frați, tată-fiu. Relația personală și business-ul se amestecă. Cel mai frecvent tip în România.', color: '#93c5fd' },
+  { num: 5, title: 'Inegal ca implicare în timp', desc: 'Unul muncește 60h/săpt, celălalt 20h. Resentimentul acumulat ani de zile iese violent.', color: 'var(--accent)' },
+  { num: 6, title: 'Viziuni divergente', desc: 'Au vrut același lucru la început — cu timpul direcțiile s-au separat. Firma intră în paralizie decizională.', color: '#fca5a5' },
+];
+
+const P3Q = [
+  'Cine e CEO-ul firmei noastre? Cine are autoritatea finală în operațional?',
+  'Care e rolul meu operațional concret în firmă? Ce decizii pot lua singur?',
+  'Care e rolul partenerului meu operațional? Ce decizii poate lua el singur?',
+  'Ce decizii necesită acordul amândurora ca parteneri? (doar strategice — nu operaționale)',
+  'Unde vreau să ajungă firma în 3 ani? (cu cifre concrete)',
+  'Cel mai important lucru pe care trebuie să îl clarificăm în parteneriatul nostru:',
+];
+
+interface PData {
+  selectedTypes: number[];
+  hasPartner: boolean | null;
+  p1_recognition: string; p1_problem: string; p1_duration: string;
+  p2_solution: string; p2_step: string; p2_date: string;
+  p3_me: Record<string, string>; p3_partner: Record<string, string>; p3_date: string;
+  ind_a: string; ind_b: string; ind_c: string;
+}
+const P_DEFAULT: PData = {
+  selectedTypes: [], hasPartner: null,
+  p1_recognition: '', p1_problem: '', p1_duration: '',
+  p2_solution: '', p2_step: '', p2_date: '',
+  p3_me: {}, p3_partner: {}, p3_date: '',
+  ind_a: '', ind_b: '', ind_c: '',
+};
+
+const PartnershipDiagnosticExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+  const [data, setData] = useState<PData>(() => {
+    try { const s = localStorage.getItem(storageKey); if (s) return { ...P_DEFAULT, ...JSON.parse(s) }; } catch {}
+    return { ...P_DEFAULT };
+  });
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+
+  const save = (d: PData) => {
+    localStorage.setItem(storageKey, JSON.stringify(d));
+    setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
+  };
+  const upd = (patch: Partial<PData>) => {
+    const next = { ...data, ...patch };
+    setData(next); save(next);
+  };
+  const updNested = (field: 'p3_me' | 'p3_partner', key: string, val: string) => {
+    const next = { ...data, [field]: { ...data[field], [key]: val } };
+    setData(next); save(next);
+  };
+
+  const toggleType = (n: number) => {
+    const sel = data.selectedTypes.includes(n)
+      ? data.selectedTypes.filter(x => x !== n)
+      : [...data.selectedTypes, n];
+    upd({ selectedTypes: sel });
+  };
+
+  const fieldStyle: React.CSSProperties = {
+    width: '100%', padding: '10px 12px', fontSize: 13,
+    background: 'var(--bg-3)', border: '1px solid var(--border)',
+    borderRadius: 10, color: 'var(--fg)', resize: 'vertical', lineHeight: 1.6,
+  };
+  const labelStyle: React.CSSProperties = {
+    display: 'block', fontSize: 12, fontWeight: 600,
+    color: 'var(--fg-2)', marginBottom: 6,
+  };
+  const sectionHeader = (n: number, title: string, subtitle: string) => (
+    <div style={{ marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+        <div style={{ width: 26, height: 26, borderRadius: 8, background: 'rgba(196,240,228,0.1)', border: '1px solid rgba(196,240,228,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <span className="font-aboreto" style={{ fontSize: 10, color: 'var(--accent)', fontWeight: 700 }}>{n}</span>
+        </div>
+        <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--fg)' }}>{title}</span>
+      </div>
+      <p style={{ fontSize: 12, color: 'var(--fg-3)', lineHeight: 1.6, paddingLeft: 36 }}>{subtitle}</p>
+    </div>
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+
+      {/* ── INTRO WARNING ── */}
+      <div style={{ padding: '14px 18px', background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.25)', borderRadius: 12, fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.65 }}>
+        <strong style={{ color: 'var(--gold)' }}>Dacă ești singur în afacere</strong> — poți sări acest exercițiu și mergi la lecția următoare.<br/>
+        <strong>Dacă ai un partener</strong> — acesta e exercițiul cel mai important din Etapa 0. Nu îl sări.
+      </div>
+
+      {/* ── PASUL 1: Tipul de parteneriat ── */}
+      <div>
+        {sectionHeader(1, 'Tipul tău de parteneriat', 'Bifează tipul în care te recunoști. Poți selecta mai multe dacă se suprapun.')}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
+          {PTYPES.map(pt => {
+            const active = data.selectedTypes.includes(pt.num);
+            return (
+              <div key={pt.num} onClick={() => toggleType(pt.num)}
+                style={{
+                  padding: '14px 16px', borderRadius: 12, cursor: 'pointer', transition: 'all 0.15s',
+                  background: active ? `${pt.color}12` : 'var(--bg-3)',
+                  border: `1.5px solid ${active ? pt.color : 'var(--border)'}`,
+                  transform: active ? 'translateY(-1px)' : 'none',
+                  boxShadow: active ? `0 4px 16px ${pt.color}18` : 'none',
+                }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                    background: active ? `${pt.color}22` : 'rgba(255,255,255,0.04)',
+                    border: `1.5px solid ${active ? pt.color : 'rgba(255,255,255,0.12)'}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 11, fontWeight: 700, color: active ? pt.color : 'var(--fg-3)',
+                    transition: 'all 0.15s',
+                  }}>
+                    {active ? '✓' : pt.num}
+                  </div>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: active ? pt.color : 'var(--fg-2)', lineHeight: 1.3 }}>{pt.title}</span>
+                </div>
+                <p style={{ fontSize: 11, color: 'var(--fg-3)', lineHeight: 1.55, paddingLeft: 38 }}>{pt.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+        {data.selectedTypes.length > 0 && (
+          <div style={{ marginTop: 10, padding: '8px 14px', background: 'rgba(196,240,228,0.06)', border: '1px solid rgba(196,240,228,0.15)', borderRadius: 8, fontSize: 12, color: 'var(--accent)' }}>
+            Ai selectat: Tipul {data.selectedTypes.sort().join(', Tipul ')}
+          </div>
+        )}
+      </div>
+
+      {/* ── PASUL 2: Diagnosticul situației ── */}
+      <div>
+        {sectionHeader(2, 'Diagnosticul situației tale', 'Răspunde sincer la cele 3 întrebări. Scrie cum este — nu cum vrei să fie.')}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {[
+            { key: 'p1_recognition' as const, label: 'De ce te recunoști în acel tip? Descrie concret situația ta în 3–4 propoziții:', rows: 3 },
+            { key: 'p1_problem' as const, label: 'Care e problema principală pe care o simți acum în parteneriatul tău?', rows: 3 },
+            { key: 'p1_duration' as const, label: 'Cât timp există această problemă? A fost mereu sau a apărut la un moment dat?', rows: 2 },
+          ].map(({ key, label, rows }) => (
+            <div key={key}>
+              <label style={labelStyle}>{label}</label>
+              <textarea value={data[key]} onChange={e => upd({ [key]: e.target.value })}
+                rows={rows} style={fieldStyle}
+                placeholder="Scrie aici..." />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── PASUL 3: Primul pas concret ── */}
+      <div>
+        {sectionHeader(3, 'Primul pas concret', 'Nu e suficient să identifici problema. Trebuie să decizi ce faci cu ea — și când.')}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div>
+            <label style={labelStyle}>Ce soluție din lecție se potrivește cel mai bine situației tale?</label>
+            <textarea value={data.p2_solution} onChange={e => upd({ p2_solution: e.target.value })}
+              rows={3} style={fieldStyle}
+              placeholder="Ex: Trebuie să avem conversația despre cine e CEO-ul firmei noastre. Am evitat-o 2 ani..." />
+          </div>
+          <div>
+            <label style={labelStyle}>Care e primul pas concret pe care îl poți face în această săptămână?</label>
+            <textarea value={data.p2_step} onChange={e => upd({ p2_step: e.target.value })}
+              rows={2} style={fieldStyle}
+              placeholder="Ex: Stabilesc o întâlnire cu partenerul meu joi seara și pun subiectul pe masă..." />
+          </div>
+          <div>
+            <label style={labelStyle}>Data concretă când vei face acel pas: <span style={{ color: 'var(--fg-3)', fontWeight: 400 }}>(nu "când avem timp")</span></label>
+            <input type="text" value={data.p2_date} onChange={e => upd({ p2_date: e.target.value })}
+              placeholder="Ex: Joi, 23 Mai 2026, ora 19:00"
+              style={{ ...fieldStyle, resize: undefined }} />
+          </div>
+        </div>
+      </div>
+
+      {/* ── PASUL 4: Exercițiu cu partenerul / individual ── */}
+      <div>
+        {sectionHeader(4, 'Exercițiu cu partenerul tău', 'Cel mai valoros pas din acest exercițiu — completați separat, fără să vă consultați, apoi comparați.')}
+
+        {/* Toggle */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+          {[
+            { val: true, label: '👥 Am partener — completăm împreună' },
+            { val: false, label: '👤 Sunt singur — exerciții individuale' },
+          ].map(({ val, label }) => (
+            <button key={String(val)} onClick={() => upd({ hasPartner: val })}
+              style={{
+                flex: 1, padding: '10px 14px', borderRadius: 10, cursor: 'pointer',
+                border: `1.5px solid ${data.hasPartner === val ? 'var(--accent)' : 'var(--border)'}`,
+                background: data.hasPartner === val ? 'rgba(196,240,228,0.08)' : 'transparent',
+                color: data.hasPartner === val ? 'var(--accent)' : 'var(--fg-3)',
+                fontSize: 13, fontWeight: data.hasPartner === val ? 700 : 400, transition: 'all 0.15s',
+              }}>
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* WITH PARTNER */}
+        {data.hasPartner === true && (
+          <div>
+            <div style={{ padding: '12px 16px', background: 'rgba(196,240,228,0.05)', border: '1px solid rgba(196,240,228,0.15)', borderRadius: 10, marginBottom: 20, fontSize: 12, color: 'var(--fg-2)', lineHeight: 1.65 }}>
+              <strong style={{ color: 'var(--accent)' }}>Cum funcționează:</strong> Fiecare completează coloana lui <strong>separat, fără să se uite la răspunsurile celuilalt</strong>. Abia după ce amândoi au terminat — comparați. Diferențele sunt exact conversația pe care trebuie să o aveți.
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {P3Q.map((q, i) => (
+                <div key={i} style={{ background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
+                  <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)', fontSize: 12, color: 'var(--fg-3)', lineHeight: 1.5 }}>
+                    <span style={{ color: 'var(--accent)', fontWeight: 700, marginRight: 8 }}>{i + 1}.</span>{q}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                    <div style={{ padding: '12px 14px', borderRight: '1px solid var(--border)' }}>
+                      <label style={{ ...labelStyle, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--accent)', marginBottom: 8 }}>Răspunsul meu</label>
+                      <textarea value={data.p3_me[`q${i}`] || ''} onChange={e => updNested('p3_me', `q${i}`, e.target.value)}
+                        rows={3} placeholder="Scrie răspunsul tău..."
+                        style={{ ...fieldStyle, fontSize: 12 }} />
+                    </div>
+                    <div style={{ padding: '12px 14px' }}>
+                      <label style={{ ...labelStyle, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--gold)', marginBottom: 8 }}>Răspunsul partenerului</label>
+                      <textarea value={data.p3_partner[`q${i}`] || ''} onChange={e => updNested('p3_partner', `q${i}`, e.target.value)}
+                        rows={3} placeholder="Partenerul scrie aici..."
+                        style={{ ...fieldStyle, fontSize: 12 }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <label style={labelStyle}>Data concretă pentru conversația asta: <span style={{ color: 'var(--fg-3)', fontWeight: 400 }}>(nu "când avem timp")</span></label>
+              <input type="text" value={data.p3_date} onChange={e => upd({ p3_date: e.target.value })}
+                placeholder="Ex: Sâmbătă, 24 Mai 2026, dimineața"
+                style={{ ...fieldStyle, resize: undefined }} />
+            </div>
+          </div>
+        )}
+
+        {/* INDIVIDUAL */}
+        {data.hasPartner === false && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ padding: '12px 16px', background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.2)', borderRadius: 10, fontSize: 12, color: 'var(--fg-2)', lineHeight: 1.65 }}>
+              Completezi exercițiile A, B, C individual. Sunt la fel de valoroase — te ajută să clarifici ce vrei și cum vrei să funcționeze parteneriatul tău.
+            </div>
+            {[
+              {
+                key: 'ind_a' as const,
+                badge: 'A',
+                title: 'Lista deciziilor cu tensiune',
+                desc: 'Scrie toate deciziile din ultima lună care au creat tensiune sau conflict cu partenerul tău. Ce tip de conflict era — operațional sau strategic?',
+                placeholder: '1. Decizia de a angaja un nou om — conflict despre cost (operațional)\n2. ...',
+                rows: 5,
+              },
+              {
+                key: 'ind_b' as const,
+                badge: 'B',
+                title: 'Parteneriatul ideal',
+                desc: 'Descrie în scris cum ar arăta parteneriatul tău ideal — cine face ce, cine decide ce, cum se rezolvă dezacordurile. Aceasta e ținta ta.',
+                placeholder: 'Parteneriatul meu ideal arată așa: Eu sunt CEO și am autoritate finală în operațional. Partenerul meu este Director Comercial și...',
+                rows: 5,
+              },
+              {
+                key: 'ind_c' as const,
+                badge: 'C',
+                title: 'Un singur lucru pe care îl schimbi săptămâna asta',
+                desc: 'Identifică un singur lucru concret pe care îl poți schimba această săptămână în modul în care funcționezi cu partenerul tău — fără să ai nevoie de acordul lui.',
+                placeholder: 'Săptămâna asta o să... (ceva specific, măsurabil, realizabil fără acordul partenerului)',
+                rows: 3,
+              },
+            ].map(({ key, badge, title, desc, placeholder, rows }) => (
+              <div key={key} style={{ background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
+                <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--gold-dim)', border: '1px solid rgba(201,169,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 12, fontWeight: 700, color: 'var(--gold)' }}>{badge}</div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--fg)', marginBottom: 2 }}>{title}</div>
+                    <div style={{ fontSize: 11, color: 'var(--fg-3)', lineHeight: 1.55 }}>{desc}</div>
+                  </div>
+                </div>
+                <div style={{ padding: '12px 16px' }}>
+                  <textarea value={data[key]} onChange={e => upd({ [key]: e.target.value })}
+                    rows={rows} placeholder={placeholder}
+                    style={fieldStyle} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {savedAt && <p style={{ fontSize: 11, color: 'var(--fg-3)' }}>Salvat automat la {savedAt}</p>}
+    </div>
+  );
+};
+
+// ─── SĂPTĂMÂNA 2 · Etapa 1 · Fundația ──────────────────────────────────────
+
+// ─── Exercițiu 1: Misiunea · Viziunea · Valorile ──────────────────────────────
+const FoundationManifestExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+  const init = () => { try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s) : {}; } catch { return {}; } };
+  const [vals, setVals] = useState<Record<string, string>>(init);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [openTests, setOpenTests] = useState<Record<string, boolean>>({});
+
+  const save = (v: Record<string, string>) => {
+    localStorage.setItem(storageKey, JSON.stringify(v));
+    setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
+  };
+  const upd = (id: string, val: string) => {
+    const next = { ...vals, [id]: val };
+    setVals(next);
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => save(next), 1200);
+  };
+  const toggleTest = (id: string) => setOpenTests(p => ({ ...p, [id]: !p[id] }));
+
+  const fieldStyle: React.CSSProperties = {
+    width: '100%', padding: '10px 12px', fontSize: 13, lineHeight: 1.65,
+    background: 'var(--bg-3)', border: '1px solid var(--border)',
+    borderRadius: 10, color: 'var(--fg)', resize: 'vertical',
+    transition: 'border-color 0.15s', boxSizing: 'border-box',
+  };
+  const finalFieldStyle: React.CSSProperties = {
+    ...fieldStyle,
+    background: 'rgba(196,240,228,0.04)',
+    border: '1px solid rgba(196,240,228,0.25)',
+    color: 'var(--accent)',
+    fontWeight: 600,
+    fontSize: 14,
+  };
+
+  const bloc = (num: string, title: string, subtitle: string, color: string) => (
+    <div style={{ marginBottom: 8 }}>
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+        <div style={{ width: 22, height: 22, borderRadius: 7, background: `${color}18`, border: `1.5px solid ${color}50`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color, flexShrink: 0 }}>{num}</div>
+        <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--fg)' }}>{title}</span>
+      </div>
+      <p style={{ fontSize: 12, color: 'var(--fg-3)', lineHeight: 1.65, marginLeft: 30 }}>{subtitle}</p>
+    </div>
+  );
+
+  const testAccordion = (id: string, items: string[], color: string) => (
+    <div style={{ marginTop: 12, borderRadius: 10, border: `1px solid ${color}20`, overflow: 'hidden' }}>
+      <button onClick={() => toggleTest(id)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 14px', background: `${color}08`, border: 'none', cursor: 'pointer', fontSize: 11, color: color, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+        <span>✓ Testul înainte să continui</span>
+        <ChevronDown size={13} style={{ transform: openTests[id] ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+      </button>
+      {openTests[id] && (
+        <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {items.map((item, i) => (
+            <div key={i} style={{ fontSize: 12, color: 'var(--fg-2)', lineHeight: 1.5, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+              <span style={{ color, flexShrink: 0, fontWeight: 700 }}>→</span>
+              <span>{item}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+
+      {/* ── BLOCUL 1: Misiunea ── */}
+      <div style={{ padding: '24px', background: 'rgba(196,240,228,0.03)', border: '1px solid rgba(196,240,228,0.12)', borderRadius: 16 }}>
+        {bloc('1', 'Misiunea', 'De ce există firma ta. Filtrul după care iei fiecare decizie importantă.', 'var(--accent)')}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 18 }}>
+          {[
+            { id: 'm_prob', label: '1. Ce problemă concretă rezolvă firma ta?', ph: 'Ex: Antreprenorii sunt blocați în operațional și nu pot delega' },
+            { id: 'm_cine', label: '2. Pentru cine anume o rezolvi?', ph: 'Ex: Antreprenori cu afaceri active și echipe de 5–50 de angajați' },
+            { id: 'm_cum', label: '3. Cum o rezolvi diferit față de alții?', ph: 'Ex: Prin sistematizare pas cu pas, cu metode testate în afaceri reale' },
+            { id: 'm_sch', label: '4. Ce se schimbă în viața clientului după ce lucrează cu tine?', ph: 'Ex: Afacerea funcționează fără el. El are timp să trăiască, nu doar să muncească.' },
+          ].map(f => (
+            <div key={f.id}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>{f.label}</label>
+              <textarea value={vals[f.id] || ''} onChange={e => upd(f.id, e.target.value)} placeholder={f.ph} rows={2}
+                style={fieldStyle}
+                onFocus={e => (e.target.style.borderColor = 'rgba(196,240,228,0.35)')}
+                onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+            </div>
+          ))}
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', display: 'block', marginBottom: 6, letterSpacing: '0.04em', textTransform: 'uppercase' }}>✦ Misiunea mea — formularea finală (o propoziție)</label>
+            <textarea value={vals['m_final'] || ''} onChange={e => upd('m_final', e.target.value)}
+              placeholder="Ajutăm [cine] să [facă ce] prin [cum], astfel încât [rezultat]."
+              rows={2} style={finalFieldStyle}
+              onFocus={e => (e.target.style.boxShadow = '0 0 0 2px rgba(196,240,228,0.15)')}
+              onBlur={e => (e.target.style.boxShadow = 'none')} />
+          </div>
+        </div>
+        {testAccordion('tm', [
+          'O pot spune dintr-o propoziție — nu mai mult',
+          'Angajatul meu cel mai nou înțelege instant ce face firma citind-o',
+          'Pot lua o decizie dificilă folosind-o ca filtru — și răspunsul e clar',
+        ], 'var(--accent)')}
+      </div>
+
+      {/* ── BLOCUL 2: Viziunea ── */}
+      <div style={{ padding: '24px', background: 'rgba(201,169,110,0.03)', border: '1px solid rgba(201,169,110,0.15)', borderRadius: 16 }}>
+        {bloc('2', 'Viziunea', 'Unde ești în 3 ani — cu cifre concrete. Fără cifre, viziunea e un vis.', 'var(--gold)')}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 18 }}>
+          {[
+            { id: 'v_desc', label: '1. Cum arată firma ta peste 3 ani? Descrie în cuvinte.', ph: 'Ex: Suntem consultanța de referință pentru antreprenorii din RO și MD care vor să sistematizeze', rows: 3 },
+            { id: 'v_ca', label: '2. Cifra de afaceri în 3 ani:', ph: 'Scrie un număr concret — nu "mai mult"', rows: 1 },
+            { id: 'v_ang', label: '3. Numărul de angajați în 3 ani:', ph: 'Ex: 12 angajați full-time', rows: 1 },
+            { id: 'v_piete', label: '4. În ce piețe ești prezent în 3 ani?', ph: 'Ex: România, Republica Moldova, diaspora din Europa', rows: 2 },
+            { id: 'v_poz', label: '5. Ce poziție ocupi pe piață în 3 ani?', ph: 'Ex: Top 3 în industrie, referința pentru segmentul de IMM-uri cu 10–50 angajați', rows: 2 },
+          ].map(f => (
+            <div key={f.id}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>{f.label}</label>
+              <textarea value={vals[f.id] || ''} onChange={e => upd(f.id, e.target.value)} placeholder={f.ph} rows={f.rows}
+                style={fieldStyle}
+                onFocus={e => (e.target.style.borderColor = 'rgba(201,169,110,0.35)')}
+                onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+            </div>
+          ))}
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)', display: 'block', marginBottom: 6, letterSpacing: '0.04em', textTransform: 'uppercase' }}>✦ Viziunea mea — formularea finală (aspirație + cifre + timp)</label>
+            <textarea value={vals['v_final'] || ''} onChange={e => upd('v_final', e.target.value)}
+              placeholder="În [an], [Firma] va fi [descriere], cu [CA] cifră de afaceri, [X] angajați, prezentă în [piețe]."
+              rows={3} style={{ ...finalFieldStyle, borderColor: 'rgba(201,169,110,0.3)', color: 'var(--gold)' }}
+              onFocus={e => (e.target.style.boxShadow = '0 0 0 2px rgba(201,169,110,0.15)')}
+              onBlur={e => (e.target.style.boxShadow = 'none')} />
+          </div>
+        </div>
+        {testAccordion('tv', [
+          'Are un orizont de timp clar — 3 ani',
+          'Are cifre concrete — nu doar cuvinte aspiraționale',
+          'E ambițioasă dar ancorată în realitate — echipa poate crede în ea',
+          'Știu exact cum arată succesul — pot măsura când am ajuns acolo',
+        ], 'var(--gold)')}
+      </div>
+
+      {/* ── BLOCUL 3: Valorile ── */}
+      <div style={{ padding: '24px', background: 'rgba(167,139,250,0.03)', border: '1px solid rgba(167,139,250,0.15)', borderRadius: 16 }}>
+        {bloc('3', 'Valorile', 'Regulile echipei când tu nu ești în cameră. Maxim 5 valori. Fiecare scrisă ca un comportament concret.', '#a78bfa')}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 18 }}>
+          {[
+            { id: 'val_apreciez', label: '1. Care sunt comportamentele pe care le apreciezi cel mai mult în echipa ta?', ph: 'Ex: Când cineva spune adevărul chiar dacă e inconfortabil', rows: 3 },
+            { id: 'val_intolerat', label: '2. Ce comportamente nu tolerezi niciodată în firmă?', ph: 'Ex: Minciuna față de client, lipsa de responsabilitate pentru greșeli', rows: 3 },
+            { id: 'val_descriere', label: '3. Cum îți dorești să te descrie clienții tăi?', ph: 'Ex: Direct, de încredere, care livrează ce promite, fără surprize neplăcute', rows: 3 },
+          ].map(f => (
+            <div key={f.id}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>{f.label}</label>
+              <textarea value={vals[f.id] || ''} onChange={e => upd(f.id, e.target.value)} placeholder={f.ph} rows={f.rows}
+                style={fieldStyle}
+                onFocus={e => (e.target.style.borderColor = 'rgba(167,139,250,0.35)')}
+                onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+            </div>
+          ))}
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: '#a78bfa', display: 'block', marginBottom: 10, letterSpacing: '0.04em', textTransform: 'uppercase' }}>✦ Cele 5 valori cu comportamentele asociate</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[1,2,3,4,5].map(n => (
+                <div key={n} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8, alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 22, height: 22, borderRadius: 6, background: 'rgba(167,139,250,0.15)', border: '1px solid rgba(167,139,250,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#a78bfa', flexShrink: 0 }}>{n}</div>
+                    <input value={vals[`val_v${n}`] || ''} onChange={e => upd(`val_v${n}`, e.target.value)}
+                      placeholder={`Valoarea ${n}`}
+                      style={{ width: '100%', padding: '8px 10px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: '#a78bfa', fontWeight: 600, boxSizing: 'border-box' }}
+                      onFocus={e => (e.target.style.borderColor = 'rgba(167,139,250,0.4)')}
+                      onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                  </div>
+                  <input value={vals[`val_b${n}`] || ''} onChange={e => upd(`val_b${n}`, e.target.value)}
+                    placeholder="Ce înseamnă concret ca comportament..."
+                    style={{ width: '100%', padding: '8px 10px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', boxSizing: 'border-box' }}
+                    onFocus={e => (e.target.style.borderColor = 'rgba(167,139,250,0.35)')}
+                    onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        {testAccordion('tval', [
+          'Am maxim 5 valori',
+          'Fiecare descrie un comportament concret — nu o calitate generală',
+          'Pot concedia pe cineva care încalcă fiecare valoare — testul realității',
+          'Valorile mele nu pot fi ale oricărei alte firme — sunt specifice mie',
+          'Pot angaja pe cineva folosind valorile ca criterii de selecție',
+        ], '#a78bfa')}
+      </div>
+
+      {savedAt && <p style={{ fontSize: 11, color: 'var(--accent)', textAlign: 'right' }}>Salvat automat ✓ {savedAt}</p>}
+    </div>
+  );
+};
+
+// ─── Exercițiu 2: Checklist de Calitate ──────────────────────────────────────
+const QUALITY_CHECKLIST_ITEMS = [
+  { id: 'q_m1', group: 'Misiunea', label: 'O pot spune dintr-o propoziție — fără să mă pierd în detalii' },
+  { id: 'q_m2', group: 'Misiunea', label: 'Răspunde clar la CE facem, PENTRU CINE și CE SCHIMBĂM în viața lor' },
+  { id: 'q_m3', group: 'Misiunea', label: 'Angajatul meu cel mai nou înțelege instant ce face firma citind-o' },
+  { id: 'q_m4', group: 'Misiunea', label: 'Pot lua o decizie dificilă folosind misiunea ca filtru — și răspunsul e clar' },
+  { id: 'q_v1', group: 'Viziunea', label: 'Are un orizont de timp clar — 3 ani' },
+  { id: 'q_v2', group: 'Viziunea', label: 'Are cifre concrete: cifra de afaceri, număr angajați, piețe, poziție pe piață' },
+  { id: 'q_v3', group: 'Viziunea', label: 'E ambițioasă dar ancorată în realitate — echipa poate crede în ea' },
+  { id: 'q_v4', group: 'Viziunea', label: 'Știu exact cum arată succesul — pot măsura când am ajuns acolo' },
+  { id: 'q_val1', group: 'Valorile', label: 'Am maxim 5 valori — nu mai mult' },
+  { id: 'q_val2', group: 'Valorile', label: 'Fiecare valoare descrie un comportament concret — nu o calitate generală' },
+  { id: 'q_val3', group: 'Valorile', label: 'Pot concedia pe cineva care încalcă fiecare valoare — testul realității' },
+  { id: 'q_val4', group: 'Valorile', label: 'Valorile mele nu pot fi ale oricărei alte firme — sunt specifice mie' },
+  { id: 'q_val5', group: 'Valorile', label: 'Pot angaja pe cineva folosind valorile ca criterii de selecție' },
+  { id: 'q_g1', group: 'General', label: 'Cele 3 elemente sunt consistente între ele — se aliniază și se susțin reciproc' },
+  { id: 'q_g2', group: 'General', label: 'Am completat Manifestul Fundației — pagina A4 de la finalul acestui document' },
+  { id: 'q_g3', group: 'General', label: 'Sunt pregătit să prezint Manifestul echipei mele' },
+];
+
+const GROUP_COLORS: Record<string, string> = {
+  'Misiunea': 'var(--accent)',
+  'Viziunea': 'var(--gold)',
+  'Valorile': '#a78bfa',
+  'General': '#93c5fd',
+};
+
+const QualityChecklistExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+  const [checked, setChecked] = useState<Record<string, boolean>>(() => {
+    try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s) : {}; } catch { return {}; }
+  });
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+
+  const toggle = (id: string) => {
+    const next = { ...checked, [id]: !checked[id] };
+    setChecked(next);
+    localStorage.setItem(storageKey, JSON.stringify(next));
+    setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
+  };
+
+  const total = QUALITY_CHECKLIST_ITEMS.length;
+  const doneCount = QUALITY_CHECKLIST_ITEMS.filter(i => checked[i.id]).length;
+  const pct = Math.round((doneCount / total) * 100);
+  const allDone = doneCount === total;
+
+  const groups = Array.from(new Set(QUALITY_CHECKLIST_ITEMS.map(i => i.group)));
+
+  return (
+    <div>
+      {/* Progress bar */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
+          <span>{doneCount}/{total} bifate</span>
+          <span style={{ color: allDone ? '#4ade80' : 'var(--fg-3)', fontWeight: allDone ? 700 : 400 }}>
+            {allDone ? '✓ Gata de predat!' : `${pct}%`}
+          </span>
+        </div>
+        <div style={{ height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${pct}%`, background: allDone ? '#4ade80' : 'var(--accent)', borderRadius: 3, transition: 'width 0.4s ease' }} />
+        </div>
+      </div>
+
+      {allDone && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          style={{ marginBottom: 20, padding: '16px 20px', background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.25)', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 12 }}
+        >
+          <CheckCircle2 size={22} style={{ color: '#4ade80', flexShrink: 0 }} />
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#4ade80' }}>Toate criteriile bifate!</div>
+            <div style={{ fontSize: 12, color: 'var(--fg-3)' }}>Manifestul tău e gata de predat. Mergi mai departe la Exercițiul 3.</div>
+          </div>
+        </motion.div>
+      )}
+
+      {groups.map(group => {
+        const items = QUALITY_CHECKLIST_ITEMS.filter(i => i.group === group);
+        const groupColor = GROUP_COLORS[group] || 'var(--accent)';
+        const groupDone = items.filter(i => checked[i.id]).length;
+        return (
+          <div key={group} style={{ marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <div style={{ height: 2, width: 16, background: groupColor, borderRadius: 1 }} />
+              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: groupColor }}>{group}</span>
+              <span style={{ fontSize: 10, color: 'var(--fg-3)' }}>{groupDone}/{items.length}</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {items.map((item, idx) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.03 }}
+                  onClick={() => toggle(item.id)}
+                  style={{
+                    display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 14px',
+                    borderRadius: 10, cursor: 'pointer',
+                    background: checked[item.id] ? 'rgba(74,222,128,0.07)' : 'var(--bg-3)',
+                    border: `1px solid ${checked[item.id] ? 'rgba(74,222,128,0.22)' : 'var(--border)'}`,
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  <div style={{
+                    width: 20, height: 20, borderRadius: 6, flexShrink: 0, marginTop: 1,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: checked[item.id] ? 'rgba(74,222,128,0.18)' : 'var(--bg-2)',
+                    border: `1.5px solid ${checked[item.id] ? '#4ade80' : 'var(--border)'}`,
+                    transition: 'all 0.15s',
+                  }}>
+                    {checked[item.id] && <Check size={11} style={{ color: '#4ade80' }} />}
+                  </div>
+                  <span style={{ fontSize: 13, color: checked[item.id] ? 'var(--fg-2)' : 'var(--fg)', lineHeight: 1.55 }}>{item.label}</span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
+      {savedAt && <p style={{ fontSize: 11, color: 'var(--accent)', textAlign: 'right', marginTop: 8 }}>Salvat ✓ {savedAt}</p>}
+    </div>
+  );
+};
+
+const TeamFeedbackReport: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+  const init = () => { try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s) : { obiectii: [{ ob: '', raspuns: '' }], checklist: {} }; } catch { return { obiectii: [{ ob: '', raspuns: '' }], checklist: {} }; } };
+  const [data, setData] = useState<{
+    s1_parti: string; s1_bine: string; s1_surprins: string;
+    s2_obiectii_text: string;
+    s3_neclar: string; s3_schimba: string;
+    s4_ritual: string; s4_data: string;
+    obiectii: { ob: string; raspuns: string }[];
+    checklist: Record<string, boolean>;
+  }>(init);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const save = (d: typeof data) => {
+    localStorage.setItem(storageKey, JSON.stringify(d));
+    setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
+  };
+  const upd = (patch: Partial<typeof data>) => {
+    const next = { ...data, ...patch };
+    setData(next);
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => save(next), 1200);
+  };
+
+  const addObiectie = () => {
+    const next = { ...data, obiectii: [...(data.obiectii || []), { ob: '', raspuns: '' }] };
+    setData(next); save(next);
+  };
+  const updObiectie = (idx: number, field: 'ob' | 'raspuns', val: string) => {
+    const obiectii = (data.obiectii || []).map((r, i) => i === idx ? { ...r, [field]: val } : r);
+    const next = { ...data, obiectii };
+    setData(next);
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => save(next), 1000);
+  };
+  const removeObiectie = (idx: number) => {
+    const obiectii = (data.obiectii || []).filter((_, i) => i !== idx);
+    const next = { ...data, obiectii: obiectii.length ? obiectii : [{ ob: '', raspuns: '' }] };
+    setData(next); save(next);
+  };
+  const toggleCheck = (id: string) => {
+    const checklist = { ...data.checklist, [id]: !data.checklist?.[id] };
+    const next = { ...data, checklist };
+    setData(next); save(next);
+  };
+
+  const fieldStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', fontSize: 13, lineHeight: 1.65, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--fg)', resize: 'vertical', boxSizing: 'border-box' as const, transition: 'border-color 0.15s' };
+
+  const PREDARE_ITEMS = [
+    { id: 'p1', label: 'Am organizat ședința cu echipa mea' },
+    { id: 'p2', label: 'Am prezentat Manifestul element cu element — nu l-am citit' },
+    { id: 'p3', label: 'Am creat spațiu pentru dialog real — nu doar Q&A formal' },
+    { id: 'p4', label: 'Am notat toate obiecțiile — inclusiv pe cele incomode' },
+    { id: 'p5', label: 'Am stabilit un ritual concret pentru săptămâna viitoare' },
+    { id: 'p6', label: 'Manifestul e afișat vizibil în biroul meu sau al echipei' },
+  ];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+
+      {/* Secțiunea 1 */}
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 14 }}>Secțiunea 1 — Cum a decurs ședința</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {[
+            { key: 's1_parti', label: '1. Câți oameni au participat și cum ai organizat ședința:', ph: 'Ex: 4 angajați, ședință de 45 min în sala de conferințe, fără laptopuri', rows: 2 },
+            { key: 's1_bine', label: '2. Ce a mers bine — ce a rezonat cu echipa, ce au primit bine:', ph: 'Ex: Valorile i-au surprins pozitiv. Au spus că se recunosc în ele.', rows: 3 },
+            { key: 's1_surprins', label: '3. Ce te-a surprins — reacții la care nu te așteptai:', ph: 'Ex: Un angajat a zis că e prima dată când aude de viziunea firmei. M-a lovit asta.', rows: 3 },
+          ].map(f => (
+            <div key={f.key}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>{f.label}</label>
+              <textarea value={(data as any)[f.key] || ''} onChange={e => upd({ [f.key]: e.target.value } as any)} placeholder={f.ph} rows={f.rows}
+                style={fieldStyle}
+                onFocus={e => (e.target.style.borderColor = 'rgba(196,240,228,0.35)')}
+                onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Secțiunea 2: Obiecțiile */}
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 6 }}>Secțiunea 2 — Obiecțiile principale</div>
+        <p style={{ fontSize: 12, color: 'var(--fg-3)', marginBottom: 14 }}>Scrie fiecare obiecție exact cum a fost formulată — nu cum ai vrea să fi fost.</p>
+        <div style={{ overflowX: 'auto', marginBottom: 10 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+            <thead>
+              <tr>
+                {['Obiecția sau întrebarea', 'Cum ai răspuns'].map(col => (
+                  <th key={col} style={{ padding: '8px 10px', textAlign: 'left', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-3)', borderBottom: '1px solid var(--border)' }}>{col}</th>
+                ))}
+                <th style={{ width: 32 }} />
+              </tr>
+            </thead>
+            <tbody>
+              {(data.obiectii || []).map((row, idx) => (
+                <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
+                  <td style={{ padding: '6px 4px', width: '48%' }}>
+                    <textarea value={row.ob} onChange={e => updObiectie(idx, 'ob', e.target.value)} placeholder={`Obiecția ${idx + 1}...`} rows={2}
+                      style={{ ...fieldStyle, fontSize: 12, resize: 'none' }}
+                      onFocus={e => (e.target.style.borderColor = 'rgba(201,169,110,0.4)')}
+                      onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                  </td>
+                  <td style={{ padding: '6px 4px', width: '48%' }}>
+                    <textarea value={row.raspuns} onChange={e => updObiectie(idx, 'raspuns', e.target.value)} placeholder="Cum ai răspuns..." rows={2}
+                      style={{ ...fieldStyle, fontSize: 12, resize: 'none' }}
+                      onFocus={e => (e.target.style.borderColor = 'rgba(196,240,228,0.35)')}
+                      onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+                  </td>
+                  <td style={{ padding: '6px 4px', textAlign: 'center' }}>
+                    <button onClick={() => removeObiectie(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--fg-3)', padding: 4, display: 'flex', transition: 'color 0.15s' }}
+                      onMouseEnter={e => (e.currentTarget.style.color = '#f87171')}
+                      onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-3)')}>
+                      <Trash2 size={12} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <button onClick={addObiectie} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: 'rgba(201,169,110,0.06)', border: '1px dashed rgba(201,169,110,0.25)', borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--gold)', fontWeight: 600 }}>
+          <Plus size={13} /> Adaugă obiecție
+        </button>
+      </div>
+
+      {/* Secțiunea 3 */}
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a78bfa', marginBottom: 14 }}>Secțiunea 3 — Ce rămâne de clarificat</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {[
+            { key: 's3_neclar', label: '1. Ce a rămas neclar pentru echipă după ședință:', ph: 'Ex: Nu au înțeles diferența dintre misiune și viziune. Vom relua.', rows: 3 },
+            { key: 's3_schimba', label: '2. Ce ai schimba în prezentare data viitoare:', ph: 'Ex: Aș da mai mult timp pentru valorile. Am grăbit acea parte.', rows: 3 },
+          ].map(f => (
+            <div key={f.key}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>{f.label}</label>
+              <textarea value={(data as any)[f.key] || ''} onChange={e => upd({ [f.key]: e.target.value } as any)} placeholder={f.ph} rows={f.rows}
+                style={fieldStyle}
+                onFocus={e => (e.target.style.borderColor = 'rgba(167,139,250,0.35)')}
+                onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Secțiunea 4 */}
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#93c5fd', marginBottom: 14 }}>Secțiunea 4 — Primul ritual concret</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>1. Ce ritual săptămânal introduci de săptămâna viitoare pentru a ține Manifestul viu:</label>
+            <textarea value={data.s4_ritual || ''} onChange={e => upd({ s4_ritual: e.target.value })} rows={2}
+              placeholder="Ex: Ședința de luni începe cu o valoare. 2 minute."
+              style={fieldStyle}
+              onFocus={e => (e.target.style.borderColor = 'rgba(147,197,253,0.4)')}
+              onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+          </div>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>2. Data concretă când introduci primul ritual:</label>
+            <input type="text" value={data.s4_data || ''} onChange={e => upd({ s4_data: e.target.value })}
+              placeholder="Ex: Luni, 26 Mai 2026"
+              style={{ ...fieldStyle, resize: undefined }} />
+          </div>
+        </div>
+      </div>
+
+      {/* Checklist predare */}
+      <div style={{ background: 'rgba(196,240,228,0.04)', border: '1px solid rgba(196,240,228,0.15)', borderRadius: 14, padding: '18px 20px' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 12 }}>Checklist de predare — Exercițiul 3</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+          {PREDARE_ITEMS.map((item, idx) => (
+            <motion.div key={item.id}
+              initial={{ opacity: 0, x: -6 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.04 }}
+              onClick={() => toggleCheck(item.id)}
+              style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '9px 12px', borderRadius: 9, cursor: 'pointer', background: data.checklist?.[item.id] ? 'rgba(74,222,128,0.07)' : 'var(--bg-3)', border: `1px solid ${data.checklist?.[item.id] ? 'rgba(74,222,128,0.22)' : 'var(--border)'}`, transition: 'all 0.15s' }}
+            >
+              <div style={{ width: 18, height: 18, borderRadius: 5, flexShrink: 0, marginTop: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', background: data.checklist?.[item.id] ? 'rgba(74,222,128,0.18)' : 'var(--bg-2)', border: `1.5px solid ${data.checklist?.[item.id] ? '#4ade80' : 'var(--border)'}`, transition: 'all 0.15s' }}>
+                {data.checklist?.[item.id] && <Check size={10} style={{ color: '#4ade80' }} />}
+              </div>
+              <span style={{ fontSize: 12, color: data.checklist?.[item.id] ? 'var(--fg-2)' : 'var(--fg)', lineHeight: 1.5 }}>{item.label}</span>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {savedAt && <p style={{ fontSize: 11, color: 'var(--accent)', textAlign: 'right' }}>Salvat automat ✓ {savedAt}</p>}
+    </div>
+  );
+};
+
+// ─── Livrabil: Manifestul Fundației ──────────────────────────────────────────
+const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
+  const { user } = useAuthContext();
+  const ex1Key = `aa_ex_${user?.id ?? 'anon'}_e-1-s2-1`;
+
+  const getEx1 = () => { try { const s = localStorage.getItem(ex1Key); return s ? JSON.parse(s) : {}; } catch { return {}; } };
+  const ex1 = getEx1();
+
+  const [firma, setFirma] = useState(() => { try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s).firma || '' : ''; } catch { return ''; } });
+  const [data, setDataVal] = useState(() => { try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s).data || '' : ''; } catch { return ''; } });
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const save = (f: string, d: string) => {
+    localStorage.setItem(storageKey, JSON.stringify({ firma: f, data: d }));
+    setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
+  };
+  const updFirma = (v: string) => { setFirma(v); if (saveTimer.current) clearTimeout(saveTimer.current); saveTimer.current = setTimeout(() => save(v, data), 800); };
+  const updData = (v: string) => { setDataVal(v); if (saveTimer.current) clearTimeout(saveTimer.current); saveTimer.current = setTimeout(() => save(firma, v), 800); };
+
+  const misiune = ex1['m_final'] || ex1['m_prob'] || '—';
+  const viziune = ex1['v_final'] || ex1['v_desc'] || '—';
+  const valori = [1,2,3,4,5].map(n => ({ v: ex1[`val_v${n}`], b: ex1[`val_b${n}`] })).filter(x => x.v);
+
+  const handlePrint = () => window.print();
+
+  return (
+    <div>
+      <p style={{ fontSize: 13, color: 'var(--fg-3)', lineHeight: 1.7, marginBottom: 20 }}>
+        Manifestul de mai jos se populează automat din răspunsurile tale din Exercițiul 1. Adaugă numele firmei și data, apoi tipărește.
+      </p>
+
+      {(!ex1['m_final'] && !ex1['m_prob']) && (
+        <div style={{ padding: '14px 18px', background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.2)', borderRadius: 12, marginBottom: 20, fontSize: 13, color: 'var(--gold)' }}>
+          ⚠ Completează mai întâi Exercițiul 1 (Misiunea · Viziunea · Valorile) pentru ca Manifestul să se populeze automat.
+        </div>
+      )}
+
+      {/* Câmpuri suplimentare */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>Numele firmei</label>
+          <input type="text" value={firma} onChange={e => updFirma(e.target.value)} placeholder="Ex: Morar Consulting SRL"
+            style={{ width: '100%', padding: '9px 12px', fontSize: 13, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', boxSizing: 'border-box' as const }}
+            onFocus={e => (e.target.style.borderColor = 'rgba(196,240,228,0.35)')}
+            onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+        </div>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>Data</label>
+          <input type="text" value={data} onChange={e => updData(e.target.value)} placeholder="Ex: 26.05.2026"
+            style={{ width: '100%', padding: '9px 12px', fontSize: 13, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', boxSizing: 'border-box' as const }}
+            onFocus={e => (e.target.style.borderColor = 'rgba(196,240,228,0.35)')}
+            onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
+        </div>
+      </div>
+
+      {/* Manifestul A4 Preview */}
+      <div id="manifest-a4" style={{
+        background: '#fafaf8',
+        border: '2px solid rgba(196,240,228,0.3)',
+        borderRadius: 16,
+        padding: '40px 44px',
+        color: '#1a1a1a',
+        fontFamily: 'Georgia, serif',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Decorative corner */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'linear-gradient(90deg, var(--accent), rgba(196,240,228,0.3))' }} />
+
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#777', marginBottom: 8 }}>Arhitectura Afacerii · Practicum de Sistematizare</div>
+          <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: '0.05em', color: '#111', marginBottom: 4 }}>MANIFESTUL FUNDAȚIEI</div>
+          <div style={{ fontSize: 16, color: '#555', fontStyle: 'italic' }}>{firma || '[ Numele firmei ]'}</div>
+        </div>
+
+        <div style={{ borderTop: '1px solid #ddd', marginBottom: 28 }} />
+
+        <div style={{ marginBottom: 28 }}>
+          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#999', marginBottom: 6 }}>MISIUNEA NOASTRĂ · De ce existăm</div>
+          <div style={{ fontSize: 15, lineHeight: 1.75, color: '#222', minHeight: 40, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{misiune}</div>
+        </div>
+
+        <div style={{ borderTop: '1px solid #eee', marginBottom: 28 }} />
+
+        <div style={{ marginBottom: 28 }}>
+          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#999', marginBottom: 6 }}>VIZIUNEA NOASTRĂ · Unde suntem în 3 ani</div>
+          <div style={{ fontSize: 15, lineHeight: 1.75, color: '#222', minHeight: 40, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{viziune}</div>
+        </div>
+
+        <div style={{ borderTop: '1px solid #eee', marginBottom: 28 }} />
+
+        <div style={{ marginBottom: 36 }}>
+          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#999', marginBottom: 12 }}>VALORILE NOASTRE · Regulile după care funcționăm</div>
+          {valori.length > 0 ? valori.map((val, i) => (
+            <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 10 }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#555', minWidth: 18 }}>{i + 1}.</span>
+              <div>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#222' }}>{val.v}</span>
+                {val.b && <span style={{ fontSize: 13, color: '#666' }}> — {val.b}</span>}
+              </div>
+            </div>
+          )) : (
+            [1,2,3,4,5].map(n => (
+              <div key={n} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#bbb' }}>{n}.</span>
+                <span style={{ fontSize: 13, color: '#ccc' }}>[ valoarea {n} ] — [ comportamentul asociat ]</span>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div style={{ borderTop: '1px solid #ddd', paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+          <div style={{ fontSize: 12, color: '#777' }}>Data: <span style={{ color: '#333', fontWeight: 600 }}>{data || '___________'}</span></div>
+          <div style={{ fontSize: 12, color: '#777' }}>Semnat: <span style={{ display: 'inline-block', borderBottom: '1px solid #bbb', minWidth: 160, marginLeft: 8 }}>&nbsp;</span></div>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+        <button onClick={handlePrint}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 20px', background: 'var(--accent)', color: '#0D0907', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 700, transition: 'filter 0.15s' }}
+          onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.1)')}
+          onMouseLeave={e => (e.currentTarget.style.filter = '')}>
+          🖨 Printează Manifestul A4
+        </button>
+      </div>
+
+      <div style={{ marginTop: 16, padding: '12px 16px', background: 'rgba(196,240,228,0.04)', border: '1px solid rgba(196,240,228,0.12)', borderRadius: 10, fontSize: 12, color: 'var(--fg-3)', lineHeight: 1.7 }}>
+        <strong style={{ color: 'var(--fg-2)' }}>Ce faci după:</strong>
+        <div>→ Tipărește-l și pune-l pe peretele biroului tău — vizibil zilnic</div>
+        <div>→ Trimite-l echipei tale — fiecare angajat să aibă o copie</div>
+        <div>→ Predă documentul complet în platformă înainte de sesiunea live</div>
+      </div>
+
+      {savedAt && <p style={{ fontSize: 11, color: 'var(--accent)', textAlign: 'right', marginTop: 8 }}>Salvat ✓ {savedAt}</p>}
+    </div>
+  );
+};
+
 // ─── Main ExerciseBlock ───────────────────────────────────────────────────────
 export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
-  const { user, loading } = useAuthContext();
+  const { user } = useAuthContext();
   const template = getExerciseTemplate(exerciseId);
   // Keyed per user so exercises are never shared between accounts
   const storageKey = `aa_ex_${user?.id ?? 'anon'}_${exerciseId}`;
-
-  useEffect(() => {
-    if (!user) return;
-    const localDraft = getStoredExerciseResponse(storageKey);
-    if (localDraft !== null) {
-      flushExerciseResponse(exerciseId, localDraft).catch((error) => {
-        console.error('[exerciseSync] initial local draft sync failed', error);
-      });
-    }
-  }, [exerciseId, storageKey, user]);
 
   if (!template) {
     return (
@@ -1181,34 +2003,36 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
     );
   }
 
-  if (loading) {
-    return (
-      <div style={{ padding: '16px', fontSize: 13, color: 'var(--fg-3)' }}>
-        Se încarcă exercițiul...
-      </div>
-    );
-  }
-
   const renderContent = () => {
     switch (template.type) {
       case 'checklist':
-        return <ChecklistExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
+        return <ChecklistExercise template={template} storageKey={storageKey} />;
       case 'form-fields':
-        return <FormFieldsExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
+        return <FormFieldsExercise template={template} storageKey={storageKey} />;
       case 'dynamic-table':
-        return <DynamicTableExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
+        return <DynamicTableExercise template={template} storageKey={storageKey} />;
       case 'quiz':
-        return <QuizExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
+        return <QuizExercise template={template} storageKey={storageKey} />;
       case 'activity-audit':
-        return <ActivityAuditExercise storageKey={storageKey} exerciseId={exerciseId} />;
+        return <ActivityAuditExercise storageKey={storageKey} />;
       case 'bottleneck-map':
-        return <BottleneckMapExercise storageKey={storageKey} exerciseId={exerciseId} />;
+        return <BottleneckMapExercise storageKey={storageKey} />;
       case 'absence-test':
-        return <AbsenceTestExercise storageKey={storageKey} exerciseId={exerciseId} />;
+        return <AbsenceTestExercise storageKey={storageKey} />;
       case 'diagnostic-grid':
-        return <DiagnosticGridExercise storageKey={storageKey} exerciseId={exerciseId} />;
+        return <DiagnosticGridExercise storageKey={storageKey} />;
+      case 'partnership-diagnostic':
+        return <PartnershipDiagnosticExercise storageKey={storageKey} />;
+      case 'foundation-manifest':
+        return <FoundationManifestExercise storageKey={storageKey} />;
+      case 'quality-checklist':
+        return <QualityChecklistExercise storageKey={storageKey} />;
+      case 'team-feedback-report':
+        return <TeamFeedbackReport storageKey={storageKey} />;
+      case 'manifest-preview':
+        return <ManifestPreview storageKey={storageKey} />;
       default:
-        return <FormFieldsExercise template={template} storageKey={storageKey} exerciseId={exerciseId} />;
+        return <FormFieldsExercise template={template} storageKey={storageKey} />;
     }
   };
 
@@ -1222,7 +2046,7 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
   };
 
   return (
-    <div key={storageKey} style={{ padding: '0 0 4px' }}>
+    <div style={{ padding: '0 0 4px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
         <span style={{
           fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
