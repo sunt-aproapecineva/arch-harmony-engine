@@ -301,7 +301,7 @@ export const MODULES: Module[] = [
       {
         id: 'l-1-1',
         module_id: 'mod-1',
-        title: 'Misiunea · Viziunea · Valorile',
+        title: 'Misiunea Viziunea Valorile',
         description:
           'Cei 3 piloni ai Fundației. Misiunea — de ce există firma ta. Viziunea — unde ești în 3 ani, cu cifre reale. Valorile — regulile echipei când tu nu ești în cameră.',
         video_url: '',
@@ -313,7 +313,7 @@ export const MODULES: Module[] = [
       {
         id: 'l-1-2',
         module_id: 'mod-1',
-        title: 'Cum comunici echipei Fundația companiei',
+        title: 'Cum comunici echipei, Fundația companiei?',
         description:
           'Cum prezinți Misiunea, Viziunea și Valorile echipei tale astfel încât să fie înțelese, asumate și aplicate zilnic — nu doar afișate pe perete.',
         video_url: '',

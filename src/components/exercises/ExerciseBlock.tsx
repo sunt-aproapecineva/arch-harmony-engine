@@ -1340,7 +1340,7 @@ const PartnershipDiagnosticExercise: React.FC<{ storageKey: string }> = ({ stora
 
 // ─── SĂPTĂMÂNA 2 · Etapa 1 · Fundația ──────────────────────────────────────
 
-// ─── Exercițiu 1: Misiunea · Viziunea · Valorile ──────────────────────────────
+// ─── Exercițiu 1: Misiunea Viziunea Valorile ──────────────────────────────
 const FoundationManifestExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
   const init = () => { try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s) : {}; } catch { return {}; } };
   const [vals, setVals] = useState<Record<string, string>>(init);
@@ -1882,7 +1882,7 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
 
       {(!ex1['m_final'] && !ex1['m_prob']) && (
         <div style={{ padding: '14px 18px', background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.2)', borderRadius: 12, marginBottom: 20, fontSize: 13, color: 'var(--gold)' }}>
-          ⚠ Completează mai întâi Exercițiul 1 (Misiunea · Viziunea · Valorile) pentru ca Manifestul să se populeze automat.
+          ⚠ Completează mai întâi Exercițiul 1 (Misiunea Viziunea Valorile) pentru ca Manifestul să se populeze automat.
         </div>
       )}
 

@@ -709,7 +709,7 @@ export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
   {
     exerciseId: 'e-1-s2-1',
     type: 'foundation-manifest',
-    title: 'Misiunea · Viziunea · Valorile',
+    title: 'Misiunea Viziunea Valorile',
     instructions:
       'Construiești cei 3 piloni ai Fundației afacerii tale. Răspunsuri concrete, nu generice. Scrie cum e acum sau cum vrei să fie cu adevărat — răspunsurile oneste sunt mai valoroase decât cele care sună bine.',
   },
