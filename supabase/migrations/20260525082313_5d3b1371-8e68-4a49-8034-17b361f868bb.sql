@@ -1,0 +1,3 @@
+UPDATE public.lessons SET title='Misiunea Viziunea Valorile', video_url='https://youtu.be/xITojkYD7xw', duration_min=24, is_published=true, order_index=1 WHERE id='793aed3f-6d99-4136-949c-b7747d9da764';
+UPDATE public.lessons SET title='Cum comunici echipei, Fundația companiei?', video_url='https://youtu.be/BBd1kcMvxmc', duration_min=20, is_published=true, order_index=2 WHERE id='65247afa-5732-40d8-8cbe-044eb3d8513c';
+DELETE FROM public.lessons WHERE id IN ('e8d1527e-b18e-4566-86ff-0b6d99de1a0b','59ff8dca-2f58-46f4-b5cd-522f3c6716f4','578ac581-82ac-4400-8b24-83924b4927c9');
