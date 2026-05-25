@@ -254,7 +254,7 @@ export const LessonPage: React.FC = () => {
   const moduleIdx = MODULES.findIndex(m => m.id === module!.id);
   if (isModuleLocked(moduleIdx)) {
     const unlockDate = module.unlockDate
-      ? new Date(module.unlockDate + 'T12:00:00').toLocaleDateString('ro-RO', { weekday: 'long', day: 'numeric', month: 'long' })
+      ? new Date(module.unlockDate).toLocaleDateString('ro-RO', { weekday: 'long', day: 'numeric', month: 'long' })
       : null;
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400, padding: 24 }}>
@@ -264,7 +264,7 @@ export const LessonPage: React.FC = () => {
           </div>
           <h2 className="font-aboreto" style={{ fontSize: 20, color: 'var(--fg)', marginBottom: 10 }}>Modul blocat</h2>
           <p style={{ fontSize: 14, color: 'var(--fg-3)', lineHeight: 1.65, marginBottom: 24 }}>
-            {unlockDate ? <>Modulul <strong style={{ color: 'var(--fg-2)' }}>{module.title}</strong> se deblochează <strong style={{ color: 'var(--gold)' }}>{unlockDate}</strong>.</> : <>Finalizează modulul anterior pentru a debloca <strong style={{ color: 'var(--fg-2)' }}>{module.title}</strong>.</>}
+            {unlockDate ? <>Modulul <strong style={{ color: 'var(--fg-2)' }}>{module.title}</strong> se deblochează pe <strong style={{ color: 'var(--gold)' }}>{unlockDate}</strong>.</> : <>Modulul este încă indisponibil.</>}
           </p>
           <button onClick={() => navigate('/dashboard')} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border)', color: 'var(--fg-2)', borderRadius: 10, cursor: 'pointer', fontSize: 13 }}>
             <ChevronLeft size={14} /> Înapoi la dashboard
