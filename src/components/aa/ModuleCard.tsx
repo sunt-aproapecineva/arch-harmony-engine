@@ -136,7 +136,7 @@ export const ModuleCard: React.FC<Props> = ({ module: mod, progress, locked, act
             >
               <Lock size={11} />
               {mod.unlockDate
-                ? `Se deblochează ${new Date(mod.unlockDate + 'T12:00:00').toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' })}`
+                ? `Se deblochează ${new Date(mod.unlockDate).toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' })}`
                 : 'Indisponibil'}
             </div>
           ) : (

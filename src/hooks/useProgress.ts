@@ -167,29 +167,22 @@ export function useProgress() {
     return Math.round(((lessonsDone + exDone) / total) * 100);
   }, [isCompleted, isExerciseDone]);
 
-  // A module is locked if:
-  //  (a) its unlock date is in the future, OR
-  //  (b) it's not the first module AND the previous module isn't FULLY done
-  //      (all lessons watched + all exercises marked finalized).
+  // A module is locked only until its scheduled unlock date begins
+  // (start of day in Bucharest for the configured date).
   const isModuleLocked = useCallback(
     (moduleIndex: number): boolean => {
       const mod = MODULES[moduleIndex];
       if (!mod) return true;
 
       if (mod.unlockDate) {
-        // Unlock la inceputul zilei, ora Bucurestiului (EEST = UTC+3 in mai)
-        // => 00:00 Bucuresti = 21:00 UTC ziua precedenta
+        // Unlock la începutul zilei în București.
         const unlock = new Date(mod.unlockDate + 'T00:00:00+03:00');
         if (new Date() < unlock) return true;
       }
 
-      if (moduleIndex === 0) return false;
-
-      const prevModule = MODULES[moduleIndex - 1];
-      if (!prevModule) return false;
-      return !isModuleFullyDone(prevModule.id);
+      return false;
     },
-    [isModuleFullyDone]
+    []
   );
 
   const getCompletedLessonsCount = useCallback(() => progress.length, [progress]);
