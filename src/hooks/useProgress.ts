@@ -177,8 +177,9 @@ export function useProgress() {
       if (!mod) return true;
 
       if (mod.unlockDate) {
-        // Unlock la 12:00 ora Bucurestiului (EEST = UTC+3 in mai)
-        const unlock = new Date(mod.unlockDate + 'T09:00:00Z');
+        // Unlock la inceputul zilei, ora Bucurestiului (EEST = UTC+3 in mai)
+        // => 00:00 Bucuresti = 21:00 UTC ziua precedenta
+        const unlock = new Date(mod.unlockDate + 'T00:00:00+03:00');
         if (new Date() < unlock) return true;
       }
 
