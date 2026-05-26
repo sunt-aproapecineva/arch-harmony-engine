@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WelcomeRouteImport } from './routes/welcome'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as LoginRouteImport } from './routes/login'
@@ -32,6 +33,11 @@ import { Route as AppDocumentsDocIdFillRouteImport } from './routes/_app.documen
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterRoute = RegisterRouteImport.update({
@@ -131,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
   '/documents': typeof AppDocumentsRouteWithChildren
@@ -150,6 +157,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
   '/documents': typeof AppDocumentsRouteWithChildren
@@ -172,6 +180,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/welcome': typeof WelcomeRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/documents': typeof AppDocumentsRouteWithChildren
@@ -194,6 +203,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/quiz'
     | '/register'
+    | '/reset-password'
     | '/welcome'
     | '/dashboard'
     | '/documents'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/quiz'
     | '/register'
+    | '/reset-password'
     | '/welcome'
     | '/dashboard'
     | '/documents'
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/quiz'
     | '/register'
+    | '/reset-password'
     | '/welcome'
     | '/_app/dashboard'
     | '/_app/documents'
@@ -256,6 +268,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   QuizRoute: typeof QuizRoute
   RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   WelcomeRoute: typeof WelcomeRoute
 }
 
@@ -266,6 +279,13 @@ declare module '@tanstack/react-router' {
       path: '/welcome'
       fullPath: '/welcome'
       preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/register': {
@@ -453,6 +473,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   QuizRoute: QuizRoute,
   RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   WelcomeRoute: WelcomeRoute,
 }
 export const routeTree = rootRouteImport
