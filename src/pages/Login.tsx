@@ -138,22 +138,28 @@ export const Login: React.FC = () => {
             <InputField label="Email" icon={<Mail size={15} />} type="email" value={email} onChange={setEmail} placeholder="email@exemplu.ro" autoComplete="email" />
             <InputField label="Parolă" icon={<Lock size={15} />} type="password" value={password} onChange={setPassword} placeholder="••••••••" autoComplete="current-password" />
 
-            {/* Remember me */}
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', userSelect: 'none' }}>
-              <div
-                onClick={() => setRememberMe(v => !v)}
-                style={{
-                  width: 18, height: 18, borderRadius: 5, flexShrink: 0,
-                  border: `1.5px solid ${rememberMe ? 'var(--accent)' : 'var(--border-hi)'}`,
-                  background: rememberMe ? 'var(--accent)' : 'transparent',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  transition: 'all 0.15s',
-                }}
-              >
-                {rememberMe && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#0D0907" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-              </div>
-              <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Ține-mă minte <span style={{ color: 'var(--fg-3)', fontSize: 12 }}>(12 ore)</span></span>
-            </label>
+            {/* Remember me + Forgot password */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', userSelect: 'none' }}>
+                <div
+                  onClick={() => setRememberMe(v => !v)}
+                  style={{
+                    width: 18, height: 18, borderRadius: 5, flexShrink: 0,
+                    border: `1.5px solid ${rememberMe ? 'var(--accent)' : 'var(--border-hi)'}`,
+                    background: rememberMe ? 'var(--accent)' : 'transparent',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {rememberMe && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#0D0907" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                </div>
+                <span style={{ fontSize: 13, color: 'var(--fg-2)' }}>Ține-mă minte <span style={{ color: 'var(--fg-3)', fontSize: 12 }}>(12h)</span></span>
+              </label>
+              <Link to="/forgot-password" style={{ fontSize: 12.5, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>
+                Ai uitat parola?
+              </Link>
+            </div>
+
 
             {error && (
               <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} style={{ padding: '10px 14px', background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: 8, fontSize: 13, color: '#f87171' }}>
