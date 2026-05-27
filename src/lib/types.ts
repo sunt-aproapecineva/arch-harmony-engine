@@ -6,6 +6,7 @@ export interface User {
   full_name: string;
   role: 'student' | 'admin';
   tariff: Tariff;
+  quiz_completed?: boolean;
   created_at: string;
   country?: string;
   city?: string;
