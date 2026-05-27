@@ -9,15 +9,14 @@ import { MODULES } from '../lib/data';
 import { useProgress } from '../hooks/useProgress';
 import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
 import { useAuthContext } from '../context/AuthContext';
+import { hasCompletedOnboarding } from '../lib/access';
 
 export const ModulePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuthContext();
   const { getModuleProgress, isModuleLocked, isCompleted } = useProgress();
-  const quizDone = user
-    ? !!localStorage.getItem(`aa_quiz_done_${user.id}`)
-    : false;
+  const quizDone = hasCompletedOnboarding(user);
   const [quizModalOpen, setQuizModalOpen] = useState(false);
 
   const module = MODULES.find(m => m.id === id);
