@@ -235,7 +235,8 @@ export const LessonPage: React.FC = () => {
   }
 
   // Quiz lock
-  const quizDone = user ? !!localStorage.getItem(`aa_quiz_done_${user.id}`) : false;
+  let quizDone = false;
+  try { quizDone = user && typeof window !== 'undefined' ? !!localStorage.getItem(`aa_quiz_done_${user.id}`) : false; } catch {}
   if (!quizDone) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400, padding: 24 }}>
