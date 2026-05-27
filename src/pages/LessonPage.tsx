@@ -15,6 +15,7 @@ import { useAuthContext } from '../context/AuthContext';
 import { logActivity } from '../lib/activity';
 import { ExerciseBlock } from '../components/exercises/ExerciseBlock';
 import { flushExerciseResponse, getStoredExerciseResponse } from '../lib/exerciseSync';
+import { hasCompletedOnboarding } from '../lib/access';
 
 function getYouTubeId(url: string): string | null {
   if (!url) return null;
@@ -235,8 +236,7 @@ export const LessonPage: React.FC = () => {
   }
 
   // Quiz lock
-  let quizDone = false;
-  try { quizDone = user && typeof window !== 'undefined' ? !!localStorage.getItem(`aa_quiz_done_${user.id}`) : false; } catch {}
+  const quizDone = hasCompletedOnboarding(user);
   if (!quizDone) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400, padding: 24 }}>
