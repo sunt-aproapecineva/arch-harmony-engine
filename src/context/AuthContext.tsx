@@ -44,6 +44,7 @@ async function hydrateUser(authUser: any): Promise<User | null> {
     full_name: profile?.full_name || authUser.user_metadata?.full_name || '',
     role: isAdmin ? 'admin' : 'student',
     tariff: (profile?.tariff as Tariff) || 'student',
+    quiz_completed: !!quiz?.completed_at,
     avatar_url: profile?.avatar_url || null,
     created_at: authUser.created_at,
   };

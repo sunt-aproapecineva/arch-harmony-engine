@@ -16,6 +16,7 @@ import { Calendar } from '../components/aa/Calendar';
 import { TelegramButton } from '../components/aa/TelegramButton';
 import { TariffBadge } from '../components/aa/TariffBadge';
 import { Tariff } from '../lib/types';
+import { hasCompletedOnboarding } from '../lib/access';
 
 /* ── helpers ─────────────────────────────────────── */
 function formatDateShort(iso: string) {
@@ -77,9 +78,7 @@ export const Dashboard: React.FC = () => {
   const { getModuleProgress, getOverallProgress, isModuleLocked, getCompletedLessonsCount, getTotalLessonsCount } = useProgress();
   const navigate = useNavigate();
 
-  const quizDone = user
-    ? !!localStorage.getItem(`aa_quiz_done_${user.id}`)
-    : false;
+  const quizDone = hasCompletedOnboarding(user);
   const [quizModalOpen, setQuizModalOpen] = useState(false);
 
   const overallPct = getOverallProgress();

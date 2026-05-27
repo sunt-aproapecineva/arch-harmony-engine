@@ -230,7 +230,8 @@ export const OnboardingQuiz: React.FC = () => {
 
   const getInitialScreen = (): QuizScreen => {
     if (!user) return 'intro';
-    const welcomeShown = !!localStorage.getItem(`aa_welcome_shown_${user.id}`);
+    let welcomeShown = false;
+    try { welcomeShown = typeof window !== 'undefined' && !!localStorage.getItem(`aa_welcome_shown_${user.id}`); } catch {}
     return welcomeShown ? 'intro' : 'welcome';
   };
 
@@ -244,7 +245,7 @@ export const OnboardingQuiz: React.FC = () => {
   const firstName = user?.full_name?.split(' ')[0] || 'Antreprenor';
 
   const goToIntro = () => {
-    if (user) localStorage.setItem(`aa_welcome_shown_${user.id}`, '1');
+    try { if (user) localStorage.setItem(`aa_welcome_shown_${user.id}`, '1'); } catch {}
     setScreen('intro');
   };
 
@@ -293,8 +294,10 @@ export const OnboardingQuiz: React.FC = () => {
         if (otherValues[id]) finalAnswers[id] = otherValues[id];
       });
       if (user) {
-        localStorage.setItem(`aa_quiz_done_${user.id}`, '1');
-        localStorage.setItem(`aa_quiz_answers_${user.id}`, JSON.stringify(finalAnswers));
+        try {
+          localStorage.setItem(`aa_quiz_done_${user.id}`, '1');
+          localStorage.setItem(`aa_quiz_answers_${user.id}`, JSON.stringify(finalAnswers));
+        } catch {}
         try {
           const profile = generateProfile(finalAnswers as any);
           await supabase.from('quiz_responses').upsert({
