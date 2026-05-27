@@ -201,12 +201,15 @@ export const LessonPage: React.FC = () => {
   }, [id]);
 
   const NOTES_KEY = `aa_note_${user?.id ?? 'anon'}_${id}`;
-  const [note, setNote] = useState(() => localStorage.getItem(NOTES_KEY) || '');
+  const [note, setNote] = useState(() => {
+    try { return typeof window !== 'undefined' ? (localStorage.getItem(NOTES_KEY) || '') : ''; }
+    catch { return ''; }
+  });
   const [noteSaved, setNoteSaved] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
 
   const saveNote = () => {
-    localStorage.setItem(NOTES_KEY, note);
+    try { localStorage.setItem(NOTES_KEY, note); } catch {}
     setNoteSaved(true);
     setTimeout(() => setNoteSaved(false), 2000);
     if (user && lesson) {
