@@ -1992,8 +1992,8 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
       {/* Gold separator + dark footer */}
       <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, #C9A96E 25%, rgba(201,169,110,0.2) 75%, transparent)' }} />
       <div style={{ background: '#1C1410', padding: '10px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Georgia, serif', fontSize: 8, letterSpacing: '0.22em', color: 'rgba(255,255,255,0.34)', textTransform: 'uppercase' }}>AA · Arhitectura Afacerii</div>
-        <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.28)', letterSpacing: '0.06em' }}>Manifestul Fundației · Pag. 1/1</div>
+        <div style={{ fontFamily: "'Aboreto', serif", fontSize: 9, letterSpacing: '0.22em', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>AA · Arhitectura Afacerii</div>
+        <div style={{ fontFamily: "'Arimo', sans-serif", fontSize: 8, color: 'rgba(255,255,255,0.28)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Document de uz intern</div>
       </div>
     </div>
   );
