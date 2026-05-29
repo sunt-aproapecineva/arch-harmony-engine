@@ -1872,7 +1872,96 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
   const viziune = ex1['v_final'] || ex1['v_desc'] || '—';
   const valori = [1,2,3,4,5].map(n => ({ v: ex1[`val_v${n}`], b: ex1[`val_b${n}`] })).filter(x => x.v);
 
-  const handlePrint = () => window.print();
+  const handlePrint = () => {
+    const esc = (s: string) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+    const valoriHtml = valori.length > 0
+      ? valori.map((val, i) => `
+          <div class="val-row">
+            <span class="val-num">${i + 1}.</span>
+            <div><span class="val-name">${esc(val.v)}</span>${val.b ? `<span class="val-desc"> — ${esc(val.b)}</span>` : ''}</div>
+          </div>`).join('')
+      : [1,2,3,4,5].map(n => `
+          <div class="val-row">
+            <span class="val-num" style="color:#bbb">${n}.</span>
+            <span style="color:#ccc;font-size:13px">[ valoarea ${n} ] — [ comportamentul asociat ]</span>
+          </div>`).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="ro"><head><meta charset="utf-8"><title>Manifestul Fundației</title>
+<style>
+  @page { size: A4; margin: 18mm 18mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; color: #1a1a1a; font-family: Georgia, 'Times New Roman', serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .sheet { padding: 8mm 4mm; }
+  .accent-bar { height: 4px; background: linear-gradient(90deg, #C4F0E4, rgba(196,240,228,0.3)); margin-bottom: 24px; }
+  .head { text-align: center; margin-bottom: 28px; }
+  .kicker { font-size: 10px; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: #777; margin-bottom: 8px; }
+  .title { font-size: 26px; font-weight: 700; letter-spacing: 0.05em; color: #111; margin-bottom: 4px; }
+  .firma { font-size: 16px; color: #555; font-style: italic; }
+  .rule { border-top: 1px solid #ddd; margin-bottom: 24px; }
+  .rule-light { border-top: 1px solid #eee; margin-bottom: 24px; }
+  .section { margin-bottom: 24px; }
+  .section-label { font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #999; margin-bottom: 8px; }
+  .section-body { font-size: 14px; line-height: 1.7; color: #222; white-space: pre-wrap; word-break: break-word; }
+  .val-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 9px; }
+  .val-num { font-size: 13px; font-weight: 700; color: #555; min-width: 18px; }
+  .val-name { font-size: 14px; font-weight: 700; color: #222; }
+  .val-desc { font-size: 13px; color: #666; }
+  .footer { border-top: 1px solid #ddd; padding-top: 14px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 12px; color: #777; margin-top: 16px; }
+  .footer strong { color: #333; font-weight: 600; }
+  .sig-line { display: inline-block; border-bottom: 1px solid #bbb; min-width: 160px; margin-left: 8px; }
+  @media print { .sheet { padding: 0; } }
+</style></head>
+<body>
+  <div class="sheet">
+    <div class="accent-bar"></div>
+    <div class="head">
+      <div class="kicker">Arhitectura Afacerii · Practicum de Sistematizare</div>
+      <div class="title">MANIFESTUL FUNDAȚIEI</div>
+      <div class="firma">${esc(firma) || '[ Numele firmei ]'}</div>
+    </div>
+    <div class="rule"></div>
+    <div class="section">
+      <div class="section-label">MISIUNEA NOASTRĂ · De ce existăm</div>
+      <div class="section-body">${esc(misiune)}</div>
+    </div>
+    <div class="rule-light"></div>
+    <div class="section">
+      <div class="section-label">VIZIUNEA NOASTRĂ · Unde suntem în 3 ani</div>
+      <div class="section-body">${esc(viziune)}</div>
+    </div>
+    <div class="rule-light"></div>
+    <div class="section">
+      <div class="section-label">VALORILE NOASTRE · Regulile după care funcționăm</div>
+      ${valoriHtml}
+    </div>
+    <div class="footer">
+      <div>Data: <strong>${esc(data) || '___________'}</strong></div>
+      <div>Semnat: <span class="sig-line">&nbsp;</span></div>
+    </div>
+  </div>
+  <script>
+    window.addEventListener('load', function () {
+      setTimeout(function () { window.focus(); window.print(); }, 150);
+    });
+    window.addEventListener('afterprint', function () { window.close(); });
+  </script>
+</body></html>`;
+
+    const win = window.open('', '_blank', 'width=900,height=1100,scrollbars=yes');
+    if (!win) {
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'manifestul-fundatiei.html';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      return;
+    }
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+  };
 
   return (
     <div>
