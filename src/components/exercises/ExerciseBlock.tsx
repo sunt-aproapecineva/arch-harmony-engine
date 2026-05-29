@@ -1965,7 +1965,7 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
           <div style={{ paddingLeft: 13 }}>
             {valori.length > 0 ? valori.map((val, i) => (
               <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 10 }}>
-                <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#C9A96E', minWidth: 22 }}>{String(i + 1).padStart(2, '0')}</span>
+                <span style={{ fontFamily: "'Aboreto', serif", fontSize: 14, fontWeight: 400, color: '#C9A96E', minWidth: 22 }}>{String(i + 1).padStart(2, '0')}</span>
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: 13.5, fontWeight: 700, color: '#1C1410' }}>{val.v}</span>
                   {val.b && <span style={{ fontSize: 12.5, color: '#7a6e64', display: 'block', marginTop: 2, fontStyle: 'italic' }}>{val.b}</span>}
