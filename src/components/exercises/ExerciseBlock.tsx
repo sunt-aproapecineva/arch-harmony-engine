@@ -1961,7 +1961,7 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
 
         {/* Valori */}
         <div>
-          <div style={{ fontFamily: 'Georgia, serif', fontSize: 10, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#a07840', padding: '6px 10px', background: 'rgba(201,169,110,0.10)', borderLeft: '3px solid #C9A96E', marginBottom: 12 }}>VALORILE · Regulile după care funcționăm</div>
+          <div style={{ fontFamily: "'Aboreto', serif", fontSize: 11, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#a07840', padding: '6px 10px', background: 'rgba(201,169,110,0.10)', borderLeft: '3px solid #C9A96E', marginBottom: 12 }}>VALORILE · Regulile după care funcționăm</div>
           <div style={{ paddingLeft: 13 }}>
             {valori.length > 0 ? valori.map((val, i) => (
               <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 10 }}>
