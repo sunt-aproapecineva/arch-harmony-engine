@@ -1974,7 +1974,7 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
             )) : (
               [1,2,3,4,5].map(n => (
                 <div key={n} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
-                  <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#ddd5c8', minWidth: 22 }}>{String(n).padStart(2, '0')}</span>
+                  <span style={{ fontFamily: "'Aboreto', serif", fontSize: 14, fontWeight: 400, color: '#ddd5c8', minWidth: 22 }}>{String(n).padStart(2, '0')}</span>
                   <span style={{ fontSize: 12.5, color: '#bbb1a3' }}>[ valoarea {n} ] — [ comportamentul asociat ]</span>
                 </div>
               ))
