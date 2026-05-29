@@ -1930,10 +1930,10 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
           <path d="M208.932 229.092L108.328 4.82955L88.037 5.94268L12.5678 239.864L36.4588 238.554L71.152 128.981L145.443 124.906L185.041 230.403L208.932 229.092ZM106.971 21.9735L142.721 117.177L73.6666 120.965L105.007 22.0812L106.971 21.9735Z" fill="rgba(201,169,110,0.45)"/>
         </svg>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: 'Georgia, serif', fontSize: 10, letterSpacing: '0.28em', color: 'rgba(255,255,255,0.78)', textTransform: 'uppercase', marginBottom: 3 }}>Arhitectura Afacerii</div>
-          <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>Practicum de Sistematizare · Victor Morar</div>
+          <div style={{ fontFamily: "'Aboreto', serif", fontSize: 11, letterSpacing: '0.28em', color: 'rgba(255,255,255,0.85)', textTransform: 'uppercase', marginBottom: 3 }}>Arhitectura Afacerii</div>
+          <div style={{ fontFamily: "'Arimo', sans-serif", fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>Practicum de Sistematizare · Victor Morar</div>
         </div>
-        <div style={{ fontFamily: 'Arial, sans-serif', fontSize: 9, color: 'rgba(201,169,110,0.75)', border: '1px solid rgba(201,169,110,0.32)', padding: '4px 11px', borderRadius: 99, letterSpacing: '0.14em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Livrabil · M1</div>
+        <div style={{ fontFamily: "'Arimo', sans-serif", fontSize: 9, color: 'rgba(201,169,110,0.75)', border: '1px solid rgba(201,169,110,0.32)', padding: '4px 11px', borderRadius: 99, letterSpacing: '0.14em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Document de uz intern</div>
       </div>
       {/* Gold accent line */}
       <div style={{ height: 2, background: 'linear-gradient(90deg, #C9A96E, rgba(201,169,110,0.18) 65%, transparent)' }} />
