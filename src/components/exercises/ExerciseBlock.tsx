@@ -1915,7 +1915,7 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
       minHeight: forPrint ? '1123px' : undefined, // 297mm @ 96dpi
       background: '#FDFAF6',
       color: '#1C1410',
-      fontFamily: "Georgia, 'Times New Roman', serif",
+      fontFamily: "'Arimo', system-ui, sans-serif",
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
