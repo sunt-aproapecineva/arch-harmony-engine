@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Plus, Trash2, ChevronRight, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { Check, Plus, Trash2, ChevronRight, ChevronDown, CheckCircle2, Download, Loader2 } from 'lucide-react';
 import { getExerciseTemplate, ExerciseTemplate, QuizQuestionItem } from '../../lib/exerciseData';
 import { useAuthContext } from '../../context/AuthContext';
 
@@ -1859,7 +1859,9 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
   const [firma, setFirma] = useState(() => { try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s).firma || '' : ''; } catch { return ''; } });
   const [data, setDataVal] = useState(() => { try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s).data || '' : ''; } catch { return ''; } });
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const printRef = useRef<HTMLDivElement | null>(null);
 
   const save = (f: string, d: string) => {
     localStorage.setItem(storageKey, JSON.stringify({ firma: f, data: d }));
@@ -1872,101 +1874,134 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
   const viziune = ex1['v_final'] || ex1['v_desc'] || '—';
   const valori = [1,2,3,4,5].map(n => ({ v: ex1[`val_v${n}`], b: ex1[`val_b${n}`] })).filter(x => x.v);
 
-  const handlePrint = () => {
-    const esc = (s: string) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
-    const valoriHtml = valori.length > 0
-      ? valori.map((val, i) => `
-          <div class="val-row">
-            <span class="val-num">${i + 1}.</span>
-            <div><span class="val-name">${esc(val.v)}</span>${val.b ? `<span class="val-desc"> — ${esc(val.b)}</span>` : ''}</div>
-          </div>`).join('')
-      : [1,2,3,4,5].map(n => `
-          <div class="val-row">
-            <span class="val-num" style="color:#bbb">${n}.</span>
-            <span style="color:#ccc;font-size:13px">[ valoarea ${n} ] — [ comportamentul asociat ]</span>
-          </div>`).join('');
+  const handleDownloadPdf = async () => {
+    if (!printRef.current) return;
+    try {
+      setGenerating(true);
+      const [{ default: jsPDF }, html2canvasMod] = await Promise.all([
+        import('jspdf'),
+        import('html2canvas-pro'),
+      ]);
+      const html2canvas = html2canvasMod.default;
 
-    const html = `<!DOCTYPE html>
-<html lang="ro"><head><meta charset="utf-8"><title>Manifestul Fundației</title>
-<style>
-  @page { size: A4; margin: 18mm 18mm; }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: #fff; color: #1a1a1a; font-family: Georgia, 'Times New Roman', serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .sheet { padding: 8mm 4mm; }
-  .accent-bar { height: 4px; background: linear-gradient(90deg, #C4F0E4, rgba(196,240,228,0.3)); margin-bottom: 24px; }
-  .head { text-align: center; margin-bottom: 28px; }
-  .kicker { font-size: 10px; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: #777; margin-bottom: 8px; }
-  .title { font-size: 26px; font-weight: 700; letter-spacing: 0.05em; color: #111; margin-bottom: 4px; }
-  .firma { font-size: 16px; color: #555; font-style: italic; }
-  .rule { border-top: 1px solid #ddd; margin-bottom: 24px; }
-  .rule-light { border-top: 1px solid #eee; margin-bottom: 24px; }
-  .section { margin-bottom: 24px; }
-  .section-label { font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #999; margin-bottom: 8px; }
-  .section-body { font-size: 14px; line-height: 1.7; color: #222; white-space: pre-wrap; word-break: break-word; }
-  .val-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 9px; }
-  .val-num { font-size: 13px; font-weight: 700; color: #555; min-width: 18px; }
-  .val-name { font-size: 14px; font-weight: 700; color: #222; }
-  .val-desc { font-size: 13px; color: #666; }
-  .footer { border-top: 1px solid #ddd; padding-top: 14px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 12px; color: #777; margin-top: 16px; }
-  .footer strong { color: #333; font-weight: 600; }
-  .sig-line { display: inline-block; border-bottom: 1px solid #bbb; min-width: 160px; margin-left: 8px; }
-  @media print { .sheet { padding: 0; } }
-</style></head>
-<body>
-  <div class="sheet">
-    <div class="accent-bar"></div>
-    <div class="head">
-      <div class="kicker">Arhitectura Afacerii · Practicum de Sistematizare</div>
-      <div class="title">MANIFESTUL FUNDAȚIEI</div>
-      <div class="firma">${esc(firma) || '[ Numele firmei ]'}</div>
-    </div>
-    <div class="rule"></div>
-    <div class="section">
-      <div class="section-label">MISIUNEA NOASTRĂ · De ce existăm</div>
-      <div class="section-body">${esc(misiune)}</div>
-    </div>
-    <div class="rule-light"></div>
-    <div class="section">
-      <div class="section-label">VIZIUNEA NOASTRĂ · Unde suntem în 3 ani</div>
-      <div class="section-body">${esc(viziune)}</div>
-    </div>
-    <div class="rule-light"></div>
-    <div class="section">
-      <div class="section-label">VALORILE NOASTRE · Regulile după care funcționăm</div>
-      ${valoriHtml}
-    </div>
-    <div class="footer">
-      <div>Data: <strong>${esc(data) || '___________'}</strong></div>
-      <div>Semnat: <span class="sig-line">&nbsp;</span></div>
-    </div>
-  </div>
-  <script>
-    window.addEventListener('load', function () {
-      setTimeout(function () { window.focus(); window.print(); }, 150);
-    });
-    window.addEventListener('afterprint', function () { window.close(); });
-  </script>
-</body></html>`;
+      // Render the hidden A4 sheet to canvas
+      const node = printRef.current;
+      const canvas = await html2canvas(node, {
+        scale: 2,
+        backgroundColor: '#FDFAF6',
+        useCORS: true,
+        logging: false,
+      });
 
-    const win = window.open('', '_blank', 'width=900,height=1100,scrollbars=yes');
-    if (!win) {
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'manifestul-fundatiei.html';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      return;
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
+      const filename = `manifestul-fundatiei${firma ? '-' + firma.replace(/[^a-z0-9]+/gi, '-').toLowerCase() : ''}.pdf`;
+      pdf.save(filename);
+    } catch (e) {
+      console.error('PDF generation failed', e);
+      alert('Nu am putut genera PDF-ul. Încearcă din nou.');
+    } finally {
+      setGenerating(false);
     }
-    win.document.open();
-    win.document.write(html);
-    win.document.close();
   };
+
+  // ─── AA-branded A4 sheet (used both for on-screen preview and PDF capture) ──
+  const ManifestSheet: React.FC<{ forPrint?: boolean }> = ({ forPrint = false }) => (
+    <div style={{
+      width: forPrint ? '794px' : '100%',       // 210mm @ 96dpi for capture
+      minHeight: forPrint ? '1123px' : undefined, // 297mm @ 96dpi
+      background: '#FDFAF6',
+      color: '#1C1410',
+      fontFamily: "Georgia, 'Times New Roman', serif",
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden',
+      borderRadius: forPrint ? 0 : 14,
+      border: forPrint ? 'none' : '1px solid rgba(201,169,110,0.18)',
+      boxShadow: forPrint ? 'none' : '0 4px 32px rgba(0,0,0,0.18)',
+    }}>
+      {/* Top dark header band */}
+      <div style={{ background: '#1C1410', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 14 }}>
+        <svg height={32} viewBox="0 0 303 240" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+          <path d="M93.6414 229.092L194.246 4.82955L214.537 5.94268L290.006 239.864L266.115 238.554L231.422 128.981L157.13 124.906L117.532 230.403L93.6414 229.092ZM195.603 21.9735L159.852 117.177L228.907 120.965L197.567 22.0812L195.603 21.9735Z" fill="#C9A96E"/>
+          <path d="M208.932 229.092L108.328 4.82955L88.037 5.94268L12.5678 239.864L36.4588 238.554L71.152 128.981L145.443 124.906L185.041 230.403L208.932 229.092ZM106.971 21.9735L142.721 117.177L73.6666 120.965L105.007 22.0812L106.971 21.9735Z" fill="rgba(201,169,110,0.45)"/>
+        </svg>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontFamily: 'Georgia, serif', fontSize: 10, letterSpacing: '0.28em', color: 'rgba(255,255,255,0.78)', textTransform: 'uppercase', marginBottom: 3 }}>Arhitectura Afacerii</div>
+          <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>Practicum de Sistematizare · Victor Morar</div>
+        </div>
+        <div style={{ fontFamily: 'Arial, sans-serif', fontSize: 9, color: 'rgba(201,169,110,0.75)', border: '1px solid rgba(201,169,110,0.32)', padding: '4px 11px', borderRadius: 99, letterSpacing: '0.14em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Livrabil · M1</div>
+      </div>
+      {/* Gold accent line */}
+      <div style={{ height: 2, background: 'linear-gradient(90deg, #C9A96E, rgba(201,169,110,0.18) 65%, transparent)' }} />
+
+      {/* Title band */}
+      <div style={{ padding: '28px 36px 22px', borderBottom: '1px solid #ddd5c8' }}>
+        <div style={{ fontFamily: 'Georgia, serif', fontSize: 10, letterSpacing: '3px', color: '#a07840', marginBottom: 8, textTransform: 'uppercase' }}>Document 01 · Fundație</div>
+        <div style={{ fontFamily: 'Georgia, serif', fontSize: 28, letterSpacing: '0.04em', color: '#1C1410', fontWeight: 400, lineHeight: 1.2 }}>Manifestul Fundației</div>
+        <div style={{ fontSize: 14, color: '#7a6e64', fontStyle: 'italic', marginTop: 8 }}>{firma || '[ Numele firmei ]'}</div>
+      </div>
+
+      {/* Body */}
+      <div style={{ padding: '26px 36px 20px', flex: 1 }}>
+        {/* Misiune */}
+        <div style={{ marginBottom: 22 }}>
+          <div style={{ fontFamily: 'Georgia, serif', fontSize: 10, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#1A5C38', padding: '6px 10px', background: 'rgba(26,92,56,0.06)', borderLeft: '3px solid #1A5C38', marginBottom: 10 }}>MISIUNEA · De ce existăm</div>
+          <div style={{ fontSize: 13.5, lineHeight: 1.75, color: '#1C1410', whiteSpace: 'pre-wrap', wordBreak: 'break-word', paddingLeft: 13 }}>{misiune}</div>
+        </div>
+
+        {/* Viziune */}
+        <div style={{ marginBottom: 22 }}>
+          <div style={{ fontFamily: 'Georgia, serif', fontSize: 10, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#8B1A1A', padding: '6px 10px', background: 'rgba(139,26,26,0.05)', borderLeft: '3px solid #8B1A1A', marginBottom: 10 }}>VIZIUNEA · Unde suntem în 3 ani</div>
+          <div style={{ fontSize: 13.5, lineHeight: 1.75, color: '#1C1410', whiteSpace: 'pre-wrap', wordBreak: 'break-word', paddingLeft: 13 }}>{viziune}</div>
+        </div>
+
+        {/* Valori */}
+        <div>
+          <div style={{ fontFamily: 'Georgia, serif', fontSize: 10, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#a07840', padding: '6px 10px', background: 'rgba(201,169,110,0.10)', borderLeft: '3px solid #C9A96E', marginBottom: 12 }}>VALORILE · Regulile după care funcționăm</div>
+          <div style={{ paddingLeft: 13 }}>
+            {valori.length > 0 ? valori.map((val, i) => (
+              <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 10 }}>
+                <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#C9A96E', minWidth: 22 }}>{String(i + 1).padStart(2, '0')}</span>
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontSize: 13.5, fontWeight: 700, color: '#1C1410' }}>{val.v}</span>
+                  {val.b && <span style={{ fontSize: 12.5, color: '#7a6e64', display: 'block', marginTop: 2, fontStyle: 'italic' }}>{val.b}</span>}
+                </div>
+              </div>
+            )) : (
+              [1,2,3,4,5].map(n => (
+                <div key={n} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                  <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#ddd5c8', minWidth: 22 }}>{String(n).padStart(2, '0')}</span>
+                  <span style={{ fontSize: 12.5, color: '#bbb1a3' }}>[ valoarea {n} ] — [ comportamentul asociat ]</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Signature area */}
+      <div style={{ padding: '14px 36px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderTop: '1px dashed #ddd5c8' }}>
+        <div style={{ fontSize: 11, color: '#7a6e64' }}>Data: <span style={{ color: '#1C1410', fontWeight: 600 }}>{data || '___________'}</span></div>
+        <div style={{ fontSize: 11, color: '#7a6e64' }}>Semnat: <span style={{ display: 'inline-block', borderBottom: '1px solid #1C1410', minWidth: 170, marginLeft: 8 }}>&nbsp;</span></div>
+      </div>
+
+      {/* Gold separator + dark footer */}
+      <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, #C9A96E 25%, rgba(201,169,110,0.2) 75%, transparent)' }} />
+      <div style={{ background: '#1C1410', padding: '10px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontFamily: 'Georgia, serif', fontSize: 8, letterSpacing: '0.22em', color: 'rgba(255,255,255,0.34)', textTransform: 'uppercase' }}>AA · Arhitectura Afacerii</div>
+        <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.28)', letterSpacing: '0.06em' }}>Manifestul Fundației · Pag. 1/1</div>
+      </div>
+    </div>
+  );
 
   return (
     <div>
       <p style={{ fontSize: 13, color: 'var(--fg-3)', lineHeight: 1.7, marginBottom: 20 }}>
-        Manifestul de mai jos se populează automat din răspunsurile tale din Exercițiul 1. Adaugă numele firmei și data, apoi tipărește.
+        Manifestul de mai jos se populează automat din răspunsurile tale din Exercițiul 1. Adaugă numele firmei și data, apoi descarcă PDF-ul.
       </p>
 
       {(!ex1['m_final'] && !ex1['m_prob']) && (
@@ -1981,87 +2016,36 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
           <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>Numele firmei</label>
           <input type="text" value={firma} onChange={e => updFirma(e.target.value)} placeholder="Ex: Morar Consulting SRL"
             style={{ width: '100%', padding: '9px 12px', fontSize: 13, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', boxSizing: 'border-box' as const }}
-            onFocus={e => (e.target.style.borderColor = 'rgba(196,240,228,0.35)')}
+            onFocus={e => (e.target.style.borderColor = 'rgba(201,169,110,0.45)')}
             onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
         </div>
         <div>
           <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>Data</label>
           <input type="text" value={data} onChange={e => updData(e.target.value)} placeholder="Ex: 26.05.2026"
             style={{ width: '100%', padding: '9px 12px', fontSize: 13, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', boxSizing: 'border-box' as const }}
-            onFocus={e => (e.target.style.borderColor = 'rgba(196,240,228,0.35)')}
+            onFocus={e => (e.target.style.borderColor = 'rgba(201,169,110,0.45)')}
             onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
         </div>
       </div>
 
-      {/* Manifestul A4 Preview */}
-      <div id="manifest-a4" style={{
-        background: '#fafaf8',
-        border: '2px solid rgba(196,240,228,0.3)',
-        borderRadius: 16,
-        padding: '40px 44px',
-        color: '#1a1a1a',
-        fontFamily: 'Georgia, serif',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
-        {/* Decorative corner */}
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'linear-gradient(90deg, var(--accent), rgba(196,240,228,0.3))' }} />
+      {/* On-screen preview (responsive) */}
+      <ManifestSheet />
 
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#777', marginBottom: 8 }}>Arhitectura Afacerii · Practicum de Sistematizare</div>
-          <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: '0.05em', color: '#111', marginBottom: 4 }}>MANIFESTUL FUNDAȚIEI</div>
-          <div style={{ fontSize: 16, color: '#555', fontStyle: 'italic' }}>{firma || '[ Numele firmei ]'}</div>
-        </div>
-
-        <div style={{ borderTop: '1px solid #ddd', marginBottom: 28 }} />
-
-        <div style={{ marginBottom: 28 }}>
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#999', marginBottom: 6 }}>MISIUNEA NOASTRĂ · De ce existăm</div>
-          <div style={{ fontSize: 15, lineHeight: 1.75, color: '#222', minHeight: 40, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{misiune}</div>
-        </div>
-
-        <div style={{ borderTop: '1px solid #eee', marginBottom: 28 }} />
-
-        <div style={{ marginBottom: 28 }}>
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#999', marginBottom: 6 }}>VIZIUNEA NOASTRĂ · Unde suntem în 3 ani</div>
-          <div style={{ fontSize: 15, lineHeight: 1.75, color: '#222', minHeight: 40, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{viziune}</div>
-        </div>
-
-        <div style={{ borderTop: '1px solid #eee', marginBottom: 28 }} />
-
-        <div style={{ marginBottom: 36 }}>
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#999', marginBottom: 12 }}>VALORILE NOASTRE · Regulile după care funcționăm</div>
-          {valori.length > 0 ? valori.map((val, i) => (
-            <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 10 }}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#555', minWidth: 18 }}>{i + 1}.</span>
-              <div>
-                <span style={{ fontSize: 14, fontWeight: 700, color: '#222' }}>{val.v}</span>
-                {val.b && <span style={{ fontSize: 13, color: '#666' }}> — {val.b}</span>}
-              </div>
-            </div>
-          )) : (
-            [1,2,3,4,5].map(n => (
-              <div key={n} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#bbb' }}>{n}.</span>
-                <span style={{ fontSize: 13, color: '#ccc' }}>[ valoarea {n} ] — [ comportamentul asociat ]</span>
-              </div>
-            ))
-          )}
-        </div>
-
-        <div style={{ borderTop: '1px solid #ddd', paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-          <div style={{ fontSize: 12, color: '#777' }}>Data: <span style={{ color: '#333', fontWeight: 600 }}>{data || '___________'}</span></div>
-          <div style={{ fontSize: 12, color: '#777' }}>Semnat: <span style={{ display: 'inline-block', borderBottom: '1px solid #bbb', minWidth: 160, marginLeft: 8 }}>&nbsp;</span></div>
+      {/* Hidden A4-sized sheet used exclusively for PDF capture */}
+      <div aria-hidden style={{ position: 'fixed', left: '-10000px', top: 0, pointerEvents: 'none', opacity: 0 }}>
+        <div ref={printRef}>
+          <ManifestSheet forPrint />
         </div>
       </div>
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-        <button onClick={handlePrint}
-          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 20px', background: 'var(--accent)', color: '#0D0907', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 700, transition: 'filter 0.15s' }}
-          onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.1)')}
+        <button onClick={handleDownloadPdf} disabled={generating}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 20px', background: 'var(--accent)', color: '#0D0907', border: 'none', borderRadius: 10, cursor: generating ? 'wait' : 'pointer', fontSize: 13, fontWeight: 700, opacity: generating ? 0.7 : 1, transition: 'filter 0.15s' }}
+          onMouseEnter={e => { if (!generating) e.currentTarget.style.filter = 'brightness(1.1)'; }}
           onMouseLeave={e => (e.currentTarget.style.filter = '')}>
-          🖨 Printează Manifestul A4
+          {generating ? <Loader2 size={15} style={{ animation: 'spin 0.8s linear infinite' }} /> : <Download size={15} />}
+          {generating ? 'Se generează PDF…' : 'Descarcă Manifestul (PDF)'}
         </button>
       </div>
 
