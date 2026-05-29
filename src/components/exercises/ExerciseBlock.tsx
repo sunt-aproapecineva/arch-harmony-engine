@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Plus, Trash2, ChevronRight, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { Check, Plus, Trash2, ChevronRight, ChevronDown, CheckCircle2, Download, Loader2 } from 'lucide-react';
 import { getExerciseTemplate, ExerciseTemplate, QuizQuestionItem } from '../../lib/exerciseData';
 import { useAuthContext } from '../../context/AuthContext';
 
