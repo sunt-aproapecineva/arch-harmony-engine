@@ -1940,9 +1940,9 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
 
       {/* Title band */}
       <div style={{ padding: '28px 36px 22px', borderBottom: '1px solid #ddd5c8' }}>
-        <div style={{ fontFamily: 'Georgia, serif', fontSize: 10, letterSpacing: '3px', color: '#a07840', marginBottom: 8, textTransform: 'uppercase' }}>Document 01 · Fundație</div>
-        <div style={{ fontFamily: 'Georgia, serif', fontSize: 28, letterSpacing: '0.04em', color: '#1C1410', fontWeight: 400, lineHeight: 1.2 }}>Manifestul Fundației</div>
-        <div style={{ fontSize: 14, color: '#7a6e64', fontStyle: 'italic', marginTop: 8 }}>{firma || '[ Numele firmei ]'}</div>
+        <div style={{ fontFamily: "'Aboreto', serif", fontSize: 10, letterSpacing: '3px', color: '#a07840', marginBottom: 8, textTransform: 'uppercase' }}>Document de uz intern · Fundație</div>
+        <div style={{ fontFamily: "'Aboreto', serif", fontSize: 30, letterSpacing: '0.06em', color: '#1C1410', fontWeight: 400, lineHeight: 1.2 }}>Manifestul Fundației</div>
+        <div style={{ fontFamily: "'Arimo', sans-serif", fontSize: 14, color: '#7a6e64', marginTop: 10 }}>Compania — <span style={{ color: '#1C1410', fontWeight: 600, fontStyle: 'normal' }}>{firma || '[ denumirea companiei ]'}</span></div>
       </div>
 
       {/* Body */}
