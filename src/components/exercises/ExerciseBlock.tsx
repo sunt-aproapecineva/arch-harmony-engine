@@ -1915,7 +1915,7 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
       minHeight: forPrint ? '1123px' : undefined, // 297mm @ 96dpi
       background: '#FDFAF6',
       color: '#1C1410',
-      fontFamily: "Georgia, 'Times New Roman', serif",
+      fontFamily: "'Arimo', system-ui, sans-serif",
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
@@ -1930,42 +1930,42 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
           <path d="M208.932 229.092L108.328 4.82955L88.037 5.94268L12.5678 239.864L36.4588 238.554L71.152 128.981L145.443 124.906L185.041 230.403L208.932 229.092ZM106.971 21.9735L142.721 117.177L73.6666 120.965L105.007 22.0812L106.971 21.9735Z" fill="rgba(201,169,110,0.45)"/>
         </svg>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: 'Georgia, serif', fontSize: 10, letterSpacing: '0.28em', color: 'rgba(255,255,255,0.78)', textTransform: 'uppercase', marginBottom: 3 }}>Arhitectura Afacerii</div>
-          <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>Practicum de Sistematizare · Victor Morar</div>
+          <div style={{ fontFamily: "'Aboreto', serif", fontSize: 11, letterSpacing: '0.28em', color: 'rgba(255,255,255,0.85)', textTransform: 'uppercase', marginBottom: 3 }}>Arhitectura Afacerii</div>
+          <div style={{ fontFamily: "'Arimo', sans-serif", fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>Practicum de Sistematizare · Victor Morar</div>
         </div>
-        <div style={{ fontFamily: 'Arial, sans-serif', fontSize: 9, color: 'rgba(201,169,110,0.75)', border: '1px solid rgba(201,169,110,0.32)', padding: '4px 11px', borderRadius: 99, letterSpacing: '0.14em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Livrabil · M1</div>
+        <div style={{ fontFamily: "'Arimo', sans-serif", fontSize: 9, color: 'rgba(201,169,110,0.75)', border: '1px solid rgba(201,169,110,0.32)', padding: '4px 11px', borderRadius: 99, letterSpacing: '0.14em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Document de uz intern</div>
       </div>
       {/* Gold accent line */}
       <div style={{ height: 2, background: 'linear-gradient(90deg, #C9A96E, rgba(201,169,110,0.18) 65%, transparent)' }} />
 
       {/* Title band */}
       <div style={{ padding: '28px 36px 22px', borderBottom: '1px solid #ddd5c8' }}>
-        <div style={{ fontFamily: 'Georgia, serif', fontSize: 10, letterSpacing: '3px', color: '#a07840', marginBottom: 8, textTransform: 'uppercase' }}>Document 01 · Fundație</div>
-        <div style={{ fontFamily: 'Georgia, serif', fontSize: 28, letterSpacing: '0.04em', color: '#1C1410', fontWeight: 400, lineHeight: 1.2 }}>Manifestul Fundației</div>
-        <div style={{ fontSize: 14, color: '#7a6e64', fontStyle: 'italic', marginTop: 8 }}>{firma || '[ Numele firmei ]'}</div>
+        <div style={{ fontFamily: "'Aboreto', serif", fontSize: 10, letterSpacing: '3px', color: '#a07840', marginBottom: 8, textTransform: 'uppercase' }}>Document de uz intern · Fundație</div>
+        <div style={{ fontFamily: "'Aboreto', serif", fontSize: 30, letterSpacing: '0.06em', color: '#1C1410', fontWeight: 400, lineHeight: 1.2 }}>Manifestul Fundației</div>
+        <div style={{ fontFamily: "'Arimo', sans-serif", fontSize: 14, color: '#7a6e64', marginTop: 10 }}>Compania — <span style={{ color: '#1C1410', fontWeight: 600, fontStyle: 'normal' }}>{firma || '[ denumirea companiei ]'}</span></div>
       </div>
 
       {/* Body */}
       <div style={{ padding: '26px 36px 20px', flex: 1 }}>
         {/* Misiune */}
         <div style={{ marginBottom: 22 }}>
-          <div style={{ fontFamily: 'Georgia, serif', fontSize: 10, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#1A5C38', padding: '6px 10px', background: 'rgba(26,92,56,0.06)', borderLeft: '3px solid #1A5C38', marginBottom: 10 }}>MISIUNEA · De ce existăm</div>
+          <div style={{ fontFamily: "'Aboreto', serif", fontSize: 11, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#1A5C38', padding: '6px 10px', background: 'rgba(26,92,56,0.06)', borderLeft: '3px solid #1A5C38', marginBottom: 10 }}>MISIUNEA · De ce existăm</div>
           <div style={{ fontSize: 13.5, lineHeight: 1.75, color: '#1C1410', whiteSpace: 'pre-wrap', wordBreak: 'break-word', paddingLeft: 13 }}>{misiune}</div>
         </div>
 
         {/* Viziune */}
         <div style={{ marginBottom: 22 }}>
-          <div style={{ fontFamily: 'Georgia, serif', fontSize: 10, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#8B1A1A', padding: '6px 10px', background: 'rgba(139,26,26,0.05)', borderLeft: '3px solid #8B1A1A', marginBottom: 10 }}>VIZIUNEA · Unde suntem în 3 ani</div>
+          <div style={{ fontFamily: "'Aboreto', serif", fontSize: 11, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#8B1A1A', padding: '6px 10px', background: 'rgba(139,26,26,0.05)', borderLeft: '3px solid #8B1A1A', marginBottom: 10 }}>VIZIUNEA · Unde suntem în 3 ani</div>
           <div style={{ fontSize: 13.5, lineHeight: 1.75, color: '#1C1410', whiteSpace: 'pre-wrap', wordBreak: 'break-word', paddingLeft: 13 }}>{viziune}</div>
         </div>
 
         {/* Valori */}
         <div>
-          <div style={{ fontFamily: 'Georgia, serif', fontSize: 10, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#a07840', padding: '6px 10px', background: 'rgba(201,169,110,0.10)', borderLeft: '3px solid #C9A96E', marginBottom: 12 }}>VALORILE · Regulile după care funcționăm</div>
+          <div style={{ fontFamily: "'Aboreto', serif", fontSize: 11, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#a07840', padding: '6px 10px', background: 'rgba(201,169,110,0.10)', borderLeft: '3px solid #C9A96E', marginBottom: 12 }}>VALORILE · Regulile după care funcționăm</div>
           <div style={{ paddingLeft: 13 }}>
             {valori.length > 0 ? valori.map((val, i) => (
               <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 10 }}>
-                <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#C9A96E', minWidth: 22 }}>{String(i + 1).padStart(2, '0')}</span>
+                <span style={{ fontFamily: "'Aboreto', serif", fontSize: 14, fontWeight: 400, color: '#C9A96E', minWidth: 22 }}>{String(i + 1).padStart(2, '0')}</span>
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: 13.5, fontWeight: 700, color: '#1C1410' }}>{val.v}</span>
                   {val.b && <span style={{ fontSize: 12.5, color: '#7a6e64', display: 'block', marginTop: 2, fontStyle: 'italic' }}>{val.b}</span>}
@@ -1974,7 +1974,7 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
             )) : (
               [1,2,3,4,5].map(n => (
                 <div key={n} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
-                  <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#ddd5c8', minWidth: 22 }}>{String(n).padStart(2, '0')}</span>
+                  <span style={{ fontFamily: "'Aboreto', serif", fontSize: 14, fontWeight: 400, color: '#ddd5c8', minWidth: 22 }}>{String(n).padStart(2, '0')}</span>
                   <span style={{ fontSize: 12.5, color: '#bbb1a3' }}>[ valoarea {n} ] — [ comportamentul asociat ]</span>
                 </div>
               ))
@@ -1992,8 +1992,8 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
       {/* Gold separator + dark footer */}
       <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, #C9A96E 25%, rgba(201,169,110,0.2) 75%, transparent)' }} />
       <div style={{ background: '#1C1410', padding: '10px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Georgia, serif', fontSize: 8, letterSpacing: '0.22em', color: 'rgba(255,255,255,0.34)', textTransform: 'uppercase' }}>AA · Arhitectura Afacerii</div>
-        <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.28)', letterSpacing: '0.06em' }}>Manifestul Fundației · Pag. 1/1</div>
+        <div style={{ fontFamily: "'Aboreto', serif", fontSize: 9, letterSpacing: '0.22em', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>AA · Arhitectura Afacerii</div>
+        <div style={{ fontFamily: "'Arimo', sans-serif", fontSize: 8, color: 'rgba(255,255,255,0.28)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Document de uz intern</div>
       </div>
     </div>
   );
