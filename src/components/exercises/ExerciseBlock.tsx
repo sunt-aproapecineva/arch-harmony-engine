@@ -1949,7 +1949,7 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
       <div style={{ padding: '26px 36px 20px', flex: 1 }}>
         {/* Misiune */}
         <div style={{ marginBottom: 22 }}>
-          <div style={{ fontFamily: 'Georgia, serif', fontSize: 10, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#1A5C38', padding: '6px 10px', background: 'rgba(26,92,56,0.06)', borderLeft: '3px solid #1A5C38', marginBottom: 10 }}>MISIUNEA · De ce existăm</div>
+          <div style={{ fontFamily: "'Aboreto', serif", fontSize: 11, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#1A5C38', padding: '6px 10px', background: 'rgba(26,92,56,0.06)', borderLeft: '3px solid #1A5C38', marginBottom: 10 }}>MISIUNEA · De ce existăm</div>
           <div style={{ fontSize: 13.5, lineHeight: 1.75, color: '#1C1410', whiteSpace: 'pre-wrap', wordBreak: 'break-word', paddingLeft: 13 }}>{misiune}</div>
         </div>
 
