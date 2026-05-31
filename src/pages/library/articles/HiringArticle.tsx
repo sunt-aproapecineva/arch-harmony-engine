@@ -113,7 +113,7 @@ export const HiringArticle: React.FC = () => {
 
       {/* SECȚIUNEA 2 — Mindset */}
       <Section>
-        <SectionHeader kicker="Secțiunea 2" title="Mindsetul „mai bine fac singur"." icon={<Target size={18} />} />
+        <SectionHeader kicker="Secțiunea 2" title={'Mindsetul „mai bine fac singur".'} icon={<Target size={18} />} />
         <Lead>
           Cel mai subtil mindset. Nu sună ca o capcană — sună ca eficiență.
         </Lead>
