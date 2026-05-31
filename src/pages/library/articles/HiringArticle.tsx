@@ -240,10 +240,9 @@ export const HiringArticle: React.FC = () => {
         </Grid>
       </Section>
 
-
-      {/* SECȚIUNEA 7 — Outsource vs Angajat */}
+      {/* SECȚIUNEA 6 — Outsource vs Angajat */}
       <Section>
-        <SectionHeader kicker="Secțiunea 7" title="Outsource vs. Angajat — care e diferența." icon={<Users size={18} />} />
+        <SectionHeader kicker="Secțiunea 6" title="Outsource vs. Angajat — care e diferența." icon={<Users size={18} />} />
         <Pull>Angajatul face parte din sistemul tău. Agenția are propriul sistem.</Pull>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 14, margin: '20px 0' }}>
