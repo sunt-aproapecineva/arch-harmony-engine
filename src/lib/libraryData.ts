@@ -23,7 +23,7 @@ export const LIBRARY_ITEMS: LibraryItem[] = [
     slug: 'cum-angajam-corect',
     title: 'Cum angajăm corect.',
     summary:
-      '5 capcane mentale, 6 greșeli ale angajărilor haotice, 4 criterii Vysotsky și diferența reală dintre angajat și outsource — notițe esențiale din sesiunea live cu Victor Morar.',
+      '5 capcane mentale, 6 greșeli ale angajărilor haotice și diferența reală dintre angajat și outsource — notițe esențiale din sesiunea live cu Victor Morar.',
     readingTime: '14 min de lectură',
     type: 'article',
     accent: 'gold',
