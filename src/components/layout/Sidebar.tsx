@@ -73,6 +73,44 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           )}
         </NavLink>
 
+        {/* Library — Arhitect only */}
+        {tariff === 'arhitect' && (
+          <NavLink
+            to="/library"
+            onClick={onClose}
+            style={({ isActive }) => ({
+              display: 'flex', alignItems: 'center', gap: 8,
+              padding: '7px 10px', borderRadius: 8, marginBottom: 8,
+              background: isActive ? 'rgba(201,169,110,0.1)' : 'transparent',
+              border: isActive ? '1px solid rgba(201,169,110,0.22)' : '1px solid transparent',
+              transition: 'all 0.15s', textDecoration: 'none',
+            })}
+          >
+            {({ isActive }) => (
+              <>
+                <div style={{
+                  width: 22, height: 22, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  background: isActive ? 'rgba(201,169,110,0.15)' : 'var(--bg-3)',
+                  border: `1px solid ${isActive ? 'rgba(201,169,110,0.3)' : 'var(--border)'}`,
+                }}>
+                  <Library size={11} style={{ color: isActive ? 'var(--gold, #C9A96E)' : 'var(--fg-3)' }} />
+                </div>
+                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, color: isActive ? 'var(--gold, #C9A96E)' : 'var(--fg-2)' }}>
+                  Biblioteca
+                </span>
+                <span style={{
+                  marginLeft: 'auto', fontSize: 8, fontWeight: 700, letterSpacing: '0.1em',
+                  color: 'var(--gold, #C9A96E)', background: 'rgba(201,169,110,0.12)',
+                  padding: '2px 6px', borderRadius: 99, textTransform: 'uppercase',
+                }}>
+                  Bonus
+                </span>
+              </>
+            )}
+          </NavLink>
+        )}
+
+
         <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-3)', padding: '4px 8px 8px' }}>
           Curriculum
         </div>
