@@ -120,7 +120,7 @@ export const HiringArticle: React.FC = () => {
         <Pull>„Fac eu mai repede. Durează 20 de minute. Nu merită să explic."</Pull>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14, margin: '20px 0' }}>
-          <Card title="„Mai bine fac singur"" tone="warn">
+          <Card title={'„Mai bine fac singur"'} tone="warn">
             <p style={{ margin: '0 0 10px' }}>20 min × 3× / săptămână = 60 min / săptămână</p>
             <p className="font-aboreto" style={{ fontSize: 18, color: '#e08585', margin: 0 }}>
               = 48 ore pierdute / an
