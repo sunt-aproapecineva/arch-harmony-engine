@@ -23,12 +23,6 @@ const MISTAKES = [
   { n: 6, title: 'Nu îi arăți organigrama.', body: 'Omul vine, începe să lucreze, nu știe cum funcționează firma. Vine la tine pentru orice. Soluția: prima zi = o oră cu organigrama. Cine răspunde de ce. Cum circulă comunicarea.' },
 ];
 
-const CRITERIA = [
-  { n: 1, title: 'Productivitatea', body: 'Ce a produs în trecut — nu ce a făcut. Întrebare cheie: „Care a fost cel mai mare rezultat produs în ultimul job?" Activități = semnal rău. Rezultate concrete = semnal bun.' },
-  { n: 2, title: 'Calitățile personale', body: 'Trebuie să se potrivească cu funcția. Vânzătorul: comunicativ, nu îi e frică de refuz. Omul pe rutină: precis, disciplinat. Orice calitate puternică are un opozit.' },
-  { n: 3, title: 'Motivația', body: '„De ce ai ales această profesie?" Dacă „era aproape de casă" — caută mai departe. Un om motivat cu competențe medii bate un om nemotivat cu competențe excelente.' },
-  { n: 4, title: 'Competențele — ultimul loc', body: 'Contează, dar se pot învăța. Productivitatea, calitățile și motivația sunt greu de schimbat. Angajează mai întâi pentru ce nu poți schimba.' },
-];
 
 const CHECKLIST = [
   'Am identificat funcția goală în organigramă — știu exact ce poziție ocupă.',
