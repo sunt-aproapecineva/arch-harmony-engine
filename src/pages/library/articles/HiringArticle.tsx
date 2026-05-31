@@ -39,7 +39,7 @@ const CHECKLIST = [
   'Am pregătit primele 5 sarcini concrete pentru prima săptămână.',
   'Am stabilit clar salariul, bonusurile și condițiile de evaluare.',
   'Am pregătit ora de onboarding cu organigrama firmei.',
-  'La interviu testez motivația și atitudinea — competențele se pot învăța.',
+  'La interviu testez: productivitate, calități, motivație — în această ordine.',
   'Nu angajez în panică — am timp să fac lucrurile corect.',
   'Am implicat echipa existentă în proces.',
 ];
