@@ -240,43 +240,6 @@ export const HiringArticle: React.FC = () => {
         </Grid>
       </Section>
 
-      {/* SECȚIUNEA 6 — Criterii Vysotsky */}
-      <Section>
-        <SectionHeader kicker="Secțiunea 6" title="Cele 4 criterii de angajare — Vysotsky." icon={<Layers size={18} />} />
-        <Lead>
-          Majoritatea caută competențele primul. Vysotsky le pune pe ultimul loc. De ce?
-        </Lead>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {CRITERIA.map((c, i) => (
-            <motion.div key={c.n}
-              initial={{ opacity: 0, x: -16 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.05 }}
-              style={{
-                display: 'flex', gap: 18, padding: 18, borderRadius: 12,
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                alignItems: 'flex-start',
-              }}
-            >
-              <div className="font-aboreto" style={{
-                fontSize: 28, color: 'var(--gold)', lineHeight: 1,
-                minWidth: 42, fontWeight: 400,
-              }}>
-                {String(c.n).padStart(2, '0')}
-              </div>
-              <div>
-                <h3 className="font-aboreto" style={{ fontSize: 15, color: 'var(--fg)', margin: '0 0 6px', fontWeight: 500 }}>
-                  {c.title}
-                </h3>
-                <p style={{ fontSize: 13.5, color: 'var(--fg-2)', lineHeight: 1.65, margin: 0 }}>
-                  {c.body}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </Section>
 
       {/* SECȚIUNEA 7 — Outsource vs Angajat */}
       <Section>
