@@ -5,13 +5,13 @@ import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { AnimatePresence, motion } from 'framer-motion';
 import { NotificationBanner } from '../aa/NotificationBanner';
-import { LayoutDashboard, BookOpen, FolderOpen, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, BookOpen, FolderOpen, ShieldCheck, Library } from 'lucide-react';
 import { useAuthContext } from '../../context/AuthContext';
 
 const SIDEBAR_KEY = 'aa_sidebar_open';
 
 export const Layout: React.FC = () => {
-  const { isAdmin } = useAuthContext();
+  const { isAdmin, user } = useAuthContext();
   const isMobile = () => window.innerWidth < 768;
 
   // Desktop: persisted open/closed. Mobile: always starts closed.
@@ -100,6 +100,7 @@ export const Layout: React.FC = () => {
               { to: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Acasă' },
               { to: '/module/mod-0', icon: <BookOpen size={20} />, label: 'Lecții' },
               { to: '/documents', icon: <FolderOpen size={20} />, label: 'Documente' },
+              ...(user?.tariff === 'arhitect' ? [{ to: '/library', icon: <Library size={20} />, label: 'Bibliotecă' }] : []),
               ...(isAdmin ? [{ to: '/admin', icon: <ShieldCheck size={20} />, label: 'Admin' }] : []),
             ].map(({ to, icon, label }) => (
               <NavLink

@@ -24,9 +24,11 @@ import { Route as AdminProgressRouteImport } from './routes/admin.progress'
 import { Route as AdminLessonsRouteImport } from './routes/admin.lessons'
 import { Route as AdminActivityRouteImport } from './routes/admin.activity'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppLibraryIndexRouteImport } from './routes/_app.library.index'
 import { Route as AppDocumentsIndexRouteImport } from './routes/_app.documents.index'
 import { Route as AdminStudentUserIdRouteImport } from './routes/admin.student.$userId'
 import { Route as AppModuleIdRouteImport } from './routes/_app.module.$id'
+import { Route as AppLibrarySlugRouteImport } from './routes/_app.library.$slug'
 import { Route as AppLessonIdRouteImport } from './routes/_app.lesson.$id'
 import { Route as AppDocumentsDocIdFillRouteImport } from './routes/_app.documents.$docId.fill'
 
@@ -104,6 +106,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLibraryIndexRoute = AppLibraryIndexRouteImport.update({
+  id: '/library/',
+  path: '/library/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDocumentsIndexRoute = AppDocumentsIndexRouteImport.update({
   id: '/documents/',
   path: '/documents/',
@@ -117,6 +124,11 @@ const AdminStudentUserIdRoute = AdminStudentUserIdRouteImport.update({
 const AppModuleIdRoute = AppModuleIdRouteImport.update({
   id: '/module/$id',
   path: '/module/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLibrarySlugRoute = AppLibrarySlugRouteImport.update({
+  id: '/library/$slug',
+  path: '/library/$slug',
   getParentRoute: () => AppRoute,
 } as any)
 const AppLessonIdRoute = AppLessonIdRouteImport.update({
@@ -146,9 +158,11 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
   '/lesson/$id': typeof AppLessonIdRoute
+  '/library/$slug': typeof AppLibrarySlugRoute
   '/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
   '/documents/': typeof AppDocumentsIndexRoute
+  '/library/': typeof AppLibraryIndexRoute
   '/documents/$docId/fill': typeof AppDocumentsDocIdFillRoute
 }
 export interface FileRoutesByTo {
@@ -166,9 +180,11 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/admin': typeof AdminIndexRoute
   '/lesson/$id': typeof AppLessonIdRoute
+  '/library/$slug': typeof AppLibrarySlugRoute
   '/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
   '/documents': typeof AppDocumentsIndexRoute
+  '/library': typeof AppLibraryIndexRoute
   '/documents/$docId/fill': typeof AppDocumentsDocIdFillRoute
 }
 export interface FileRoutesById {
@@ -189,9 +205,11 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
   '/_app/lesson/$id': typeof AppLessonIdRoute
+  '/_app/library/$slug': typeof AppLibrarySlugRoute
   '/_app/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
   '/_app/documents/': typeof AppDocumentsIndexRoute
+  '/_app/library/': typeof AppLibraryIndexRoute
   '/_app/documents/$docId/fill': typeof AppDocumentsDocIdFillRoute
 }
 export interface FileRouteTypes {
@@ -212,9 +230,11 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/'
     | '/lesson/$id'
+    | '/library/$slug'
     | '/module/$id'
     | '/admin/student/$userId'
     | '/documents/'
+    | '/library/'
     | '/documents/$docId/fill'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -232,9 +252,11 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin'
     | '/lesson/$id'
+    | '/library/$slug'
     | '/module/$id'
     | '/admin/student/$userId'
     | '/documents'
+    | '/library'
     | '/documents/$docId/fill'
   id:
     | '__root__'
@@ -254,9 +276,11 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/'
     | '/_app/lesson/$id'
+    | '/_app/library/$slug'
     | '/_app/module/$id'
     | '/admin/student/$userId'
     | '/_app/documents/'
+    | '/_app/library/'
     | '/_app/documents/$docId/fill'
   fileRoutesById: FileRoutesById
 }
@@ -379,6 +403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/library/': {
+      id: '/_app/library/'
+      path: '/library'
+      fullPath: '/library/'
+      preLoaderRoute: typeof AppLibraryIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/documents/': {
       id: '/_app/documents/'
       path: '/documents'
@@ -398,6 +429,13 @@ declare module '@tanstack/react-router' {
       path: '/module/$id'
       fullPath: '/module/$id'
       preLoaderRoute: typeof AppModuleIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/library/$slug': {
+      id: '/_app/library/$slug'
+      path: '/library/$slug'
+      fullPath: '/library/$slug'
+      preLoaderRoute: typeof AppLibrarySlugRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/lesson/$id': {
@@ -420,16 +458,20 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppLessonIdRoute: typeof AppLessonIdRoute
+  AppLibrarySlugRoute: typeof AppLibrarySlugRoute
   AppModuleIdRoute: typeof AppModuleIdRoute
   AppDocumentsIndexRoute: typeof AppDocumentsIndexRoute
+  AppLibraryIndexRoute: typeof AppLibraryIndexRoute
   AppDocumentsDocIdFillRoute: typeof AppDocumentsDocIdFillRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppLessonIdRoute: AppLessonIdRoute,
+  AppLibrarySlugRoute: AppLibrarySlugRoute,
   AppModuleIdRoute: AppModuleIdRoute,
   AppDocumentsIndexRoute: AppDocumentsIndexRoute,
+  AppLibraryIndexRoute: AppLibraryIndexRoute,
   AppDocumentsDocIdFillRoute: AppDocumentsDocIdFillRoute,
 }
 
@@ -469,13 +511,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
