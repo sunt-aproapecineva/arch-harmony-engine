@@ -32,7 +32,7 @@ const CHECKLIST = [
   'Am pregătit primele 5 sarcini concrete pentru prima săptămână.',
   'Am stabilit clar salariul, bonusurile și condițiile de evaluare.',
   'Am pregătit ora de onboarding cu organigrama firmei.',
-  'La interviu testez: productivitate, calități, motivație — în această ordine.',
+  'La interviu testez motivația și atitudinea — competențele se pot învăța.',
   'Nu angajez în panică — am timp să fac lucrurile corect.',
   'Am implicat echipa existentă în proces.',
 ];
@@ -66,7 +66,7 @@ export const HiringArticle: React.FC = () => {
           color: 'var(--fg-2)', lineHeight: 1.6, maxWidth: 580,
           fontStyle: 'italic',
         }}>
-          5 capcane · 6 greșeli · 4 criterii · Outsource vs. Angajat
+          5 capcane · 6 greșeli · Outsource vs. Angajat
         </p>
 
         <div style={{
