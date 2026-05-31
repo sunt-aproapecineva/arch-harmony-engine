@@ -3,8 +3,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import {
   Section, SectionHeader, Lead, Pull, Card, Grid,
-  AlertTriangle, CheckCircle2, XCircle, Target, Users, TrendingDown, ListChecks, Clock, BookOpen,
+  AlertTriangle, CheckCircle2, XCircle, Target, Users, TrendingDown, Layers, ListChecks, Clock, BookOpen,
 } from '../../LibraryArticlePage';
+
+const CRITERIA = [
+  { n: 1, title: 'Productivitatea', body: 'Ce a produs în trecut — nu ce a făcut. Întrebare cheie: „Care a fost cel mai mare rezultat produs în ultimul job?" Activități = semnal rău. Rezultate concrete = semnal bun.' },
+  { n: 2, title: 'Calitățile personale', body: 'Trebuie să se potrivească cu funcția. Vânzătorul: comunicativ, nu îi e frică de refuz. Omul pe rutină: precis, disciplinat. Orice calitate puternică are un opozit.' },
+  { n: 3, title: 'Motivația', body: '„De ce ai ales această profesie?" Dacă „era aproape de casă" — caută mai departe. Un om motivat cu competențe medii bate un om nemotivat cu competențe excelente.' },
+  { n: 4, title: 'Competențele — ultimul loc', body: 'Contează, dar se pot învăța. Productivitatea, calitățile și motivația sunt greu de schimbat. Angajează mai întâi pentru ce nu poți schimba.' },
+];
 
 const TRAPS = [
   { n: 1, title: 'Nu am timp să angajez acum.', body: 'Ești prea ocupat pentru că nu ai angajat. E un cerc închis. Adevărul: ești ocupat EXACT pentru că nu ai angajat. Cu cât amâni mai mult, cu atât devine mai greu să ieși.' },
