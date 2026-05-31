@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import {
   Section, SectionHeader, Lead, Pull, Card, Grid,
-  AlertTriangle, CheckCircle2, XCircle, Target, Users, TrendingDown, Layers, ListChecks, Clock, BookOpen,
+  AlertTriangle, CheckCircle2, XCircle, Target, Users, TrendingDown, ListChecks, Clock, BookOpen,
 } from '../../LibraryArticlePage';
 
 const TRAPS = [
