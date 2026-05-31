@@ -73,7 +73,7 @@ export const HiringArticle: React.FC = () => {
           color: 'var(--fg-2)', lineHeight: 1.6, maxWidth: 580,
           fontStyle: 'italic',
         }}>
-          5 capcane · 6 greșeli · Outsource vs. Angajat
+          5 capcane · 6 greșeli · 4 criterii · Outsource vs. Angajat
         </p>
 
         <div style={{
