@@ -2715,6 +2715,14 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
         return <TeamFeedbackReport storageKey={storageKey} />;
       case 'manifest-preview':
         return <ManifestPreview storageKey={storageKey} />;
+      case 'quiz-mcq':
+        return <QuizMCQExercise template={template} storageKey={storageKey} />;
+      case 'function-roles':
+        return <FunctionRolesExercise template={template} storageKey={storageKey} />;
+      case 'miro-org':
+        return <MiroOrgExercise template={template} storageKey={storageKey} />;
+      case 'decision-matrix':
+        return <DecisionMatrixExercise template={template} storageKey={storageKey} />;
       default:
         return <FormFieldsExercise template={template} storageKey={storageKey} />;
     }
@@ -2725,9 +2733,14 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
     'form-fields': 'Formular',
     'dynamic-table': 'Tabel interactiv',
     quiz: 'Chestionar',
+    'quiz-mcq': 'Quiz cu scor',
     'text-input': 'Formular',
     'rating-grid': 'Evaluare',
+    'function-roles': 'Funcție · Rol · Produs',
+    'miro-org': 'Organigramă Miro',
+    'decision-matrix': 'Matrice decizională',
   };
+
 
   return (
     <div style={{ padding: '0 0 4px' }}>
