@@ -19,17 +19,50 @@ export interface FormField {
   addLabel?: string;
 }
 
+export interface MCQOption {
+  label: string;
+  correct: boolean;
+  explanation?: string;
+}
+
+export interface MCQSituation {
+  id: string;
+  title?: string;
+  text: string;
+  options: MCQOption[];
+}
+
+export interface DMExampleRow {
+  role: string;
+  alone: string[];
+  manager: string[];
+  ceo: string[];
+}
+
 export interface ExerciseTemplate {
   exerciseId: string;
   type: 'checklist' | 'form-fields' | 'quiz' | 'text-input' | 'rating-grid' | 'dynamic-table'
       | 'activity-audit' | 'bottleneck-map' | 'absence-test' | 'diagnostic-grid'
       | 'partnership-diagnostic'
-      | 'foundation-manifest' | 'quality-checklist' | 'team-feedback-report' | 'manifest-preview';
+      | 'foundation-manifest' | 'quality-checklist' | 'team-feedback-report' | 'manifest-preview'
+      | 'quiz-mcq' | 'function-roles' | 'miro-org' | 'decision-matrix';
   title: string;
   instructions: string;
   items?: ChecklistItem[];
   fields?: FormField[];
   questions?: QuizQuestionItem[];
+  // quiz-mcq
+  situations?: MCQSituation[];
+  scoringTiers?: { min: number; max: number; label: string; tone: 'good' | 'ok' | 'bad' }[];
+  // miro-org
+  miroTemplateUrl?: string;
+  colorLegend?: { color: string; name: string; meaning: string; action: string }[];
+  // decision-matrix
+  dmExample?: DMExampleRow[];
+  dmRolesCount?: number;
+  dmReflection?: { id: string; label: string; placeholder?: string }[];
+  // function-roles
+  functionOptions?: { value: string; label: string; sampleProduct: string }[];
 }
 
 export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
