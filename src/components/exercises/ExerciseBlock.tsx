@@ -2061,6 +2061,617 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
   );
 };
 
+// ─── Quiz MCQ (multiple-choice with correct answers) ─────────────────────────
+const QuizMCQExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({ template, storageKey }) => {
+  const situations = template.situations || [];
+  const tiers = template.scoringTiers || [];
+  const [answers, setAnswers] = useState<Record<string, number>>(() => {
+    try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s) : {}; } catch { return {}; }
+  });
+  const [idx, setIdx] = useState(0);
+  const [reviewing, setReviewing] = useState(false);
+
+  const total = situations.length;
+  const answeredCount = Object.keys(answers).length;
+  const allDone = answeredCount === total;
+
+  const choose = (sid: string, optIdx: number) => {
+    const next = { ...answers, [sid]: optIdx };
+    setAnswers(next);
+    localStorage.setItem(storageKey, JSON.stringify(next));
+    setTimeout(() => {
+      if (idx < total - 1) setIdx(i => i + 1);
+      else setReviewing(true);
+    }, 350);
+  };
+
+  const score = situations.reduce((sum, s) => {
+    const a = answers[s.id];
+    return a !== undefined && s.options[a]?.correct ? sum + 1 : sum;
+  }, 0);
+
+  const reset = () => {
+    setAnswers({});
+    localStorage.removeItem(storageKey);
+    setIdx(0);
+    setReviewing(false);
+  };
+
+  if (reviewing || allDone) {
+    const tier = tiers.find(t => score >= t.min && score <= t.max);
+    const toneColor = tier?.tone === 'good' ? '#4ade80' : tier?.tone === 'ok' ? '#fbbf24' : '#f87171';
+    return (
+      <div>
+        <p style={{ fontSize: 13, color: 'var(--fg-3)', marginBottom: 16, lineHeight: 1.7 }}>{template.instructions}</p>
+        <div style={{ textAlign: 'center', padding: '20px 16px', background: 'var(--bg-3)', borderRadius: 12, marginBottom: 18, border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: 48, fontWeight: 700, color: toneColor, lineHeight: 1, marginBottom: 6 }}>{score}<span style={{ fontSize: 22, color: 'var(--fg-3)' }}>/{total}</span></div>
+          {tier && <p style={{ fontSize: 13, color: 'var(--fg-2)', margin: 0 }}>{tier.label}</p>}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
+          {situations.map((s, i) => {
+            const a = answers[s.id];
+            const chosen = a !== undefined ? s.options[a] : null;
+            const correctIdx = s.options.findIndex(o => o.correct);
+            const isOK = chosen?.correct;
+            return (
+              <div key={s.id} style={{
+                padding: 14, borderRadius: 10,
+                background: isOK ? 'rgba(74,222,128,0.06)' : 'rgba(248,113,113,0.05)',
+                border: `1px solid ${isOK ? 'rgba(74,222,128,0.2)' : 'rgba(248,113,113,0.18)'}`,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: isOK ? '#4ade80' : '#f87171', letterSpacing: '0.08em' }}>
+                    {i + 1}. {isOK ? 'CORECT' : 'GREȘIT'}
+                  </span>
+                </div>
+                <p style={{ fontSize: 12, color: 'var(--fg-2)', margin: '0 0 10px', lineHeight: 1.6 }}>{s.text}</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {s.options.map((opt, oi) => {
+                    const isChosen = oi === a;
+                    const isCorrect = opt.correct;
+                    return (
+                      <div key={oi} style={{
+                        fontSize: 12, padding: '6px 10px', borderRadius: 6,
+                        color: isCorrect ? '#4ade80' : isChosen ? '#f87171' : 'var(--fg-3)',
+                        background: isCorrect ? 'rgba(74,222,128,0.08)' : isChosen ? 'rgba(248,113,113,0.06)' : 'transparent',
+                        fontWeight: isCorrect || isChosen ? 500 : 400,
+                      }}>
+                        {isCorrect ? '✓ ' : isChosen ? '✗ ' : '○ '}{opt.label}
+                      </div>
+                    );
+                  })}
+                </div>
+                {chosen?.explanation && (
+                  <div style={{ marginTop: 8, fontSize: 11, color: 'var(--fg-3)', fontStyle: 'italic', lineHeight: 1.6 }}>
+                    {chosen.explanation}
+                  </div>
+                )}
+                {!isOK && s.options[correctIdx]?.explanation && (
+                  <div style={{ marginTop: 4, fontSize: 11, color: '#4ade80', lineHeight: 1.6 }}>
+                    Răspuns corect: {s.options[correctIdx].explanation}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <button onClick={reset} style={{
+          padding: '8px 16px', background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)',
+          borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--accent)', fontWeight: 600,
+        }}>Reia quiz-ul</button>
+      </div>
+    );
+  }
+
+  const q = situations[idx];
+  return (
+    <div>
+      <p style={{ fontSize: 13, color: 'var(--fg-3)', marginBottom: 16, lineHeight: 1.7 }}>{template.instructions}</p>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
+          <span>Situația {idx + 1} din {total}</span>
+          <span>{answeredCount} răspunsuri salvate</span>
+        </div>
+        <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
+          <motion.div animate={{ width: `${((idx + 1) / total) * 100}%` }} transition={{ duration: 0.4 }}
+            style={{ height: '100%', background: 'var(--accent)', borderRadius: 2 }} />
+        </div>
+      </div>
+      <AnimatePresence mode="wait">
+        <motion.div key={q.id}
+          initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.2 }}>
+          {q.title && <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--gold)', letterSpacing: '0.08em', marginBottom: 8, textTransform: 'uppercase' }}>{q.title}</div>}
+          <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--fg)', marginBottom: 16, lineHeight: 1.6 }}>{q.text}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {q.options.map((opt, oi) => (
+              <motion.button key={oi}
+                whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
+                onClick={() => choose(q.id, oi)}
+                style={{
+                  textAlign: 'left', padding: '12px 14px', background: 'var(--bg-3)',
+                  border: '1px solid var(--border)', borderRadius: 10, cursor: 'pointer',
+                  color: 'var(--fg)', fontSize: 13, lineHeight: 1.5, transition: 'all 0.15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(196,240,228,0.35)'; e.currentTarget.style.background = 'rgba(196,240,228,0.04)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--bg-3)'; }}>
+                <span style={{ color: 'var(--fg-3)', marginRight: 8, fontSize: 11, fontWeight: 600 }}>{String.fromCharCode(65 + oi)}.</span>
+                {opt.label}
+              </motion.button>
+            ))}
+          </div>
+        </motion.div>
+      </AnimatePresence>
+      {idx > 0 && (
+        <button onClick={() => setIdx(i => Math.max(0, i - 1))} style={{
+          marginTop: 16, padding: '6px 12px', background: 'transparent', border: '1px solid var(--border)',
+          borderRadius: 6, cursor: 'pointer', fontSize: 11, color: 'var(--fg-3)',
+        }}>← Înapoi</button>
+      )}
+    </div>
+  );
+};
+
+// ─── Function-Roles (Ex.1) ────────────────────────────────────────────────────
+const FunctionRolesExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({ template, storageKey }) => {
+  type RoleRow = { rol: string; persoana: string; ceFace: string; produs: string };
+  type State = { fnId: string; produs: string; flux: string; rows: RoleRow[] };
+  const initial: State = { fnId: '', produs: '', flux: '', rows: [{ rol: '', persoana: '', ceFace: '', produs: '' }] };
+  const [state, setState] = useState<State>(() => {
+    try { const s = localStorage.getItem(storageKey); return s ? { ...initial, ...JSON.parse(s) } : initial; } catch { return initial; }
+  });
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showExample, setShowExample] = useState(false);
+
+  const save = (s: State) => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      localStorage.setItem(storageKey, JSON.stringify(s));
+      setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
+    }, 800);
+  };
+  const set = (patch: Partial<State>) => { const n = { ...state, ...patch }; setState(n); save(n); };
+  const updateRow = (i: number, k: keyof RoleRow, v: string) => {
+    const rows = state.rows.map((r, ri) => ri === i ? { ...r, [k]: v } : r);
+    set({ rows });
+  };
+  const addRow = () => set({ rows: [...state.rows, { rol: '', persoana: '', ceFace: '', produs: '' }] });
+  const removeRow = (i: number) => set({ rows: state.rows.filter((_, ri) => ri !== i).length ? state.rows.filter((_, ri) => ri !== i) : [{ rol: '', persoana: '', ceFace: '', produs: '' }] });
+
+  const selectedFn = template.functionOptions?.find(o => o.value === state.fnId);
+
+  const cellStyle: React.CSSProperties = {
+    width: '100%', padding: '6px 8px', fontSize: 12, background: 'var(--bg-3)',
+    border: '1px solid var(--border)', borderRadius: 6, color: 'var(--fg)', boxSizing: 'border-box',
+  };
+
+  return (
+    <div>
+      <p style={{ fontSize: 13, color: 'var(--fg-3)', marginBottom: 14, lineHeight: 1.7 }}>{template.instructions}</p>
+
+      {/* Diferența funcție vs rol */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+        <div style={{ padding: 12, background: 'rgba(74,222,128,0.05)', border: '1px solid rgba(74,222,128,0.18)', borderRadius: 10 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#4ade80', letterSpacing: '0.08em', marginBottom: 6 }}>FUNCȚIA</div>
+          <ul style={{ margin: 0, paddingLeft: 16, fontSize: 11, color: 'var(--fg-2)', lineHeight: 1.7 }}>
+            <li>Există în organigramă</li>
+            <li>Nu dispare când pleacă omul</li>
+            <li>Una din cele 7</li>
+            <li>Are un produs final al funcției</li>
+          </ul>
+        </div>
+        <div style={{ padding: 12, background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.2)', borderRadius: 10 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--gold)', letterSpacing: '0.08em', marginBottom: 6 }}>ROLUL</div>
+          <ul style={{ margin: 0, paddingLeft: 16, fontSize: 11, color: 'var(--fg-2)', lineHeight: 1.7 }}>
+            <li>Titlul persoanei care lucrează</li>
+            <li>Se schimbă când vine un om nou</li>
+            <li>Director, Manager, Specialist</li>
+            <li>Are un produs al rolului său</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Exemplu expandable */}
+      <button onClick={() => setShowExample(s => !s)} style={{
+        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '10px 14px', background: 'var(--bg-3)', border: '1px solid var(--border)',
+        borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--fg-2)', marginBottom: 14,
+      }}>
+        <span>📖 Exemplu — Funcția 2: Marketing și Vânzări</span>
+        {showExample ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+      </button>
+      <AnimatePresence>
+        {showExample && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+            style={{ overflow: 'hidden', marginBottom: 14 }}>
+            <div style={{ padding: 12, background: 'var(--bg-3)', borderRadius: 8, fontSize: 11, color: 'var(--fg-2)', lineHeight: 1.7 }}>
+              <div style={{ marginBottom: 8 }}><strong>Produsul FUNCȚIEI:</strong> Clienți noi plătitori și venituri lunare conform targetului.</div>
+              <div><strong>Manager Marketing</strong> · Ana → 200 lead-uri/lună</div>
+              <div><strong>Agent Vânzări</strong> · Ion → 15 contracte semnate/lună</div>
+              <div><strong>SMM Manager</strong> · Maria → engagement 4%+, 500 followeri/lună</div>
+              <div style={{ marginTop: 8, fontStyle: 'italic', color: 'var(--fg-3)' }}>
+                Cum se obține: Ana aduce 200 leaduri → Ion închide 15 → Maria menține audiența caldă. Împreună = clienți noi și venituri.
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Selector funcție */}
+      <div style={{ marginBottom: 12 }}>
+        <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', display: 'block', marginBottom: 6 }}>
+          Funcția aleasă (1–7)
+        </label>
+        <select value={state.fnId} onChange={e => {
+          const fn = template.functionOptions?.find(o => o.value === e.target.value);
+          set({ fnId: e.target.value, produs: state.produs || fn?.sampleProduct || '' });
+        }} style={{
+          width: '100%', padding: '10px 12px', fontSize: 13, background: 'var(--bg-3)',
+          border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)',
+        }}>
+          <option value="">— Alege o funcție —</option>
+          {template.functionOptions?.map(o => (<option key={o.value} value={o.value}>{o.label}</option>))}
+        </select>
+      </div>
+
+      {selectedFn && (
+        <>
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', display: 'block', marginBottom: 6 }}>
+              Produsul FUNCȚIEI
+            </label>
+            <textarea value={state.produs} onChange={e => set({ produs: e.target.value })} rows={2}
+              placeholder={selectedFn.sampleProduct}
+              style={{ width: '100%', padding: '10px 12px', fontSize: 13, lineHeight: 1.6,
+                background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8,
+                color: 'var(--fg)', resize: 'vertical', boxSizing: 'border-box' }} />
+          </div>
+
+          <div style={{ marginBottom: 10 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg)', marginBottom: 8 }}>Rolurile care produc bucățica lor</div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                <thead>
+                  <tr>
+                    {['ROLUL', 'PERSOANA', 'CE FACE', 'PRODUSUL ROLULUI'].map(h => (
+                      <th key={h} style={{ padding: '8px 6px', textAlign: 'left', fontSize: 10, fontWeight: 600,
+                        letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-3)',
+                        borderBottom: '1px solid var(--border)' }}>{h}</th>
+                    ))}
+                    <th style={{ width: 32 }} />
+                  </tr>
+                </thead>
+                <tbody>
+                  {state.rows.map((row, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '6px 4px' }}><input type="text" value={row.rol} onChange={e => updateRow(i, 'rol', e.target.value)} placeholder="ex: Agent vânzări" style={cellStyle} /></td>
+                      <td style={{ padding: '6px 4px' }}><input type="text" value={row.persoana} onChange={e => updateRow(i, 'persoana', e.target.value)} placeholder="ex: Ion Marin" style={cellStyle} /></td>
+                      <td style={{ padding: '6px 4px' }}><input type="text" value={row.ceFace} onChange={e => updateRow(i, 'ceFace', e.target.value)} placeholder="ce face concret" style={cellStyle} /></td>
+                      <td style={{ padding: '6px 4px' }}><input type="text" value={row.produs} onChange={e => updateRow(i, 'produs', e.target.value)} placeholder="bucățica măsurabilă" style={cellStyle} /></td>
+                      <td style={{ padding: '6px 4px', textAlign: 'center' }}>
+                        <button onClick={() => removeRow(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--fg-3)', padding: 4 }}>
+                          <Trash2 size={12} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <button onClick={addRow} style={{
+              marginTop: 8, display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px',
+              background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)',
+              borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--accent)', fontWeight: 600,
+            }}><Plus size={13} /> Adaugă rol</button>
+          </div>
+
+          <div style={{ marginBottom: 10 }}>
+            <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', display: 'block', marginBottom: 6 }}>
+              Cum se obține produsul funcției (sinteza fluxului)
+            </label>
+            <textarea value={state.flux} onChange={e => set({ flux: e.target.value })} rows={2}
+              placeholder="Ana face X → Ion face Y → împreună produc Z"
+              style={{ width: '100%', padding: '10px 12px', fontSize: 13, lineHeight: 1.6,
+                background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8,
+                color: 'var(--fg)', resize: 'vertical', boxSizing: 'border-box' }} />
+          </div>
+
+          <div style={{ padding: '10px 14px', background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.2)',
+            borderRadius: 8, fontSize: 11, color: 'var(--fg-2)', lineHeight: 1.6 }}>
+            ⚠ Șoferul, curățătoarea, agentul de pază — toți au un rol și un produs. Întreabă-te: ce se blochează dacă acest om lipsește 2 săptămâni?
+          </div>
+        </>
+      )}
+
+      {savedAt && (<div style={{ marginTop: 12, fontSize: 11, color: 'var(--accent)', textAlign: 'right' }}>Salvat automat ✓ {savedAt}</div>)}
+    </div>
+  );
+};
+
+// ─── Miro Organigramă (Ex.3) ──────────────────────────────────────────────────
+const MiroOrgExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({ template, storageKey }) => {
+  type State = { miroUrl: string; rosii: string; primaPozitie: string; schimbare: string };
+  const initial: State = { miroUrl: '', rosii: '', primaPozitie: '', schimbare: '' };
+  const [state, setState] = useState<State>(() => {
+    try { const s = localStorage.getItem(storageKey); return s ? { ...initial, ...JSON.parse(s) } : initial; } catch { return initial; }
+  });
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const set = (patch: Partial<State>) => {
+    const n = { ...state, ...patch }; setState(n);
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      localStorage.setItem(storageKey, JSON.stringify(n));
+      setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
+    }, 800);
+  };
+
+  const textStyle: React.CSSProperties = {
+    width: '100%', padding: '10px 12px', fontSize: 13, lineHeight: 1.6,
+    background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8,
+    color: 'var(--fg)', resize: 'vertical', boxSizing: 'border-box',
+  };
+
+  return (
+    <div>
+      <p style={{ fontSize: 13, color: 'var(--fg-3)', marginBottom: 14, lineHeight: 1.7 }}>{template.instructions}</p>
+
+      {/* CTA Miro */}
+      {template.miroTemplateUrl && (
+        <a href={template.miroTemplateUrl} target="_blank" rel="noopener noreferrer" style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+          padding: '14px 16px', background: 'linear-gradient(135deg, rgba(255,210,49,0.12), rgba(255,210,49,0.04))',
+          border: '1px solid rgba(255,210,49,0.3)', borderRadius: 12, textDecoration: 'none',
+          color: 'var(--fg)', marginBottom: 16, transition: 'all 0.15s',
+        }} onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,210,49,0.18), rgba(255,210,49,0.08))'; }}
+           onMouseLeave={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,210,49,0.12), rgba(255,210,49,0.04))'; }}>
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#FFD231', letterSpacing: '0.1em', marginBottom: 4 }}>TEMPLATE MIRO</div>
+            <div style={{ fontSize: 14, fontWeight: 600 }}>Deschide template-ul organigramei</div>
+            <div style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 2 }}>Copiază board-ul în contul tău și începe să desenezi</div>
+          </div>
+          <ChevronRight size={18} style={{ color: '#FFD231', flexShrink: 0 }} />
+        </a>
+      )}
+
+      {/* Cod de culori */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg)', marginBottom: 8 }}>Codul de culori obligatoriu</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {template.colorLegend?.map((c, i) => (
+            <div key={i} style={{
+              display: 'grid', gridTemplateColumns: '14px 1fr 2fr', gap: 10, alignItems: 'center',
+              padding: '8px 10px', background: 'var(--bg-3)', borderRadius: 8, border: '1px solid var(--border)',
+            }}>
+              <div style={{ width: 14, height: 14, borderRadius: 4, background: c.color, border: c.name === 'Gri punctat' ? '1.5px dashed var(--fg-3)' : 'none' }} />
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg)' }}>{c.name}</div>
+                <div style={{ fontSize: 10, color: 'var(--fg-3)' }}>{c.meaning}</div>
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--fg-2)' }}>{c.action}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Anatomie bloc */}
+      <div style={{ padding: 12, background: 'rgba(196,240,228,0.05)', border: '1px solid rgba(196,240,228,0.15)',
+        borderRadius: 8, fontSize: 11, color: 'var(--fg-2)', lineHeight: 1.7, marginBottom: 16 }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.08em', marginBottom: 6 }}>ANATOMIE BLOC</div>
+        FUNCȚIA: Marketing și Vânzări<br />
+        Rolul: Agent Vânzări<br />
+        Persoana: Maria Popescu<br />
+        Produs final: 10 contracte noi semnate / lună
+      </div>
+
+      {/* Input link */}
+      <div style={{ marginBottom: 14 }}>
+        <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', display: 'block', marginBottom: 6 }}>
+          Link-ul board-ului tău Miro (după ce ai copiat template-ul)
+        </label>
+        <input type="url" value={state.miroUrl} onChange={e => set({ miroUrl: e.target.value })}
+          placeholder="https://miro.com/app/board/..."
+          style={{ ...textStyle, padding: '9px 12px' }} />
+      </div>
+
+      {/* 3 întrebări reflexie */}
+      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg)', marginBottom: 10 }}>După ce ai construit ambele organigrame</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div>
+          <label style={{ fontSize: 12, color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>
+            1. Câte blocuri roșii ai? Ce funcții faci tu și nu ar trebui?
+          </label>
+          <textarea value={state.rosii} onChange={e => set({ rosii: e.target.value })} rows={2}
+            placeholder="Nr: ___   Funcțiile: ..." style={textStyle} />
+        </div>
+        <div>
+          <label style={{ fontSize: 12, color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>
+            2. Care e prima poziție goală pe care o angajezi — și de ce?
+          </label>
+          <textarea value={state.primaPozitie} onChange={e => set({ primaPozitie: e.target.value })} rows={2}
+            placeholder="Funcția: ...   De ce prima: ..." style={textStyle} />
+        </div>
+        <div>
+          <label style={{ fontSize: 12, color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>
+            3. Ce s-a schimbat cel mai mult între organigrama actuală și cea vizată?
+          </label>
+          <textarea value={state.schimbare} onChange={e => set({ schimbare: e.target.value })} rows={2}
+            placeholder="..." style={textStyle} />
+        </div>
+      </div>
+
+      {savedAt && (<div style={{ marginTop: 12, fontSize: 11, color: 'var(--accent)', textAlign: 'right' }}>Salvat automat ✓ {savedAt}</div>)}
+    </div>
+  );
+};
+
+// ─── Decision Matrix (Ex.5) ───────────────────────────────────────────────────
+const DecisionMatrixExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({ template, storageKey }) => {
+  type Role = { role: string; alone: string[]; manager: string[]; ceo: string[] };
+  const rolesCount = template.dmRolesCount || 2;
+  const initialRoles: Role[] = Array.from({ length: rolesCount }, () => ({ role: '', alone: [''], manager: [''], ceo: [''] }));
+  type State = { roles: Role[]; reflection: Record<string, string> };
+  const initial: State = { roles: initialRoles, reflection: {} };
+  const [state, setState] = useState<State>(() => {
+    try { const s = localStorage.getItem(storageKey); return s ? { ...initial, ...JSON.parse(s) } : initial; } catch { return initial; }
+  });
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showExample, setShowExample] = useState(false);
+
+  const save = (s: State) => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      localStorage.setItem(storageKey, JSON.stringify(s));
+      setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
+    }, 800);
+  };
+
+  const updateRole = (idx: number, patch: Partial<Role>) => {
+    const roles = state.roles.map((r, i) => i === idx ? { ...r, ...patch } : r);
+    const n = { ...state, roles }; setState(n); save(n);
+  };
+  const updateBullet = (idx: number, col: 'alone' | 'manager' | 'ceo', bIdx: number, val: string) => {
+    const bullets = state.roles[idx][col].map((b, i) => i === bIdx ? val : b);
+    updateRole(idx, { [col]: bullets } as Partial<Role>);
+  };
+  const addBullet = (idx: number, col: 'alone' | 'manager' | 'ceo') => {
+    updateRole(idx, { [col]: [...state.roles[idx][col], ''] } as Partial<Role>);
+  };
+  const removeBullet = (idx: number, col: 'alone' | 'manager' | 'ceo', bIdx: number) => {
+    const next = state.roles[idx][col].filter((_, i) => i !== bIdx);
+    updateRole(idx, { [col]: next.length ? next : [''] } as Partial<Role>);
+  };
+  const setReflection = (id: string, val: string) => {
+    const n = { ...state, reflection: { ...state.reflection, [id]: val } }; setState(n); save(n);
+  };
+
+  const colHeaders: { key: 'alone' | 'manager' | 'ceo'; label: string; color: string }[] = [
+    { key: 'alone', label: 'Decide SINGUR', color: '#4ade80' },
+    { key: 'manager', label: 'Decide MANAGERUL', color: '#fbbf24' },
+    { key: 'ceo', label: 'Decide CEO', color: '#f87171' },
+  ];
+
+  return (
+    <div>
+      <p style={{ fontSize: 13, color: 'var(--fg-3)', marginBottom: 14, lineHeight: 1.7 }}>{template.instructions}</p>
+
+      {/* Exemplu expandable */}
+      <button onClick={() => setShowExample(s => !s)} style={{
+        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '10px 14px', background: 'var(--bg-3)', border: '1px solid var(--border)',
+        borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--fg-2)', marginBottom: 14,
+      }}>
+        <span>📖 Exemplu complet — Agent vânzări, Designer, SMM Manager</span>
+        {showExample ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+      </button>
+      <AnimatePresence>
+        {showExample && template.dmExample && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+            style={{ overflow: 'hidden', marginBottom: 14 }}>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+                <thead>
+                  <tr>
+                    <th style={{ padding: '8px 6px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'var(--fg-3)', borderBottom: '1px solid var(--border)' }}>ROLUL</th>
+                    {colHeaders.map(c => (
+                      <th key={c.key} style={{ padding: '8px 6px', textAlign: 'left', fontSize: 10, fontWeight: 700, color: c.color, borderBottom: '1px solid var(--border)' }}>{c.label}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {template.dmExample.map((r, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '8px 6px', fontWeight: 600, color: 'var(--fg)', verticalAlign: 'top' }}>{r.role}</td>
+                      {colHeaders.map(c => (
+                        <td key={c.key} style={{ padding: '8px 6px', verticalAlign: 'top', color: 'var(--fg-2)' }}>
+                          {r[c.key].map((b, bi) => (<div key={bi} style={{ marginBottom: 2 }}>• {b}</div>))}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Alert */}
+      <div style={{ padding: '10px 14px', background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)',
+        borderRadius: 8, fontSize: 11, color: 'var(--fg-2)', lineHeight: 1.6, marginBottom: 16 }}>
+        ⚠ Dacă o decizie nu e scrisă în matrice — angajatul vine la tine. Fiecare decizie în coloana 1 = o întrebare mai puțin pe zi.
+      </div>
+
+      {/* Roluri */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 18 }}>
+        {state.roles.map((role, idx) => (
+          <div key={idx} style={{ padding: 14, background: 'var(--bg-3)', borderRadius: 12, border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--gold)', letterSpacing: '0.08em', marginBottom: 8 }}>
+              ROLUL #{idx + 1}
+            </div>
+            <input type="text" value={role.role} onChange={e => updateRole(idx, { role: e.target.value })}
+              placeholder="ex: Agent vânzări, Designer..."
+              style={{ width: '100%', padding: '10px 12px', fontSize: 14, fontWeight: 600,
+                background: 'var(--bg-2)', border: '1px solid var(--border)', borderRadius: 8,
+                color: 'var(--fg)', marginBottom: 14, boxSizing: 'border-box' }} />
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+              {colHeaders.map(c => (
+                <div key={c.key}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: c.color, letterSpacing: '0.08em', marginBottom: 6 }}>{c.label}</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {role[c.key].map((b, bi) => (
+                      <div key={bi} style={{ display: 'flex', gap: 4, alignItems: 'flex-start' }}>
+                        <span style={{ color: c.color, fontSize: 12, marginTop: 8 }}>•</span>
+                        <input type="text" value={b} onChange={e => updateBullet(idx, c.key, bi, e.target.value)}
+                          placeholder="decizie..."
+                          style={{ flex: 1, padding: '6px 8px', fontSize: 12, background: 'var(--bg-2)',
+                            border: '1px solid var(--border)', borderRadius: 6, color: 'var(--fg)', boxSizing: 'border-box' }} />
+                        <button onClick={() => removeBullet(idx, c.key, bi)} style={{
+                          background: 'none', border: 'none', cursor: 'pointer', color: 'var(--fg-3)', padding: 4, marginTop: 2,
+                        }}><Trash2 size={11} /></button>
+                      </div>
+                    ))}
+                    <button onClick={() => addBullet(idx, c.key)} style={{
+                      display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px',
+                      background: 'transparent', border: '1px dashed var(--border)', borderRadius: 6,
+                      cursor: 'pointer', fontSize: 10, color: 'var(--fg-3)', marginTop: 2,
+                    }}><Plus size={10} /> adaugă</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Reflecție */}
+      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg)', marginBottom: 10 }}>După implementare</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {template.dmReflection?.map(r => (
+          <div key={r.id}>
+            <label style={{ fontSize: 12, color: 'var(--fg-2)', display: 'block', marginBottom: 6 }}>{r.label}</label>
+            <textarea value={state.reflection[r.id] || ''} onChange={e => setReflection(r.id, e.target.value)}
+              placeholder={r.placeholder} rows={2}
+              style={{ width: '100%', padding: '10px 12px', fontSize: 13, lineHeight: 1.6,
+                background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8,
+                color: 'var(--fg)', resize: 'vertical', boxSizing: 'border-box' }} />
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: 14, padding: '10px 14px', background: 'rgba(248,113,113,0.06)',
+        border: '1px solid rgba(248,113,113,0.2)', borderRadius: 8, fontSize: 11, color: 'var(--fg-2)', lineHeight: 1.6 }}>
+        ⚠ <strong>Primul care respectă matricea ești tu.</strong> Dacă un angajat vine cu o decizie din coloana 1 — nu îi dai răspunsul. Îi spui: "După matrice, aceasta e decizia ta. Ce ai decis?"
+      </div>
+
+      {savedAt && (<div style={{ marginTop: 12, fontSize: 11, color: 'var(--accent)', textAlign: 'right' }}>Salvat automat ✓ {savedAt}</div>)}
+    </div>
+  );
+};
+
 // ─── Main ExerciseBlock ───────────────────────────────────────────────────────
 export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
   const { user } = useAuthContext();
@@ -2104,6 +2715,14 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
         return <TeamFeedbackReport storageKey={storageKey} />;
       case 'manifest-preview':
         return <ManifestPreview storageKey={storageKey} />;
+      case 'quiz-mcq':
+        return <QuizMCQExercise template={template} storageKey={storageKey} />;
+      case 'function-roles':
+        return <FunctionRolesExercise template={template} storageKey={storageKey} />;
+      case 'miro-org':
+        return <MiroOrgExercise template={template} storageKey={storageKey} />;
+      case 'decision-matrix':
+        return <DecisionMatrixExercise template={template} storageKey={storageKey} />;
       default:
         return <FormFieldsExercise template={template} storageKey={storageKey} />;
     }
@@ -2114,9 +2733,14 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
     'form-fields': 'Formular',
     'dynamic-table': 'Tabel interactiv',
     quiz: 'Chestionar',
+    'quiz-mcq': 'Quiz cu scor',
     'text-input': 'Formular',
     'rating-grid': 'Evaluare',
+    'function-roles': 'Funcție · Rol · Produs',
+    'miro-org': 'Organigramă Miro',
+    'decision-matrix': 'Matrice decizională',
   };
+
 
   return (
     <div style={{ padding: '0 0 4px' }}>

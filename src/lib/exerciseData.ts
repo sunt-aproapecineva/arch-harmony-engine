@@ -19,17 +19,50 @@ export interface FormField {
   addLabel?: string;
 }
 
+export interface MCQOption {
+  label: string;
+  correct: boolean;
+  explanation?: string;
+}
+
+export interface MCQSituation {
+  id: string;
+  title?: string;
+  text: string;
+  options: MCQOption[];
+}
+
+export interface DMExampleRow {
+  role: string;
+  alone: string[];
+  manager: string[];
+  ceo: string[];
+}
+
 export interface ExerciseTemplate {
   exerciseId: string;
   type: 'checklist' | 'form-fields' | 'quiz' | 'text-input' | 'rating-grid' | 'dynamic-table'
       | 'activity-audit' | 'bottleneck-map' | 'absence-test' | 'diagnostic-grid'
       | 'partnership-diagnostic'
-      | 'foundation-manifest' | 'quality-checklist' | 'team-feedback-report' | 'manifest-preview';
+      | 'foundation-manifest' | 'quality-checklist' | 'team-feedback-report' | 'manifest-preview'
+      | 'quiz-mcq' | 'function-roles' | 'miro-org' | 'decision-matrix';
   title: string;
   instructions: string;
   items?: ChecklistItem[];
   fields?: FormField[];
   questions?: QuizQuestionItem[];
+  // quiz-mcq
+  situations?: MCQSituation[];
+  scoringTiers?: { min: number; max: number; label: string; tone: 'good' | 'ok' | 'bad' }[];
+  // miro-org
+  miroTemplateUrl?: string;
+  colorLegend?: { color: string; name: string; meaning: string; action: string }[];
+  // decision-matrix
+  dmExample?: DMExampleRow[];
+  dmRolesCount?: number;
+  dmReflection?: { id: string; label: string; placeholder?: string }[];
+  // function-roles
+  functionOptions?: { value: string; label: string; sampleProduct: string }[];
 }
 
 export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
@@ -739,6 +772,219 @@ export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
     title: 'Manifestul Fundației · Livrabil Final',
     instructions:
       'Aceasta este pagina ta A4. Se populează automat din răspunsurile tale din Exercițiul 1. Tipărește-o. Pune-o pe peretele biroului tău. E fundația pe care construim tot ce urmează.',
+  },
+
+  // ─── SĂPTĂMÂNA 3 — Etapa 2 · Pereții Portanți ─────────────────────────────────
+
+  // e-2-1: Funcția, Rolul și Produsul final → function-roles
+  {
+    exerciseId: 'e-2-1',
+    type: 'function-roles',
+    title: 'Funcția, Rolul și Produsul final',
+    instructions:
+      'Citește mai întâi explicația și exemplele. Apoi alege una din cele 7 funcții și completează rolurile, persoanele și produsele pentru firma ta.',
+    functionOptions: [
+      { value: '1', label: '1. Conducere / Strategie', sampleProduct: 'Direcție clară, decizii majore luate la timp, viziune comunicată echipei.' },
+      { value: '2', label: '2. Marketing și Vânzări', sampleProduct: 'Clienți noi plătitori și venituri lunare conform targetului.' },
+      { value: '3', label: '3. Financiar / Contabilitate', sampleProduct: 'Cash-flow pozitiv, plăți la termen, rapoarte financiare lunare exacte.' },
+      { value: '4', label: '4. Producție / Serviciu', sampleProduct: 'Produs sau serviciu livrat la calitate, la termen și la costul planificat.' },
+      { value: '5', label: '5. Calitate / Mulțumire Client', sampleProduct: 'Clienți mulțumiți care revin și recomandă — NPS ≥ țintă.' },
+      { value: '6', label: '6. HR / Resurse Umane', sampleProduct: 'Echipă completă, motivată, cu fluctuație < țintă și roluri acoperite.' },
+      { value: '7', label: '7. Dezvoltare / Extindere', sampleProduct: 'Produse, piețe sau canale noi lansate conform planului anual.' },
+    ],
+  },
+
+  // e-2-2: Quiz Organigramă → quiz-mcq (5 situații, 4 opțiuni)
+  {
+    exerciseId: 'e-2-2',
+    type: 'quiz-mcq',
+    title: 'Quiz · Înțelegi organigrama?',
+    instructions:
+      'Citește fiecare situație și bifează răspunsul pe care îl crezi corect. La final vezi scorul și explicațiile.',
+    scoringTiers: [
+      { min: 5, max: 5, label: 'Excelent. Ai înțeles organigrama complet.', tone: 'good' },
+      { min: 3, max: 4, label: 'Bine. Recitește secțiunile unde ai greșit din Lecția 6.', tone: 'ok' },
+      { min: 0, max: 2, label: 'Revezi Lecția 6 înainte de a construi organigrama.', tone: 'bad' },
+    ],
+    situations: [
+      {
+        id: 's1',
+        title: 'Situația 1 — Cum construiești organigrama',
+        text: 'Ai o firmă de 5 oameni. Maria face vânzări și contabilitate. Ion face livrări și HR. Tu faci tot restul. Cum construiești organigrama?',
+        options: [
+          { label: 'Pui 5 blocuri — unul pentru fiecare om din firmă.', correct: false, explanation: 'Greșit — construiești în jurul oamenilor, nu al funcțiilor. Când pleacă unul, totul se prăbușește.' },
+          { label: 'Pui cele 7 funcții de bază. Lângă fiecare funcție scrii cine o face acum — chiar dacă un om apare la mai multe funcții.', correct: true, explanation: 'Corect. Funcțiile sunt stabile, oamenii se schimbă. Vezi clar suprapunerile.' },
+          { label: 'Pui doar funcțiile care sunt ocupate — cele goale nu au rost să apară.', correct: false, explanation: 'Greșit — funcțiile goale sunt exact lista ta de angajări viitoare.' },
+          { label: 'Pui 3 blocuri: tu, Maria și Ion — că așa sunt oamenii.', correct: false, explanation: 'Greșit — asta nu e organigramă, e listă de oameni.' },
+        ],
+      },
+      {
+        id: 's2',
+        title: 'Situația 2 — Funcția sau omul?',
+        text: 'Angajatul tău cel mai bun, Ion, pleacă din firmă. Organigrama ta era construită în jurul lui — el era în 3 blocuri. Ce se întâmplă?',
+        options: [
+          { label: 'Nimic — organigrama rămâne valabilă. Pui alt nume în locul lui Ion.', correct: false, explanation: 'Doar dacă funcțiile erau definite. Dacă blocurile erau "Ion", nu funcții — nu ai cum să pui alt nume.' },
+          { label: 'Organigrama se prăbușește — era construită în jurul lui Ion, nu al funcțiilor.', correct: true, explanation: 'Corect. De aceea organigrama trebuie pe funcții, nu pe persoane.' },
+          { label: 'Ștergi cele 3 blocuri și refaci organigrama de la zero.', correct: false, explanation: 'Greșit — funcțiile nu dispar pentru că omul a plecat.' },
+          { label: 'Organigrama nu contează — oamenii își știu treaba oricum.', correct: false, explanation: 'Greșit. Fără organigramă nu știi cine răspunde de ce când apare o problemă.' },
+        ],
+      },
+      {
+        id: 's3',
+        title: 'Situația 3 — Actuală vs. vizată',
+        text: 'Un antreprenor a făcut o singură organigramă — cea vizată, cum vrea să fie firma în 3 ani. Ce problemă are?',
+        options: [
+          { label: 'Nicio problemă — e mai bine să te concentrezi pe viitor.', correct: false, explanation: 'Greșit — fără punct de pornire nu poți măsura progresul.' },
+          { label: 'Nu știe de unde pornește. Fără organigrama actuală nu poate măsura distanța și nu știe care e primul pas.', correct: true, explanation: 'Corect. Ai nevoie de ambele — actuală (de unde pornești) și vizată (unde mergi).' },
+          { label: 'Trebuia să facă mai întâi organigrama vizată și după cea actuală.', correct: false, explanation: 'Ordinea nu e atât de importantă — important e să existe ambele.' },
+          { label: 'Organigrama vizată nu e necesară — ajunge cea actuală.', correct: false, explanation: 'Greșit — fără cea vizată nu știi în ce direcție recrutezi.' },
+        ],
+      },
+      {
+        id: 's4',
+        title: 'Situația 4 — Codul de culori',
+        text: 'În organigrama ta actuală, blocul Marketing și Vânzări e marcat cu roșu. Ce înseamnă asta?',
+        options: [
+          { label: 'Roșu înseamnă că departamentul merge prost. Trebuie să îmbunătățești vânzările.', correct: false, explanation: 'Greșit — roșul nu e indicator de performanță în acest cod.' },
+          { label: 'Roșu înseamnă că tu ocupi această funcție acum. Prioritatea ta e să găsești pe cineva care să o preia.', correct: true, explanation: 'Corect. Roșu = TU ești acolo. Prioritatea ta: înlocuitor.' },
+          { label: 'Roșu înseamnă că funcția e goală — nu are nimeni asignat.', correct: false, explanation: 'Greșit — funcția goală e marcată cu gri punctat.' },
+          { label: 'Roșu înseamnă că un om face mai multe funcții simultan.', correct: false, explanation: 'Asta e portocaliu — un om suprapus pe mai multe funcții.' },
+        ],
+      },
+      {
+        id: 's5',
+        title: 'Situația 5 — Pozițiile goale',
+        text: 'În organigrama vizată ai 4 blocuri marcate cu gri punctat. Cum interpretezi asta?',
+        options: [
+          { label: 'Organigrama e incompletă — trebuie să o refaci când ai toți oamenii.', correct: false, explanation: 'Greșit — organigrama vizată ARE pozițiile goale. Asta e scopul ei.' },
+          { label: 'Cele 4 poziții goale sunt lista ta de angajări viitoare. Știi exact ce să recrutezi și în ce ordine.', correct: true, explanation: 'Corect. Pozițiile goale sunt planul tău de recrutare.' },
+          { label: 'Gri înseamnă că acele funcții nu sunt necesare firmei tale.', correct: false, explanation: 'Greșit — dacă nu erau necesare, nu apăreau în organigrama vizată.' },
+          { label: 'Trebuie să angajezi urgent toți 4 oamenii înainte să lansezi organigrama.', correct: false, explanation: 'Greșit — angajezi în ordinea priorității, nu toți deodată.' },
+        ],
+      },
+    ],
+  },
+
+  // e-2-3: Organigrama în Miro → miro-org
+  {
+    exerciseId: 'e-2-3',
+    type: 'miro-org',
+    title: 'Construiește organigrama firmei tale în Miro',
+    instructions:
+      'Deschizi template-ul Miro de mai jos, îl copiezi în contul tău și construiești 2 organigrame — actuală și vizată. Codul de culori este obligatoriu. Fiecare bloc conține: Rolul + Persoana + Produsul final.',
+    miroTemplateUrl: 'https://miro.com/app/board/uXjVHMYB6CI=/?share_link_id=356253360599',
+    colorLegend: [
+      { color: '#1F6B3A', name: 'Verde închis', meaning: 'Conducere — tu', action: 'Ești CEO. Apari doar aici.' },
+      { color: '#4ADE80', name: 'Verde', meaning: 'Funcție ocupată OK', action: 'Un om dedicat, cu produs final clar.' },
+      { color: '#EF4444', name: 'Roșu', meaning: 'Tu ești acolo acum', action: 'Prioritatea ta: găsești un înlocuitor.' },
+      { color: '#F59E0B', name: 'Portocaliu', meaning: 'Un om, mai multe funcții', action: 'Supraîncărcat — clarifici sau angajezi.' },
+      { color: '#9CA3AF', name: 'Gri punctat', meaning: 'Funcție lipsă', action: 'Lista ta de angajări viitoare.' },
+    ],
+  },
+
+  // e-2-4: Quiz Linii → quiz-mcq (6 situații, 2 opțiuni — binar)
+  {
+    exerciseId: 'e-2-4',
+    type: 'quiz-mcq',
+    title: 'Quiz · Linii de conducere sau comunicare directă?',
+    instructions:
+      'Linie de CONDUCERE: între CEO/manager și echipă (obiective, instrucțiuni, raportări). Linie de COMUNICARE DIRECTĂ: între două funcții, fără să treacă prin șefi (probleme zilnice). Decide pentru fiecare situație.',
+    scoringTiers: [
+      { min: 6, max: 6, label: 'Perfect. Știi exact cum circulă informația în firmă.', tone: 'good' },
+      { min: 4, max: 5, label: 'Bine. Revezi definițiile de mai sus.', tone: 'ok' },
+      { min: 0, max: 3, label: 'Recitește secțiunea despre linii din Lecția 6.', tone: 'bad' },
+    ],
+    situations: [
+      {
+        id: 'l1',
+        title: 'Situația 1',
+        text: 'Directorul de vânzări îi spune agentului: "Obiectivul tău pe luna aceasta este 15 contracte noi."',
+        options: [
+          { label: 'Linie de CONDUCERE', correct: true, explanation: 'Director → Agent, obiectiv setat de sus în jos.' },
+          { label: 'Linie de COMUNICARE DIRECTĂ', correct: false },
+        ],
+      },
+      {
+        id: 'l2',
+        title: 'Situația 2',
+        text: 'Agentul de vânzări îi scrie contabilului: "Am nevoie de extrasul de cont al clientului X pentru întâlnirea de mâine."',
+        options: [
+          { label: 'Linie de CONDUCERE', correct: false },
+          { label: 'Linie de COMUNICARE DIRECTĂ', correct: true, explanation: 'Două funcții la același nivel rezolvă o problemă zilnică, fără șefi.' },
+        ],
+      },
+      {
+        id: 'l3',
+        title: 'Situația 3',
+        text: 'Agentul de vânzări îi raportează managerului: "Am încheiat 12 contracte luna aceasta, mai am 3 în negociere."',
+        options: [
+          { label: 'Linie de CONDUCERE', correct: true, explanation: 'Raportare de jos în sus pe linia ierarhică.' },
+          { label: 'Linie de COMUNICARE DIRECTĂ', correct: false },
+        ],
+      },
+      {
+        id: 'l4',
+        title: 'Situația 4',
+        text: 'Managerul de producție îi cere depozitarului: "Verifică stocul de materie primă și spune-mi câți avem."',
+        options: [
+          { label: 'Linie de CONDUCERE', correct: false },
+          { label: 'Linie de COMUNICARE DIRECTĂ', correct: true, explanation: 'Operațional zilnic, între două funcții care colaborează.' },
+        ],
+      },
+      {
+        id: 'l5',
+        title: 'Situația 5',
+        text: 'Designerul îi trimite marketerului fișierele pentru campania de săptămâna viitoare.',
+        options: [
+          { label: 'Linie de CONDUCERE', correct: false },
+          { label: 'Linie de COMUNICARE DIRECTĂ', correct: true, explanation: 'Predare de livrabil între două funcții la același nivel.' },
+        ],
+      },
+      {
+        id: 'l6',
+        title: 'Situația 6',
+        text: 'CEO-ul anunță echipa: "De luna viitoare schimbăm strategia de preț — reducerile maxime sunt de 10%."',
+        options: [
+          { label: 'Linie de CONDUCERE', correct: true, explanation: 'Decizie strategică transmisă de CEO către întreaga echipă.' },
+          { label: 'Linie de COMUNICARE DIRECTĂ', correct: false },
+        ],
+      },
+    ],
+  },
+
+  // e-2-5: Matricea decizională → decision-matrix
+  {
+    exerciseId: 'e-2-5',
+    type: 'decision-matrix',
+    title: 'Matricea decizională — cine decide ce în firma ta',
+    instructions:
+      'Studiază exemplul complet. Apoi completează matricea pentru 2 roluri din firma ta. Pentru fiecare rol scrii ce decizii ia singur, ce trec prin manager, ce ajung la CEO.',
+    dmRolesCount: 2,
+    dmExample: [
+      {
+        role: 'Agent vânzări',
+        alone: ['Reducere până la 5%', 'Reprogramează o întâlnire', 'Trimite oferta standard'],
+        manager: ['Reducere 5–15%', 'Condiții speciale client', 'Prelungește termen plată'],
+        ceo: ['Reducere peste 15%', 'Refuză un client', 'Contract nou strategic'],
+      },
+      {
+        role: 'Designer',
+        alone: ['Alege fontul și culorile', 'Cere feedback intern', 'Revizuiește un design'],
+        manager: ['Livrează design spre client', 'Schimbă direcția vizuală', 'Refuză o revizie client'],
+        ceo: ['Schimbă brandul vizual', 'Cumpără soft nou (>500€)', 'Externalizează design'],
+      },
+      {
+        role: 'SMM Manager',
+        alone: ['Postează conform calendarului', 'Răspunde la comentarii', 'Alege ora de postare'],
+        manager: ['Schimbă formatul conținutului', 'Răspunde la criză de imagine', 'Activează reclame plătite'],
+        ceo: ['Schimbă strategia de brand', 'Buget reclame >1.000€', 'Colaborare influenceri'],
+      },
+    ],
+    dmReflection: [
+      { id: 'r1', label: 'Cum a reacționat echipa când ai prezentat matricea?', placeholder: 'Reacția lor inițială, întrebări, rezistențe...' },
+      { id: 'r2', label: 'Ce decizii au continuat să vină la tine deși erau în coloana 1?', placeholder: 'Listează deciziile care încă urcă la tine...' },
+      { id: 'r3', label: 'Câte întrebări pe zi ai eliminat după prima săptămână?', placeholder: 'Estimare: ___ întrebări/zi mai puțin' },
+    ],
   },
 ];
 

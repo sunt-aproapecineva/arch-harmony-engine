@@ -449,26 +449,42 @@ export const MODULES: Module[] = [
       {
         id: 'e-2-1',
         module_id: 'mod-2',
-        title: 'Organigrama Actuală',
+        title: 'Funcția, Rolul și Produsul final',
         description:
-          'Desenezi cu NUME REALE, nu cu titluri ideale. Incluzi toate rolurile pe care le porți TU personal — vei vedea 4–5 ori același nume. Marchezi: cine răspunde de ce, cine nu răspunde de nimic.',
+          'Alegi una din cele 7 funcții obligatorii și completezi rolurile, persoanele și produsele pentru firma ta. Înveți să distingi funcția (există în organigramă) de rol (cine o ocupă acum).',
         order_index: 1,
       },
       {
         id: 'e-2-2',
         module_id: 'mod-2',
-        title: 'Organigrama Finală la 3 ani',
+        title: 'Quiz · Înțelegi organigrama?',
         description:
-          'Cum trebuie să arate compania ta când ajungi la viziunea din Etapa 1. Toate căsuțele, chiar dacă acum sunt goale. Orice rol gol are un termen estimat de acoperire.',
+          '5 situații cu scor. Testezi dacă ai înțeles cum se construiește organigrama, codul de culori, diferența între actuală și vizată.',
         order_index: 2,
       },
       {
         id: 'e-2-3',
         module_id: 'mod-2',
-        title: 'Fișele de Rol pentru 3 Poziții Pilot',
+        title: 'Construiește organigrama firmei tale în Miro',
         description:
-          'Alegi cele 3 poziții care te dor cel mai tare. Pentru fiecare: scop, responsabilități, rezultate așteptate, 3–5 indicatori, decizii pe care le poate lua SINGUR fără să vină la tine.',
+          'Folosești template-ul Miro pregătit. Desenezi 2 organigrame — actuală și vizată — cu codul de culori obligatoriu și cu Rol + Persoană + Produs final în fiecare bloc.',
         order_index: 3,
+      },
+      {
+        id: 'e-2-4',
+        module_id: 'mod-2',
+        title: 'Quiz · Linii de conducere sau de comunicare directă?',
+        description:
+          '6 situații cu scor. Înveți să distingi când informația circulă pe linie ierarhică (obiective, raportări) și când merge direct între roluri (probleme zilnice).',
+        order_index: 4,
+      },
+      {
+        id: 'e-2-5',
+        module_id: 'mod-2',
+        title: 'Matricea decizională — cine decide ce',
+        description:
+          'Pentru 2 roluri din firma ta: ce decizii ia singur, ce trec prin manager, ce ajung la tine. Fiecare decizie pe coloana 1 = o întrebare mai puțin pe zi.',
+        order_index: 5,
       },
     ],
   },
