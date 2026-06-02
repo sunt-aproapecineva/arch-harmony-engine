@@ -2616,9 +2616,18 @@ const DecisionMatrixExercise: React.FC<{ template: ExerciseTemplate; storageKey:
       {/* Roluri */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 18 }}>
         {state.roles.map((role, idx) => (
-          <div key={idx} style={{ padding: 14, background: 'var(--bg-3)', borderRadius: 12, border: '1px solid var(--border)' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--gold)', letterSpacing: '0.08em', marginBottom: 8 }}>
-              ROLUL #{idx + 1}
+          <div key={idx} style={{ padding: 14, background: 'var(--bg-3)', borderRadius: 12, border: '1px solid var(--border)', position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--gold)', letterSpacing: '0.08em' }}>
+                ROLUL #{idx + 1}
+              </div>
+              {state.roles.length > 1 && (
+                <button onClick={() => removeRole(idx)} title="Șterge rolul" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4, background: 'transparent',
+                  border: '1px solid var(--border)', color: 'var(--fg-3)', borderRadius: 6,
+                  padding: '4px 8px', cursor: 'pointer', fontSize: 10,
+                }}><Trash2 size={11} /> șterge rol</button>
+              )}
             </div>
             <input type="text" value={role.role} onChange={e => updateRole(idx, { role: e.target.value })}
               placeholder="ex: Agent vânzări, Designer..."
