@@ -440,7 +440,7 @@ export const MODULES: Module[] = [
           'Continuarea lecției despre cele 7 funcții obligatorii: aplicare practică și exemple.',
         video_url: 'https://youtu.be/xBzMNDdn5qU',
         pdf_url: '',
-        duration_min: 12,
+        duration_min: 31,
         order_index: 3,
         is_published: true,
       },
