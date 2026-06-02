@@ -423,12 +423,12 @@ export const MODULES: Module[] = [
       {
         id: 'l-2-2',
         module_id: 'mod-2',
-        title: 'Cele 7 funcții obligatorii ale oricărei companii',
+        title: 'Organigrama',
         description:
           'De la 5 la 500 de angajați, aceleași 7 funcții există. Cum le identifici și cum le acoperi în stadiul tău actual.',
         video_url: 'https://youtu.be/qSiLBz9nwIU',
         pdf_url: '',
-        duration_min: 12,
+        duration_min: 46,
         order_index: 2,
         is_published: true,
       },
