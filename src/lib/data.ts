@@ -411,12 +411,12 @@ export const MODULES: Module[] = [
       {
         id: 'l-2-1',
         module_id: 'mod-2',
-        title: 'Cum se desenează o organigramă reală',
+        title: 'Produsul final al fiecărei funcții.',
         description:
           'De ce desenezi VIITORUL, nu prezentul. Organigrama actuală vs organigrama la 3 ani.',
         video_url: 'https://youtu.be/9ZOKyML5_pk',
         pdf_url: '',
-        duration_min: 14,
+        duration_min: 60,
         order_index: 1,
         is_published: true,
       },
