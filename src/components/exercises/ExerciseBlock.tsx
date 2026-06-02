@@ -2665,6 +2665,15 @@ const DecisionMatrixExercise: React.FC<{ template: ExerciseTemplate; storageKey:
         ))}
       </div>
 
+      {/* Adaugă rol */}
+      <button onClick={addRole} style={{
+        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+        padding: '12px 14px', background: 'var(--gold-dim)', border: '1px dashed var(--gold)',
+        borderRadius: 10, cursor: 'pointer', fontSize: 12, fontWeight: 600,
+        color: 'var(--gold)', marginBottom: 18,
+      }}><Plus size={13} /> Adaugă încă un rol</button>
+
+
       {/* Reflecție */}
       <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg)', marginBottom: 10 }}>După implementare</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
