@@ -516,7 +516,7 @@ export const MODULES: Module[] = [
           'Pentru 2 roluri din firma ta: ce decide singur, ce trec prin manager, ce ajung la tine.',
         video_url: '',
         duration_min: 25,
-        order_index: 8,
+        order_index: 9,
         is_published: true,
         type: 'exercise',
         exercise_id: 'e-2-5',
