@@ -490,7 +490,7 @@ export const MODULES: Module[] = [
           'Folosești template-ul Miro. 2 organigrame — actuală și vizată — cu codul de culori obligatoriu.',
         video_url: '',
         duration_min: 45,
-        order_index: 6,
+        order_index: 7,
         is_published: true,
         type: 'exercise',
         exercise_id: 'e-2-3',
