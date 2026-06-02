@@ -503,7 +503,7 @@ export const MODULES: Module[] = [
           '6 situații cu scor. Înveți să distingi linia ierarhică de comunicarea directă.',
         video_url: '',
         duration_min: 10,
-        order_index: 7,
+        order_index: 8,
         is_published: true,
         type: 'exercise',
         exercise_id: 'e-2-4',
