@@ -477,7 +477,7 @@ export const MODULES: Module[] = [
           '5 situații cu scor. Testezi codul de culori, diferența între actuală și vizată.',
         video_url: '',
         duration_min: 10,
-        order_index: 5,
+        order_index: 6,
         is_published: true,
         type: 'exercise',
         exercise_id: 'e-2-2',
