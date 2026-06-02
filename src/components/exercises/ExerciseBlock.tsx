@@ -2543,6 +2543,15 @@ const DecisionMatrixExercise: React.FC<{ template: ExerciseTemplate; storageKey:
     const next = state.roles[idx][col].filter((_, i) => i !== bIdx);
     updateRole(idx, { [col]: next.length ? next : [''] } as Partial<Role>);
   };
+  const addRole = () => {
+    const n = { ...state, roles: [...state.roles, { role: '', alone: [''], manager: [''], ceo: [''] }] };
+    setState(n); save(n);
+  };
+  const removeRole = (idx: number) => {
+    if (state.roles.length <= 1) return;
+    const n = { ...state, roles: state.roles.filter((_, i) => i !== idx) };
+    setState(n); save(n);
+  };
   const setReflection = (id: string, val: string) => {
     const n = { ...state, reflection: { ...state.reflection, [id]: val } }; setState(n); save(n);
   };
