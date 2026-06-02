@@ -464,7 +464,7 @@ export const MODULES: Module[] = [
           'Alegi una din cele 7 funcții obligatorii și completezi rolurile, persoanele și produsele pentru firma ta.',
         video_url: '',
         duration_min: 20,
-        order_index: 4,
+        order_index: 5,
         is_published: true,
         type: 'exercise',
         exercise_id: 'e-2-1',
