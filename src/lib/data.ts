@@ -435,12 +435,12 @@ export const MODULES: Module[] = [
       {
         id: 'l-2-2b',
         module_id: 'mod-2',
-        title: 'Cele 7 funcții obligatorii — partea 2',
+        title: 'Matricea decizională',
         description:
           'Continuarea lecției despre cele 7 funcții obligatorii: aplicare practică și exemple.',
-        video_url: 'https://youtu.be/xBzMNDdn5qU',
+        video_url: 'https://youtu.be/UYzWC4ciDeM',
         pdf_url: '',
-        duration_min: 31,
+        duration_min: 25,
         order_index: 3,
         is_published: true,
       },
