@@ -608,8 +608,46 @@ export const MODULES: Module[] = [
         order_index: 4,
         is_published: false,
       },
+      {
+        id: 'l-3-ex-6',
+        module_id: 'mod-3',
+        title: 'Primul tău SOP documentat',
+        description:
+          'Alegi UN proces de bază și îl documentezi complet cu cele 5 componente ale unui SOP. Pentru forma tipăribilă folosește documentul "SOP — Procedură Standard" din Documente.',
+        video_url: '',
+        duration_min: 35,
+        order_index: 5,
+        is_published: true,
+        type: 'exercise',
+        exercise_id: 'e-3-6',
+      },
+      {
+        id: 'l-3-ex-7',
+        module_id: 'mod-3',
+        title: 'Harta completă a proceselor firmei tale',
+        description:
+          'Minim 5 procese identificate pe cele 7 funcții, fiecare cu tipul SOP (Liniar/Decizional) și prioritatea (Critică/Înaltă/Medie).',
+        video_url: '',
+        duration_min: 25,
+        order_index: 6,
+        is_published: true,
+        type: 'exercise',
+        exercise_id: 'e-3-7',
+      },
+      {
+        id: 'l-3-ex-8',
+        module_id: 'mod-3',
+        title: 'Primul tău flux vizual în Miro',
+        description:
+          'Vizualizezi SOP-ul ca flux pe coloane per rol în Miro. Livrabil: link-ul board-ului Miro completat.',
+        video_url: '',
+        duration_min: 30,
+        order_index: 7,
+        is_published: true,
+        type: 'exercise',
+        exercise_id: 'e-3-8',
+      },
 
-    ],
     exercises: [
       {
         id: 'e-3-1',
