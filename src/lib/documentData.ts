@@ -1376,4 +1376,18 @@ export const PLATFORM_DOCUMENTS: PlatformDocument[] = [
     steps: doc3Steps,
     generate: generateDoc3,
   },
+  {
+    id: 'sop-procedura',
+    lessonIds: ['l-3-2', 'l-3-4'],
+    docNumber: '04',
+    title: 'SOP · Procedură Standard de Operare',
+    shortTitle: 'SOP — Procedură Standard',
+    description:
+      'Template tipăribil pentru documentarea unui proces: identificare, scop, roluri, pași (Nr/Responsabil/Acțiune/Output) și criteriu de calitate. Companion pentru Exercițiul „Primul SOP documentat" din Săptămâna 4.',
+    downloadUrl: '',
+    topic: 'Instalațiile',
+    color: 'green',
+    steps: doc4Steps,
+    generate: generateDoc4,
+  },
 ];
