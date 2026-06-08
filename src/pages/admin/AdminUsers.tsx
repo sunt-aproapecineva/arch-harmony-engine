@@ -223,7 +223,18 @@ export const AdminUsers: React.FC = () => {
               <div key={entry.email} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 8 }}>
                 <span style={{ fontSize: 13, color: 'var(--fg)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: 8 }}>{entry.email}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                  <TariffBadge tariff={entry.tariff} compact />
+                  {(() => { const tc = tariffColor(entry.tariff); return (
+                    <select
+                      value={entry.tariff}
+                      onChange={e => handleChangeWhitelistTariff(entry.email, e.target.value as Tariff)}
+                      title="Schimbă tariful"
+                      style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 99, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, cursor: 'pointer', appearance: 'none', outline: 'none' }}>
+                      {TARIFF_OPTIONS.map(opt => (
+                        <option key={opt.value} value={opt.value} style={{ background: '#0D0907', color: 'var(--fg)' }}>{opt.label}</option>
+                      ))}
+                    </select>
+                  ); })()}
+
                   <button onClick={() => handleCopyLink(entry.email)} title="Copiază link de înregistrare"
                     style={{ padding: '3px 10px', borderRadius: 6, fontSize: 11, cursor: 'pointer', border: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, background: copiedLink === entry.email ? 'rgba(74,222,128,0.15)' : 'rgba(196,240,228,0.08)', color: copiedLink === entry.email ? '#4ade80' : 'var(--accent)' }}>
                     <Link2 size={11} />{copiedLink === entry.email ? 'Copiat!' : 'Link'}
