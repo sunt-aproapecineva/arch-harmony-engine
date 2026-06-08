@@ -292,9 +292,19 @@ export const AdminUsers: React.FC = () => {
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--fg-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</div>
                   </div>
-                  <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 99, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, whiteSpace: 'nowrap', justifySelf: 'start' }}>
-                    {user.tariff.charAt(0).toUpperCase() + user.tariff.slice(1)}
-                  </span>
+                  <select
+                    value={user.tariff}
+                    onClick={e => e.stopPropagation()}
+                    onChange={e => handleChangeTariff(user, e.target.value as Tariff)}
+                    title="Schimbă tariful"
+                    style={{ fontSize: 10, fontWeight: 700, padding: '4px 8px', borderRadius: 99, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, cursor: 'pointer', appearance: 'none', justifySelf: 'start', outline: 'none' }}>
+                    {TARIFF_OPTIONS.map(opt => (
+                      <option key={opt.value} value={opt.value} style={{ background: '#0D0907', color: 'var(--fg)' }}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+
                   <div style={{ fontSize: 11, color: 'var(--fg-3)' }}>{user.last_activity ? timeAgo(user.last_activity) : '—'}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <div style={{ flex: 1, height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
