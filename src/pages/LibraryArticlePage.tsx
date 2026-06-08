@@ -6,9 +6,11 @@ import { ArrowLeft, Clock, BookOpen, Quote, AlertTriangle, CheckCircle2, XCircle
 import { useAuthContext } from '../context/AuthContext';
 import { getLibraryItem } from '../lib/libraryData';
 import { HiringArticle } from './library/articles/HiringArticle';
+import { MiroFluxuriArticle } from './library/articles/MiroFluxuriArticle';
 
 const REGISTRY: Record<string, React.FC> = {
   'cum-angajam-corect': HiringArticle,
+  'ghid-miro-fluxuri': MiroFluxuriArticle,
 };
 
 export const LibraryArticlePage: React.FC = () => {
