@@ -647,8 +647,9 @@ export const MODULES: Module[] = [
         type: 'exercise',
         exercise_id: 'e-3-8',
       },
-
+    ],
     exercises: [
+
       {
         id: 'e-3-1',
         module_id: 'mod-3',
