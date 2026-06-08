@@ -521,6 +521,19 @@ export const MODULES: Module[] = [
         type: 'exercise',
         exercise_id: 'e-2-5',
       },
+      {
+        id: 'l-2-ex-6',
+        module_id: 'mod-2',
+        title: 'Profilul primei angajări',
+        description:
+          'Pornind de la organigrama vizată, definești complet prima poziție: profil, anunț cu cele 4 componente, plan de integrare, pregătirea locului de muncă.',
+        video_url: '',
+        duration_min: 30,
+        order_index: 10,
+        is_published: true,
+        type: 'exercise',
+        exercise_id: 'e-2-6',
+      },
     ],
     exercises: [
       {
@@ -533,6 +546,7 @@ export const MODULES: Module[] = [
       },
     ],
   },
+
   {
     id: 'mod-3',
     title: 'Instalațiile',
