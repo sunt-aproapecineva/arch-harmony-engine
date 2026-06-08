@@ -522,7 +522,16 @@ export const MODULES: Module[] = [
         exercise_id: 'e-2-5',
       },
     ],
-    exercises: [],
+    exercises: [
+      {
+        id: 'e-2-6',
+        module_id: 'mod-2',
+        title: 'Profilul primei angajări',
+        description:
+          'Săptămâna 4 · Lecția 8. Pornind de la organigrama vizată, definești complet prima poziție: profil, anunț de angajare cu cele 4 componente, plan de integrare cu primele 5 sarcini și pregătirea locului de muncă.',
+        order_index: 1,
+      },
+    ],
   },
   {
     id: 'mod-3',
@@ -626,6 +635,30 @@ export const MODULES: Module[] = [
         description:
           'Dai instrucțiunea unui coleg sau prieten care NU lucrează în acel rol. El o execută doar pe baza documentului tău, fără să te întrebe nimic. Dacă pune o singură întrebare de tip "dar dacă..." — instrucțiunea are găuri. Refaci până când se poate executa fără nicio întrebare adresată ție.',
         order_index: 5,
+      },
+      {
+        id: 'e-3-6',
+        module_id: 'mod-3',
+        title: 'Primul tău SOP documentat',
+        description:
+          'Săptămâna 4 · Lecția 9. Alegi UN proces de bază și îl documentezi complet cu cele 5 componente ale unui SOP: titlu + responsabil + versiune, scop, roluri, pași (Nr/Resp/Acțiune/Output), criteriu de calitate. Pentru forma tipăribilă folosește documentul "SOP — Procedură Standard" din Documente.',
+        order_index: 6,
+      },
+      {
+        id: 'e-3-7',
+        module_id: 'mod-3',
+        title: 'Harta completă a proceselor firmei tale',
+        description:
+          'Săptămâna 4 · Lecția 10. Construiești o hartă completă a proceselor — minim 5 procese identificate pe cele 7 funcții, fiecare cu tipul SOP (Liniar/Decizional) și prioritatea (Critică/Înaltă/Medie). Imagine completă peste tot ce trebuie sistematizat.',
+        order_index: 7,
+      },
+      {
+        id: 'e-3-8',
+        module_id: 'mod-3',
+        title: 'Primul tău flux vizual în Miro',
+        description:
+          'Săptămâna 4 · Lecția 11. Vizualizezi SOP-ul ca flux pe coloane per rol în Miro. Pregătire (roluri, paralele, decizii) + construirea board-ului pas cu pas urmând Ghidul Miro din Bibliotecă. Livrabil: link-ul board-ului Miro completat.',
+        order_index: 8,
       },
     ],
   },

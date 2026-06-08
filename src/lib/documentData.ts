@@ -1161,6 +1161,175 @@ function generateDoc3(answers: Record<string, string>): string {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// DOCUMENT 4 — SOP · Procedură Standard
+// ─────────────────────────────────────────────────────────────────────────────
+
+const doc4Steps: DocWizardStep[] = [
+  {
+    title: 'Identificare',
+    subtitle: 'Titlu, responsabil, versiune',
+    questions: [
+      { id: 'sop_cod',         label: 'Cod / număr SOP',          placeholder: 'ex: SOP-001',                       type: 'text' },
+      { id: 'sop_titlu',       label: 'Titlul procesului',         placeholder: 'ex: Producerea unei lecții',        type: 'text' },
+      { id: 'sop_responsabil', label: 'Responsabil principal',     placeholder: 'ex: Victor Morar',                  type: 'text' },
+      { id: 'sop_functie',     label: 'Funcția în care se înscrie', placeholder: 'ex: Producție / Serviciu',         type: 'text' },
+      { id: 'sop_versiune',    label: 'Versiunea documentului',    placeholder: 'ex: v1.0',                          type: 'text' },
+      { id: 'sop_data',        label: 'Data emiterii',             placeholder: '',                                  type: 'date' },
+    ],
+  },
+  {
+    title: 'Scopul',
+    subtitle: 'De ce există procesul și ce rezultat asigură',
+    questions: [
+      { id: 'sop_scop', label: 'Scopul (1–2 fraze)', placeholder: 'De ce există procesul. Ce rezultat asigură.', type: 'textarea' },
+      { id: 'sop_tip',  label: 'Tipul SOP (Liniar / Decizional)', placeholder: 'ex: Liniar', type: 'text' },
+    ],
+  },
+  {
+    title: 'Roluri implicate',
+    subtitle: 'NU numele — rolurile',
+    questions: [
+      { id: 'sop_roluri', label: 'Lista rolurilor implicate (unul pe linie)', placeholder: 'Coordonator producție\nEditor video\nDesigner\n...', type: 'textarea' },
+    ],
+  },
+  {
+    title: 'Pașii procesului',
+    subtitle: 'Nr · Responsabil · Acțiunea · Output (până la 10 pași)',
+    questions: [
+      { id: 'sop_pas1',  label: 'Pasul 1',  placeholder: 'Resp: ... — Acțiunea: ... — Output: ...', type: 'textarea' },
+      { id: 'sop_pas2',  label: 'Pasul 2',  placeholder: 'Resp: ... — Acțiunea: ... — Output: ...', type: 'textarea' },
+      { id: 'sop_pas3',  label: 'Pasul 3',  placeholder: 'Resp: ... — Acțiunea: ... — Output: ...', type: 'textarea' },
+      { id: 'sop_pas4',  label: 'Pasul 4',  placeholder: 'Resp: ... — Acțiunea: ... — Output: ...', type: 'textarea' },
+      { id: 'sop_pas5',  label: 'Pasul 5',  placeholder: 'Resp: ... — Acțiunea: ... — Output: ...', type: 'textarea' },
+      { id: 'sop_pas6',  label: 'Pasul 6 (opțional)', placeholder: 'Resp: ... — Acțiunea: ... — Output: ...', type: 'textarea' },
+      { id: 'sop_pas7',  label: 'Pasul 7 (opțional)', placeholder: 'Resp: ... — Acțiunea: ... — Output: ...', type: 'textarea' },
+      { id: 'sop_pas8',  label: 'Pasul 8 (opțional)', placeholder: 'Resp: ... — Acțiunea: ... — Output: ...', type: 'textarea' },
+      { id: 'sop_pas9',  label: 'Pasul 9 (opțional)', placeholder: 'Resp: ... — Acțiunea: ... — Output: ...', type: 'textarea' },
+      { id: 'sop_pas10', label: 'Pasul 10 (opțional)', placeholder: 'Resp: ... — Acțiunea: ... — Output: ...', type: 'textarea' },
+    ],
+  },
+  {
+    title: 'Criteriul de calitate',
+    subtitle: 'Cum confirmi că procesul a mers bine',
+    questions: [
+      { id: 'sop_calitate', label: 'Criteriul de calitate (2–3 condiții obiective)', placeholder: '1. Deadline respectat\n2. Output validat de coordonator\n3. Fără greșeli majore', type: 'textarea' },
+      { id: 'sop_observatii', label: 'Observații / excepții (opțional)', placeholder: 'Cazuri speciale, excepții, note adiționale...', type: 'textarea' },
+    ],
+  },
+];
+
+function generateDoc4(answers: Record<string, string>): string {
+  const a = (k: string) => ans(answers, k);
+
+  const sectionBg = '#eaf3ed';
+  const sectionColor = '#1A5C38';
+
+  const titleBand = `
+    <div class="title-band" style="background: linear-gradient(135deg, #1A5C38 0%, #2a7a4f 100%);">
+      <div class="doc-num">DOCUMENT 04 · ${a('sop_cod') || 'SOP'}</div>
+      <h1>${a('sop_titlu') || 'Procedură Standard de Operare'}</h1>
+      <span class="topic-tag">Instalațiile · Procese</span>
+    </div>`;
+
+  const secIdentificare = section(
+    'Identificare',
+    'Titlu, responsabil, versiune',
+    sectionBg, sectionColor,
+    `${fieldRow(
+        field('Cod / număr SOP', a('sop_cod')),
+        field('Versiune', a('sop_versiune')),
+        field('Data emiterii', a('sop_data'))
+      )}
+      ${fieldRow(
+        field('Titlul procesului', a('sop_titlu')),
+      )}
+      ${fieldRow(
+        field('Responsabil principal', a('sop_responsabil')),
+        field('Funcția', a('sop_functie')),
+        field('Tipul SOP', a('sop_tip'))
+      )}`
+  );
+
+  const secScop = section(
+    'Scopul',
+    'De ce există procesul și ce rezultat asigură',
+    sectionBg, sectionColor,
+    `${fieldMulti('Scop', a('sop_scop'))}`
+  );
+
+  const secRoluri = section(
+    'Roluri implicate',
+    'Nu persoanele — rolurile care execută procesul',
+    sectionBg, sectionColor,
+    `${fieldMulti('Rolurile implicate', a('sop_roluri'))}`
+  );
+
+  // Build the steps list — only render non-empty
+  const stepIds = ['sop_pas1','sop_pas2','sop_pas3','sop_pas4','sop_pas5','sop_pas6','sop_pas7','sop_pas8','sop_pas9','sop_pas10'];
+  const stepBlocks = stepIds
+    .map((id, idx) => ({ idx: idx + 1, val: a(id) }))
+    .filter(s => s.val !== '')
+    .map(s => `
+      <div style="display:flex;gap:12px;margin-bottom:10px;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:var(--paper-dark);">
+        <div style="flex-shrink:0;width:28px;height:28px;border-radius:50%;background:#1A5C38;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Aboreto',serif;font-size:11px;">${s.idx}</div>
+        <div style="flex:1;font-size:12.5px;line-height:1.55;white-space:pre-wrap;color:var(--ink);">${s.val}</div>
+      </div>`)
+    .join('');
+
+  const stepsContent = stepBlocks || `<div class="field-value multiline empty">&nbsp;</div>`;
+
+  const secPasi = section(
+    'Pașii procesului',
+    'Nr · Responsabil · Acțiunea · Output',
+    sectionBg, sectionColor,
+    stepsContent
+  );
+
+  const secCalitate = section(
+    'Criteriul de calitate',
+    'Cum confirmi că procesul a mers bine',
+    sectionBg, sectionColor,
+    `${fieldMulti('Criteriul de calitate', a('sop_calitate'))}
+     ${a('sop_observatii') ? fieldMulti('Observații / excepții', a('sop_observatii')) : ''}`
+  );
+
+  const secSemnatura = `
+    <div class="signature-block">
+      <div class="sig-title">Aprobat și pus în aplicare</div>
+      <div class="sig-row">
+        <div class="sig-col">
+          <div class="sig-name-line"></div>
+          <div class="sig-label">${a('sop_responsabil') || 'Responsabil proces'}</div>
+        </div>
+        <div class="sig-col">
+          <div class="sig-name-line"></div>
+          <div class="sig-label">CEO / Manager</div>
+        </div>
+      </div>
+      <div class="sig-date-row">
+        <div style="flex:1;">
+          <div class="sig-date-field" style="padding-top:4px;font-size:12px;color:#555;">${a('sop_data') || ''}</div>
+          <div class="sig-date-label">Data emiterii</div>
+        </div>
+        <div style="flex:1;">
+          <div class="sig-date-field" style="padding-top:4px;font-size:12px;color:#555;">${a('sop_versiune') || ''}</div>
+          <div class="sig-date-label">Versiune</div>
+        </div>
+      </div>
+    </div>`;
+
+  const totalPages = 3;
+  const pagesHtml = [
+    renderPage('04', 'Instalațiile', 1, totalPages, `${secIdentificare}${secScop}${secRoluri}`, titleBand),
+    renderPage('04', 'Instalațiile', 2, totalPages, secPasi),
+    renderPage('04', 'Instalațiile', 3, totalPages, `${secCalitate}${secSemnatura}${docFooter()}`),
+  ].join('');
+
+  return htmlShell('', pagesHtml, `${a('sop_cod') || 'SOP'} · ${a('sop_titlu') || 'Procedură Standard'}`);
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
 // PLATFORM_DOCUMENTS export
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -1206,5 +1375,19 @@ export const PLATFORM_DOCUMENTS: PlatformDocument[] = [
     color: 'gold',
     steps: doc3Steps,
     generate: generateDoc3,
+  },
+  {
+    id: 'sop-procedura',
+    lessonIds: ['l-3-2', 'l-3-4'],
+    docNumber: '04',
+    title: 'SOP · Procedură Standard de Operare',
+    shortTitle: 'SOP — Procedură Standard',
+    description:
+      'Template tipăribil pentru documentarea unui proces: identificare, scop, roluri, pași (Nr/Responsabil/Acțiune/Output) și criteriu de calitate. Companion pentru Exercițiul „Primul SOP documentat" din Săptămâna 4.',
+    downloadUrl: '',
+    topic: 'Instalațiile',
+    color: 'green',
+    steps: doc4Steps,
+    generate: generateDoc4,
   },
 ];

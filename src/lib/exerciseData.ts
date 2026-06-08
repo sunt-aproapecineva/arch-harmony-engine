@@ -830,6 +830,150 @@ export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
       { id: 'r3', label: 'Câte întrebări pe zi ai eliminat după prima săptămână?', placeholder: 'Estimare: ___ întrebări/zi mai puțin' },
     ],
   },
+
+  // ─── SĂPTĂMÂNA 4 — Etapa 2 + Etapa 3 ──────────────────────────────────────
+  // (mod-2: e-2-6 · mod-3: e-3-6 / e-3-7 / e-3-8)
+
+  // e-2-6: Profilul primei angajări → form-fields
+  {
+    exerciseId: 'e-2-6',
+    type: 'form-fields',
+    title: 'Profilul primei angajări',
+    instructions:
+      'Pornind de la organigrama vizată construită în Săptămâna 3, definești complet prima poziție pe care trebuie să o ocupi: profil, anunț de angajare și plan de integrare.',
+    fields: [
+      {
+        id: 'pa_info',
+        type: 'info',
+        text: 'Pasul 1 — Identifică poziția prioritară din organigrama vizată (cea marcată cu gri pe care trebuie să o ocupi cel mai urgent).',
+      },
+      { id: 'pa_functie', type: 'input', label: 'Funcția de angajat', placeholder: 'Ex: Specialist marketing / Coordonator producție' },
+      { id: 'pa_dece', type: 'textarea', label: 'De ce această funcție și nu alta?', placeholder: 'Justificarea ta — de ce e prioritară acum.' },
+      { id: 'pa_cand', type: 'input', label: 'Până când ai nevoie de ea?', placeholder: 'Ex: 30.07.2026' },
+
+      {
+        id: 'pa_info2',
+        type: 'info',
+        text: 'Pasul 2 — Construiește profilul complet al funcției.',
+      },
+      { id: 'pa_produs', type: 'textarea', label: 'Produsul final al funcției (ce măsurabil produce lunar)', placeholder: 'Ex: 20 de articole publicate / lună cu engagement > 3%.' },
+      { id: 'pa_criteriu', type: 'textarea', label: 'Criteriul de evaluare (după ce îl măsori)', placeholder: 'Ce cifră / rezultat verifică performanța.' },
+      { id: 'pa_context', type: 'textarea', label: 'Cum lucrează (context real, ce primește, cu cine)', placeholder: 'Cine îi dă input, cine primește output, ce tooluri folosește.' },
+      { id: 'pa_salariu', type: 'textarea', label: 'Salariul (fix + bonus + condiția de bonus)', placeholder: 'Ex: 5000 RON fix + 1000 RON bonus dacă target atins.' },
+      { id: 'pa_calitati', type: 'textarea', label: 'Calități necesare (potrivite cu funcția)', placeholder: 'Listează calitățile-cheie — nu generice ("muncitor"), ci specifice.' },
+      { id: 'pa_kpi', type: 'textarea', label: 'KPI-ul principal (1–2 indicatori clari)', placeholder: 'Ex: număr leaduri calificate / lună; rata de conversie.' },
+
+      {
+        id: 'pa_info3',
+        type: 'info',
+        text: 'Pasul 3 — Construiește anunțul de angajare pe baza celor 4 componente din Lecția 8.',
+      },
+      { id: 'pa_an_produc', type: 'textarea', label: '1. CE PRODUCI (rezultatul concret al jobului)', placeholder: 'Cum se va vedea succesul în această poziție.' },
+      { id: 'pa_an_lucru', type: 'textarea', label: '2. CUM LUCREZI (mediu, echipă, instrumente)', placeholder: 'Cu cine, în ce ritm, în ce sistem.' },
+      { id: 'pa_an_evalu', type: 'textarea', label: '3. CUM EȘTI EVALUAT (criterii clare)', placeholder: 'Cifrele după care e judecat.' },
+      { id: 'pa_an_salar', type: 'textarea', label: '4. SALARIUL (transparent, complet)', placeholder: 'Pachet financiar complet — fără surprize.' },
+
+      {
+        id: 'pa_info4',
+        type: 'info',
+        text: 'Pasul 4 — Planul de integrare. Ce pregătești cu o săptămână înainte să vină omul.',
+      },
+      { id: 'pa_pregatire', type: 'textarea', label: 'Pregătirea înainte de prima zi', placeholder: '1. Acces sisteme și tooluri: ...\n2. Echipament necesar: ...\n3. Cont email, badge, etc.: ...' },
+      { id: 'pa_sarcini', type: 'textarea', label: 'Primele 5 sarcini concrete + deadline pentru prima săptămână', placeholder: '1. ... — deadline: ...\n2. ... — deadline: ...\n3. ...' },
+      { id: 'pa_intalniri', type: 'textarea', label: 'Întâlniri programate cu echipa în prima săptămână', placeholder: 'Ex: Luni 10:00 cu CEO, Marți 14:00 cu echipa de marketing...' },
+    ],
+  },
+
+  // e-3-6: Primul tău SOP documentat → form-fields
+  {
+    exerciseId: 'e-3-6',
+    type: 'form-fields',
+    title: 'Primul tău SOP documentat',
+    instructions:
+      'Documentezi UN proces de bază din firma ta complet și corect — cu toate cele 5 componente ale SOP-ului. La final ai un document pe care îl poți preda echipei.',
+    fields: [
+      {
+        id: 'sop_info1',
+        type: 'info',
+        text: 'Pasul 1 — Alege procesul potrivit. Răspunde la 3 întrebări și ia procesul care apare la toate 3. Apoi deschide Template-ul SOP din pagina Documente pentru forma finală tipăribilă.',
+      },
+      { id: 'sop_i1', type: 'textarea', label: '1. Care e procesul pe care îl faci cel mai des + implică mai mult de o persoană?', placeholder: 'Răspuns scurt și concret.' },
+      { id: 'sop_i2', type: 'textarea', label: '2. Care e procesul care, dacă e greșit, afectează cel mai mult calitatea sau clientul?', placeholder: 'Răspuns scurt și concret.' },
+      { id: 'sop_i3', type: 'textarea', label: '3. Care e procesul pe care îl explici cel mai des echipei de la zero?', placeholder: 'Răspuns scurt și concret.' },
+      { id: 'sop_ales', type: 'input', label: 'Procesul ales (concluzia)', placeholder: 'Numele clar al procesului.' },
+      { id: 'sop_tip', type: 'input', label: 'Tipul SOP (Liniar sau Decizional)', placeholder: 'Liniar / Decizional' },
+
+      {
+        id: 'sop_info2',
+        type: 'info',
+        text: 'Pasul 2 — Completează cele 5 componente ale SOP-ului. Pentru exportul final tipăribil, intră în Documente → "SOP — Procedură Standard".',
+      },
+      { id: 'sop_titlu', type: 'input', label: '1. Titlu + responsabil + versiune', placeholder: 'Ex: SOP-001 · Producerea unei lecții · Resp: Victor · v1.0' },
+      { id: 'sop_scop', type: 'textarea', label: '2. Scopul (1–2 fraze)', placeholder: 'De ce există procesul. Ce rezultat asigură.' },
+      { id: 'sop_roluri', type: 'textarea', label: '3. Rolurile implicate (NU numele — rolurile)', placeholder: 'Ex: Coordonator producție, Editor video, Designer...' },
+      { id: 'sop_pasi', type: 'textarea', label: '4. Pașii (Nr / Responsabil / Acțiunea / Output)', placeholder: '1. Resp: ... — Acțiunea: ... — Output: ...\n2. Resp: ... — Acțiunea: ... — Output: ...\n3. ...' },
+      { id: 'sop_calitate', type: 'textarea', label: '5. Criteriul de calitate (2–3 condiții care confirmă că procesul a mers bine)', placeholder: 'Ex: deadline respectat, output validat de coordonator, fără greșeli majore.' },
+
+      {
+        id: 'sop_info3',
+        type: 'info',
+        text: 'Pasul 3 — Prezintă SOP-ul echipei. Răspunde la cele 2 întrebări după prezentare.',
+      },
+      { id: 'sop_reactie', type: 'textarea', label: 'Cum a reacționat echipa când a văzut procesul documentat? Ce întrebări au avut?', placeholder: 'Scrie reacțiile și întrebările.' },
+      { id: 'sop_descoperire', type: 'textarea', label: 'Ce ai descoperit documentând procesul pe care nu îl știai înainte?', placeholder: 'Aspecte invizibile, ineficiențe, suprapuneri.' },
+    ],
+  },
+
+  // e-3-7: Harta proceselor → dynamic-table
+  {
+    exerciseId: 'e-3-7',
+    type: 'dynamic-table',
+    title: 'Harta completă a proceselor firmei tale',
+    instructions:
+      'Treci prin fiecare din cele 7 funcții și notează procesele repetabile și importante. Pentru fiecare proces alege Tip SOP (Liniar/Decizional) și Prioritate (Critică/Înaltă/Medie). Adaugă rânduri pentru câte procese ai nevoie.',
+    fields: [
+      {
+        id: 'hp_info',
+        type: 'info',
+        text: 'Folosește structura celor 7 funcții: 1) Construcția echipei, 2) Marketing și Vânzări, 3) Finanțe, 4) Producție / Serviciu, 5) Calitate, 6) PR și Imagine, 7) Conducere. Prioritizează: Critică = Impact mare + Efort mic/mediu · Înaltă = Impact mare + Efort mare · Medie = Impact mic.',
+      },
+      {
+        id: 'hp_table',
+        type: 'dynamic-table',
+        columns: ['Funcția', 'Procesul', 'Tip SOP (Liniar/Decizional)', 'Prioritate (Critică/Înaltă/Medie)'],
+        addLabel: 'Adaugă proces',
+      },
+    ],
+  },
+
+  // e-3-8: Primul flux vizual în Miro → form-fields
+  {
+    exerciseId: 'e-3-8',
+    type: 'form-fields',
+    title: 'Primul tău flux vizual în Miro',
+    instructions:
+      'Vizualizezi SOP-ul din Exercițiul 2 ca flux pe coloane per rol în Miro. Folosește ghidul "Ghid Miro · Fluxuri Vizuale" din Bibliotecă pentru pașii detaliați.',
+    fields: [
+      {
+        id: 'mf_info1',
+        type: 'info',
+        text: 'Pasul 1 — Pregătire înainte de Miro. Completează tabelul înainte să deschizi board-ul.',
+      },
+      { id: 'mf_proces', type: 'input', label: 'Procesul din SOP (din Exercițiul 2)', placeholder: 'Numele procesului ales.' },
+      { id: 'mf_tip', type: 'input', label: 'Tipul fluxului (Liniar sau Decizional)', placeholder: 'Liniar / Decizional' },
+      { id: 'mf_roluri', type: 'textarea', label: 'Rolurile implicate = coloanele fluxului', placeholder: '1. ...\n2. ...\n3. ...\n4. ...' },
+      { id: 'mf_paralel', type: 'textarea', label: 'Există acțiuni care merg în paralel? Care?', placeholder: 'Ex: Editor montează video în paralel cu Designerul care face grafica.' },
+      { id: 'mf_decizie', type: 'textarea', label: 'Punct de decizie (doar pentru flux decizional)', placeholder: 'Întrebarea din romb: ...\nDA → ...\nNU → ...' },
+
+      {
+        id: 'mf_info2',
+        type: 'info',
+        text: 'Pasul 2 — Construiește fluxul în Miro urmând Ghidul Miro din Bibliotecă. La final, lipește link-ul board-ului mai jos.',
+      },
+      { id: 'mf_url', type: 'input', label: 'Link-ul către board-ul Miro construit', placeholder: 'https://miro.com/app/board/...' },
+      { id: 'mf_descoperire', type: 'textarea', label: 'Ce ai descoperit construind fluxul vizual pe care nu ai văzut în SOP?', placeholder: 'Suprapuneri, pași inutili, decizii ascunse...' },
+    ],
+  },
 ];
 
 export function getExerciseTemplate(exerciseId: string): ExerciseTemplate | undefined {

@@ -43,13 +43,17 @@ export const LIBRARY_ITEMS: LibraryItem[] = [
     available: false,
   },
   {
-    slug: '__soon-2',
-    title: 'Bibliotecă în creștere',
-    summary: 'Materialele se adaugă pe parcurs, în completarea programei.',
-    type: 'video',
+    slug: 'ghid-miro-fluxuri',
+    title: 'Ghid Miro · Fluxuri Vizuale',
+    summary:
+      'Cum construiești pas cu pas un flux vizual pe coloane per rol în Miro — flux liniar și flux decizional, pregătire, conexiuni, paralele, criteriu de calitate, partajare. Companion pentru Exercițiul 4 al Săptămânii 4.',
+    readingTime: '8 min de lectură',
+    type: 'article',
     accent: 'green',
     span: 'wide',
-    available: false,
+    topic: 'Procese & Sisteme',
+    eyebrow: 'Săptămâna 4 · Ghid practic',
+    available: true,
   },
   {
     slug: '__soon-3',
