@@ -110,6 +110,23 @@ export const AdminUsers: React.FC = () => {
     else alert(error);
   };
 
+  const handleChangeTariff = async (user: AdminUserRow, tariff: Tariff) => {
+    if (tariff === user.tariff) return;
+    // Update profile (active user record)
+    const { error: pErr } = await supabase.from('profiles').update({ tariff }).eq('id', user.id);
+    if (pErr) { alert('Eroare la actualizarea profilului: ' + pErr.message); return; }
+    // Keep whitelist in sync (for future re-registrations / consistency)
+    await supabase.from('whitelist').update({ tariff }).eq('email', user.email.toLowerCase());
+    reload();
+  };
+
+  const handleChangeWhitelistTariff = async (email: string, tariff: Tariff) => {
+    const { error } = await supabase.from('whitelist').update({ tariff }).eq('email', email.toLowerCase());
+    if (error) { alert('Eroare: ' + error.message); return; }
+    reload();
+  };
+
+
   const filteredUsers = users.filter(u => {
     const matchSearch = !search || u.full_name?.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
     const matchTariff = tariffFilter === 'all' || u.tariff === tariffFilter;
