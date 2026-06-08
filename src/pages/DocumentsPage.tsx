@@ -119,7 +119,13 @@ const TemplateCard: React.FC<{ doc: PlatformDocument; index: number }> = ({ doc,
         {/* Actions */}
         <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center' }}>
           <button
-            onClick={() => window.open(doc.downloadUrl, '_blank')}
+            onClick={() => {
+              if (doc.downloadUrl) {
+                window.open(doc.downloadUrl, '_blank');
+              } else {
+                openPrintWindow(doc.generate({}));
+              }
+            }}
             title="Descarcă șablon PDF gol"
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
