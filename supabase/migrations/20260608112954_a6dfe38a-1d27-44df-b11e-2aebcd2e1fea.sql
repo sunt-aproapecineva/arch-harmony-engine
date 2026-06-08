@@ -1,0 +1,1 @@
+UPDATE public.profiles SET tariff = 'arhitect' WHERE email = 'babaradumi@gmail.com';
