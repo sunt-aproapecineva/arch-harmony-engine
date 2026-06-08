@@ -549,10 +549,10 @@ export const MODULES: Module[] = [
       {
         id: 'l-3-1',
         module_id: 'mod-3',
-        title: 'Cum identifici cele 5–7 procese care chiar contează',
+        title: 'Cum angajăm corect',
         description:
           'Nu toate procesele sunt egale. Cum le scorezi pe impact financiar și frecvență și alegi pe care să le documentezi acum.',
-        video_url: '',
+        video_url: 'https://youtu.be/K9h1QLDjC9c',
         pdf_url: '',
         duration_min: 10,
         order_index: 1,
@@ -561,7 +561,7 @@ export const MODULES: Module[] = [
       {
         id: 'l-3-2',
         module_id: 'mod-3',
-        title: 'Cum scrii un proces exact așa cum SE FACE',
+        title: 'Ce este un proces și cum îl documentezi?',
         description:
           'Nu cum ar trebui să fie — cum se face azi. Diferența critică: "contactează rapid clientul" vs "sună clientul în maxim 2 ore de la primirea cererii".',
         video_url: '',
@@ -573,7 +573,7 @@ export const MODULES: Module[] = [
       {
         id: 'l-3-3',
         module_id: 'mod-3',
-        title: 'Standardizarea deciziilor',
+        title: 'Harta proceselor firmei tale',
         description:
           'Cum scoți butonul tău de OK din mijlocul firmei. Matricea decizională: cine decide ce și până la ce nivel de autoritate.',
         video_url: '',
@@ -585,7 +585,7 @@ export const MODULES: Module[] = [
       {
         id: 'l-3-4',
         module_id: 'mod-3',
-        title: 'Instrucțiunea pas cu pas',
+        title: 'Ce este un flux și tipurile lui',
         description:
           'Instrucțiunea care nu lasă loc de interpretare. Format standard: input → pași numerotați → output → responsabil → indicator de calitate.',
         video_url: '',
@@ -594,6 +594,7 @@ export const MODULES: Module[] = [
         order_index: 4,
         is_published: false,
       },
+
     ],
     exercises: [
       {
