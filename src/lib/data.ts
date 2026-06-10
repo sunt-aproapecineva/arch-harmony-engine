@@ -446,18 +446,6 @@ export const MODULES: Module[] = [
         is_published: true,
       },
       {
-        id: 'l-2-3',
-        module_id: 'mod-2',
-        title: 'Fișa de rol funcțională',
-        description:
-          'De ce fără indicatori e o foaie albă. Structura corectă: scop, responsabilități, indicatori, decizii autonome.',
-        video_url: '',
-        pdf_url: '',
-        duration_min: 10,
-        order_index: 4,
-        is_published: false,
-      },
-      {
         id: 'l-2-ex-1',
         module_id: 'mod-2',
         title: 'Funcția, Rolul și Produsul final',
