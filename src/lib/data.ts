@@ -427,6 +427,7 @@ export const MODULES: Module[] = [
         description:
           'De la 5 la 500 de angajați, aceleași 7 funcții există. Cum le identifici și cum le acoperi în stadiul tău actual.',
         video_url: 'https://youtu.be/qSiLBz9nwIU',
+        video_url_2: 'https://youtu.be/xBzMNDdn5qU',
         pdf_url: '',
         duration_min: 46,
         order_index: 2,
