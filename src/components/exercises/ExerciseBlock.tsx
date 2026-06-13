@@ -2251,20 +2251,67 @@ const FunctionRolesExercise: React.FC<{ template: ExerciseTemplate; storageKey: 
       setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
     }, 800);
   };
-  const set = (patch: Partial<State>) => { const n = { ...state, ...patch }; setState(n); save(n); };
+  const updateState = (updater: (current: State) => State) => {
+    setState(current => {
+      const next = updater(current);
+      save(next);
+      return next;
+    });
+  };
   const functionData = state.fnId ? (state.byFunction[state.fnId] || emptyFunctionData()) : emptyFunctionData();
+  const selectFunction = (fnId: string) => {
+    updateState(current => ({
+      ...current,
+      fnId,
+      byFunction: fnId && !current.byFunction[fnId]
+        ? { ...current.byFunction, [fnId]: emptyFunctionData() }
+        : current.byFunction,
+    }));
+  };
   const setFunctionData = (patch: Partial<FunctionData>) => {
     if (!state.fnId) return;
-    set({ byFunction: { ...state.byFunction, [state.fnId]: { ...functionData, ...patch } } });
+    updateState(current => {
+      const currentData = current.byFunction[current.fnId] || emptyFunctionData();
+      return {
+        ...current,
+        byFunction: { ...current.byFunction, [current.fnId]: { ...currentData, ...patch } },
+      };
+    });
   };
   const updateRow = (i: number, k: keyof RoleRow, v: string) => {
-    const rows = functionData.rows.map((r, ri) => ri === i ? { ...r, [k]: v } : r);
-    setFunctionData({ rows });
+    if (!state.fnId) return;
+    updateState(current => {
+      const currentData = current.byFunction[current.fnId] || emptyFunctionData();
+      const rows = currentData.rows.map((r, ri) => ri === i ? { ...r, [k]: v } : r);
+      return {
+        ...current,
+        byFunction: { ...current.byFunction, [current.fnId]: { ...currentData, rows } },
+      };
+    });
   };
-  const addRow = () => setFunctionData({ rows: [...functionData.rows, { rol: '', persoana: '', ceFace: '', produs: '' }] });
+  const addRow = () => {
+    if (!state.fnId) return;
+    updateState(current => {
+      const currentData = current.byFunction[current.fnId] || emptyFunctionData();
+      return {
+        ...current,
+        byFunction: {
+          ...current.byFunction,
+          [current.fnId]: { ...currentData, rows: [...currentData.rows, { rol: '', persoana: '', ceFace: '', produs: '' }] },
+        },
+      };
+    });
+  };
   const removeRow = (i: number) => {
-    const rows = functionData.rows.filter((_, ri) => ri !== i);
-    setFunctionData({ rows: rows.length ? rows : emptyFunctionData().rows });
+    if (!state.fnId) return;
+    updateState(current => {
+      const currentData = current.byFunction[current.fnId] || emptyFunctionData();
+      const rows = currentData.rows.filter((_, ri) => ri !== i);
+      return {
+        ...current,
+        byFunction: { ...current.byFunction, [current.fnId]: { ...currentData, rows: rows.length ? rows : emptyFunctionData().rows } },
+      };
+    });
   };
 
   const selectedFn = template.functionOptions?.find(o => o.value === state.fnId);
@@ -2331,7 +2378,7 @@ const FunctionRolesExercise: React.FC<{ template: ExerciseTemplate; storageKey: 
         <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', display: 'block', marginBottom: 6 }}>
           Funcția aleasă (1–7)
         </label>
-        <select value={state.fnId} onChange={e => set({ fnId: e.target.value })} style={{
+        <select value={state.fnId} onChange={e => selectFunction(e.target.value)} style={{
           width: '100%', padding: '10px 12px', fontSize: 13, background: 'var(--bg-3)',
           border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)',
         }}>
