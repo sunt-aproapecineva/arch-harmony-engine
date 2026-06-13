@@ -2378,7 +2378,7 @@ const FunctionRolesExercise: React.FC<{ template: ExerciseTemplate; storageKey: 
         <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', display: 'block', marginBottom: 6 }}>
           Funcția aleasă (1–7)
         </label>
-        <select value={state.fnId} onChange={e => set({ fnId: e.target.value })} style={{
+        <select value={state.fnId} onChange={e => selectFunction(e.target.value)} style={{
           width: '100%', padding: '10px 12px', fontSize: 13, background: 'var(--bg-3)',
           border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)',
         }}>
