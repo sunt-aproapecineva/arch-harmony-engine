@@ -2215,10 +2215,30 @@ const QuizMCQExercise: React.FC<{ template: ExerciseTemplate; storageKey: string
 // ─── Function-Roles (Ex.1) ────────────────────────────────────────────────────
 const FunctionRolesExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }> = ({ template, storageKey }) => {
   type RoleRow = { rol: string; persoana: string; ceFace: string; produs: string };
-  type State = { fnId: string; produs: string; flux: string; rows: RoleRow[] };
-  const initial: State = { fnId: '', produs: '', flux: '', rows: [{ rol: '', persoana: '', ceFace: '', produs: '' }] };
+  type FunctionData = { produs: string; flux: string; rows: RoleRow[] };
+  type State = { fnId: string; byFunction: Record<string, FunctionData> };
+  const emptyFunctionData = (): FunctionData => ({ produs: '', flux: '', rows: [{ rol: '', persoana: '', ceFace: '', produs: '' }] });
+  const initial: State = { fnId: '', byFunction: {} };
   const [state, setState] = useState<State>(() => {
-    try { const s = localStorage.getItem(storageKey); return s ? { ...initial, ...JSON.parse(s) } : initial; } catch { return initial; }
+    try {
+      const saved = localStorage.getItem(storageKey);
+      if (!saved) return initial;
+      const parsed = JSON.parse(saved);
+      if (parsed.byFunction) return { ...initial, ...parsed };
+      if (parsed.fnId) {
+        return {
+          fnId: parsed.fnId,
+          byFunction: {
+            [parsed.fnId]: {
+              produs: parsed.produs || '',
+              flux: parsed.flux || '',
+              rows: Array.isArray(parsed.rows) && parsed.rows.length ? parsed.rows : emptyFunctionData().rows,
+            },
+          },
+        };
+      }
+      return initial;
+    } catch { return initial; }
   });
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -2232,12 +2252,20 @@ const FunctionRolesExercise: React.FC<{ template: ExerciseTemplate; storageKey: 
     }, 800);
   };
   const set = (patch: Partial<State>) => { const n = { ...state, ...patch }; setState(n); save(n); };
-  const updateRow = (i: number, k: keyof RoleRow, v: string) => {
-    const rows = state.rows.map((r, ri) => ri === i ? { ...r, [k]: v } : r);
-    set({ rows });
+  const functionData = state.fnId ? (state.byFunction[state.fnId] || emptyFunctionData()) : emptyFunctionData();
+  const setFunctionData = (patch: Partial<FunctionData>) => {
+    if (!state.fnId) return;
+    set({ byFunction: { ...state.byFunction, [state.fnId]: { ...functionData, ...patch } } });
   };
-  const addRow = () => set({ rows: [...state.rows, { rol: '', persoana: '', ceFace: '', produs: '' }] });
-  const removeRow = (i: number) => set({ rows: state.rows.filter((_, ri) => ri !== i).length ? state.rows.filter((_, ri) => ri !== i) : [{ rol: '', persoana: '', ceFace: '', produs: '' }] });
+  const updateRow = (i: number, k: keyof RoleRow, v: string) => {
+    const rows = functionData.rows.map((r, ri) => ri === i ? { ...r, [k]: v } : r);
+    setFunctionData({ rows });
+  };
+  const addRow = () => setFunctionData({ rows: [...functionData.rows, { rol: '', persoana: '', ceFace: '', produs: '' }] });
+  const removeRow = (i: number) => {
+    const rows = functionData.rows.filter((_, ri) => ri !== i);
+    setFunctionData({ rows: rows.length ? rows : emptyFunctionData().rows });
+  };
 
   const selectedFn = template.functionOptions?.find(o => o.value === state.fnId);
 
@@ -2303,10 +2331,7 @@ const FunctionRolesExercise: React.FC<{ template: ExerciseTemplate; storageKey: 
         <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', display: 'block', marginBottom: 6 }}>
           Funcția aleasă (1–7)
         </label>
-        <select value={state.fnId} onChange={e => {
-          const fn = template.functionOptions?.find(o => o.value === e.target.value);
-          set({ fnId: e.target.value, produs: state.produs || fn?.sampleProduct || '' });
-        }} style={{
+        <select value={state.fnId} onChange={e => set({ fnId: e.target.value })} style={{
           width: '100%', padding: '10px 12px', fontSize: 13, background: 'var(--bg-3)',
           border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)',
         }}>
@@ -2321,7 +2346,7 @@ const FunctionRolesExercise: React.FC<{ template: ExerciseTemplate; storageKey: 
             <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', display: 'block', marginBottom: 6 }}>
               Produsul FUNCȚIEI
             </label>
-            <textarea value={state.produs} onChange={e => set({ produs: e.target.value })} rows={2}
+            <textarea value={functionData.produs} onChange={e => setFunctionData({ produs: e.target.value })} rows={2}
               placeholder={selectedFn.sampleProduct}
               style={{ width: '100%', padding: '10px 12px', fontSize: 13, lineHeight: 1.6,
                 background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8,
@@ -2343,7 +2368,7 @@ const FunctionRolesExercise: React.FC<{ template: ExerciseTemplate; storageKey: 
                   </tr>
                 </thead>
                 <tbody>
-                  {state.rows.map((row, i) => (
+                  {functionData.rows.map((row, i) => (
                     <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
                       <td style={{ padding: '6px 4px' }}><input type="text" value={row.rol} onChange={e => updateRow(i, 'rol', e.target.value)} placeholder="ex: Agent vânzări" style={cellStyle} /></td>
                       <td style={{ padding: '6px 4px' }}><input type="text" value={row.persoana} onChange={e => updateRow(i, 'persoana', e.target.value)} placeholder="ex: Ion Marin" style={cellStyle} /></td>
@@ -2370,7 +2395,7 @@ const FunctionRolesExercise: React.FC<{ template: ExerciseTemplate; storageKey: 
             <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', display: 'block', marginBottom: 6 }}>
               Cum se obține produsul funcției (sinteza fluxului)
             </label>
-            <textarea value={state.flux} onChange={e => set({ flux: e.target.value })} rows={2}
+            <textarea value={functionData.flux} onChange={e => setFunctionData({ flux: e.target.value })} rows={2}
               placeholder="Ana face X → Ion face Y → împreună produc Z"
               style={{ width: '100%', padding: '10px 12px', fontSize: 13, lineHeight: 1.6,
                 background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8,
