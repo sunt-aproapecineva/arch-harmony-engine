@@ -591,11 +591,11 @@ export const MODULES: Module[] = [
         title: 'Ce este un flux și tipurile lui',
         description:
           'Instrucțiunea care nu lasă loc de interpretare. Format standard: input → pași numerotați → output → responsabil → indicator de calitate.',
-        video_url: '',
+        video_url: 'https://www.youtube.com/watch?v=j7VRnpGQn7s',
         pdf_url: '',
         duration_min: 12,
         order_index: 4,
-        is_published: false,
+        is_published: true,
       },
       {
         id: 'l-3-ex-6',
