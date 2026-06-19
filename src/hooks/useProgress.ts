@@ -132,40 +132,34 @@ export function useProgress() {
     [exerciseDone]
   );
 
-  // Progress now combines lessons + exercises (both count toward module completion).
+  // Progress is based on lessons only (exercises live inside the lessons array as l-*-ex-* items).
   const getModuleProgress = useCallback(
     (moduleId: string) => {
       const mod = MODULES.find((m) => m.id === moduleId);
       if (!mod) return 0;
-      const total = mod.lessons.length + mod.exercises.length;
+      const total = mod.lessons.length;
       if (total === 0) return 0;
       const lessonsDone = mod.lessons.filter((l) => isCompleted(l.id)).length;
-      const exDone = mod.exercises.filter((e) => isExerciseDone(e.id)).length;
-      return Math.round(((lessonsDone + exDone) / total) * 100);
+      return Math.round((lessonsDone / total) * 100);
     },
-    [isCompleted, isExerciseDone]
+    [isCompleted]
   );
 
   const isModuleFullyDone = useCallback(
     (moduleId: string) => {
       const mod = MODULES.find((m) => m.id === moduleId);
       if (!mod) return false;
-      const lessonsOk = mod.lessons.every((l) => isCompleted(l.id));
-      const exOk = mod.exercises.every((e) => isExerciseDone(e.id));
-      return lessonsOk && exOk;
+      return mod.lessons.every((l) => isCompleted(l.id));
     },
-    [isCompleted, isExerciseDone]
+    [isCompleted]
   );
 
   const getOverallProgress = useCallback(() => {
     const totalLessons = MODULES.flatMap((m) => m.lessons).length;
-    const totalEx = MODULES.flatMap((m) => m.exercises).length;
-    const total = totalLessons + totalEx;
-    if (total === 0) return 0;
+    if (totalLessons === 0) return 0;
     const lessonsDone = MODULES.flatMap((m) => m.lessons).filter((l) => isCompleted(l.id)).length;
-    const exDone = MODULES.flatMap((m) => m.exercises).filter((e) => isExerciseDone(e.id)).length;
-    return Math.round(((lessonsDone + exDone) / total) * 100);
-  }, [isCompleted, isExerciseDone]);
+    return Math.round((lessonsDone / totalLessons) * 100);
+  }, [isCompleted]);
 
   // A module is locked only until its scheduled unlock date begins
   // (start of day in Bucharest for the configured date).
