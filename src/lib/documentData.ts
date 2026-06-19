@@ -34,24 +34,38 @@ export interface PlatformDocument {
 // ─── Print window utility ────────────────────────────────────────────────────
 
 export function openPrintWindow(html: string): void {
-  const win = window.open('', '_blank', 'width=900,height=700,scrollbars=yes');
+  // Use a Blob URL so the browser fully loads the document before we trigger print().
+  // Writing via document.write + immediate win.print() races on desktop browsers
+  // (Chrome/Safari) and often prints a blank page or shows nothing.
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+
   if (!win) {
-    // Fallback if popups blocked — download as HTML
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
+    // Popup blocked — fall back to opening in same tab / downloading.
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'document.html';
+    a.target = '_blank';
+    a.rel = 'noopener';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
     return;
   }
-  win.document.write(html);
-  win.document.close();
-  // Automatically trigger browser print dialog
-  win.print();
+
+  // Trigger print after the new window has finished loading.
+  const triggerPrint = () => {
+    try { win.focus(); win.print(); } catch {}
+  };
+  try {
+    win.addEventListener('load', triggerPrint, { once: true });
+  } catch {
+    setTimeout(triggerPrint, 800);
+  }
+  // Safety net in case 'load' never fires (some browsers with Blob URLs).
+  setTimeout(triggerPrint, 1500);
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
 // ─── Shared HTML helpers ─────────────────────────────────────────────────────
