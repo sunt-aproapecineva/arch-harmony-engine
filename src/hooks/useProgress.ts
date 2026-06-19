@@ -132,34 +132,42 @@ export function useProgress() {
     [exerciseDone]
   );
 
-  // Progress is based on lessons only (exercises live inside the lessons array as l-*-ex-* items).
+  // Progress is based on lessons (video + exercise items) AND the module's standalone exercises.
   const getModuleProgress = useCallback(
     (moduleId: string) => {
       const mod = MODULES.find((m) => m.id === moduleId);
       if (!mod) return 0;
-      const total = mod.lessons.length;
+      const total = mod.lessons.length + (mod.exercises?.length || 0);
       if (total === 0) return 0;
       const lessonsDone = mod.lessons.filter((l) => isCompleted(l.id)).length;
-      return Math.round((lessonsDone / total) * 100);
+      const exercisesDone = (mod.exercises || []).filter((e) => isExerciseDone(e.id)).length;
+      return Math.round(((lessonsDone + exercisesDone) / total) * 100);
     },
-    [isCompleted]
+    [isCompleted, isExerciseDone]
   );
 
   const isModuleFullyDone = useCallback(
     (moduleId: string) => {
       const mod = MODULES.find((m) => m.id === moduleId);
       if (!mod) return false;
-      return mod.lessons.every((l) => isCompleted(l.id));
+      return (
+        mod.lessons.every((l) => isCompleted(l.id)) &&
+        (mod.exercises || []).every((e) => isExerciseDone(e.id))
+      );
     },
-    [isCompleted]
+    [isCompleted, isExerciseDone]
   );
 
   const getOverallProgress = useCallback(() => {
     const totalLessons = MODULES.flatMap((m) => m.lessons).length;
-    if (totalLessons === 0) return 0;
+    const totalExercises = MODULES.flatMap((m) => m.exercises || []).length;
+    const total = totalLessons + totalExercises;
+    if (total === 0) return 0;
     const lessonsDone = MODULES.flatMap((m) => m.lessons).filter((l) => isCompleted(l.id)).length;
-    return Math.round((lessonsDone / totalLessons) * 100);
-  }, [isCompleted]);
+    const exercisesDone = MODULES.flatMap((m) => m.exercises || []).filter((e) => isExerciseDone(e.id)).length;
+    return Math.round(((lessonsDone + exercisesDone) / total) * 100);
+  }, [isCompleted, isExerciseDone]);
+
 
   // A module is locked only until its scheduled unlock date begins
   // (start of day in Bucharest for the configured date).
