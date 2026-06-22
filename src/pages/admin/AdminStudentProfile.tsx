@@ -885,6 +885,7 @@ export const AdminStudentProfile: React.FC = () => {
           <p style={{ fontSize: 13, color: 'var(--fg-3)', textAlign: 'center', padding: '16px 0' }}>Niciun exercițiu completat.</p>
         )}
       </motion.div>
+      </>)}
     </div>
   );
 };
