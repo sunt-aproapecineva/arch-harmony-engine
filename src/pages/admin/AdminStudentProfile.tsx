@@ -911,6 +911,16 @@ export const AdminStudentProfile: React.FC = () => {
                           </span>
                         )}
                       </div>
+                      {template?.instructions && (
+                        <div style={{
+                          fontSize: 12, color: 'var(--fg-2)', lineHeight: 1.55,
+                          background: 'var(--bg)', border: '1px solid var(--border)', borderLeft: '2px solid var(--accent)',
+                          borderRadius: 6, padding: '8px 10px', marginBottom: 10, whiteSpace: 'pre-wrap',
+                        }}>
+                          <div style={{ fontSize: 10, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>Cerința exercițiului</div>
+                          {template.instructions}
+                        </div>
+                      )}
                       {summary.node}
                     </div>
                   );
