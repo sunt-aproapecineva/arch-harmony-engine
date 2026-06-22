@@ -76,10 +76,39 @@ function ActivityIcon({ type }: { type: ActivityType }) {
 }
 
 // ── Readable answer renderer ──────────────────────────────────────────────────
+// Friendly Romanian labels for row-keys used by dynamic exercises.
+// Keyed by exercise type so the supervisor sees the question instead of "id / role / activity".
+const ROW_KEY_LABELS: Record<string, Record<string, string>> = {
+  'activity-audit': {
+    activity: 'Activitatea',
+    percentage: '% din timp',
+    role: 'Rol (S=Specialist · D=Director · P=Proprietar)',
+  },
+  'bottleneck-map': {
+    situation: 'Decizia / Situația',
+    wasNecessary: 'Trebuia chiar tu? (Da/Nu)',
+    reason: 'Motiv (dacă Nu)',
+    time: 'Timp pierdut (min)',
+  },
+  'absence-test': {
+    scenario: 'Scenariul (dacă lipsesc 2 zile)',
+    gravity: 'Gravitate (Mare/Medie/Mică)',
+    causedBy: 'Cauza (de ce se întâmplă)',
+  },
+};
+// Keys we never want to display (internal IDs).
+const HIDDEN_ROW_KEYS = new Set(['id', '_id']);
+
+function labelForRowKey(type: string | undefined, key: string): string {
+  if (type && ROW_KEY_LABELS[type] && ROW_KEY_LABELS[type][key]) return ROW_KEY_LABELS[type][key];
+  return key;
+}
+
 function renderReadableAnswer(
   parsed: any,
   template: any
 ): { node: React.ReactNode; metric?: string; metricColor?: string } {
+  const exType: string | undefined = template?.type;
   // Empty / null
   if (parsed === null || parsed === undefined) {
     return { node: <p style={{ fontSize: 12, color: 'var(--fg-3)', fontStyle: 'italic' }}>Fără răspuns</p> };
