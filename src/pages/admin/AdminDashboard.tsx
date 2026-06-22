@@ -11,6 +11,7 @@ import { TariffBadge } from '../../components/aa/TariffBadge';
 import { ProgressBar } from '../../components/aa/ProgressBar';
 import { getActivity, ActivityEvent, timeAgo, ActivityType } from '../../lib/activity';
 import { fetchAdminUsers, fetchAllProgress, AdminUserRow, AdminProgressRow } from '../../lib/adminData';
+import { AttentionQueueCard } from '../../components/admin/AttentionQueueCard';
 
 function ActivityIcon({ type }: { type: ActivityType }) {
   const size = 13;
@@ -138,6 +139,10 @@ export const AdminDashboard: React.FC = () => {
             <div style={{ fontSize: 11, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{stat.label}</div>
           </motion.div>
         ))}
+      </div>
+
+      <div style={{ marginBottom: 20 }}>
+        <AttentionQueueCard />
       </div>
 
       <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', marginBottom: 20 }}>

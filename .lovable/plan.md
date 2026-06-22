@@ -1,100 +1,95 @@
 
-# Plan implementare — Exerciții Săptămâna 4
+# Update Admin: „Supervisor Cockpit"
 
-## 1. Ce am verificat din ce există deja (și funcționează bine)
+Scopul e ca tu (supervizorul) să intri în platformă și în 30 de secunde să știi despre fiecare elev: unde e blocat, ce a completat real, ce a înțeles, ce nu, și ce intervenție concretă să faci. Toată informația pe care elevii o introduc (quiz, exerciții, notițe) e deja stocată — o vom transforma în claritate.
 
-**Pattern-uri solide pe care le voi refolosi 1:1, fără să le ating:**
+## 1. Profil elev: trei tab-uri clare
 
-- **Tipuri de exerciții** definite în `src/lib/exerciseData.ts` (`ExerciseTemplate.type`):
-  - `form-fields` — câmpuri text/textarea/input/info (folosit la e-1-1, e-1-2, e-3-2, e-3-3, e-4-1)
-  - `dynamic-table` — tabel cu rânduri pe care utilizatorul le adaugă (e-3-4, e-4-3)
-  - `checklist` — bife (e-3-1, e-3-5, e-4-4)
-  - `decision-matrix` — special pentru roluri (e-2-5 Matricea decizională)
-- **Persistență**: `pushExerciseResponse`/`loadExerciseResponse` în `src/lib/exerciseSync.ts` — debounced upsert pe `exercise_responses`, deja folosit de toate variantele.
-- **Marcare „finalizat"**: `useExerciseCompletions` — merge pentru toate tipurile.
-- **Rendering**: `ExerciseBlock.tsx` dispatch-uiește pe `type` — adăugarea unui exercițiu nou e doar o intrare în array, fără cod nou pe UI dacă reutilizez tipuri existente.
-- **Documente cu wizard**: `documentData.ts` are deja `DocWizardStep[]` + `generate(answers)` cu HTML brand-uit AA (header, footer, secțiuni colorate). Pattern-ul Acord Parteneriat (Doc1/2/3) e exact ce-mi trebuie pentru SOP.
-- **Bibliotecă**: `libraryData.ts` + articole React în `src/pages/library/articles/` (vezi `HiringArticle.tsx` ca model).
+Pagina `admin/student/$userId` se reorganizează din listă lungă în trei tab-uri:
 
-## 2. Maparea Săptămâna 4 → module (fără ștergeri)
+**a) „Briefing supervizor"** (tab default, nou)
+- Card de sus: nume, tarif, scor global, status („activ săptămâna asta" / „inactiv 5 zile" / „blocat la Modulul X").
+- **Rezumat AI generat** (3-5 paragrafe), structurat fix:
+  1. *Cine e elevul* — domeniu, vechime, cifră de afaceri, echipă (sintetizate din quiz).
+  2. *Nivelul de maturitate* — startup / manual / illusion / systemic, cu o frază de context.
+  3. *Ce a făcut concret* — câte lecții, câte exerciții completate vs lăsate goale, calitatea răspunsurilor (scurte / superficiale / detaliate).
+  4. *Unde e blocat acum* — pe baza ultimei activități și a exercițiilor neîncepute.
+  5. *Recomandări pentru supervizor* — 3 acțiuni concrete („sună-l despre Modulul 2", „verifică exercițiul X unde a răspuns confuz", „felicită-l pentru progres pe Y").
+- Buton „Regenerează rezumat" (cache 24h ca să nu cheltuim credite degeaba).
+- **Indicatori-cheie** sub rezumat: scor maturitate, scor implicare, scor înțelegere, scor consistență (vezi punctul 3).
 
-Din `Exercitii_Saptamana_4_FINAL.md`:
+**b) „Date brute"** (ce există acum)
+- Quiz onboarding cu toate răspunsurile.
+- Toate exercițiile cu răspunsurile elevului, lecție cu lecție.
+- Toate notițele.
+- Activitate cronologică.
 
-| # | Exercițiu nou | Lecția | Module destinație |
-|---|---|---|---|
-| 1 | Profilul primei angajări | L8 — Cum angajezi corect | **mod-2** (Pereții Portanți) → `e-2-6` |
-| 2 | Primul tău SOP documentat | L9 — Ce este un proces | **mod-3** (Instalațiile) → `e-3-6` |
-| 3 | Harta completă a proceselor | L10 — Harta proceselor | **mod-3** → `e-3-7` |
-| 4 | Primul flux vizual în Miro | L11 — Ce este un flux | **mod-3** → `e-3-8` |
+**c) „Note supervizor"** (nou)
+- Câmp privat unde tu scrii observații despre elev după apeluri / sesiuni.
+- Listă cronologică, doar admin vede.
 
-**Nimic existent nu se șterge.** `e-2-1..e-2-5` și `e-3-1..e-3-5` rămân pe loc, exact cum sunt acum.
+## 2. Dashboard admin: vedere de ansamblu
 
-## 3. Ce adaug, concret
+Pe `/admin` (sau `/admin/users`) adaug:
+- **Coadă de atenție**: top 5 elevi care necesită intervenție acum (inactivi recent, blocați la același modul de N zile, exerciții cu calitate scăzută).
+- **Heatmap săptămânal**: cine a fost activ în ultimele 7 zile.
+- **Filtre rapide**: „blocați la M1 / M2 / M3", „n-au început quiz-ul", „n-au terminat niciun exercițiu", „inactivi 7+ zile".
+- Coloane noi în tabel: ultima activitate, scor implicare, status („pe drum" / „lent" / „blocat" / „terminat").
 
-### A. `src/lib/exerciseData.ts` — 4 template-uri noi
+## 3. Scoruri (calcul determinist, nu AI)
 
-1. **`e-2-6` — Profilul primei angajări** → tip `form-fields`
-   - Pasul 1: funcția prioritară (input + 2 textarea-uri „de ce" / „până când")
-   - Pasul 2: 6 textarea-uri (produs final, criteriu evaluare, context, salariu, calități, KPI)
-   - Pasul 3: 4 textarea-uri (cele 4 componente anunț)
-   - Pasul 4: checklist de pregătire integrare (refolosesc `info` + textarea pentru cele 5 sarcini)
-   - Buton CTA la final: link spre Matricea decizională (`e-2-5`) ca „bonus"
+Patru scoruri vizibile per elev, calculate din datele existente:
 
-2. **`e-3-6` — Primul SOP documentat** → tip `form-fields`
-   - Pasul 1: 3 textarea-uri de filtrare + concluzia + radio Liniar/Decizional (folosesc 2 input-uri marcate)
-   - Pasul 2: câmpuri pentru cele 5 componente SOP (titlu, scop, roluri, pași, criteriu)
-   - Pasul 3: 2 textarea-uri reacție echipă
-   - CTA: „Deschide template-ul SOP" → `/documents/sop-producere/fill` (vezi B.)
+- **Implicare (0-100)** = pondere între lecții vizionate, exerciții completate, notițe scrise, zile active. 
+- **Înțelegere (0-100)** = bazat pe câmpurile umplute la exerciții (gol vs scurt vs detaliat), bifări checklist, medii la grilele diagnostice (d1..d50).
+- **Consistență (0-100)** = câte zile distincte a intrat în platformă în ultimele 30 zile, fără găuri lungi.
+- **Maturitate** = deja există din quiz (startup/manual/illusion/systemic).
 
-3. **`e-3-7` — Harta proceselor** → tip `dynamic-table`
-   - Coloane: `Funcția | Proces | Tip SOP (Liniar/Decizional) | Prioritate (Critică/Înaltă/Medie)`
-   - Pre-completat cu 7 rânduri-șablon (cele 7 funcții) — utilizatorul completează procese, poate adăuga mai multe
-   - CTA: link spre template Google Sheets (dacă există URL) + spre `e-3-6` pentru a doc
+Scorurile sunt afișate cu bare colorate și o estimare globală „Progres real" (medie ponderată).
 
-4. **`e-3-8` — Flux vizual în Miro** → tip `form-fields`
-   - Pasul 1 pregătire: 4 input-uri (proces, tip flux, roluri/coloane, punct decizie)
-   - Pasul 2: 6 itemi checklist „am construit fluxul în Miro" (refolosesc tip `checklist`? — NU, păstrez `form-fields` cu un câmp dedicat de URL Miro)
-   - Câmp final: URL board Miro + textarea „ce am descoperit construindu-l"
-   - CTA: link spre articolul „Ghid Miro Fluxuri" din Bibliotecă
+## 4. Rezumatul AI — cum funcționează
 
-### B. `src/lib/documentData.ts` — 1 document nou
+- Server function nouă, doar admin (verifică rolul cu `has_role`).
+- Trimite la Lovable AI Gateway (`google/gemini-2.5-flash`, ieftin, suficient): quiz answers + listă exerciții completate + sample de răspunsuri lungi + scoruri calculate.
+- Prompt strict în română, format fix pe 5 secțiuni, ton constructiv, fără jargon.
+- Rezultatul se salvează în tabel nou `student_insights` (cache 24h + buton refresh manual).
+- Dacă AI Gateway returnează 429/402, afișăm fallback cu scorurile + datele brute.
 
-**`sop-producere`** — Template SOP (model: Doc1 Parteneriat)
-- 5 pași de wizard corespunzând celor 5 componente: Titlu/Versiune, Scop, Roluri, Pași (10 câmpuri numerotate), Criteriu calitate
-- `generate(answers)` produce HTML A4 brand-uit (header AA + footer + secțiuni verzi — culoarea `green` ca în Doc1)
-- `docNumber: 'AA-DOC-04 · SOP'`, `lessonIds: ['l-3-2', 'l-3-4']`
+## 5. Backend (migrații necesare)
 
-### C. `src/lib/libraryData.ts` — 1 articol nou
+Două tabele noi:
 
-**`ghid-miro-fluxuri`** (înlocuiește placeholder-ul `__soon-2`)
-- `type: 'article'`, `accent: 'green'`, `span: 'wide'`, `available: true`
-- Conținut React în `src/pages/library/articles/MiroFluxuriArticle.tsx` — pași cu screenshot-uri pentru construirea unui flux pe coloane per rol, bazat pe `Ghid_Miro_Fluxuri_FINAL.md`
-- Wire în `src/pages/LibraryArticlePage.tsx` (după modelul `HiringArticle`)
+```
+student_insights         supervisor_notes
+-----------------        ------------------
+user_id (FK profiles)    user_id (FK profiles)
+summary (text)           author_id (admin)
+scores (jsonb)           note (text)
+generated_at             created_at
+model_used
+```
 
-### D. `src/lib/data.ts` — `mod-2.exercises` și `mod-3.exercises`
+Ambele: RLS doar pentru admin (`has_role(auth.uid(), 'admin')`), GRANT pe authenticated + service_role.
 
-Adaug intrările `{ id, module_id, title, description, order_index }` pentru `e-2-6`, `e-3-6`, `e-3-7`, `e-3-8`. Restul module-ului rămâne identic.
+Server functions noi (toate cu `requireSupabaseAuth` + verificare admin):
+- `generateStudentInsight({ studentId })` — apel AI, salvează în `student_insights`.
+- `getStudentInsight({ studentId })` — citește cache.
+- `addSupervisorNote / listSupervisorNotes / deleteSupervisorNote`.
+- `getAttentionQueue()` — calculează top elevi care necesită atenție.
 
-## 4. Ordine recomandată de implementare (commit-uri mici)
+## 6. Ce NU schimbăm
 
-1. Adaug `e-2-6` în `exerciseData.ts` + `data.ts` (form-fields, 0 cod nou)
-2. Adaug `e-3-6`, `e-3-7`, `e-3-8` în `exerciseData.ts` + `data.ts`
-3. Adaug documentul `sop-producere` în `documentData.ts` (riguros pe template Doc1)
-4. Adaug articolul Miro: `MiroFluxuriArticle.tsx` + intrare în `libraryData.ts` + branch în `LibraryArticlePage.tsx`
-5. Adaug CTA-urile cross-link (din `e-3-6` spre wizardul SOP, din `e-3-8` spre articolul Miro) — modificare minimă în `ExerciseBlock` pentru a renderiza un câmp `info` cu link, sau adaug câmp `info` cu HTML.
+- Vederea elevului rămâne identică, fără indicii că e analizat.
+- Datele brute (răspunsuri, notițe, quiz) nu se modifică, doar le re-prezentăm.
+- Restul aplicației (lecții, exerciții, documente) — neatinse.
 
-## 5. Ce NU fac (explicit)
+## Ordinea de implementare
 
-- Nu șterg `e-3-1..e-3-5` și niciun template existent.
-- Nu modific `client.ts`, `types.ts`, migrațiile, sau structura BD — exercițiile noi se salvează automat pe `exercise_responses` cu `exercise_id` nou, fără migrație.
-- Nu schimb numărul de lecții al mod-3 (rămâne 4) — exercițiile pot exista chiar dacă lecția dedicată e separată; user-ul le vede pe pagina modulului.
-- Nu ating Documente vechi (Doc1/2/3 Parteneriat) și nici `cum-angajam-corect` din Bibliotecă.
+1. Migrații: `student_insights`, `supervisor_notes` + RLS.
+2. Funcții de scoring (deterministe, fără AI) + afișare pe profil elev.
+3. Tab-urile noi pe pagina elevului (Briefing / Date brute / Note).
+4. Server function pentru rezumat AI + cache.
+5. „Coadă de atenție" + filtre noi pe dashboard admin.
+6. Note supervizor (CRUD simplu).
 
-## Detalii tehnice
-
-- Toate exercițiile noi folosesc tipuri deja procesate de `ExerciseBlock` → 0 cod nou pe componente, doar date.
-- Pentru CTA-urile spre `/documents/.../fill` și `/library/ghid-miro-fluxuri`: rutele există deja (`_app.documents.$docId.fill.tsx` și `_app.library.$slug.tsx`). Folosesc `<Link to="...">` din `@tanstack/react-router`.
-- Pentru articolul nou: pattern identic cu `HiringArticle.tsx`; lazy în `LibraryArticlePage` printr-un `switch(slug)`.
-- Brand-ul SOP: refolosesc `BASE_STYLES` și `htmlShell` din `documentData.ts` — culoare `green` (`--green: #1A5C38`), ca diferențiere vizuală față de Parteneriat (`red`).
-
-Confirmi planul și încep implementarea în ordinea de mai sus?
+La final: o privire pe profilul oricărui elev = claritate completă fără să sapi.

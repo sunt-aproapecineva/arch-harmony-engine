@@ -16,6 +16,10 @@ import { getActivityForUser, ActivityEvent, timeAgo, ActivityType } from '../../
 import { generateProfile, QuizProfile } from '../../lib/quizProfile';
 import { EXERCISE_TEMPLATES } from '../../lib/exerciseData';
 import { recoverStudentExerciseResponses } from '../../lib/adminRecovery.functions';
+import { StudentBriefingPanel } from '@/components/admin/StudentBriefingPanel';
+import { SupervisorNotesPanel } from '@/components/admin/SupervisorNotesPanel';
+
+type TabKey = 'briefing' | 'raw' | 'notes';
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -259,6 +263,7 @@ export const AdminStudentProfile: React.FC = () => {
   const [recoveringDrafts, setRecoveringDrafts] = useState(false);
   const [recoveryMessage, setRecoveryMessage] = useState<string | null>(null);
   const recoverResponses = useServerFn(recoverStudentExerciseResponses);
+  const [tab, setTab] = useState<TabKey>('briefing');
 
   const handleRecoverLocalDrafts = async () => {
     if (!userId) return;
@@ -477,6 +482,43 @@ export const AdminStudentProfile: React.FC = () => {
         </div>
       </motion.div>
 
+      {/* ── Tabs ── */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 16, borderBottom: '1px solid var(--border)' }}>
+        {([
+          { key: 'briefing', label: 'Briefing supervizor' },
+          { key: 'raw', label: 'Date brute' },
+          { key: 'notes', label: 'Note supervizor' },
+        ] as { key: TabKey; label: string }[]).map(t => {
+          const active = tab === t.key;
+          return (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: '10px 14px',
+                fontSize: 13, fontWeight: active ? 700 : 500,
+                color: active ? 'var(--fg)' : 'var(--fg-3)',
+                borderBottom: active ? '2px solid var(--accent)' : '2px solid transparent',
+                marginBottom: -1,
+                transition: 'color 0.15s',
+              }}
+            >
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {tab === 'briefing' && (
+        <StudentBriefingPanel studentId={userId!} studentName={user.full_name || user.email} />
+      )}
+
+      {tab === 'notes' && (
+        <SupervisorNotesPanel studentId={userId!} />
+      )}
+
+      {tab === 'raw' && (<>
       {/* ── Section 2: Quiz Profile ── */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} style={cardStyle}>
         <div style={sectionLabel}>Profil Quiz</div>
@@ -843,6 +885,7 @@ export const AdminStudentProfile: React.FC = () => {
           <p style={{ fontSize: 13, color: 'var(--fg-3)', textAlign: 'center', padding: '16px 0' }}>Niciun exercițiu completat.</p>
         )}
       </motion.div>
+      </>)}
     </div>
   );
 };
