@@ -482,6 +482,43 @@ export const AdminStudentProfile: React.FC = () => {
         </div>
       </motion.div>
 
+      {/* ── Tabs ── */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 16, borderBottom: '1px solid var(--border)' }}>
+        {([
+          { key: 'briefing', label: 'Briefing supervizor' },
+          { key: 'raw', label: 'Date brute' },
+          { key: 'notes', label: 'Note supervizor' },
+        ] as { key: TabKey; label: string }[]).map(t => {
+          const active = tab === t.key;
+          return (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: '10px 14px',
+                fontSize: 13, fontWeight: active ? 700 : 500,
+                color: active ? 'var(--fg)' : 'var(--fg-3)',
+                borderBottom: active ? '2px solid var(--accent)' : '2px solid transparent',
+                marginBottom: -1,
+                transition: 'color 0.15s',
+              }}
+            >
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {tab === 'briefing' && (
+        <StudentBriefingPanel studentId={userId!} studentName={user.full_name || user.email} />
+      )}
+
+      {tab === 'notes' && (
+        <SupervisorNotesPanel studentId={userId!} />
+      )}
+
+      {tab === 'raw' && (<>
       {/* ── Section 2: Quiz Profile ── */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} style={cardStyle}>
         <div style={sectionLabel}>Profil Quiz</div>
