@@ -130,19 +130,58 @@ function renderReadableAnswer(
       node: rows.length === 0 ? (
         <p style={{ fontSize: 12, color: 'var(--fg-3)', fontStyle: 'italic' }}>Niciun rând completat</p>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {rows.map((row: any, i: number) => (
             <div key={i} style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 10px' }}>
               <div style={{ fontSize: 10, color: 'var(--fg-3)', marginBottom: 4 }}>#{i + 1}</div>
-              {Object.entries(row).map(([k, v]) => (
+              {Object.entries(row)
+                .filter(([k]) => !HIDDEN_ROW_KEYS.has(k))
+                .map(([k, v]) => (
                 <div key={k} style={{ display: 'flex', gap: 8, fontSize: 12, marginBottom: 2 }}>
-                  <span style={{ color: 'var(--fg-3)', minWidth: 130, flexShrink: 0 }}>{k}:</span>
+                  <span style={{ color: 'var(--fg-3)', minWidth: 180, flexShrink: 0 }}>{labelForRowKey(exType, k)}:</span>
                   <span style={{ color: 'var(--fg)', whiteSpace: 'pre-wrap' }}>{String(v ?? '—')}</span>
                 </div>
               ))}
             </div>
           ))}
         </div>
+      ),
+    };
+  }
+
+  // Object
+  if (typeof parsed === 'object') {
+    if (Array.isArray(parsed.rows)) {
+      const rows = parsed.rows.filter((r: any) => r && typeof r === 'object' && Object.values(r).some(v => String(v ?? '').trim() !== ''));
+      const conclusion = typeof parsed.conclusion === 'string' ? parsed.conclusion.trim() : '';
+      return {
+        metric: `${rows.length} ${rows.length === 1 ? 'rând' : 'rânduri'}${conclusion ? ' • concluzie' : ''}`,
+        metricColor: rows.length > 0 || conclusion ? '#4ade80' : 'var(--fg-3)',
+        node: (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {rows.map((row: any, i: number) => (
+              <div key={i} style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 10px' }}>
+                <div style={{ fontSize: 10, color: 'var(--fg-3)', marginBottom: 4 }}>#{i + 1}</div>
+                {Object.entries(row)
+                  .filter(([k, v]) => !HIDDEN_ROW_KEYS.has(k) && String(v ?? '').trim() !== '')
+                  .map(([k, v]) => (
+                  <div key={k} style={{ display: 'flex', gap: 8, fontSize: 12, marginBottom: 2 }}>
+                    <span style={{ color: 'var(--fg-3)', minWidth: 180, flexShrink: 0 }}>{labelForRowKey(exType, k)}:</span>
+                    <span style={{ color: 'var(--fg)', whiteSpace: 'pre-wrap' }}>{String(v ?? '—')}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+            {conclusion && (
+              <div style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 12px' }}>
+                <div style={{ fontSize: 10, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>Concluzia studentului</div>
+                <div style={{ fontSize: 13, color: 'var(--fg)', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{conclusion}</div>
+              </div>
+            )}
+          </div>
+        ),
+      };
+    }
       ),
     };
   }
