@@ -16,6 +16,10 @@ import { getActivityForUser, ActivityEvent, timeAgo, ActivityType } from '../../
 import { generateProfile, QuizProfile } from '../../lib/quizProfile';
 import { EXERCISE_TEMPLATES } from '../../lib/exerciseData';
 import { recoverStudentExerciseResponses } from '../../lib/adminRecovery.functions';
+import { StudentBriefingPanel } from '@/components/admin/StudentBriefingPanel';
+import { SupervisorNotesPanel } from '@/components/admin/SupervisorNotesPanel';
+
+type TabKey = 'briefing' | 'raw' | 'notes';
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -259,6 +263,7 @@ export const AdminStudentProfile: React.FC = () => {
   const [recoveringDrafts, setRecoveringDrafts] = useState(false);
   const [recoveryMessage, setRecoveryMessage] = useState<string | null>(null);
   const recoverResponses = useServerFn(recoverStudentExerciseResponses);
+  const [tab, setTab] = useState<TabKey>('briefing');
 
   const handleRecoverLocalDrafts = async () => {
     if (!userId) return;
