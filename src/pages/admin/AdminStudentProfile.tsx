@@ -76,10 +76,39 @@ function ActivityIcon({ type }: { type: ActivityType }) {
 }
 
 // ── Readable answer renderer ──────────────────────────────────────────────────
+// Friendly Romanian labels for row-keys used by dynamic exercises.
+// Keyed by exercise type so the supervisor sees the question instead of "id / role / activity".
+const ROW_KEY_LABELS: Record<string, Record<string, string>> = {
+  'activity-audit': {
+    activity: 'Activitatea',
+    percentage: '% din timp',
+    role: 'Rol (S=Specialist · D=Director · P=Proprietar)',
+  },
+  'bottleneck-map': {
+    situation: 'Decizia / Situația',
+    wasNecessary: 'Trebuia chiar tu? (Da/Nu)',
+    reason: 'Motiv (dacă Nu)',
+    time: 'Timp pierdut (min)',
+  },
+  'absence-test': {
+    scenario: 'Scenariul (dacă lipsesc 2 zile)',
+    gravity: 'Gravitate (Mare/Medie/Mică)',
+    causedBy: 'Cauza (de ce se întâmplă)',
+  },
+};
+// Keys we never want to display (internal IDs).
+const HIDDEN_ROW_KEYS = new Set(['id', '_id']);
+
+function labelForRowKey(type: string | undefined, key: string): string {
+  if (type && ROW_KEY_LABELS[type] && ROW_KEY_LABELS[type][key]) return ROW_KEY_LABELS[type][key];
+  return key;
+}
+
 function renderReadableAnswer(
   parsed: any,
   template: any
 ): { node: React.ReactNode; metric?: string; metricColor?: string } {
+  const exType: string | undefined = template?.type;
   // Empty / null
   if (parsed === null || parsed === undefined) {
     return { node: <p style={{ fontSize: 12, color: 'var(--fg-3)', fontStyle: 'italic' }}>Fără răspuns</p> };
@@ -101,13 +130,15 @@ function renderReadableAnswer(
       node: rows.length === 0 ? (
         <p style={{ fontSize: 12, color: 'var(--fg-3)', fontStyle: 'italic' }}>Niciun rând completat</p>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {rows.map((row: any, i: number) => (
             <div key={i} style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 10px' }}>
               <div style={{ fontSize: 10, color: 'var(--fg-3)', marginBottom: 4 }}>#{i + 1}</div>
-              {Object.entries(row).map(([k, v]) => (
+              {Object.entries(row)
+                .filter(([k]) => !HIDDEN_ROW_KEYS.has(k))
+                .map(([k, v]) => (
                 <div key={k} style={{ display: 'flex', gap: 8, fontSize: 12, marginBottom: 2 }}>
-                  <span style={{ color: 'var(--fg-3)', minWidth: 130, flexShrink: 0 }}>{k}:</span>
+                  <span style={{ color: 'var(--fg-3)', minWidth: 180, flexShrink: 0 }}>{labelForRowKey(exType, k)}:</span>
                   <span style={{ color: 'var(--fg)', whiteSpace: 'pre-wrap' }}>{String(v ?? '—')}</span>
                 </div>
               ))}
@@ -131,15 +162,22 @@ function renderReadableAnswer(
             {rows.map((row: any, i: number) => (
               <div key={i} style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 10px' }}>
                 <div style={{ fontSize: 10, color: 'var(--fg-3)', marginBottom: 4 }}>#{i + 1}</div>
-                {Object.entries(row).filter(([, v]) => String(v ?? '').trim() !== '').map(([k, v]) => (
+                {Object.entries(row)
+                  .filter(([k, v]) => !HIDDEN_ROW_KEYS.has(k) && String(v ?? '').trim() !== '')
+                  .map(([k, v]) => (
                   <div key={k} style={{ display: 'flex', gap: 8, fontSize: 12, marginBottom: 2 }}>
-                    <span style={{ color: 'var(--fg-3)', minWidth: 130, flexShrink: 0 }}>{k}:</span>
+                    <span style={{ color: 'var(--fg-3)', minWidth: 180, flexShrink: 0 }}>{labelForRowKey(exType, k)}:</span>
                     <span style={{ color: 'var(--fg)', whiteSpace: 'pre-wrap' }}>{String(v ?? '—')}</span>
                   </div>
                 ))}
               </div>
             ))}
-            {conclusion && <div style={{ fontSize: 13, color: 'var(--fg)', whiteSpace: 'pre-wrap', lineHeight: 1.5, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 10px' }}>{conclusion}</div>}
+            {conclusion && (
+              <div style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 12px' }}>
+                <div style={{ fontSize: 10, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>Concluzia studentului</div>
+                <div style={{ fontSize: 13, color: 'var(--fg)', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{conclusion}</div>
+              </div>
+            )}
           </div>
         ),
       };
@@ -873,6 +911,16 @@ export const AdminStudentProfile: React.FC = () => {
                           </span>
                         )}
                       </div>
+                      {template?.instructions && (
+                        <div style={{
+                          fontSize: 12, color: 'var(--fg-2)', lineHeight: 1.55,
+                          background: 'var(--bg)', border: '1px solid var(--border)', borderLeft: '2px solid var(--accent)',
+                          borderRadius: 6, padding: '8px 10px', marginBottom: 10, whiteSpace: 'pre-wrap',
+                        }}>
+                          <div style={{ fontSize: 10, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>Cerința exercițiului</div>
+                          {template.instructions}
+                        </div>
+                      )}
                       {summary.node}
                     </div>
                   );
