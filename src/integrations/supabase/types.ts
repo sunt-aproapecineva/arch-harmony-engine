@@ -327,6 +327,69 @@ export type Database = {
         }
         Relationships: []
       }
+      student_insights: {
+        Row: {
+          created_at: string
+          generated_at: string
+          id: string
+          model_used: string | null
+          scores: Json
+          summary: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          generated_at?: string
+          id?: string
+          model_used?: string | null
+          scores?: Json
+          summary?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          generated_at?: string
+          id?: string
+          model_used?: string | null
+          scores?: Json
+          summary?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      supervisor_notes: {
+        Row: {
+          author_id: string
+          author_name: string | null
+          created_at: string
+          id: string
+          note: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          author_id: string
+          author_name?: string | null
+          created_at?: string
+          id?: string
+          note: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          author_id?: string
+          author_name?: string | null
+          created_at?: string
+          id?: string
+          note?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
