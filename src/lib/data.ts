@@ -65,7 +65,7 @@ export const LIVE_EVENTS: LiveEvent[] = [
     id: 'ev-6',
     type: 'workshop',
     title: 'Workshop Tematic #3',
-    date: '2026-06-26',
+    date: '2026-06-25',
     time: '19:00',
     duration: '90 min',
     description: 'Workshop interactiv. Tema aleasă de grup, prezentare extinsă.',
