@@ -54,7 +54,8 @@ async function gatherStudent(admin: any, studentId: string) {
   const exerciseResponses: Record<string, unknown> = {};
   exerciseRows.forEach((r: any) => { exerciseResponses[r.exercise_id] = r.response; });
 
-  const completedLessonIds = progress.map((p: any) => p.lesson_id);
+  const videoLessonIds = new Set(lessons.map((l: any) => l.id));
+  const completedLessonIds = progress.map((p: any) => p.lesson_id).filter((id: string) => videoLessonIds.has(id));
   const totalLessons = lessons.length;
   const totalExercises = exercises.length;
   const nonEmptyNotes = notes.filter((n: any) => (n.content || '').trim().length > 5).length;
