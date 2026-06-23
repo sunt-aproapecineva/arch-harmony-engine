@@ -363,7 +363,7 @@ export const getAttentionQueue = createServerFn({ method: 'POST' })
         admin.from('activity_log').select('user_id,created_at').order('created_at', { ascending: false }).limit(5000),
         admin.from('quiz_responses').select('user_id'),
         admin.from('modules').select('id,title,etapa,order_index').order('order_index'),
-        admin.from('lessons').select('id,module_id,order_index').order('order_index'),
+        admin.from('lessons').select('id,module_id,order_index,video_url').order('order_index'),
         admin.from('exercises').select('id,module_id').order('order_index'),
       ]);
 
