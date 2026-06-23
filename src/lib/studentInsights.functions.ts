@@ -158,8 +158,11 @@ ${exerciseSamples || '(niciun exercițiu completat)'}
 NOTIȚE LECȚII (până la 6):
 ${notesSample || '(nicio notiță)'}
 
+CONTEXT IMPORTANT:
+Supervizorul (Valeria, Manager de Implementare) organizează sesiuni individuale de tracking de ~60 minute cu fiecare elev. Scopul apelului: analizează progresul, identifică blocaje, vede cum poate îmbunătăți procesul de învățare și implementare. Briefingul tău trebuie să o pregătească pentru acest apel concret.
+
 INSTRUCȚIUNI DE FORMATARE:
-Scrie EXACT 5 secțiuni, cu titluri markdown, în această ordine:
+Scrie EXACT 6 secțiuni, cu titluri markdown, în această ordine:
 
 ## 1. Cine e elevul
 2-3 fraze: domeniu, vechime, dimensiune echipă, cifră de afaceri (din quiz). Ton neutru, factual.
@@ -176,7 +179,14 @@ Identifică problema PRINCIPALĂ acum: modul/exercițiu/concept. Dacă e inactiv
 ## 5. Recomandări pentru supervizor
 EXACT 3 acțiuni concrete și scurte, fiecare începând cu un verb la imperativ (ex: "Sună-l despre...", "Verifică exercițiul...", "Trimite-i materialul...", "Felicită-l pentru..."). Acțiuni reale, nu generice.
 
-Lungime totală: 250-400 cuvinte. Fără introducere și fără concluzie generală. Începe direct cu "## 1. Cine e elevul". Nu inventa date care nu sunt în input.`;
+## 6. Întrebări pentru apelul de tracking
+EXACT 6-8 întrebări pe care Valeria să le pună în apelul de 60 min, PERSONALIZATE pe baza datelor concrete ale acestui elev (nu generice). Fiecare întrebare:
+- Pleacă de la ceva ce elevul A SCRIS sau A FĂCUT (citează scurt în paranteză când e relevant: ex. "(la auditul de activitate ai marcat 70% rol Specialist)").
+- Sau de la ceva ce LIPSEȘTE (ex: "Nu ai completat exercițiul X — ce te-a oprit?").
+- Acoperă: blocaje reale, înțelegerea conceptelor cheie, aplicarea în business, motivație/timp, pași următori.
+- Format: listă numerotată "1." ... "8.", fiecare întrebare pe o linie, deschisă (nu da/nu), maxim 25 cuvinte.
+
+Lungime totală: 350-550 cuvinte. Fără introducere și fără concluzie generală. Începe direct cu "## 1. Cine e elevul". Nu inventa date care nu sunt în input — dacă lipsesc date pentru o secțiune, spune asta scurt.`;
 }
 
 export const generateStudentInsight = createServerFn({ method: 'POST' })
