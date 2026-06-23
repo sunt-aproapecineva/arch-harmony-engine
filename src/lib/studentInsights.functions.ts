@@ -22,7 +22,7 @@ async function gatherStudent(admin: any, studentId: string) {
       admin.from('exercise_responses').select('exercise_id,response,updated_at').eq('user_id', studentId),
       admin.from('activity_log').select('created_at,type,label').eq('user_id', studentId).order('created_at', { ascending: false }).limit(500),
       admin.from('modules').select('id,title,etapa,order_index').order('order_index'),
-      admin.from('lessons').select('id,module_id,title,order_index').order('order_index'),
+      admin.from('lessons').select('id,module_id,title,order_index,video_url').order('order_index'),
       admin.from('exercises').select('id,module_id,title,order_index').order('order_index'),
     ]);
 
@@ -31,7 +31,9 @@ async function gatherStudent(admin: any, studentId: string) {
   if (!profile) throw new Error('Elev inexistent.');
 
   const modules = (modulesRes.data || []) as any[];
-  const lessons = (lessonsRes.data || []) as any[];
+  const allLessons = (lessonsRes.data || []) as any[];
+  // Only count lessons that actually have a video — placeholders/empty lessons are excluded
+  const lessons = allLessons.filter((l: any) => !!(l.video_url && String(l.video_url).trim()));
   const exercises = (exercisesRes.data || []) as any[];
   const lessonsByMod: Record<string, any[]> = {};
   const exercisesByMod: Record<string, any[]> = {};
@@ -52,7 +54,8 @@ async function gatherStudent(admin: any, studentId: string) {
   const exerciseResponses: Record<string, unknown> = {};
   exerciseRows.forEach((r: any) => { exerciseResponses[r.exercise_id] = r.response; });
 
-  const completedLessonIds = progress.map((p: any) => p.lesson_id);
+  const videoLessonIds = new Set(lessons.map((l: any) => l.id));
+  const completedLessonIds = progress.map((p: any) => p.lesson_id).filter((id: string) => videoLessonIds.has(id));
   const totalLessons = lessons.length;
   const totalExercises = exercises.length;
   const nonEmptyNotes = notes.filter((n: any) => (n.content || '').trim().length > 5).length;
@@ -360,7 +363,7 @@ export const getAttentionQueue = createServerFn({ method: 'POST' })
         admin.from('activity_log').select('user_id,created_at').order('created_at', { ascending: false }).limit(5000),
         admin.from('quiz_responses').select('user_id'),
         admin.from('modules').select('id,title,etapa,order_index').order('order_index'),
-        admin.from('lessons').select('id,module_id,order_index').order('order_index'),
+        admin.from('lessons').select('id,module_id,order_index,video_url').order('order_index'),
         admin.from('exercises').select('id,module_id').order('order_index'),
       ]);
 
@@ -368,7 +371,8 @@ export const getAttentionQueue = createServerFn({ method: 'POST' })
     const profiles = (profilesRes.data || []).filter((p: any) => !adminIds.has(p.id));
 
     const modules = (modulesRes.data || []) as any[];
-    const lessons = (lessonsRes.data || []) as any[];
+    const allLessons = (lessonsRes.data || []) as any[];
+    const lessons = allLessons.filter((l: any) => !!(l.video_url && String(l.video_url).trim()));
     const exercises = (exercisesRes.data || []) as any[];
     const lessonsByMod: Record<string, any[]> = {};
     const exercisesByMod: Record<string, any[]> = {};
@@ -382,8 +386,9 @@ export const getAttentionQueue = createServerFn({ method: 'POST' })
     const totalLessons = lessons.length;
     const totalExercises = exercises.length;
 
+    const videoLessonIds = new Set(lessons.map((l: any) => l.id));
     const progressByUser: Record<string, string[]> = {};
-    (progressRes.data || []).forEach((p: any) => { (progressByUser[p.user_id] ||= []).push(p.lesson_id); });
+    (progressRes.data || []).forEach((p: any) => { if (videoLessonIds.has(p.lesson_id)) (progressByUser[p.user_id] ||= []).push(p.lesson_id); });
 
     const exByUser: Record<string, Record<string, unknown>> = {};
     (exRes.data || []).forEach((r: any) => {
