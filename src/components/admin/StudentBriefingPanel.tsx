@@ -110,11 +110,11 @@ function splitCategories(text: string): Category[] {
     const pairs: QuestionPair[] = [];
     let current: QuestionPair | null = null;
     for (const line of bodyLines) {
-      const qMatch = line.match(/^\*\*Întrebare:\*\*\s*(.+)$/);
+      const qMatch = line.match(/^\*\*Întrebare:\*\*\s*(.+?)(?:\s*_(Context elev):_\s*(.+))?$/);
       const cMatch = line.match(/^_(Context elev):_\s*(.+)$/);
       if (qMatch) {
         if (current) pairs.push(current);
-        current = { q: qMatch[1].trim(), ctx: '' };
+        current = { q: qMatch[1].trim(), ctx: qMatch[3] ? qMatch[3].trim() : '' };
       } else if (cMatch && current) {
         current.ctx = cMatch[2].trim();
       }
