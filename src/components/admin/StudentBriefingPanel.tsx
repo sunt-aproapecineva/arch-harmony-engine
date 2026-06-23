@@ -48,42 +48,199 @@ function ScoreBar({ label, value, icon }: { label: string; value: number; icon: 
   );
 }
 
-// Lightweight markdown rendering (## H2 + paragraphs + bullets)
-function MarkdownLite({ text }: { text: string }) {
-  const lines = text.split('\n');
-  const blocks: React.ReactNode[] = [];
-  let buf: string[] = [];
-  const flush = (key: string) => {
-    if (!buf.length) return;
-    const para = buf.join(' ').trim();
-    if (para) blocks.push(<p key={key} style={{ fontSize: 13.5, color: 'var(--fg-2)', lineHeight: 1.65, marginBottom: 10 }}>{para}</p>);
-    buf = [];
-  };
-  lines.forEach((raw, i) => {
-    const line = raw.trim();
-    if (line.startsWith('## ')) {
-      flush(`p-${i}`);
-      blocks.push(
-        <h3 key={`h-${i}`} style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 18, marginBottom: 8 }}>
-          {line.replace(/^##\s*/, '')}
-        </h3>
-      );
-    } else if (line.startsWith('- ') || line.startsWith('* ')) {
-      flush(`p-${i}`);
-      blocks.push(
-        <div key={`li-${i}`} style={{ display: 'flex', gap: 8, fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.6, marginBottom: 4 }}>
-          <span style={{ color: 'var(--accent)' }}>•</span><span>{line.replace(/^[-*]\s*/, '')}</span>
-        </div>
-      );
-    } else if (line === '') {
-      flush(`p-${i}`);
-    } else {
-      buf.push(line);
-    }
-  });
-  flush('p-end');
-  return <>{blocks}</>;
+function getTextContent(node: React.ReactNode): string {
+  if (typeof node === 'string' || typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(getTextContent).join('');
+  if (React.isValidElement(node) && node.props.children) return getTextContent(node.props.children);
+  return '';
 }
+
+const mdComponents = {
+  h2: ({ children }: { children?: React.ReactNode }) => (
+    <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 18, marginBottom: 8 }}>
+      {children}
+    </h3>
+  ),
+  h3: ({ children }: { children?: React.ReactNode }) => (
+    <h4 style={{ fontSize: 12, fontWeight: 700, color: 'var(--fg-2)', marginTop: 14, marginBottom: 6 }}>{children}</h4>
+  ),
+  p: ({ children }: { children?: React.ReactNode }) => (
+    <p style={{ fontSize: 13.5, color: 'var(--fg-2)', lineHeight: 1.65, marginBottom: 10 }}>{children}</p>
+  ),
+  ul: ({ children }: { children?: React.ReactNode }) => (
+    <ul style={{ paddingLeft: 18, marginBottom: 10 }}>{children}</ul>
+  ),
+  li: ({ children }: { children?: React.ReactNode }) => (
+    <li style={{ fontSize: 13.5, color: 'var(--fg-2)', lineHeight: 1.6, marginBottom: 4 }}>{children}</li>
+  ),
+  strong: ({ children }: { children?: React.ReactNode }) => (
+    <strong style={{ color: 'var(--fg)', fontWeight: 700 }}>{children}</strong>
+  ),
+  em: ({ children }: { children?: React.ReactNode }) => (
+    <em style={{ color: 'var(--fg-2)' }}>{children}</em>
+  ),
+};
+
+interface QuestionPair { q: string; ctx: string; }
+interface Category { letter: string; title: string; pairs: QuestionPair[]; }
+
+function splitTopLevelSections(text: string): { title: string; body: string }[] {
+  const raw = text.replace(/^\s+|\s+$/g, '');
+  if (!raw) return [];
+  const blocks = raw.split(/\n(?=## )/).filter(Boolean);
+  return blocks.map((block) => {
+    const lines = block.split('\n');
+    const first = lines[0].replace(/^##\s*/, '').trim();
+    const body = lines.slice(1).join('\n').trim();
+    return { title: first, body };
+  });
+}
+
+function splitCategories(text: string): Category[] {
+  const raw = text.replace(/^\s+|\s+$/g, '');
+  if (!raw) return [];
+  const blocks = raw.split(/\n(?=### )/).filter(Boolean);
+  return blocks.map((block) => {
+    const lines = block.split('\n');
+    const header = lines[0].replace(/^###\s*/, '').trim();
+    const letterMatch = header.match(/^([A-F])\.\s*(.*)$/);
+    const letter = letterMatch?.[1] || '';
+    const title = letterMatch?.[2] || header;
+    const bodyLines = lines.slice(1).map((l) => l.trim()).filter((l) => l !== '');
+    const pairs: QuestionPair[] = [];
+    let current: QuestionPair | null = null;
+    for (const line of bodyLines) {
+      const qMatch = line.match(/^\*\*Întrebare:\*\*\s*(.+)$/);
+      const cMatch = line.match(/^_(Context elev):_\s*(.+)$/);
+      if (qMatch) {
+        if (current) pairs.push(current);
+        current = { q: qMatch[1].trim(), ctx: '' };
+      } else if (cMatch && current) {
+        current.ctx = cMatch[2].trim();
+      }
+    }
+    if (current) pairs.push(current);
+    return { letter, title, pairs };
+  });
+}
+
+function NormalSection({ title, body }: { title: string; body: string }) {
+  return (
+    <div style={{ marginBottom: 4 }}>
+      <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8, marginTop: 0 }}>
+        {title}
+      </h3>
+      <ReactMarkdown components={mdComponents}>{body}</ReactMarkdown>
+    </div>
+  );
+}
+
+function QuestionsSection({ body }: { body: string }) {
+  const categories = splitCategories(body);
+  if (categories.length === 0) {
+    return <ReactMarkdown components={mdComponents}>{body}</ReactMarkdown>;
+  }
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {categories.map((cat, idx) => (
+        <div
+          key={idx}
+          style={{
+            background: 'var(--bg)',
+            border: '1px solid var(--border)',
+            borderRadius: 12,
+            padding: '14px 16px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 26,
+                height: 26,
+                borderRadius: 7,
+                background: 'var(--accent)',
+                color: '#0D0907',
+                fontSize: 12,
+                fontWeight: 800,
+              }}
+            >
+              {cat.letter}
+            </span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--fg)' }}>{cat.title}</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {cat.pairs.map((pair, i) => (
+              <div
+                key={i}
+                style={{
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 10,
+                  padding: '12px 14px',
+                }}
+              >
+                <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--accent)', fontWeight: 700, marginBottom: 6 }}>
+                  Întrebare
+                </div>
+                <div style={{ fontSize: 14, color: 'var(--fg)', lineHeight: 1.55, marginBottom: pair.ctx ? 10 : 0 }}>
+                  {pair.q}
+                </div>
+                {pair.ctx && (
+                  <div style={{ borderLeft: '3px solid var(--accent)', paddingLeft: 10 }}>
+                    <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--fg-3)', fontWeight: 700, marginBottom: 4 }}>
+                      Context elev
+                    </div>
+                    <div style={{ fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.55, fontStyle: 'italic' }}>
+                      {pair.ctx}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BriefingMarkdown({ text }: { text: string }) {
+  const sections = splitTopLevelSections(text);
+  if (sections.length === 0) return <ReactMarkdown components={mdComponents}>{text}</ReactMarkdown>;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {sections.map((section, idx) => {
+        const isQuestions = /^6[.\s]/.test(section.title) || section.title.toLowerCase().includes('întrebări');
+        return (
+          <div
+            key={idx}
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border)',
+              borderRadius: 14,
+              padding: '18px 20px',
+            }}
+          >
+            {isQuestions ? (
+              <>
+                <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14, marginTop: 0 }}>
+                  {section.title}
+                </h3>
+                <QuestionsSection body={section.body} />
+              </>
+            ) : (
+              <NormalSection title={section.title} body={section.body} />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 
 export const StudentBriefingPanel: React.FC<Props> = ({ studentId, studentName }) => {
   const [scores, setScores] = useState<StudentScores | null>(null);
