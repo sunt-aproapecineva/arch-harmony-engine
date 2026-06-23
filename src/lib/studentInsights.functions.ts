@@ -183,7 +183,7 @@ EXACT 3 acțiuni concrete și scurte, fiecare începând cu un verb la imperativ
 Generează 10-14 întrebări PERSONALIZATE pentru apelul de 60 min, grupate pe categorii. Scop: Valeria să nu piardă timp căutând context — toate datele relevante să fie deja în întrebare.
 
 REGULI STRICTE pentru fiecare întrebare:
-- Format obligatoriu pe DOUĂ linii consecutive:
+- Folosește EXACT formatul următor, cu o linie goală între întrebare și context:
   **Întrebare:** <textul întrebării, deschisă, max 25 cuvinte>
   _Context elev:_ <ce a scris / făcut / NU a făcut elevul, citat scurt sau parafrazat, max 30 cuvinte. Dacă nu există date, scrie "(fără date — întrebare exploratorie)".>
 - Întrebările pleacă din datele REALE (quiz, exerciții, notițe, progres, inactivitate). Nu inventa.
