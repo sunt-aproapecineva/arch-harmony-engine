@@ -185,6 +185,8 @@ Generează 10-14 întrebări PERSONALIZATE pentru apelul de 60 min, grupate pe c
 REGULI STRICTE pentru fiecare întrebare:
 - Folosește EXACT formatul următor, cu o linie goală între întrebare și context:
   **Întrebare:** <textul întrebării, deschisă, max 25 cuvinte>
+
+
   _Context elev:_ <ce a scris / făcut / NU a făcut elevul, citat scurt sau parafrazat, max 30 cuvinte. Dacă nu există date, scrie "(fără date — întrebare exploratorie)".>
 - Întrebările pleacă din datele REALE (quiz, exerciții, notițe, progres, inactivitate). Nu inventa.
 - Fără răspunsuri "da/nu". Fără generalități goale.
