@@ -371,7 +371,8 @@ export const getAttentionQueue = createServerFn({ method: 'POST' })
     const profiles = (profilesRes.data || []).filter((p: any) => !adminIds.has(p.id));
 
     const modules = (modulesRes.data || []) as any[];
-    const lessons = (lessonsRes.data || []) as any[];
+    const allLessons = (lessonsRes.data || []) as any[];
+    const lessons = allLessons.filter((l: any) => !!(l.video_url && String(l.video_url).trim()));
     const exercises = (exercisesRes.data || []) as any[];
     const lessonsByMod: Record<string, any[]> = {};
     const exercisesByMod: Record<string, any[]> = {};
