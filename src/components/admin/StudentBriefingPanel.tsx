@@ -1,8 +1,10 @@
 // @ts-nocheck
 import React, { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { useServerFn } from '@tanstack/react-start';
 import { motion } from 'framer-motion';
 import { Sparkles, RefreshCw, AlertCircle, TrendingUp, Activity, Brain, Calendar } from 'lucide-react';
+
 import {
   generateStudentInsight,
   getStudentInsightBundle,
