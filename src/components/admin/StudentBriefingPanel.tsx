@@ -388,7 +388,8 @@ export const StudentBriefingPanel: React.FC<Props> = ({ studentId, studentName }
             <TrendingUp size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} /> AI analizează datele elevului...
           </div>
         ) : summary ? (
-          <div><MarkdownLite text={summary} /></div>
+          <div><BriefingMarkdown text={summary} /></div>
+
         ) : null}
       </motion.div>
     </div>
