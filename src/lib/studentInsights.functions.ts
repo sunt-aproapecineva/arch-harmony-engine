@@ -180,13 +180,36 @@ Identifică problema PRINCIPALĂ acum: modul/exercițiu/concept. Dacă e inactiv
 EXACT 3 acțiuni concrete și scurte, fiecare începând cu un verb la imperativ (ex: "Sună-l despre...", "Verifică exercițiul...", "Trimite-i materialul...", "Felicită-l pentru..."). Acțiuni reale, nu generice.
 
 ## 6. Întrebări pentru apelul de tracking
-EXACT 6-8 întrebări pe care Valeria să le pună în apelul de 60 min, PERSONALIZATE pe baza datelor concrete ale acestui elev (nu generice). Fiecare întrebare:
-- Pleacă de la ceva ce elevul A SCRIS sau A FĂCUT (citează scurt în paranteză când e relevant: ex. "(la auditul de activitate ai marcat 70% rol Specialist)").
-- Sau de la ceva ce LIPSEȘTE (ex: "Nu ai completat exercițiul X — ce te-a oprit?").
-- Acoperă: blocaje reale, înțelegerea conceptelor cheie, aplicarea în business, motivație/timp, pași următori.
-- Format: listă numerotată "1." ... "8.", fiecare întrebare pe o linie, deschisă (nu da/nu), maxim 25 cuvinte.
+Generează 10-14 întrebări PERSONALIZATE pentru apelul de 60 min, grupate pe categorii. Scop: Valeria să nu piardă timp căutând context — toate datele relevante să fie deja în întrebare.
 
-Lungime totală: 350-550 cuvinte. Fără introducere și fără concluzie generală. Începe direct cu "## 1. Cine e elevul". Nu inventa date care nu sunt în input — dacă lipsesc date pentru o secțiune, spune asta scurt.`;
+REGULI STRICTE pentru fiecare întrebare:
+- Format obligatoriu pe DOUĂ linii consecutive:
+  **Întrebare:** <textul întrebării, deschisă, max 25 cuvinte>
+  _Context elev:_ <ce a scris / făcut / NU a făcut elevul, citat scurt sau parafrazat, max 30 cuvinte. Dacă nu există date, scrie "(fără date — întrebare exploratorie)".>
+- Întrebările pleacă din datele REALE (quiz, exerciții, notițe, progres, inactivitate). Nu inventa.
+- Fără răspunsuri "da/nu". Fără generalități goale.
+
+Folosește EXACT aceste 6 sub-secțiuni (titluri cu ###), 1-3 întrebări fiecare:
+
+### A. Blocaje și progres concret
+Ce nu a terminat, unde s-a oprit, ce modul/exercițiu pare greu. Citează numele modulului sau exercițiului.
+
+### B. Înțelegerea conceptelor cheie
+Verifică dacă a înțeles ce a scris (audit roluri, organigramă, pereți portanți, SOP etc.). Pleacă de la un răspuns concret al lui.
+
+### C. Aplicarea în business (implementare reală)
+Ce a reușit să implementeze deja în firma lui? Care etapă e cea mai grea de implementat practic? Ce blochează trecerea de la teorie la acțiune?
+
+### D. Suport și ajutor necesar
+Unde are nevoie de mai mult suport (1-la-1, exemple, template, follow-up)? Ce lipsește din formatul actual?
+
+### E. Platforma și calitatea informației
+Feedback despre platformă (UX, claritate exerciții, lecții video, documente, bibliotecă). Ce e neclar, ce ar îmbunătăți, ce material i-a folosit cel mai mult.
+
+### F. Motivație, timp și pași următori
+Cât timp alocă săptămânal, ce îl ține motivat, ce angajament concret face până la următorul apel.
+
+Lungime totală: 500-800 cuvinte. Fără introducere și fără concluzie generală. Începe direct cu "## 1. Cine e elevul". Nu inventa date — dacă lipsesc, spune scurt.`;
 }
 
 export const generateStudentInsight = createServerFn({ method: 'POST' })
