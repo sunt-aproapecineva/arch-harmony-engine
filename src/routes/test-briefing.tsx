@@ -58,8 +58,8 @@ _Context elev:_ Scorul de consistență este 0/100, iar ultima activitate a fost
 
 export const Route = createFileRoute('/test-briefing')({
   component: TestBriefing,
-  head: () => ({ title: 'Test Briefing' }),
 });
+
 
 function TestBriefing() {
   return (

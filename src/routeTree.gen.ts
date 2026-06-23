@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WelcomeRouteImport } from './routes/welcome'
+import { Route as TestBriefingRouteImport } from './routes/test-briefing'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as QuizRouteImport } from './routes/quiz'
@@ -35,6 +36,11 @@ import { Route as AppDocumentsDocIdFillRouteImport } from './routes/_app.documen
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestBriefingRoute = TestBriefingRouteImport.update({
+  id: '/test-briefing',
+  path: '/test-briefing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/test-briefing': typeof TestBriefingRoute
   '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
@@ -172,6 +179,7 @@ export interface FileRoutesByTo {
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/test-briefing': typeof TestBriefingRoute
   '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
@@ -197,6 +205,7 @@ export interface FileRoutesById {
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/test-briefing': typeof TestBriefingRoute
   '/welcome': typeof WelcomeRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/quiz'
     | '/register'
     | '/reset-password'
+    | '/test-briefing'
     | '/welcome'
     | '/dashboard'
     | '/admin/activity'
@@ -244,6 +254,7 @@ export interface FileRouteTypes {
     | '/quiz'
     | '/register'
     | '/reset-password'
+    | '/test-briefing'
     | '/welcome'
     | '/dashboard'
     | '/admin/activity'
@@ -268,6 +279,7 @@ export interface FileRouteTypes {
     | '/quiz'
     | '/register'
     | '/reset-password'
+    | '/test-briefing'
     | '/welcome'
     | '/_app/dashboard'
     | '/admin/activity'
@@ -293,6 +305,7 @@ export interface RootRouteChildren {
   QuizRoute: typeof QuizRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  TestBriefingRoute: typeof TestBriefingRoute
   WelcomeRoute: typeof WelcomeRoute
 }
 
@@ -303,6 +316,13 @@ declare module '@tanstack/react-router' {
       path: '/welcome'
       fullPath: '/welcome'
       preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test-briefing': {
+      id: '/test-briefing'
+      path: '/test-briefing'
+      fullPath: '/test-briefing'
+      preLoaderRoute: typeof TestBriefingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -506,6 +526,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuizRoute: QuizRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  TestBriefingRoute: TestBriefingRoute,
   WelcomeRoute: WelcomeRoute,
 }
 export const routeTree = rootRouteImport
