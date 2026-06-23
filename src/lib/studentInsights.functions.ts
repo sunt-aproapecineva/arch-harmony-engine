@@ -386,6 +386,7 @@ export const getAttentionQueue = createServerFn({ method: 'POST' })
     const totalLessons = lessons.length;
     const totalExercises = exercises.length;
 
+    const videoLessonIds = new Set(lessons.map((l: any) => l.id));
     const progressByUser: Record<string, string[]> = {};
     (progressRes.data || []).forEach((p: any) => { (progressByUser[p.user_id] ||= []).push(p.lesson_id); });
 
