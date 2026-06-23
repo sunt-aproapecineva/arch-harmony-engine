@@ -207,7 +207,7 @@ function QuestionsSection({ body }: { body: string }) {
   );
 }
 
-function BriefingMarkdown({ text }: { text: string }) {
+export function BriefingMarkdown({ text }: { text: string }) {
   const sections = splitTopLevelSections(text);
   if (sections.length === 0) return <ReactMarkdown components={mdComponents}>{text}</ReactMarkdown>;
   return (
