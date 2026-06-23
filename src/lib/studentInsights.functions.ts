@@ -22,7 +22,7 @@ async function gatherStudent(admin: any, studentId: string) {
       admin.from('exercise_responses').select('exercise_id,response,updated_at').eq('user_id', studentId),
       admin.from('activity_log').select('created_at,type,label').eq('user_id', studentId).order('created_at', { ascending: false }).limit(500),
       admin.from('modules').select('id,title,etapa,order_index').order('order_index'),
-      admin.from('lessons').select('id,module_id,title,order_index').order('order_index'),
+      admin.from('lessons').select('id,module_id,title,order_index,video_url').order('order_index'),
       admin.from('exercises').select('id,module_id,title,order_index').order('order_index'),
     ]);
 
