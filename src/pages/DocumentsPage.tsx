@@ -56,6 +56,9 @@ const DOC_PAGE_COUNTS: Record<string, number> = {
   'doc-1': 7,
   'doc-2': 5,
   'doc-3': 4,
+  'sop-procedura': 3,
+  'doc-fisa-post': 4,
+  'doc-instructiune': 4,
 };
 
 // ─── Template Card ────────────────────────────────────────────────────────────
