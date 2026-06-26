@@ -66,20 +66,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+    let cancelled = false;
+
+    // Initial hydration from persisted session (storage). This is the only
+    // path that runs on mount — avoids the race where INITIAL_SESSION fires
+    // before getSession() returns and re-hydrates with stale state.
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (cancelled) return;
+      const u = await hydrateUser(session?.user);
+      if (cancelled) return;
+      setUser(u);
+      setLoading(false);
+    });
+
+    // Only react to identity changes. Skip INITIAL_SESSION and
+    // TOKEN_REFRESHED — those fire on every mount / ~hourly and used to
+    // re-fetch profile+quiz, briefly flipping quiz_completed=false and
+    // hiding the lesson video behind the onboarding gate.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event !== 'SIGNED_IN' && event !== 'SIGNED_OUT' && event !== 'USER_UPDATED') return;
       // defer DB calls to avoid deadlock inside listener
       setTimeout(async () => {
+        if (cancelled) return;
         const u = await hydrateUser(session?.user);
+        if (cancelled) return;
         setUser(u);
         setLoading(false);
       }, 0);
     });
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      const u = await hydrateUser(session?.user);
-      setUser(u);
-      setLoading(false);
-    });
-    return () => subscription.unsubscribe();
+
+    return () => { cancelled = true; subscription.unsubscribe(); };
   }, []);
 
   const login = async (email: string, password: string) => {
