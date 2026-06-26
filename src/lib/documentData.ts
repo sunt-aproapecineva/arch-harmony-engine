@@ -1849,4 +1849,32 @@ export const PLATFORM_DOCUMENTS: PlatformDocument[] = [
     steps: doc4Steps,
     generate: generateDoc4,
   },
+  {
+    id: 'doc-fisa-post',
+    lessonIds: ['l-4-1', 'l-4-2', 'l-4-3'],
+    docNumber: '05',
+    title: 'Fișă de Post',
+    shortTitle: 'Fișă de Post',
+    description:
+      'Template tipăribil pentru fișa de post: scopul rolului, produsul, criteriul de evaluare, KPI, limite de autoritate, salariu și resurse. Companion pentru Săptămâna 5 — Contoarele.',
+    downloadUrl: '',
+    topic: 'Oamenii',
+    color: 'gold',
+    steps: doc5Steps,
+    generate: generateDoc5,
+  },
+  {
+    id: 'doc-instructiune',
+    lessonIds: ['l-4-1', 'l-4-2', 'l-4-3'],
+    docNumber: '06',
+    title: 'Instrucțiune de Lucru',
+    shortTitle: 'Instrucțiune de Lucru',
+    description:
+      'Template tipăribil pentru instrucțiuni operaționale: scop, materiale necesare, pași concreți, criterii de calitate, greșeli frecvente și situații de excepție. Companion pentru Săptămâna 5.',
+    downloadUrl: '',
+    topic: 'Instrucțiune',
+    color: 'red',
+    steps: doc6Steps,
+    generate: generateDoc6,
+  },
 ];
