@@ -1,11 +1,23 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Plus, Trash2, ChevronRight, ChevronDown, CheckCircle2, Download, Loader2 } from 'lucide-react';
 import { getExerciseTemplate, ExerciseTemplate, QuizQuestionItem } from '../../lib/exerciseData';
 import { useAuthContext } from '../../context/AuthContext';
+import { pushExerciseResponse, loadExerciseResponse } from '../../lib/exerciseSync';
 
 interface ExerciseBlockProps {
   exerciseId: string;
+}
+
+// Save to localStorage + debounced cloud sync. Cloud sync skipped for the
+// anonymous storage key (used briefly before user is hydrated).
+function saveExLocal(storageKey: string, value: unknown) {
+  try { localStorage.setItem(storageKey, JSON.stringify(value)); } catch {}
+  // storageKey format: aa_ex_<userId>_<exerciseId>
+  const m = storageKey.match(/^aa_ex_([^_]+)_(.+)$/);
+  if (m && m[1] !== 'anon') {
+    pushExerciseResponse(m[2], value);
+  }
 }
 
 // ─── Checklist ────────────────────────────────────────────────────────────────
@@ -26,7 +38,7 @@ const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: stri
   const toggle = (id: string) => {
     const next = { ...checked, [id]: !checked[id] };
     setChecked(next);
-    localStorage.setItem(storageKey, JSON.stringify(next));
+    saveExLocal(storageKey, next);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
 
@@ -92,7 +104,7 @@ const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: str
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const save = useCallback((newVals: Record<string, string>) => {
-    localStorage.setItem(storageKey, JSON.stringify(newVals));
+    saveExLocal(storageKey, newVals);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   }, [storageKey]);
 
@@ -202,7 +214,7 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   const save = (newRows: TableRow[]) => {
-    localStorage.setItem(storageKey, JSON.stringify(newRows));
+    saveExLocal(storageKey, newRows);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
 
@@ -330,7 +342,7 @@ const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }>
   const handleAnswer = (questionId: string, val: string | number) => {
     const next = { ...answers, [questionId]: val };
     setAnswers(next);
-    localStorage.setItem(storageKey, JSON.stringify(next));
+    saveExLocal(storageKey, next);
     setTimeout(() => {
       if (currentIdx < questions.length - 1) {
         setCurrentIdx(i => i + 1);
@@ -510,7 +522,7 @@ const ActivityAuditExercise: React.FC<{ storageKey: string }> = ({ storageKey })
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   const save = (r: ActivityRow[], c: string) => {
-    localStorage.setItem(storageKey, JSON.stringify({ rows: r, conclusion: c }));
+    saveExLocal(storageKey, { rows: r, conclusion: c });
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updateRow = (id: string, field: keyof ActivityRow, value: string) => {
@@ -629,7 +641,7 @@ const BottleneckMapExercise: React.FC<{ storageKey: string }> = ({ storageKey })
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   const save = (r: BottleneckRow[], c: string) => {
-    localStorage.setItem(storageKey, JSON.stringify({ rows: r, conclusion: c }));
+    saveExLocal(storageKey, { rows: r, conclusion: c });
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updateRow = (id: string, field: keyof BottleneckRow, value: string) => {
@@ -740,7 +752,7 @@ const AbsenceTestExercise: React.FC<{ storageKey: string }> = ({ storageKey }) =
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   const save = (r: AbsenceRow[], c: string) => {
-    localStorage.setItem(storageKey, JSON.stringify({ rows: r, conclusion: c }));
+    saveExLocal(storageKey, { rows: r, conclusion: c });
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updateRow = (id: string, field: keyof AbsenceRow, value: string) => {
@@ -899,7 +911,7 @@ const DiagnosticGridExercise: React.FC<{ storageKey: string }> = ({ storageKey }
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   const save = (a: Record<string, number>, c: string) => {
-    localStorage.setItem(storageKey, JSON.stringify({ answers: a, commitment: c }));
+    saveExLocal(storageKey, { answers: a, commitment: c });
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const setAnswer = (qId: string, val: number) => {
@@ -1088,7 +1100,7 @@ const PartnershipDiagnosticExercise: React.FC<{ storageKey: string }> = ({ stora
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   const save = (d: PData) => {
-    localStorage.setItem(storageKey, JSON.stringify(d));
+    saveExLocal(storageKey, d);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const upd = (patch: Partial<PData>) => {
@@ -1349,7 +1361,7 @@ const FoundationManifestExercise: React.FC<{ storageKey: string }> = ({ storageK
   const [openTests, setOpenTests] = useState<Record<string, boolean>>({});
 
   const save = (v: Record<string, string>) => {
-    localStorage.setItem(storageKey, JSON.stringify(v));
+    saveExLocal(storageKey, v);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const upd = (id: string, val: string) => {
@@ -1567,7 +1579,7 @@ const QualityChecklistExercise: React.FC<{ storageKey: string }> = ({ storageKey
   const toggle = (id: string) => {
     const next = { ...checked, [id]: !checked[id] };
     setChecked(next);
-    localStorage.setItem(storageKey, JSON.stringify(next));
+    saveExLocal(storageKey, next);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
 
@@ -1670,7 +1682,7 @@ const TeamFeedbackReport: React.FC<{ storageKey: string }> = ({ storageKey }) =>
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const save = (d: typeof data) => {
-    localStorage.setItem(storageKey, JSON.stringify(d));
+    saveExLocal(storageKey, d);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const upd = (patch: Partial<typeof data>) => {
@@ -1864,7 +1876,7 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
   const printRef = useRef<HTMLDivElement | null>(null);
 
   const save = (f: string, d: string) => {
-    localStorage.setItem(storageKey, JSON.stringify({ firma: f, data: d }));
+    saveExLocal(storageKey, { firma: f, data: d });
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updFirma = (v: string) => { setFirma(v); if (saveTimer.current) clearTimeout(saveTimer.current); saveTimer.current = setTimeout(() => save(v, data), 800); };
@@ -2078,7 +2090,7 @@ const QuizMCQExercise: React.FC<{ template: ExerciseTemplate; storageKey: string
   const choose = (sid: string, optIdx: number) => {
     const next = { ...answers, [sid]: optIdx };
     setAnswers(next);
-    localStorage.setItem(storageKey, JSON.stringify(next));
+    saveExLocal(storageKey, next);
     setTimeout(() => {
       if (idx < total - 1) setIdx(i => i + 1);
       else setReviewing(true);
@@ -2247,7 +2259,7 @@ const FunctionRolesExercise: React.FC<{ template: ExerciseTemplate; storageKey: 
   const save = (s: State) => {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      localStorage.setItem(storageKey, JSON.stringify(s));
+      saveExLocal(storageKey, s);
       setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
     }, 800);
   };
@@ -2474,7 +2486,7 @@ const MiroOrgExercise: React.FC<{ template: ExerciseTemplate; storageKey: string
     const n = { ...state, ...patch }; setState(n);
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      localStorage.setItem(storageKey, JSON.stringify(n));
+      saveExLocal(storageKey, n);
       setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
     }, 800);
   };
@@ -2595,7 +2607,7 @@ const DecisionMatrixExercise: React.FC<{ template: ExerciseTemplate; storageKey:
   const save = (s: State) => {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      localStorage.setItem(storageKey, JSON.stringify(s));
+      saveExLocal(storageKey, s);
       setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
     }, 800);
   };
@@ -2773,15 +2785,45 @@ const DecisionMatrixExercise: React.FC<{ template: ExerciseTemplate; storageKey:
 
 // ─── Main ExerciseBlock ───────────────────────────────────────────────────────
 export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
-  const { user } = useAuthContext();
+  const { user, loading: authLoading } = useAuthContext();
   const template = getExerciseTemplate(exerciseId);
   // Keyed per user so exercises are never shared between accounts
   const storageKey = `aa_ex_${user?.id ?? 'anon'}_${exerciseId}`;
+
+  // Hydrate from cloud if local is empty (cross-device + recovery after
+  // a localStorage wipe). Only runs once per (user, exercise).
+  const [hydrated, setHydrated] = useState<boolean>(!user?.id);
+  useEffect(() => {
+    if (!user?.id) { setHydrated(true); return; }
+    let cancelled = false;
+    const existing = (() => { try { return localStorage.getItem(storageKey); } catch { return null; } })();
+    if (existing) { setHydrated(true); return; }
+    loadExerciseResponse(exerciseId)
+      .then((cloud) => {
+        if (cancelled) return;
+        if (cloud != null) {
+          try { localStorage.setItem(storageKey, JSON.stringify(cloud)); } catch {}
+        }
+        setHydrated(true);
+      })
+      .catch(() => { if (!cancelled) setHydrated(true); });
+    return () => { cancelled = true; };
+  }, [user?.id, exerciseId, storageKey]);
 
   if (!template) {
     return (
       <div style={{ padding: '16px', fontSize: 13, color: 'var(--fg-3)' }}>
         Exercițiul interactiv va fi disponibil în curând.
+      </div>
+    );
+  }
+
+  // Wait for auth to settle before mounting variants — prevents writes to
+  // the "anon" storage key that would be orphaned once the session loads.
+  if (authLoading || !user?.id || !hydrated) {
+    return (
+      <div style={{ padding: '28px 16px', fontSize: 13, color: 'var(--fg-3)', textAlign: 'center' }}>
+        Se încarcă răspunsurile salvate…
       </div>
     );
   }
@@ -2853,7 +2895,7 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
           {typeLabels[template.type] || 'Interactiv'}
         </span>
         <span style={{ fontSize: 12, color: 'var(--fg-3)', display: 'flex', alignItems: 'center', gap: 4 }}>
-          <ChevronRight size={11} /> Progresul se salvează automat local
+          <ChevronRight size={11} /> Progresul se salvează automat (cloud sync)
         </span>
       </div>
       {renderContent()}
