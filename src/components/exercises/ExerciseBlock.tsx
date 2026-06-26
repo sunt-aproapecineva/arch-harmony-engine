@@ -1,11 +1,23 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Plus, Trash2, ChevronRight, ChevronDown, CheckCircle2, Download, Loader2 } from 'lucide-react';
 import { getExerciseTemplate, ExerciseTemplate, QuizQuestionItem } from '../../lib/exerciseData';
 import { useAuthContext } from '../../context/AuthContext';
+import { pushExerciseResponse, loadExerciseResponse } from '../../lib/exerciseSync';
 
 interface ExerciseBlockProps {
   exerciseId: string;
+}
+
+// Save to localStorage + debounced cloud sync. Cloud sync skipped for the
+// anonymous storage key (used briefly before user is hydrated).
+function saveExLocal(storageKey: string, value: unknown) {
+  try { localStorage.setItem(storageKey, JSON.stringify(value)); } catch {}
+  // storageKey format: aa_ex_<userId>_<exerciseId>
+  const m = storageKey.match(/^aa_ex_([^_]+)_(.+)$/);
+  if (m && m[1] !== 'anon') {
+    pushExerciseResponse(m[2], value);
+  }
 }
 
 // ─── Checklist ────────────────────────────────────────────────────────────────
