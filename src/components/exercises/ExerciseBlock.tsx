@@ -2785,15 +2785,45 @@ const DecisionMatrixExercise: React.FC<{ template: ExerciseTemplate; storageKey:
 
 // ─── Main ExerciseBlock ───────────────────────────────────────────────────────
 export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
-  const { user } = useAuthContext();
+  const { user, loading: authLoading } = useAuthContext();
   const template = getExerciseTemplate(exerciseId);
   // Keyed per user so exercises are never shared between accounts
   const storageKey = `aa_ex_${user?.id ?? 'anon'}_${exerciseId}`;
+
+  // Hydrate from cloud if local is empty (cross-device + recovery after
+  // a localStorage wipe). Only runs once per (user, exercise).
+  const [hydrated, setHydrated] = useState<boolean>(!user?.id);
+  useEffect(() => {
+    if (!user?.id) { setHydrated(true); return; }
+    let cancelled = false;
+    const existing = (() => { try { return localStorage.getItem(storageKey); } catch { return null; } })();
+    if (existing) { setHydrated(true); return; }
+    loadExerciseResponse(exerciseId)
+      .then((cloud) => {
+        if (cancelled) return;
+        if (cloud != null) {
+          try { localStorage.setItem(storageKey, JSON.stringify(cloud)); } catch {}
+        }
+        setHydrated(true);
+      })
+      .catch(() => { if (!cancelled) setHydrated(true); });
+    return () => { cancelled = true; };
+  }, [user?.id, exerciseId, storageKey]);
 
   if (!template) {
     return (
       <div style={{ padding: '16px', fontSize: 13, color: 'var(--fg-3)' }}>
         Exercițiul interactiv va fi disponibil în curând.
+      </div>
+    );
+  }
+
+  // Wait for auth to settle before mounting variants — prevents writes to
+  // the "anon" storage key that would be orphaned once the session loads.
+  if (authLoading || !user?.id || !hydrated) {
+    return (
+      <div style={{ padding: '28px 16px', fontSize: 13, color: 'var(--fg-3)', textAlign: 'center' }}>
+        Se încarcă răspunsurile salvate…
       </div>
     );
   }
