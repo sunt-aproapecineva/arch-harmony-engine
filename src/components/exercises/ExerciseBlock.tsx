@@ -2895,7 +2895,7 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
           {typeLabels[template.type] || 'Interactiv'}
         </span>
         <span style={{ fontSize: 12, color: 'var(--fg-3)', display: 'flex', alignItems: 'center', gap: 4 }}>
-          <ChevronRight size={11} /> Progresul se salvează automat local
+          <ChevronRight size={11} /> Progresul se salvează automat (cloud sync)
         </span>
       </div>
       {renderContent()}
