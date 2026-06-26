@@ -17,6 +17,13 @@ import { ExerciseBlock } from '../components/exercises/ExerciseBlock';
 import { flushExerciseResponse, getStoredExerciseResponse } from '../lib/exerciseSync';
 import { hasCompletedOnboarding } from '../lib/access';
 
+function isTrackableTimelineItem(lesson: Lesson): boolean {
+  return lesson.type === 'exercise' || !!(
+    lesson.video_url?.trim() ||
+    (lesson as any).video_url_2?.trim()
+  );
+}
+
 function getYouTubeId(url: string): string | null {
   if (!url) return null;
   const patterns = [
@@ -285,8 +292,9 @@ export const LessonPage: React.FC = () => {
   const nextModule = moduleIndex < MODULES.length - 1 ? MODULES[moduleIndex + 1] : null;
   const nextModuleLesson = nextModule?.lessons[0] || null;
 
-  const completedCount = module.lessons.filter(l => isCompleted(l.id)).length;
-  const totalCount = module.lessons.length;
+  const trackableLessons = module.lessons.filter(isTrackableTimelineItem);
+  const completedCount = trackableLessons.filter(l => isCompleted(l.id)).length;
+  const totalCount = trackableLessons.length;
   const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   const handleComplete = async () => {
