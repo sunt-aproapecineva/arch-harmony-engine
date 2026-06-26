@@ -1344,6 +1344,451 @@ function generateDoc4(answers: Record<string, string>): string {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
+// DOCUMENT 5 — Fișă de Post
+// ─────────────────────────────────────────────────────────────────────────────
+
+const doc5Steps: DocWizardStep[] = [
+  {
+    title: 'Identificare rol',
+    subtitle: 'Cine, unde, când',
+    questions: [
+      { id: 'fp_firma',          label: 'Numele firmei',         placeholder: 'ex: Firma SRL',                       type: 'text' },
+      { id: 'fp_versiune',       label: 'Versiunea',             placeholder: 'ex: v1.0',                            type: 'text' },
+      { id: 'fp_data',           label: 'Data emiterii',         placeholder: '',                                    type: 'date' },
+      { id: 'fp_titlu',          label: 'Titlul rolului',        placeholder: 'ex: Director Marketing și Comunitate', type: 'text' },
+      { id: 'fp_departament',    label: 'Departamentul',         placeholder: 'ex: Marketing și Vânzări',            type: 'text' },
+      { id: 'fp_raporteaza',     label: 'Raportează către',      placeholder: 'ex: CEO',                             type: 'text' },
+      { id: 'fp_loc',            label: 'Locul de muncă',        placeholder: 'ex: Remote / Hibrid / Sediu',         type: 'text' },
+      { id: 'fp_data_vigoare',   label: 'Data intrării în vigoare', placeholder: '',                                 type: 'date' },
+      { id: 'fp_tip_angajare',   label: 'Tip angajare',          placeholder: 'ex: Full-time / Part-time',           type: 'text' },
+    ],
+  },
+  {
+    title: '1 · Scopul rolului',
+    subtitle: 'De ce există acest rol în firmă (2–3 fraze)',
+    questions: [
+      { id: 'fp_scop', label: 'Scopul rolului', placeholder: 'Rolul există pentru a...', type: 'textarea' },
+    ],
+  },
+  {
+    title: '2 · Produsul rolului',
+    subtitle: 'Ce produce concret și măsurabil (substantive, nu verbe)',
+    questions: [
+      { id: 'fp_produs', label: 'Produsele rolului (unul pe linie)', placeholder: '1. ...\n2. ...\n3. ...\n4. ...', type: 'textarea' },
+    ],
+  },
+  {
+    title: '3 · Criteriul de evaluare',
+    subtitle: 'Cum știi că și-a făcut bine treaba',
+    questions: [
+      { id: 'fp_evaluare', label: 'Criterii de evaluare (unul pe linie)', placeholder: '1. ...\n2. ...\n3. ...', type: 'textarea' },
+    ],
+  },
+  {
+    title: '4 · Cum lucrează',
+    subtitle: 'Fluxul de input / output al rolului',
+    questions: [
+      { id: 'fp_primeste',    label: 'Primește de la',  placeholder: 'De la cine și ce primește...',  type: 'textarea' },
+      { id: 'fp_coordoneaza', label: 'Coordonează',     placeholder: 'Pe cine coordonează și ce...',  type: 'textarea' },
+      { id: 'fp_preda',       label: 'Predă către',     placeholder: 'Către cine și ce livrează...',  type: 'textarea' },
+      { id: 'fp_colaboreaza', label: 'Colaborează cu',  placeholder: 'Cu cine colaborează...',         type: 'textarea' },
+      { id: 'fp_raporteaza_cum', label: 'Raportează',   placeholder: 'Către cine, când și cum...',     type: 'textarea' },
+    ],
+  },
+  {
+    title: '5 · Studii și experiență',
+    subtitle: 'Cerințele minime pentru rol',
+    questions: [
+      { id: 'fp_studii',          label: 'Nivel de studii',          placeholder: 'ex: Studii superioare finalizate...', type: 'text' },
+      { id: 'fp_experienta',      label: 'Experiență minimă',         placeholder: 'ex: Minim 2 ani...',                  type: 'text' },
+      { id: 'fp_cunostinte',      label: 'Cunoștințe tehnice specifice', placeholder: 'Liste de tooluri, platforme...',    type: 'textarea' },
+      { id: 'fp_certificari',     label: 'Certificări (dacă există)', placeholder: 'ex: Nu sunt obligatorii. ... avantaj.', type: 'text' },
+    ],
+  },
+  {
+    title: '6 · Condiții de muncă',
+    subtitle: 'Programul, tools, deplasări',
+    questions: [
+      { id: 'fp_loc_munca',   label: 'Locul de muncă',        placeholder: 'Remote / Hibrid / detaliile...',  type: 'text' },
+      { id: 'fp_program',     label: 'Programul de lucru',    placeholder: 'ex: Full-time, program flexibil...', type: 'text' },
+      { id: 'fp_tools',       label: 'Tooluri și platforme',  placeholder: 'ex: Instagram, CapCut, Drive...', type: 'textarea' },
+      { id: 'fp_deplasari',   label: 'Deplasări / alte condiții', placeholder: 'Sesiuni lunare în..., deplasări ocazionale...', type: 'textarea' },
+    ],
+  },
+  {
+    title: '7 · Calitățile necesare',
+    subtitle: '6 calități cheie cu scurtă descriere',
+    questions: [
+      { id: 'fp_calitati', label: 'Calități (una pe linie, format: Calitate — descriere scurtă)', placeholder: '1. Autonomie — inițiază și execută fără confirmare constantă.\n2. Creativitate practică — ...\n3. ...', type: 'textarea' },
+    ],
+  },
+  {
+    title: '8 · Salariul',
+    subtitle: 'Componenta fixă, variabilă, condiția de bonus',
+    questions: [
+      { id: 'fp_salariu_fix',    label: 'Componenta fixă (lunar)',   placeholder: 'ex: [sumă] EUR — echivalent în MDL/RON',  type: 'text' },
+      { id: 'fp_salariu_var',    label: 'Componenta variabilă',       placeholder: 'ex: [sumă] EUR condiționat de KPI...',   type: 'text' },
+      { id: 'fp_bonus_conditie', label: 'Condiția de bonus',          placeholder: 'ex: Ambii KPI atinși (minim 85%) timp de 2 luni...', type: 'textarea' },
+      { id: 'fp_plata',          label: 'Modalitate de plată',        placeholder: 'ex: Transfer bancar până pe data de 5...', type: 'text' },
+    ],
+  },
+  {
+    title: '9 · KPI-ul rolului',
+    subtitle: 'Maxim 3 indicatori — fiecare cu target și interval',
+    questions: [
+      { id: 'fp_kpi1', label: 'KPI 1', placeholder: 'Indicator — Target — Interval (ex: Rata aderenței calendar — Minim 85% — Lunar)', type: 'textarea' },
+      { id: 'fp_kpi2', label: 'KPI 2', placeholder: 'Indicator — Target — Interval', type: 'textarea' },
+      { id: 'fp_kpi3', label: 'KPI 3 (opțional)', placeholder: 'Indicator — Target — Interval', type: 'textarea' },
+    ],
+  },
+  {
+    title: '10 · Limitele de autoritate',
+    subtitle: 'Ce decide singur vs ce escaladează',
+    questions: [
+      { id: 'fp_decide',     label: 'Decide singur (unul pe linie)',         placeholder: '1. ...\n2. ...\n3. ...', type: 'textarea' },
+      { id: 'fp_escaladeaza', label: 'Escaladează către CEO (unul pe linie)', placeholder: '1. ...\n2. ...\n3. ...', type: 'textarea' },
+    ],
+  },
+  {
+    title: '11 · Resurse la dispoziție',
+    subtitle: 'Acces, buget, echipamente',
+    questions: [
+      { id: 'fp_acces',      label: 'Acces la sisteme și conturi', placeholder: 'Liste conturi și platforme...',        type: 'textarea' },
+      { id: 'fp_buget',      label: 'Buget la dispoziție',         placeholder: 'ex: [sumă] EUR lunar pentru...',       type: 'textarea' },
+      { id: 'fp_echipamente', label: 'Echipamente',                placeholder: 'ex: Laptop personal. Echipament foto-video...', type: 'textarea' },
+      { id: 'fp_alte_resurse', label: 'Alte resurse',              placeholder: 'ex: Bibliotecă de conținut, brand guidelines...', type: 'textarea' },
+    ],
+  },
+];
+
+function generateDoc5(answers: Record<string, string>): string {
+  const a = (k: string) => ans(answers, k);
+  const sectionBg = '#eaf3ed';
+  const sectionColor = '#1A5C38';
+
+  const firma = a('fp_firma') || '[Numele firmei]';
+  const versiune = a('fp_versiune') || 'v1.0';
+  const data = a('fp_data') || '';
+
+  const titleBand = `
+    <div class="title-band" style="background: linear-gradient(135deg, #1A5C38 0%, #2a7a4f 100%);">
+      <div class="doc-num">DOCUMENT 05 · FIȘĂ DE POST</div>
+      <h1>${a('fp_titlu') || 'Fișă de Post'}</h1>
+      <span class="topic-tag">${firma} · ${versiune}${data ? ' · ' + data : ''}</span>
+    </div>`;
+
+  const secIdent = section(
+    'Identificare rol',
+    'Cine, unde, când',
+    sectionBg, sectionColor,
+    `${fieldRow(
+        field('Titlul rolului', a('fp_titlu')),
+        field('Departamentul', a('fp_departament')),
+      )}
+      ${fieldRow(
+        field('Raportează către', a('fp_raporteaza')),
+        field('Locul de muncă', a('fp_loc')),
+      )}
+      ${fieldRow(
+        field('Data intrării în vigoare', a('fp_data_vigoare')),
+        field('Tip angajare', a('fp_tip_angajare')),
+      )}`
+  );
+
+  const secScop = section('1 · Scopul rolului', 'De ce există acest rol', sectionBg, sectionColor,
+    `${fieldMulti('Scopul rolului', a('fp_scop'))}`);
+
+  const secProdus = section('2 · Produsul rolului', 'Ce produce concret și măsurabil', sectionBg, sectionColor,
+    `${fieldMulti('Produsele rolului', a('fp_produs'))}`);
+
+  const secEval = section('3 · Criteriul de evaluare', 'Cum știi că și-a făcut bine treaba', sectionBg, sectionColor,
+    `${fieldMulti('Criterii de evaluare', a('fp_evaluare'))}`);
+
+  const secLucru = section('4 · Cum lucrează', 'Fluxul de input / output al rolului', sectionBg, sectionColor,
+    `${fieldMulti('Primește de la', a('fp_primeste'))}
+     ${fieldMulti('Coordonează', a('fp_coordoneaza'))}
+     ${fieldMulti('Predă către', a('fp_preda'))}
+     ${fieldMulti('Colaborează cu', a('fp_colaboreaza'))}
+     ${fieldMulti('Raportează', a('fp_raporteaza_cum'))}`);
+
+  const secStudii = section('5 · Studii și experiență necesare', undefined, sectionBg, sectionColor,
+    `${fieldRow(field('Nivel de studii', a('fp_studii')))}
+     ${fieldRow(field('Experiență minimă', a('fp_experienta')))}
+     ${fieldMulti('Cunoștințe tehnice specifice', a('fp_cunostinte'))}
+     ${fieldRow(field('Certificări', a('fp_certificari')))}`);
+
+  const secCond = section('6 · Condiții de muncă', undefined, sectionBg, sectionColor,
+    `${fieldRow(
+        field('Locul de muncă', a('fp_loc_munca')),
+        field('Programul', a('fp_program')),
+      )}
+     ${fieldMulti('Tooluri și platforme', a('fp_tools'))}
+     ${fieldMulti('Deplasări / alte condiții', a('fp_deplasari'))}`);
+
+  const secCalit = section('7 · Calitățile necesare rolului', '6 calități cheie cu descriere scurtă', sectionBg, sectionColor,
+    `${fieldMulti('Calitățile necesare', a('fp_calitati'))}`);
+
+  const secSalariu = section('8 · Salariul', undefined, sectionBg, sectionColor,
+    `${fieldRow(
+        field('Componenta fixă (lunar)', a('fp_salariu_fix')),
+        field('Componenta variabilă', a('fp_salariu_var')),
+      )}
+     ${fieldMulti('Condiția de bonus', a('fp_bonus_conditie'))}
+     ${fieldRow(field('Modalitate de plată', a('fp_plata')))}`);
+
+  const kpiRows = ['fp_kpi1','fp_kpi2','fp_kpi3']
+    .map((id, idx) => ({ idx: idx + 1, val: a(id) }))
+    .filter(s => s.val !== '')
+    .map(s => `
+      <div style="display:flex;gap:12px;margin-bottom:8px;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:var(--paper-dark);">
+        <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:#1A5C38;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Aboreto',serif;font-size:10px;">${s.idx}</div>
+        <div style="flex:1;font-size:12px;line-height:1.5;white-space:pre-wrap;color:var(--ink);">${s.val}</div>
+      </div>`).join('');
+  const secKpi = section('9 · KPI-ul rolului', 'Maxim 3 indicatori — fiecare cu target și interval', sectionBg, sectionColor,
+    kpiRows || `<div class="field-value multiline empty">&nbsp;</div>`);
+
+  const secLimite = section('10 · Limitele de autoritate', 'Decide singur vs escaladează', sectionBg, sectionColor,
+    `<div class="partner-grid">
+       <div class="partner-card">
+         <div class="partner-card-title" style="color:#1A5C38;">Decide singur</div>
+         <div class="field-value multiline${!a('fp_decide') ? ' empty' : ''}">${a('fp_decide') || '&nbsp;'}</div>
+       </div>
+       <div class="partner-card">
+         <div class="partner-card-title" style="color:#1A5C38;">Escaladează către CEO</div>
+         <div class="field-value multiline${!a('fp_escaladeaza') ? ' empty' : ''}">${a('fp_escaladeaza') || '&nbsp;'}</div>
+       </div>
+     </div>`);
+
+  const secResurse = section('11 · Resurse la dispoziție', undefined, sectionBg, sectionColor,
+    `${fieldMulti('Acces la sisteme și conturi', a('fp_acces'))}
+     ${fieldMulti('Buget la dispoziție', a('fp_buget'))}
+     ${fieldMulti('Echipamente', a('fp_echipamente'))}
+     ${fieldMulti('Alte resurse', a('fp_alte_resurse'))}`);
+
+  const secSign = `
+    <div class="signature-block">
+      <div class="sig-title">Semnături</div>
+      <div class="sig-row">
+        <div class="sig-col">
+          <div class="sig-name-line"></div>
+          <div class="sig-label">CEO / Manager — ${firma}</div>
+        </div>
+        <div class="sig-col">
+          <div class="sig-name-line"></div>
+          <div class="sig-label">${a('fp_titlu') || 'Titularul rolului'}</div>
+        </div>
+      </div>
+      <div class="sig-date-row">
+        <div style="flex:1;"><div class="sig-date-field" style="padding-top:4px;font-size:12px;color:#555;">${data}</div><div class="sig-date-label">Data</div></div>
+        <div style="flex:1;"><div class="sig-date-field"></div><div class="sig-date-label">Data titular</div></div>
+      </div>
+    </div>`;
+
+  const totalPages = 4;
+  const pagesHtml = [
+    renderPage('05', 'Oamenii', 1, totalPages, `${secIdent}${secScop}${secProdus}${secEval}`, titleBand),
+    renderPage('05', 'Oamenii', 2, totalPages, `${secLucru}${secStudii}`),
+    renderPage('05', 'Oamenii', 3, totalPages, `${secCond}${secCalit}${secSalariu}`),
+    renderPage('05', 'Oamenii', 4, totalPages, `${secKpi}${secLimite}${secResurse}${secSign}${docFooter()}`),
+  ].join('');
+
+  return htmlShell('', pagesHtml, `Fișă de Post · ${a('fp_titlu') || 'Rol'}`);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DOCUMENT 6 — Instrucțiune de Lucru
+// ─────────────────────────────────────────────────────────────────────────────
+
+const doc6Steps: DocWizardStep[] = [
+  {
+    title: 'Identificare',
+    subtitle: 'Cod, versiune, rol care o folosește',
+    questions: [
+      { id: 'ins_firma',       label: 'Numele firmei',         placeholder: 'ex: Firma SRL',          type: 'text' },
+      { id: 'ins_cod',         label: 'Cod instrucțiune',       placeholder: 'ex: DM-INS-001',        type: 'text' },
+      { id: 'ins_versiune',    label: 'Versiunea',              placeholder: 'ex: v1.0',              type: 'text' },
+      { id: 'ins_data',        label: 'Data emiterii',          placeholder: '',                      type: 'date' },
+      { id: 'ins_titlu',       label: 'Titlul instrucțiunii',   placeholder: 'ex: Cum editezi și publici un reel pe Instagram', type: 'text' },
+      { id: 'ins_departament', label: 'Departamentul',          placeholder: 'ex: Marketing și Vânzări', type: 'text' },
+      { id: 'ins_rol',         label: 'Rolul care o folosește', placeholder: 'ex: Creator de Conținut', type: 'text' },
+      { id: 'ins_aprobat',     label: 'Aprobat de',             placeholder: 'ex: CEO',               type: 'text' },
+    ],
+  },
+  {
+    title: '1 · Scopul instrucțiunii',
+    subtitle: 'De ce există și ce garantează când e urmată (maxim 2 fraze)',
+    questions: [
+      { id: 'ins_scop', label: 'Scopul instrucțiunii', placeholder: 'Această instrucțiune garantează că...', type: 'textarea' },
+    ],
+  },
+  {
+    title: '2 · Cine o folosește și când',
+    subtitle: 'Rolul executant și momentul de deschidere',
+    questions: [
+      { id: 'ins_rol_exec', label: 'Rolul care execută',  placeholder: 'ex: Creator de Conținut',                   type: 'text' },
+      { id: 'ins_cand',     label: 'Când o deschide',     placeholder: 'ex: De fiecare dată când are de publicat un reel...', type: 'textarea' },
+    ],
+  },
+  {
+    title: '3 · Materiale și tooluri necesare',
+    subtitle: 'Tot ce trebuie să aibă înainte să înceapă',
+    questions: [
+      { id: 'ins_materiale', label: 'Lista materialelor și toolurilor (una pe linie)', placeholder: '1. CapCut instalat...\n2. Acces Google Drive...\n3. ...', type: 'textarea' },
+    ],
+  },
+  {
+    title: '4 · Pașii de executat',
+    subtitle: 'Până la 11 pași — fiecare: Acțiunea — Cum exact — Output',
+    questions: Array.from({ length: 11 }, (_, i) => ({
+      id: `ins_pas${i + 1}`,
+      label: `Pasul ${i + 1}${i >= 5 ? ' (opțional)' : ''}`,
+      placeholder: 'Acțiunea — Cum exact (la persoana a doua) — Output',
+      type: 'textarea' as const,
+    })),
+  },
+  {
+    title: '5 · Criterii de calitate',
+    subtitle: 'Cum știi că sarcina a fost executată corect (verificabile)',
+    questions: [
+      { id: 'ins_calitate', label: 'Criterii de calitate (unul pe linie)', placeholder: '1. ...\n2. ...\n3. ...', type: 'textarea' },
+    ],
+  },
+  {
+    title: '6 · Greșeli frecvente',
+    subtitle: 'Greșeala — Cum o eviți (una pe linie, separator „ — ")',
+    questions: [
+      { id: 'ins_greseli', label: 'Greșeli frecvente', placeholder: 'Greșeală 1 — Cum o eviți\nGreșeală 2 — Cum o eviți\n...', type: 'textarea' },
+    ],
+  },
+  {
+    title: '7 · Ce faci dacă ceva nu merge',
+    subtitle: 'Situații de excepție și răspunsul corect',
+    questions: [
+      { id: 'ins_exceptii', label: 'Situații de excepție (Situație — Ce faci, una pe linie)', placeholder: 'Fișierul lipsește din Drive — Trimiți mesaj către...\n...', type: 'textarea' },
+    ],
+  },
+  {
+    title: '8 · Documente conexe',
+    subtitle: 'Documentul — Locația în Drive',
+    questions: [
+      { id: 'ins_documente', label: 'Documente conexe (Document — Locație, una pe linie)', placeholder: 'SOP Publicare Reel — Drive / ...\nChecklist — Drive / ...\n...', type: 'textarea' },
+    ],
+  },
+];
+
+function generateDoc6(answers: Record<string, string>): string {
+  const a = (k: string) => ans(answers, k);
+  const sectionBg = '#eaf3ed';
+  const sectionColor = '#1A5C38';
+
+  const firma = a('ins_firma') || '[Numele firmei]';
+  const cod = a('ins_cod') || 'INS-001';
+  const versiune = a('ins_versiune') || 'v1.0';
+  const data = a('ins_data') || '';
+
+  const titleBand = `
+    <div class="title-band" style="background: linear-gradient(135deg, #1A5C38 0%, #2a7a4f 100%);">
+      <div class="doc-num">DOCUMENT 06 · INSTRUCȚIUNE DE LUCRU · ${cod}</div>
+      <h1>${a('ins_titlu') || 'Instrucțiune de Lucru'}</h1>
+      <span class="topic-tag">${firma} · ${versiune}${data ? ' · ' + data : ''}</span>
+    </div>`;
+
+  const secIdent = section('Identificare', 'Cod, versiune, rol care o folosește', sectionBg, sectionColor,
+    `${fieldRow(field('Titlul instrucțiunii', a('ins_titlu')))}
+     ${fieldRow(
+        field('Departamentul', a('ins_departament')),
+        field('Rolul care o folosește', a('ins_rol')),
+      )}
+     ${fieldRow(
+        field('Cod', cod),
+        field('Versiunea', versiune),
+        field('Data', data),
+      )}
+     ${fieldRow(field('Aprobat de', a('ins_aprobat')))}`);
+
+  const secScop = section('1 · Scopul instrucțiunii', undefined, sectionBg, sectionColor,
+    `${fieldMulti('Scopul', a('ins_scop'))}`);
+
+  const secCine = section('2 · Cine o folosește și când', undefined, sectionBg, sectionColor,
+    `${fieldRow(field('Rolul care execută', a('ins_rol_exec')))}
+     ${fieldMulti('Când o deschide', a('ins_cand'))}`);
+
+  const secMat = section('3 · Materiale și tooluri necesare', 'Tot ce trebuie să aibă la dispoziție înainte', sectionBg, sectionColor,
+    `${fieldMulti('Materiale și tooluri', a('ins_materiale'))}`);
+
+  const stepIds = Array.from({ length: 11 }, (_, i) => `ins_pas${i + 1}`);
+  const stepBlocks = stepIds
+    .map((id, idx) => ({ idx: idx + 1, val: a(id) }))
+    .filter(s => s.val !== '')
+    .map(s => `
+      <div style="display:flex;gap:12px;margin-bottom:10px;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:var(--paper-dark);">
+        <div style="flex-shrink:0;width:28px;height:28px;border-radius:50%;background:#1A5C38;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Aboreto',serif;font-size:11px;">${s.idx}</div>
+        <div style="flex:1;font-size:12.5px;line-height:1.55;white-space:pre-wrap;color:var(--ink);">${s.val}</div>
+      </div>`).join('');
+  const secPasi = section('4 · Pașii de executat', 'Acțiune · Cum exact · Output', sectionBg, sectionColor,
+    stepBlocks || `<div class="field-value multiline empty">&nbsp;</div>`);
+
+  const secCalit = section('5 · Criterii de calitate', 'Cum știi că sarcina a fost executată corect', sectionBg, sectionColor,
+    `${fieldMulti('Criterii de calitate', a('ins_calitate'))}`);
+
+  const renderTwoCol = (raw: string, headLeft: string, headRight: string) => {
+    const rows = raw.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+      const parts = l.split(/\s+—\s+|\s+-\s+/);
+      const left = parts[0] || '';
+      const right = parts.slice(1).join(' — ') || '';
+      return `<tr><td style="padding:8px 10px;border:1px solid var(--line);font-size:12px;vertical-align:top;width:42%;">${left}</td><td style="padding:8px 10px;border:1px solid var(--line);font-size:12px;vertical-align:top;">${right}</td></tr>`;
+    }).join('');
+    if (!rows) return `<div class="field-value multiline empty">&nbsp;</div>`;
+    return `<table style="width:100%;border-collapse:collapse;margin-top:4px;">
+      <thead><tr>
+        <th style="text-align:left;padding:8px 10px;background:#1A5C38;color:#fff;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #1A5C38;">${headLeft}</th>
+        <th style="text-align:left;padding:8px 10px;background:#1A5C38;color:#fff;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #1A5C38;">${headRight}</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  };
+
+  const secGreseli = section('6 · Greșeli frecvente și cum le eviți', undefined, sectionBg, sectionColor,
+    renderTwoCol(a('ins_greseli'), 'Greșeala frecventă', 'Cum o eviți'));
+
+  const secExceptii = section('7 · Ce faci dacă ceva nu merge', undefined, sectionBg, sectionColor,
+    renderTwoCol(a('ins_exceptii'), 'Situația de excepție', 'Ce faci'));
+
+  const secDocuments = section('8 · Documente conexe', undefined, sectionBg, sectionColor,
+    renderTwoCol(a('ins_documente'), 'Documentul', 'Locația în Drive'));
+
+  const secSign = `
+    <div class="signature-block">
+      <div class="sig-title">Aprobare și confirmare</div>
+      <div class="sig-row">
+        <div class="sig-col">
+          <div class="sig-name-line"></div>
+          <div class="sig-label">Aprobat de — ${a('ins_aprobat') || 'CEO / Manager'}</div>
+        </div>
+        <div class="sig-col">
+          <div class="sig-name-line"></div>
+          <div class="sig-label">Confirmat de — ${a('ins_rol') || 'Titularul rolului'}</div>
+        </div>
+      </div>
+      <div class="sig-date-row">
+        <div style="flex:1;"><div class="sig-date-field" style="padding-top:4px;font-size:12px;color:#555;">${data}</div><div class="sig-date-label">Data aprobării</div></div>
+        <div style="flex:1;"><div class="sig-date-field"></div><div class="sig-date-label">Data confirmării</div></div>
+      </div>
+    </div>`;
+
+  const totalPages = 4;
+  const pagesHtml = [
+    renderPage('06', 'Instrucțiune', 1, totalPages, `${secIdent}${secScop}${secCine}${secMat}`, titleBand),
+    renderPage('06', 'Instrucțiune', 2, totalPages, secPasi),
+    renderPage('06', 'Instrucțiune', 3, totalPages, `${secCalit}${secGreseli}${secExceptii}`),
+    renderPage('06', 'Instrucțiune', 4, totalPages, `${secDocuments}${secSign}${docFooter()}`),
+  ].join('');
+
+  return htmlShell('', pagesHtml, `${cod} · ${a('ins_titlu') || 'Instrucțiune de Lucru'}`);
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
 // PLATFORM_DOCUMENTS export
 // ─────────────────────────────────────────────────────────────────────────────
 
