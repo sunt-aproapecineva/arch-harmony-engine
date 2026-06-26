@@ -26,7 +26,7 @@ const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: stri
   const toggle = (id: string) => {
     const next = { ...checked, [id]: !checked[id] };
     setChecked(next);
-    saveExLocal(storageKey, exerciseId, next);
+    saveExLocal(storageKey, next);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
 
@@ -92,7 +92,7 @@ const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: str
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const save = useCallback((newVals: Record<string, string>) => {
-    saveExLocal(storageKey, exerciseId, newVals);
+    saveExLocal(storageKey, newVals);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   }, [storageKey]);
 
@@ -202,7 +202,7 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   const save = (newRows: TableRow[]) => {
-    saveExLocal(storageKey, exerciseId, newRows);
+    saveExLocal(storageKey, newRows);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
 
@@ -330,7 +330,7 @@ const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }>
   const handleAnswer = (questionId: string, val: string | number) => {
     const next = { ...answers, [questionId]: val };
     setAnswers(next);
-    saveExLocal(storageKey, exerciseId, next);
+    saveExLocal(storageKey, next);
     setTimeout(() => {
       if (currentIdx < questions.length - 1) {
         setCurrentIdx(i => i + 1);
@@ -510,7 +510,7 @@ const ActivityAuditExercise: React.FC<{ storageKey: string }> = ({ storageKey })
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   const save = (r: ActivityRow[], c: string) => {
-    saveExLocal(storageKey, exerciseId, { rows: r, conclusion: c });
+    saveExLocal(storageKey, { rows: r, conclusion: c });
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updateRow = (id: string, field: keyof ActivityRow, value: string) => {
@@ -629,7 +629,7 @@ const BottleneckMapExercise: React.FC<{ storageKey: string }> = ({ storageKey })
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   const save = (r: BottleneckRow[], c: string) => {
-    saveExLocal(storageKey, exerciseId, { rows: r, conclusion: c });
+    saveExLocal(storageKey, { rows: r, conclusion: c });
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updateRow = (id: string, field: keyof BottleneckRow, value: string) => {
@@ -740,7 +740,7 @@ const AbsenceTestExercise: React.FC<{ storageKey: string }> = ({ storageKey }) =
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   const save = (r: AbsenceRow[], c: string) => {
-    saveExLocal(storageKey, exerciseId, { rows: r, conclusion: c });
+    saveExLocal(storageKey, { rows: r, conclusion: c });
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updateRow = (id: string, field: keyof AbsenceRow, value: string) => {
@@ -899,7 +899,7 @@ const DiagnosticGridExercise: React.FC<{ storageKey: string }> = ({ storageKey }
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   const save = (a: Record<string, number>, c: string) => {
-    saveExLocal(storageKey, exerciseId, { answers: a, commitment: c });
+    saveExLocal(storageKey, { answers: a, commitment: c });
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const setAnswer = (qId: string, val: number) => {
@@ -1088,7 +1088,7 @@ const PartnershipDiagnosticExercise: React.FC<{ storageKey: string }> = ({ stora
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   const save = (d: PData) => {
-    saveExLocal(storageKey, exerciseId, d);
+    saveExLocal(storageKey, d);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const upd = (patch: Partial<PData>) => {
@@ -1349,7 +1349,7 @@ const FoundationManifestExercise: React.FC<{ storageKey: string }> = ({ storageK
   const [openTests, setOpenTests] = useState<Record<string, boolean>>({});
 
   const save = (v: Record<string, string>) => {
-    saveExLocal(storageKey, exerciseId, v);
+    saveExLocal(storageKey, v);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const upd = (id: string, val: string) => {
@@ -1567,7 +1567,7 @@ const QualityChecklistExercise: React.FC<{ storageKey: string }> = ({ storageKey
   const toggle = (id: string) => {
     const next = { ...checked, [id]: !checked[id] };
     setChecked(next);
-    saveExLocal(storageKey, exerciseId, next);
+    saveExLocal(storageKey, next);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
 
@@ -1670,7 +1670,7 @@ const TeamFeedbackReport: React.FC<{ storageKey: string }> = ({ storageKey }) =>
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const save = (d: typeof data) => {
-    saveExLocal(storageKey, exerciseId, d);
+    saveExLocal(storageKey, d);
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const upd = (patch: Partial<typeof data>) => {
@@ -1864,7 +1864,7 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
   const printRef = useRef<HTMLDivElement | null>(null);
 
   const save = (f: string, d: string) => {
-    saveExLocal(storageKey, exerciseId, { firma: f, data: d });
+    saveExLocal(storageKey, { firma: f, data: d });
     setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
   };
   const updFirma = (v: string) => { setFirma(v); if (saveTimer.current) clearTimeout(saveTimer.current); saveTimer.current = setTimeout(() => save(v, data), 800); };
@@ -2078,7 +2078,7 @@ const QuizMCQExercise: React.FC<{ template: ExerciseTemplate; storageKey: string
   const choose = (sid: string, optIdx: number) => {
     const next = { ...answers, [sid]: optIdx };
     setAnswers(next);
-    saveExLocal(storageKey, exerciseId, next);
+    saveExLocal(storageKey, next);
     setTimeout(() => {
       if (idx < total - 1) setIdx(i => i + 1);
       else setReviewing(true);
@@ -2247,7 +2247,7 @@ const FunctionRolesExercise: React.FC<{ template: ExerciseTemplate; storageKey: 
   const save = (s: State) => {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      saveExLocal(storageKey, exerciseId, s);
+      saveExLocal(storageKey, s);
       setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
     }, 800);
   };
@@ -2474,7 +2474,7 @@ const MiroOrgExercise: React.FC<{ template: ExerciseTemplate; storageKey: string
     const n = { ...state, ...patch }; setState(n);
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      saveExLocal(storageKey, exerciseId, n);
+      saveExLocal(storageKey, n);
       setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
     }, 800);
   };
@@ -2595,7 +2595,7 @@ const DecisionMatrixExercise: React.FC<{ template: ExerciseTemplate; storageKey:
   const save = (s: State) => {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      saveExLocal(storageKey, exerciseId, s);
+      saveExLocal(storageKey, s);
       setSavedAt(new Date().toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }));
     }, 800);
   };
