@@ -1942,7 +1942,7 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
         </svg>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontFamily: "'Aboreto', serif", fontSize: 11, letterSpacing: '0.28em', color: 'rgba(255,255,255,0.85)', textTransform: 'uppercase', marginBottom: 3 }}>Arhitectura Afacerii</div>
-          <div style={{ fontFamily: "'Arimo', sans-serif", fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>Practicum de Sistematizare · Victor Morar</div>
+          <div style={{ fontFamily: "'Arimo', sans-serif", fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>Practicum de Sistematizare</div>
         </div>
         <div style={{ fontFamily: "'Arimo', sans-serif", fontSize: 9, color: 'rgba(201,169,110,0.75)', border: '1px solid rgba(201,169,110,0.32)', padding: '4px 11px', borderRadius: 99, letterSpacing: '0.14em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Document de uz intern</div>
       </div>

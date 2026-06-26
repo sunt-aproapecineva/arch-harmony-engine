@@ -517,7 +517,7 @@ function aaHeader(docNum: string, topic: string): string {
       ${MONOGRAM_SVG(40, '#C9A96E', 'rgba(201,169,110,0.4)')}
       <div class="aa-header-text">
         <div class="aa-header-brand">Arhitectura Afacerii</div>
-        <div class="aa-header-subtitle">Victor Morar · Program de Mentorat</div>
+        <div class="aa-header-subtitle">Program de Mentorat</div>
       </div>
       <div class="aa-doc-tag">Doc ${docNum} · ${topic}</div>
     </div>
@@ -530,7 +530,7 @@ function aaFooter(_docNum: string, pageInfo = ''): string {
     <div class="aa-footer">
       <div class="aa-footer-left">
         ${MONOGRAM_SVG(22, 'rgba(255,255,255,0.22)', 'rgba(255,255,255,0.1)')}
-        <div class="aa-footer-brand">Arhitectura Afacerii · Victor Morar</div>
+        <div class="aa-footer-brand">Arhitectura Afacerii</div>
       </div>
       <div class="aa-footer-right">
         ${pageInfo ? pageInfo + ' · ' : ''}Document Confidențial · Uz Personal
@@ -571,7 +571,7 @@ function signatureBlock(
 }
 
 function docFooter(): string {
-  return `<div class="doc-disclaimer">Generat cu <strong>Arhitectura Afacerii</strong> · Victor Morar · Program de Mentorat. Document confidențial, generat local — datele nu se transmit pe niciun server.</div>`;
+  return `<div class="doc-disclaimer">Generat cu <strong>Arhitectura Afacerii</strong> · Program de Mentorat. Document confidențial, generat local — datele nu se transmit pe niciun server.</div>`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1185,7 +1185,7 @@ const doc4Steps: DocWizardStep[] = [
     questions: [
       { id: 'sop_cod',         label: 'Cod / număr SOP',          placeholder: 'ex: SOP-001',                       type: 'text' },
       { id: 'sop_titlu',       label: 'Titlul procesului',         placeholder: 'ex: Producerea unei lecții',        type: 'text' },
-      { id: 'sop_responsabil', label: 'Responsabil principal',     placeholder: 'ex: Victor Morar',                  type: 'text' },
+      { id: 'sop_responsabil', label: 'Responsabil principal',     placeholder: 'ex: Nume Prenume',                  type: 'text' },
       { id: 'sop_functie',     label: 'Funcția în care se înscrie', placeholder: 'ex: Producție / Serviciu',         type: 'text' },
       { id: 'sop_versiune',    label: 'Versiunea documentului',    placeholder: 'ex: v1.0',                          type: 'text' },
       { id: 'sop_data',        label: 'Data emiterii',             placeholder: '',                                  type: 'date' },
