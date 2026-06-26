@@ -23,31 +23,58 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuthContext = () => useContext(AuthContext);
 
-async function hydrateUser(authUser: any): Promise<User | null> {
-  if (!authUser) return null;
-  const [{ data: profile }, { data: roles }, { data: quiz }] = await Promise.all([
-    supabase.from('profiles').select('full_name,email,tariff,avatar_url').eq('id', authUser.id).maybeSingle(),
-    supabase.from('user_roles').select('role').eq('user_id', authUser.id),
-    supabase.from('quiz_responses').select('answers,completed_at').eq('user_id', authUser.id).maybeSingle(),
-  ]);
-  const isAdmin = (roles || []).some((r: any) => r.role === 'admin');
-  // Sync quiz state into localStorage for legacy gating
-  try {
-    if (quiz?.completed_at) {
-      localStorage.setItem(`aa_quiz_done_${authUser.id}`, '1');
-      if (quiz.answers) localStorage.setItem(`aa_quiz_answers_${authUser.id}`, JSON.stringify(quiz.answers));
-    }
-  } catch {}
+function readLocalQuizDone(userId: string): boolean {
+  try { return localStorage.getItem(`aa_quiz_done_${userId}`) === '1'; } catch { return false; }
+}
+
+function buildFallbackUser(authUser: any): User {
   return {
     id: authUser.id,
-    email: profile?.email || authUser.email,
-    full_name: profile?.full_name || authUser.user_metadata?.full_name || '',
-    role: isAdmin ? 'admin' : 'student',
-    tariff: (profile?.tariff as Tariff) || 'student',
-    quiz_completed: !!quiz?.completed_at,
-    avatar_url: profile?.avatar_url || null,
+    email: authUser.email,
+    full_name: authUser.user_metadata?.full_name || '',
+    role: 'student',
+    tariff: 'student',
+    quiz_completed: readLocalQuizDone(authUser.id),
+    avatar_url: null,
     created_at: authUser.created_at,
   };
+}
+
+async function hydrateUser(authUser: any): Promise<User | null> {
+  if (!authUser) return null;
+
+  try {
+    const [{ data: profile }, { data: roles }, { data: quiz }] = await Promise.all([
+      supabase.from('profiles').select('full_name,email,tariff,avatar_url').eq('id', authUser.id).maybeSingle(),
+      supabase.from('user_roles').select('role').eq('user_id', authUser.id),
+      supabase.from('quiz_responses').select('answers,completed_at').eq('user_id', authUser.id).maybeSingle(),
+    ]);
+    const isAdmin = (roles || []).some((r: any) => r.role === 'admin');
+    // Sync quiz state into localStorage for legacy gating
+    try {
+      if (quiz?.completed_at) {
+        localStorage.setItem(`aa_quiz_done_${authUser.id}`, '1');
+        if (quiz.answers) localStorage.setItem(`aa_quiz_answers_${authUser.id}`, JSON.stringify(quiz.answers));
+      }
+    } catch {}
+    const localQuizDone = readLocalQuizDone(authUser.id);
+    return {
+      id: authUser.id,
+      email: profile?.email || authUser.email,
+      full_name: profile?.full_name || authUser.user_metadata?.full_name || '',
+      role: isAdmin ? 'admin' : 'student',
+      tariff: (profile?.tariff as Tariff) || 'student',
+      quiz_completed: !!quiz?.completed_at || localQuizDone,
+      avatar_url: profile?.avatar_url || null,
+      created_at: authUser.created_at,
+    };
+  } catch (error) {
+    // Never leave the app stuck on a blank/loading state if one profile query
+    // fails transiently. The session itself is enough to render the platform;
+    // profile/role data can be refreshed on the next auth update/page load.
+    console.warn('[Auth] hydrate failed; using session fallback', error);
+    return buildFallbackUser(authUser);
+  }
 }
 
 // Whitelist helpers — admin-only direct reads; eligibility check via secure RPC
@@ -67,17 +94,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let cancelled = false;
+    let hydrationSeq = 0;
+
+    const runHydration = async (authUser: any, showLoading = false) => {
+      const seq = ++hydrationSeq;
+      if (showLoading) setLoading(true);
+      const u = await hydrateUser(authUser);
+      if (cancelled || seq !== hydrationSeq) return;
+      setUser(u);
+      setLoading(false);
+    };
 
     // Initial hydration from persisted session (storage). This is the only
     // path that runs on mount — avoids the race where INITIAL_SESSION fires
     // before getSession() returns and re-hydrates with stale state.
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (cancelled) return;
-      const u = await hydrateUser(session?.user);
-      if (cancelled) return;
-      setUser(u);
-      setLoading(false);
-    });
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => runHydration(session?.user))
+      .catch((error) => {
+        console.warn('[Auth] initial session failed', error);
+        if (!cancelled) { setUser(null); setLoading(false); }
+      });
 
     // Only react to identity changes. Skip INITIAL_SESSION and
     // TOKEN_REFRESHED — those fire on every mount / ~hourly and used to
@@ -85,14 +121,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // hiding the lesson video behind the onboarding gate.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event !== 'SIGNED_IN' && event !== 'SIGNED_OUT' && event !== 'USER_UPDATED') return;
-      // defer DB calls to avoid deadlock inside listener
-      setTimeout(async () => {
-        if (cancelled) return;
-        const u = await hydrateUser(session?.user);
-        if (cancelled) return;
-        setUser(u);
+      if (event === 'SIGNED_OUT') {
+        hydrationSeq++;
+        setUser(null);
         setLoading(false);
-      }, 0);
+        return;
+      }
+      // defer DB calls to avoid deadlock inside listener
+      setLoading(true);
+      setTimeout(() => runHydration(session?.user, false), 0);
     });
 
     return () => { cancelled = true; subscription.unsubscribe(); };

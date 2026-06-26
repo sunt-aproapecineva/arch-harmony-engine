@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { MODULES } from '@/lib/data';
+import { useAuthContext } from '@/context/AuthContext';
 
 type Ctx = { version: number; ready: boolean };
 const LiveCtx = createContext<Ctx>({ version: 0, ready: false });
@@ -22,11 +23,20 @@ export const useLiveContent = () => useContext(LiveCtx);
  * the static file and are not affected by admin edits.
  */
 export function LiveContentProvider({ children }: { children: React.ReactNode }) {
+  const { user, loading: authLoading } = useAuthContext();
   const [version, setVersion] = useState(0);
   const [ready, setReady] = useState(false);
+  const [loadedForUserId, setLoadedForUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!user?.id) {
+      setReady(true);
+      setLoadedForUserId(null);
+      return;
+    }
     let cancelled = false;
+    setReady(false);
     (async () => {
       try {
         const [{ data: dbMods }, { data: dbLessons }] = await Promise.all([
@@ -41,6 +51,7 @@ export function LiveContentProvider({ children }: { children: React.ReactNode })
         ]);
         if (cancelled) return;
         if (!dbMods || dbMods.length === 0) {
+          setLoadedForUserId(user.id);
           setReady(true);
           return;
         }
@@ -71,27 +82,29 @@ export function LiveContentProvider({ children }: { children: React.ReactNode })
             if (!db) return;
             if (db.title != null && db.title !== '') sl.title = db.title;
             if (db.description != null) sl.description = db.description;
-            if (db.video_url != null) sl.video_url = db.video_url;
-            if (db.pdf_url != null) sl.pdf_url = db.pdf_url;
+            if (typeof db.video_url === 'string' && db.video_url.trim() !== '') sl.video_url = db.video_url.trim();
+            if (typeof db.pdf_url === 'string' && db.pdf_url.trim() !== '') sl.pdf_url = db.pdf_url.trim();
             if (db.duration_min != null) sl.duration_min = db.duration_min;
             if (db.is_published != null) sl.is_published = db.is_published;
           });
         });
 
         setVersion((v) => v + 1);
+        setLoadedForUserId(user.id);
         setReady(true);
       } catch (e) {
         console.warn('[LiveContent] overlay failed', e);
+        setLoadedForUserId(user.id);
         setReady(true);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [authLoading, user?.id]);
 
   return (
-    <LiveCtx.Provider value={{ version, ready }}>
+    <LiveCtx.Provider value={{ version, ready: !authLoading && (!user?.id || (ready && loadedForUserId === user.id)) }}>
       {/* key bump remounts the route tree once overrides land, so any
           component that captured stale MODULES values re-reads them. */}
       <div key={version} style={{ display: 'contents' }}>

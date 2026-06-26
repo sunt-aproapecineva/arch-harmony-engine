@@ -7,6 +7,20 @@ import { MODULES } from '../lib/data';
 
 const STORAGE_PROGRESS_KEY = 'aa_progress';
 
+function hasVideo(lesson: any): boolean {
+  return lesson?.type !== 'exercise' && !!(
+    (typeof lesson?.video_url === 'string' && lesson.video_url.trim()) ||
+    (typeof lesson?.video_url_2 === 'string' && lesson.video_url_2.trim())
+  );
+}
+
+function isTrackableLesson(lesson: any): boolean {
+  // Count only real video lessons + interactive exercise pages that exist in
+  // the timeline. Empty placeholder lessons and legacy standalone exercises do
+  // not affect student progress, otherwise modules can never reach 100%.
+  return lesson?.type === 'exercise' || hasVideo(lesson);
+}
+
 function getMockProgress(userId: string): Progress[] {
   try {
     const stored = localStorage.getItem(STORAGE_PROGRESS_KEY);
@@ -132,41 +146,38 @@ export function useProgress() {
     [exerciseDone]
   );
 
-  // Progress is based on lessons (video + exercise items) AND the module's standalone exercises.
+  // Progress is based only on visible, completable timeline items:
+  // video lessons that actually have a video URL + exercise lesson pages.
   const getModuleProgress = useCallback(
     (moduleId: string) => {
       const mod = MODULES.find((m) => m.id === moduleId);
       if (!mod) return 0;
-      const total = mod.lessons.length + (mod.exercises?.length || 0);
+      const trackableLessons = mod.lessons.filter(isTrackableLesson);
+      const total = trackableLessons.length;
       if (total === 0) return 0;
-      const lessonsDone = mod.lessons.filter((l) => isCompleted(l.id)).length;
-      const exercisesDone = (mod.exercises || []).filter((e) => isExerciseDone(e.id)).length;
-      return Math.round(((lessonsDone + exercisesDone) / total) * 100);
+      const lessonsDone = trackableLessons.filter((l) => isCompleted(l.id)).length;
+      return Math.round((lessonsDone / total) * 100);
     },
-    [isCompleted, isExerciseDone]
+    [isCompleted]
   );
 
   const isModuleFullyDone = useCallback(
     (moduleId: string) => {
       const mod = MODULES.find((m) => m.id === moduleId);
       if (!mod) return false;
-      return (
-        mod.lessons.every((l) => isCompleted(l.id)) &&
-        (mod.exercises || []).every((e) => isExerciseDone(e.id))
-      );
+      const trackableLessons = mod.lessons.filter(isTrackableLesson);
+      return trackableLessons.length > 0 && trackableLessons.every((l) => isCompleted(l.id));
     },
-    [isCompleted, isExerciseDone]
+    [isCompleted]
   );
 
   const getOverallProgress = useCallback(() => {
-    const totalLessons = MODULES.flatMap((m) => m.lessons).length;
-    const totalExercises = MODULES.flatMap((m) => m.exercises || []).length;
-    const total = totalLessons + totalExercises;
+    const trackableLessons = MODULES.flatMap((m) => m.lessons).filter(isTrackableLesson);
+    const total = trackableLessons.length;
     if (total === 0) return 0;
-    const lessonsDone = MODULES.flatMap((m) => m.lessons).filter((l) => isCompleted(l.id)).length;
-    const exercisesDone = MODULES.flatMap((m) => m.exercises || []).filter((e) => isExerciseDone(e.id)).length;
-    return Math.round(((lessonsDone + exercisesDone) / total) * 100);
-  }, [isCompleted, isExerciseDone]);
+    const lessonsDone = trackableLessons.filter((l) => isCompleted(l.id)).length;
+    return Math.round((lessonsDone / total) * 100);
+  }, [isCompleted]);
 
 
   // A module is locked only until its scheduled unlock date begins
@@ -187,9 +198,12 @@ export function useProgress() {
     []
   );
 
-  const getCompletedLessonsCount = useCallback(() => progress.length, [progress]);
+  const getCompletedLessonsCount = useCallback(() => {
+    const videoLessonIds = new Set(MODULES.flatMap((m) => m.lessons).filter(hasVideo).map((l) => l.id));
+    return progress.filter((p) => videoLessonIds.has(p.lesson_id)).length;
+  }, [progress]);
   const getTotalLessonsCount = useCallback(
-    () => MODULES.flatMap((m) => m.lessons).length,
+    () => MODULES.flatMap((m) => m.lessons).filter(hasVideo).length,
     []
   );
 

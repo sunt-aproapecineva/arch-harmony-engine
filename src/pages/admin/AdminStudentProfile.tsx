@@ -34,6 +34,12 @@ function lastLoginLabel(iso?: string): string {
   return `Acum ${d} zile`;
 }
 
+function isVideoLesson(lesson: any): boolean {
+  return lesson?.type !== 'exercise' && !!(
+    lesson?.video_url?.trim?.() || lesson?.video_url_2?.trim?.()
+  );
+}
+
 // ── Maturity colours ─────────────────────────────────────────────────────────
 const MATURITY_COLOR: Record<QuizProfile['maturityLevel'], string> = {
   startup: '#93c5fd',
@@ -399,9 +405,10 @@ export const AdminStudentProfile: React.FC = () => {
     );
   }
 
-  const allLessons = MODULES.flatMap(m => m.lessons);
+  const allLessons = MODULES.flatMap(m => m.lessons).filter(isVideoLesson);
+  const videoLessonIds = new Set(allLessons.map((l: any) => l.id));
   const totalLessons = allLessons.length;
-  const completedCount = progress.length;
+  const completedCount = progress.filter((p: any) => videoLessonIds.has(p.lesson_id)).length;
   const overallPct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
   const cardStyle: React.CSSProperties = {
