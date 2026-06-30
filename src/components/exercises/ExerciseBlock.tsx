@@ -1864,8 +1864,36 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
   const { user } = useAuthContext();
   const ex1Key = `aa_ex_${user?.id ?? 'anon'}_e-1-s2-1`;
 
-  const getEx1 = () => { try { const s = localStorage.getItem(ex1Key); return s ? JSON.parse(s) : {}; } catch { return {}; } };
-  const ex1 = getEx1();
+  const getEx1Local = () => { try { const s = localStorage.getItem(ex1Key); return s ? JSON.parse(s) : {}; } catch { return {}; } };
+  const [ex1, setEx1] = useState<Record<string, string>>(getEx1Local);
+  const [ex1Loading, setEx1Loading] = useState<boolean>(!user?.id ? false : Object.keys(getEx1Local()).length === 0);
+
+  // Hydrate Exercise-1 answers from cloud if local is empty (different device /
+  // cleared cache). Without this, the manifest renders the bracket placeholders
+  // even though the student filled the form on another browser.
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    const local = getEx1Local();
+    const hasLocal = Object.keys(local).length > 0;
+    if (hasLocal) { setEx1Loading(false); return; }
+    setEx1Loading(true);
+    loadExerciseResponseWithMeta('e-1-s2-1')
+      .then((cloud) => {
+        if (cancelled) return;
+        if (cloud?.response && typeof cloud.response === 'object') {
+          const data = cloud.response as Record<string, string>;
+          try {
+            localStorage.setItem(ex1Key, JSON.stringify(data));
+            const ts = cloud.updated_at ? Date.parse(cloud.updated_at) : 0;
+            if (ts) localStorage.setItem(`${ex1Key}__saved_at`, String(ts));
+          } catch {}
+          setEx1(data);
+        }
+      })
+      .finally(() => { if (!cancelled) setEx1Loading(false); });
+    return () => { cancelled = true; };
+  }, [user?.id, ex1Key]);
 
   const [firma, setFirma] = useState(() => { try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s).firma || '' : ''; } catch { return ''; } });
   const [data, setDataVal] = useState(() => { try { const s = localStorage.getItem(storageKey); return s ? JSON.parse(s).data || '' : ''; } catch { return ''; } });
@@ -2015,7 +2043,11 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
         Manifestul de mai jos se populează automat din răspunsurile tale din Exercițiul 1. Adaugă numele firmei și data, apoi descarcă PDF-ul.
       </p>
 
-      {(!ex1['m_final'] && !ex1['m_prob']) && (
+      {ex1Loading ? (
+        <div style={{ padding: '14px 18px', background: 'rgba(201,169,110,0.05)', border: '1px solid rgba(201,169,110,0.15)', borderRadius: 12, marginBottom: 20, fontSize: 13, color: 'var(--fg-3)' }}>
+          Se încarcă răspunsurile tale din Exercițiul 1…
+        </div>
+      ) : (!ex1['m_final'] && !ex1['m_prob']) && (
         <div style={{ padding: '14px 18px', background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.2)', borderRadius: 12, marginBottom: 20, fontSize: 13, color: 'var(--gold)' }}>
           ⚠ Completează mai întâi Exercițiul 1 (Misiunea Viziunea Valorile) pentru ca Manifestul să se populeze automat.
         </div>
