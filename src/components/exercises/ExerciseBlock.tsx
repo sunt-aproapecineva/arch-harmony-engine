@@ -2043,7 +2043,11 @@ const ManifestPreview: React.FC<{ storageKey: string }> = ({ storageKey }) => {
         Manifestul de mai jos se populează automat din răspunsurile tale din Exercițiul 1. Adaugă numele firmei și data, apoi descarcă PDF-ul.
       </p>
 
-      {(!ex1['m_final'] && !ex1['m_prob']) && (
+      {ex1Loading ? (
+        <div style={{ padding: '14px 18px', background: 'rgba(201,169,110,0.05)', border: '1px solid rgba(201,169,110,0.15)', borderRadius: 12, marginBottom: 20, fontSize: 13, color: 'var(--fg-3)' }}>
+          Se încarcă răspunsurile tale din Exercițiul 1…
+        </div>
+      ) : (!ex1['m_final'] && !ex1['m_prob']) && (
         <div style={{ padding: '14px 18px', background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.2)', borderRadius: 12, marginBottom: 20, fontSize: 13, color: 'var(--gold)' }}>
           ⚠ Completează mai întâi Exercițiul 1 (Misiunea Viziunea Valorile) pentru ca Manifestul să se populeze automat.
         </div>
