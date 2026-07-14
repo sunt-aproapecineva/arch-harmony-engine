@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 import { NavLink, useNavigate } from '@/lib/router-compat';
-import { Lock, CheckCircle2, LogOut, FolderOpen, Library } from 'lucide-react';
+import { Lock, CheckCircle2, LogOut, FolderOpen, Library, Archive } from 'lucide-react';
 import { MODULES } from '../../lib/data';
 import { useProgress } from '../../hooks/useProgress';
 import { useAuthContext } from '../../context/AuthContext';
@@ -109,6 +109,35 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
             )}
           </NavLink>
         )}
+
+
+        {/* Materialele mele */}
+        <NavLink
+          to="/materials"
+          onClick={onClose}
+          style={({ isActive }) => ({
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '7px 10px', borderRadius: 8, marginBottom: 12,
+            background: isActive ? 'var(--accent-dim)' : 'transparent',
+            border: isActive ? '1px solid rgba(196,240,228,0.2)' : '1px solid transparent',
+            transition: 'all 0.15s', textDecoration: 'none',
+          })}
+        >
+          {({ isActive }) => (
+            <>
+              <div style={{
+                width: 22, height: 22, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                background: isActive ? 'var(--accent-dim)' : 'var(--bg-3)',
+                border: `1px solid ${isActive ? 'rgba(196,240,228,0.3)' : 'var(--border)'}`,
+              }}>
+                <Archive size={11} style={{ color: isActive ? 'var(--accent)' : 'var(--fg-3)' }} />
+              </div>
+              <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, color: isActive ? 'var(--fg)' : 'var(--fg-2)' }}>
+                Materialele mele
+              </span>
+            </>
+          )}
+        </NavLink>
 
 
         <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-3)', padding: '4px 8px 8px' }}>
