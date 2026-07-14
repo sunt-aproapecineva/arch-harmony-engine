@@ -80,7 +80,7 @@ export const MONOGRAM_SVG = (height = 40, fill1 = '#C9A96E', fill2 = 'rgba(201,1
   </svg>`;
 
 
-const BASE_STYLES = `
+export const BASE_STYLES = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   @page {
     size: A4;
