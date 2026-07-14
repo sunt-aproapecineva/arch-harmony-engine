@@ -404,7 +404,7 @@ export const BASE_STYLES = `
   .doc-disclaimer strong { color: var(--ink-light); }
 `;
 
-function htmlShell(
+export function htmlShell(
   styles: string,
   body: string,
   title: string
