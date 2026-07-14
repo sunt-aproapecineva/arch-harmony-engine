@@ -16,6 +16,8 @@ import { logActivity } from '../lib/activity';
 import { ExerciseBlock } from '../components/exercises/ExerciseBlock';
 import { flushExerciseResponse, getStoredExerciseResponse } from '../lib/exerciseSync';
 import { hasCompletedOnboarding } from '../lib/access';
+import { formatLessonNumber } from '../lib/lessonNumbering';
+import { useLessonNote } from '../hooks/useLessonNote';
 
 function isTrackableTimelineItem(lesson: Lesson): boolean {
   return lesson.type === 'exercise' || !!(
@@ -208,22 +210,8 @@ export const LessonPage: React.FC = () => {
     setCompleteError(null);
   }, [id]);
 
-  const NOTES_KEY = `aa_note_${user?.id ?? 'anon'}_${id}`;
-  const [note, setNote] = useState(() => {
-    try { return typeof window !== 'undefined' ? (localStorage.getItem(NOTES_KEY) || '') : ''; }
-    catch { return ''; }
-  });
-  const [noteSaved, setNoteSaved] = useState(false);
+  const { note, setNote, status: noteStatus } = useLessonNote(user?.id, id);
   const [notesOpen, setNotesOpen] = useState(false);
-
-  const saveNote = () => {
-    try { localStorage.setItem(NOTES_KEY, note); } catch {}
-    setNoteSaved(true);
-    setTimeout(() => setNoteSaved(false), 2000);
-    if (user && lesson) {
-      logActivity({ userId: user.id, userEmail: user.email, userName: user.full_name, type: 'note_saved', label: `${user.full_name} a salvat o notiță la "${lesson.title}"`, data: { lessonId: lesson.id, noteLength: String(note.length) } });
-    }
-  };
 
   let lesson: Lesson | null = null;
   let module: Module | null = null;
