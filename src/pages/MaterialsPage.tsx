@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/context/AuthContext';
 import { MODULES } from '@/lib/data';
 import { EXERCISES } from '@/lib/exerciseData';
-import { DOCUMENTS } from '@/lib/documentData';
+import { PLATFORM_DOCUMENTS as DOCUMENTS } from '@/lib/documentData';
 import { formatLessonNumber, getModuleNumber } from '@/lib/lessonNumbering';
 import { exportExercisePDF, exportNotePDF, exportAllPDF } from '@/lib/materialsExport';
 
