@@ -511,7 +511,7 @@ function section(
     </div>`;
 }
 
-function aaHeader(docNum: string, topic: string): string {
+export function aaHeader(docNum: string, topic: string): string {
   return `
     <div class="aa-header">
       ${MONOGRAM_SVG(40, '#C9A96E', 'rgba(201,169,110,0.4)')}
