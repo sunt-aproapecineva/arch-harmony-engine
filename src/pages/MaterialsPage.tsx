@@ -6,7 +6,7 @@ import { FileText, StickyNote, Download, ChevronRight, FolderOpen, BookOpen } fr
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/context/AuthContext';
 import { MODULES } from '@/lib/data';
-import { EXERCISES } from '@/lib/exerciseData';
+import { EXERCISE_TEMPLATES as EXERCISES } from '@/lib/exerciseData';
 import { PLATFORM_DOCUMENTS as DOCUMENTS } from '@/lib/documentData';
 import { formatLessonNumber, getModuleNumber } from '@/lib/lessonNumbering';
 import { exportExercisePDF, exportNotePDF, exportAllPDF } from '@/lib/materialsExport';

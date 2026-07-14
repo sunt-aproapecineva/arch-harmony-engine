@@ -1,7 +1,7 @@
 // @ts-nocheck
 import jsPDF from 'jspdf';
 import { MODULES } from './data';
-import { EXERCISES } from './exerciseData';
+import { EXERCISE_TEMPLATES as EXERCISES } from './exerciseData';
 import { formatLessonNumber, getModuleNumber } from './lessonNumbering';
 
 const BRAND = 'Arhitectura Afacerii';
