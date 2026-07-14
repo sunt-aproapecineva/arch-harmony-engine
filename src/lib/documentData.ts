@@ -70,17 +70,17 @@ export function openPrintWindow(html: string): void {
 
 // ─── Shared HTML helpers ─────────────────────────────────────────────────────
 
-const FONTS = `<link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Arimo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">`;
+export const FONTS = `<link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Arimo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">`;
 
 // AA Monogram SVG — two interlocking A shapes
-const MONOGRAM_SVG = (height = 40, fill1 = '#C9A96E', fill2 = 'rgba(201,169,110,0.45)') =>
+export const MONOGRAM_SVG = (height = 40, fill1 = '#C9A96E', fill2 = 'rgba(201,169,110,0.45)') =>
   `<svg height="${height}" viewBox="0 0 303 240" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0">
     <path d="M93.6414 229.092L194.246 4.82955L214.537 5.94268L290.006 239.864L266.115 238.554L231.422 128.981L157.13 124.906L117.532 230.403L93.6414 229.092ZM195.603 21.9735L159.852 117.177L228.907 120.965L197.567 22.0812L195.603 21.9735Z" fill="${fill1}"/>
     <path d="M208.932 229.092L108.328 4.82955L88.037 5.94268L12.5678 239.864L36.4588 238.554L71.152 128.981L145.443 124.906L185.041 230.403L208.932 229.092ZM106.971 21.9735L142.721 117.177L73.6666 120.965L105.007 22.0812L106.971 21.9735Z" fill="${fill2}"/>
   </svg>`;
 
 
-const BASE_STYLES = `
+export const BASE_STYLES = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   @page {
     size: A4;
@@ -404,7 +404,7 @@ const BASE_STYLES = `
   .doc-disclaimer strong { color: var(--ink-light); }
 `;
 
-function htmlShell(
+export function htmlShell(
   styles: string,
   body: string,
   title: string
@@ -511,7 +511,7 @@ function section(
     </div>`;
 }
 
-function aaHeader(docNum: string, topic: string): string {
+export function aaHeader(docNum: string, topic: string): string {
   return `
     <div class="aa-header">
       ${MONOGRAM_SVG(40, '#C9A96E', 'rgba(201,169,110,0.4)')}
@@ -524,7 +524,7 @@ function aaHeader(docNum: string, topic: string): string {
     <div class="aa-header-accent"></div>`;
 }
 
-function aaFooter(_docNum: string, pageInfo = ''): string {
+export function aaFooter(_docNum: string, pageInfo = ''): string {
   return `
     <div class="aa-footer-sep"></div>
     <div class="aa-footer">
