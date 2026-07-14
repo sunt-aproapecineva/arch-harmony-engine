@@ -438,13 +438,13 @@ export const LessonPage: React.FC = () => {
           {module.title}
         </Link>
         <ChevronRight size={12} />
-        <span style={{ color: 'var(--fg)' }}>Lecția {lesson.order_index}</span>
+        <span style={{ color: 'var(--fg)' }}>Lecția {formatLessonNumber(module, lesson)}</span>
       </div>
 
       {/* Progress bar */}
       <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
-          <span>Lecția {lesson.order_index} din {totalCount} · {module.title}</span>
+          <span>Lecția {formatLessonNumber(module, lesson)} · {module.title}</span>
           <span style={{ color: progressPct === 100 ? '#4ade80' : 'var(--accent)' }}>{progressPct}%</span>
         </div>
         <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
@@ -494,7 +494,7 @@ export const LessonPage: React.FC = () => {
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }} style={{ marginBottom: 20 }}>
             <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--fg-3)', background: 'var(--bg-3)', border: '1px solid var(--border)', padding: '3px 10px', borderRadius: 99 }}>
-                <BookOpen size={10} /> Lecția {lesson.order_index}
+                <BookOpen size={10} /> Lecția {formatLessonNumber(module, lesson)}
               </span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--accent)', background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)', padding: '3px 10px', borderRadius: 99 }}>
                 <Clock size={10} /> {lesson.duration_min} min
@@ -602,15 +602,23 @@ export const LessonPage: React.FC = () => {
                       onFocus={e => (e.target.style.borderColor = 'rgba(196,240,228,0.35)')}
                       onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-                      {noteSaved
-                        ? <span style={{ fontSize: 11, color: '#4ade80', display: 'flex', alignItems: 'center', gap: 4 }}><CheckCircle2 size={12} /> Notița salvată</span>
-                        : <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>{note ? `${note.length} caractere` : 'Necompletat'}</span>}
-                      <button onClick={saveNote}
-                        style={{ padding: '7px 16px', background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--accent)', transition: 'background 0.15s' }}
-                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(196,240,228,0.15)')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'var(--accent-dim)')}>
-                        Salvează notița
-                      </button>
+                      {noteStatus === 'saving' ? (
+                        <span style={{ fontSize: 11, color: 'var(--fg-3)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent)', animation: 'pulse 1s ease-in-out infinite' }} />
+                          Se salvează…
+                        </span>
+                      ) : noteStatus === 'saved' ? (
+                        <span style={{ fontSize: 11, color: '#4ade80', display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <CheckCircle2 size={12} /> Salvat automat în cloud
+                        </span>
+                      ) : noteStatus === 'error' ? (
+                        <span style={{ fontSize: 11, color: '#f87171' }}>Eroare la salvare — retrimit</span>
+                      ) : (
+                        <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>{note ? `${note.length} caractere · autosave activ` : 'Se salvează automat pe măsură ce scrii'}</span>
+                      )}
+                      <a href="/materials" style={{ fontSize: 11, color: 'var(--accent)', textDecoration: 'none' }}>
+                        Toate notițele →
+                      </a>
                     </div>
                   </div>
                 </motion.div>
