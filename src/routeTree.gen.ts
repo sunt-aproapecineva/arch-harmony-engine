@@ -24,6 +24,7 @@ import { Route as AdminProgressRouteImport } from './routes/admin.progress'
 import { Route as AdminLessonsRouteImport } from './routes/admin.lessons'
 import { Route as AdminActivityRouteImport } from './routes/admin.activity'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppMaterialsIndexRouteImport } from './routes/_app.materials.index'
 import { Route as AppLibraryIndexRouteImport } from './routes/_app.library.index'
 import { Route as AppDocumentsIndexRouteImport } from './routes/_app.documents.index'
 import { Route as AdminStudentUserIdRouteImport } from './routes/admin.student.$userId'
@@ -106,6 +107,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMaterialsIndexRoute = AppMaterialsIndexRouteImport.update({
+  id: '/materials/',
+  path: '/materials/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppLibraryIndexRoute = AppLibraryIndexRouteImport.update({
   id: '/library/',
   path: '/library/',
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
   '/documents/': typeof AppDocumentsIndexRoute
   '/library/': typeof AppLibraryIndexRoute
+  '/materials/': typeof AppMaterialsIndexRoute
   '/documents/$docId/fill': typeof AppDocumentsDocIdFillRoute
 }
 export interface FileRoutesByTo {
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
   '/documents': typeof AppDocumentsIndexRoute
   '/library': typeof AppLibraryIndexRoute
+  '/materials': typeof AppMaterialsIndexRoute
   '/documents/$docId/fill': typeof AppDocumentsDocIdFillRoute
 }
 export interface FileRoutesById {
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
   '/_app/documents/': typeof AppDocumentsIndexRoute
   '/_app/library/': typeof AppLibraryIndexRoute
+  '/_app/materials/': typeof AppMaterialsIndexRoute
   '/_app/documents/$docId/fill': typeof AppDocumentsDocIdFillRoute
 }
 export interface FileRouteTypes {
@@ -235,6 +244,7 @@ export interface FileRouteTypes {
     | '/admin/student/$userId'
     | '/documents/'
     | '/library/'
+    | '/materials/'
     | '/documents/$docId/fill'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -257,6 +267,7 @@ export interface FileRouteTypes {
     | '/admin/student/$userId'
     | '/documents'
     | '/library'
+    | '/materials'
     | '/documents/$docId/fill'
   id:
     | '__root__'
@@ -281,6 +292,7 @@ export interface FileRouteTypes {
     | '/admin/student/$userId'
     | '/_app/documents/'
     | '/_app/library/'
+    | '/_app/materials/'
     | '/_app/documents/$docId/fill'
   fileRoutesById: FileRoutesById
 }
@@ -403,6 +415,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/materials/': {
+      id: '/_app/materials/'
+      path: '/materials'
+      fullPath: '/materials/'
+      preLoaderRoute: typeof AppMaterialsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/library/': {
       id: '/_app/library/'
       path: '/library'
@@ -462,6 +481,7 @@ interface AppRouteChildren {
   AppModuleIdRoute: typeof AppModuleIdRoute
   AppDocumentsIndexRoute: typeof AppDocumentsIndexRoute
   AppLibraryIndexRoute: typeof AppLibraryIndexRoute
+  AppMaterialsIndexRoute: typeof AppMaterialsIndexRoute
   AppDocumentsDocIdFillRoute: typeof AppDocumentsDocIdFillRoute
 }
 
@@ -472,6 +492,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppModuleIdRoute: AppModuleIdRoute,
   AppDocumentsIndexRoute: AppDocumentsIndexRoute,
   AppLibraryIndexRoute: AppLibraryIndexRoute,
+  AppMaterialsIndexRoute: AppMaterialsIndexRoute,
   AppDocumentsDocIdFillRoute: AppDocumentsDocIdFillRoute,
 }
 
@@ -511,13 +532,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
