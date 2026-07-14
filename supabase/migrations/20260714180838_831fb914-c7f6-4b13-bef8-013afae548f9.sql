@@ -1,0 +1,5 @@
+INSERT INTO public.lessons (id, module_id, order_index, title, description, video_url, pdf_url, duration_min, is_published)
+VALUES
+  (gen_random_uuid(), 'fceaf485-9834-4e78-8b77-f37a37f798f9', 3, 'Contoarele', 'Fără contoare nu conduci — ghicești. Ce măsori, cum măsori și de ce contează.', 'https://youtu.be/OVAm24baaBA', '', 18, true),
+  (gen_random_uuid(), 'fceaf485-9834-4e78-8b77-f37a37f798f9', 4, 'Cum construiești un KPI viu', 'Un KPI care se folosește, nu unul care stă într-un fișier. Cum îl definești, cum îl urmărești, cum reacționezi.', 'https://youtu.be/itL-bhGLKNE', '', 40, true),
+  (gen_random_uuid(), 'fceaf485-9834-4e78-8b77-f37a37f798f9', 5, 'Tabloul de bord', 'Cum arată tabloul de bord al unei afaceri conduse cu contoare. 1 pagină, 5 minute luni dimineața.', 'https://www.youtube.com/watch?v=EgQ1OkeBMZA', '', 25, true);
