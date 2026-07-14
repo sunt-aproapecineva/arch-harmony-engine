@@ -70,7 +70,7 @@ export function openPrintWindow(html: string): void {
 
 // ─── Shared HTML helpers ─────────────────────────────────────────────────────
 
-const FONTS = `<link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Arimo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">`;
+export const FONTS = `<link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Arimo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">`;
 
 // AA Monogram SVG — two interlocking A shapes
 const MONOGRAM_SVG = (height = 40, fill1 = '#C9A96E', fill2 = 'rgba(201,169,110,0.45)') =>
