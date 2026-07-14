@@ -1,95 +1,106 @@
+# Plan îmbunătățiri UX platformă
 
-# Update Admin: „Supervisor Cockpit"
+Analiză pe fiecare cerere: **ce vrea elevul**, **ce avem deja**, **complexitate**, **cum executăm**. Le-am grupat pe priorități ca să livrăm în valuri, nu tot deodată (fiecare val = ~1 sesiune de lucru).
 
-Scopul e ca tu (supervizorul) să intri în platformă și în 30 de secunde să știi despre fiecare elev: unde e blocat, ce a completat real, ce a înțeles, ce nu, și ce intervenție concretă să faci. Toată informația pe care elevii o introduc (quiz, exerciții, notițe) e deja stocată — o vom transforma în claritate.
+---
 
-## 1. Profil elev: trei tab-uri clare
+## VAL 1 — Quick wins (impact mare, efort mic)
 
-Pagina `admin/student/$userId` se reorganizează din listă lungă în trei tab-uri:
+### 1.1 Numerotare lecții „6.1 / 6.2" ⭐
+- **Ce vrea:** claritate — „Lecția 1 din Etapa 6".
+- **Avem:** `MODULES[].order_index` + `lessons[].order_index` (excluzând exerciții).
+- **Complexitate:** XS.
+- **Execuție:** un singur helper `formatLessonNumber(module, lesson)` → afișat în `ModuleCard`, `LessonPage` header, timeline, sidebar breadcrumb, Dashboard. Fără migrație DB — pur UI.
 
-**a) „Briefing supervizor"** (tab default, nou)
-- Card de sus: nume, tarif, scor global, status („activ săptămâna asta" / „inactiv 5 zile" / „blocat la Modulul X").
-- **Rezumat AI generat** (3-5 paragrafe), structurat fix:
-  1. *Cine e elevul* — domeniu, vechime, cifră de afaceri, echipă (sintetizate din quiz).
-  2. *Nivelul de maturitate* — startup / manual / illusion / systemic, cu o frază de context.
-  3. *Ce a făcut concret* — câte lecții, câte exerciții completate vs lăsate goale, calitatea răspunsurilor (scurte / superficiale / detaliate).
-  4. *Unde e blocat acum* — pe baza ultimei activități și a exercițiilor neîncepute.
-  5. *Recomandări pentru supervizor* — 3 acțiuni concrete („sună-l despre Modulul 2", „verifică exercițiul X unde a răspuns confuz", „felicită-l pentru progres pe Y").
-- Buton „Regenerează rezumat" (cache 24h ca să nu cheltuim credite degeaba).
-- **Indicatori-cheie** sub rezumat: scor maturitate, scor implicare, scor înțelegere, scor consistență (vezi punctul 3).
+### 1.2 Autosave „draft" universal pe toate câmpurile text ⭐
+- **Ce vrea:** „scriu ceva, vin alte idei, nicăieri nu se salvează" — teamă că pierde ce a scris.
+- **Avem:** exerciții deja salvează local+cloud (ok). Dar **notițele lecției** (`lesson_notes`) și **răspunsurile quiz** nu au feedback vizual de „salvat".
+- **Complexitate:** S.
+- **Execuție:**
+  - Indicator vizibil „Se salvează… / Salvat acum 3s" pe fiecare card de notiță și exercițiu (reuse pattern din `exerciseSync`).
+  - Debounce 800ms → localStorage instant + cloud sync cu status.
+  - Warning „Ai modificări nesalvate" la close tab dacă e ceva pending.
 
-**b) „Date brute"** (ce există acum)
-- Quiz onboarding cu toate răspunsurile.
-- Toate exercițiile cu răspunsurile elevului, lecție cu lecție.
-- Toate notițele.
-- Activitate cronologică.
+### 1.3 Retry quiz cu istoric note
+- **Ce vrea:** dacă a luat 4/5 să poată reface pentru scor mai bun.
+- **Avem:** `quiz_responses` — o singură rândă per user (upsert).
+- **Complexitate:** S-M.
+- **Execuție:**
+  - Adăugăm `quiz_attempts` (user_id, quiz_id, score, answers jsonb, created_at) — istoric complet.
+  - Buton „Refă quiz-ul" pe pagina de rezultate.
+  - Afișăm cel mai bun scor + timeline încercări („Ai făcut de 3 ori: 3/5 → 4/5 → 5/5").
+  - **Excepție onboarding quiz** (profilul de maturitate) — acela rămâne one-shot ca să nu strice `studentInsights`; sau permitem re-editare dar re-generăm briefing-ul admin. Decide-tu.
 
-**c) „Note supervizor"** (nou)
-- Câmp privat unde tu scrii observații despre elev după apeluri / sesiuni.
-- Listă cronologică, doar admin vede.
+---
 
-## 2. Dashboard admin: vedere de ansamblu
+## VAL 2 — Materialele mele (hub central) ⭐⭐
 
-Pe `/admin` (sau `/admin/users`) adaug:
-- **Coadă de atenție**: top 5 elevi care necesită intervenție acum (inactivi recent, blocați la același modul de N zile, exerciții cu calitate scăzută).
-- **Heatmap săptămânal**: cine a fost activ în ultimele 7 zile.
-- **Filtre rapide**: „blocați la M1 / M2 / M3", „n-au început quiz-ul", „n-au terminat niciun exercițiu", „inactivi 7+ zile".
-- Coloane noi în tabel: ultima activitate, scor implicare, status („pe drum" / „lent" / „blocat" / „terminat").
+### 2.1 Pagină nouă `/materialele-mele`
+- **Ce vor:** „toate într-un loc" — download exerciții completate, notițe, documente generate, PDF-uri lecție.
+- **Complexitate:** M.
+- **Execuție:**
+  - Rută nouă `_app.materials.index.tsx` — link în Sidebar sub „Biblioteca".
+  - 4 taburi:
+    1. **Exerciții completate** — listă cu buton „Descarcă PDF" per exercițiu, filtrat pe săptămână/modul.
+    2. **Notițe** — toate `lesson_notes` grupate pe lecție, buton „Descarcă toate ca PDF" + „.md".
+    3. **Documente** — templatele deja completate în DocumentsPage (deja există, doar link).
+    4. **Resurse curs** — PDF-uri / rezumate lecție (vezi 3.1).
+  - Buton mare „📦 Descarcă TOT (ZIP)" — generează un ZIP cu toate PDF-urile.
 
-## 3. Scoruri (calcul determinist, nu AI)
+### 2.2 Export PDF per exercițiu completat
+- **Ce vor:** print / arhivare.
+- **Avem:** deja avem generatoare HTML→print pentru documente (Manifest, SOP, Fișă Post).
+- **Complexitate:** M.
+- **Execuție:**
+  - Extindem pattern-ul existent din `DocumentsPage`: un template HTML per tip exercițiu (quiz-mcq, function-roles, decision-matrix etc.) cu răspunsurile elevului injectate.
+  - Buton „Printează" (window.print cu CSS `@media print`) — fără librărie nouă, gratis.
+  - Alternativ: `jspdf` + `html2canvas` pentru download direct (dar print e mai fiabil).
 
-Patru scoruri vizibile per elev, calculate din datele existente:
+### 2.3 Export ZIP total
+- **Complexitate:** M.
+- **Execuție:** `jszip` (30kb) — client-side, adună HTML-urile generate + notițele markdown → download ca `arhitectura-afacerii-{nume}-{data}.zip`. Fără backend.
 
-- **Implicare (0-100)** = pondere între lecții vizionate, exerciții completate, notițe scrise, zile active. 
-- **Înțelegere (0-100)** = bazat pe câmpurile umplute la exerciții (gol vs scurt vs detaliat), bifări checklist, medii la grilele diagnostice (d1..d50).
-- **Consistență (0-100)** = câte zile distincte a intrat în platformă în ultimele 30 zile, fără găuri lungi.
-- **Maturitate** = deja există din quiz (startup/manual/illusion/systemic).
+---
 
-Scorurile sunt afișate cu bare colorate și o estimare globală „Progres real" (medie ponderată).
+## VAL 3 — Rezumate & resurse per lecție
 
-## 4. Rezumatul AI — cum funcționează
+### 3.1 Rezumat text + slide-uri per lecție
+- **Ce vor:** ceva de citit/revizuit fără să reia videoul.
+- **Complexitate:** M-L (depinde cine scrie conținutul).
+- **Execuție tehnică:**
+  - Adăugăm `lessons.summary_md` (text markdown) + `lessons.slides_url` (PDF/link) în DB.
+  - Afișăm pe `LessonPage` un tab „📝 Rezumat" + „🎞️ Slide-uri".
+  - Admin poate edita din `AdminLessons`.
+- **Execuție conținut:** două opțiuni:
+  - (a) Tu scrii manual rezumatele — control total, timp mare.
+  - (b) Generăm draft cu AI (transcript YouTube → Gemini Flash) → tu verifici și publici. Rapid, dar necesită revizie.
+  - Recomand (b) pentru bootstrap, apoi editezi.
 
-- Server function nouă, doar admin (verifică rolul cu `has_role`).
-- Trimite la Lovable AI Gateway (`google/gemini-2.5-flash`, ieftin, suficient): quiz answers + listă exerciții completate + sample de răspunsuri lungi + scoruri calculate.
-- Prompt strict în română, format fix pe 5 secțiuni, ton constructiv, fără jargon.
-- Rezultatul se salvează în tabel nou `student_insights` (cache 24h + buton refresh manual).
-- Dacă AI Gateway returnează 429/402, afișăm fallback cu scorurile + datele brute.
+### 3.2 Notițe descărcabile
+- **Complexitate:** XS (parte din 2.1 tab 2).
 
-## 5. Backend (migrații necesare)
+---
 
-Două tabele noi:
+## VAL 4 — Nice-to-have (după feedback val 1-3)
 
-```
-student_insights         supervisor_notes
------------------        ------------------
-user_id (FK profiles)    user_id (FK profiles)
-summary (text)           author_id (admin)
-scores (jsonb)           note (text)
-generated_at             created_at
-model_used
-```
+- **Ordonare exerciții după completare** — badge „✓ Completat 12 iun" în timeline.
+- **Resume video** (deja pe roadmap) — `progress` cu `last_position_sec`.
+- **Notificări „materiale noi"** — când adaugi rezumat/slide la o lecție veche, elevul vede badge.
 
-Ambele: RLS doar pentru admin (`has_role(auth.uid(), 'admin')`), GRANT pe authenticated + service_role.
+---
 
-Server functions noi (toate cu `requireSupabaseAuth` + verificare admin):
-- `generateStudentInsight({ studentId })` — apel AI, salvează în `student_insights`.
-- `getStudentInsight({ studentId })` — citește cache.
-- `addSupervisorNote / listSupervisorNotes / deleteSupervisorNote`.
-- `getAttentionQueue()` — calculează top elevi care necesită atenție.
+## Complexitate totală & ordine sugerată
 
-## 6. Ce NU schimbăm
+| Val | Ce livrează | Efort | Impact vizibil |
+|-----|-------------|-------|----------------|
+| 1   | Numerotare + autosave feedback + retry quiz | ~1 sesiune | Mare — rezolvă frustrări zilnice |
+| 2   | Hub „Materialele mele" + export PDF/ZIP | ~1-2 sesiuni | Foarte mare — feature nou vizibil |
+| 3   | Rezumate + slide-uri per lecție | ~1 sesiune tehnic + timp conținut | Mare — depinde de conținut |
+| 4   | Polish | ad-hoc | Mediu |
 
-- Vederea elevului rămâne identică, fără indicii că e analizat.
-- Datele brute (răspunsuri, notițe, quiz) nu se modifică, doar le re-prezentăm.
-- Restul aplicației (lecții, exerciții, documente) — neatinse.
+## Decizii de luat înainte să încep
 
-## Ordinea de implementare
-
-1. Migrații: `student_insights`, `supervisor_notes` + RLS.
-2. Funcții de scoring (deterministe, fără AI) + afișare pe profil elev.
-3. Tab-urile noi pe pagina elevului (Briefing / Date brute / Note).
-4. Server function pentru rezumat AI + cache.
-5. „Coadă de atenție" + filtre noi pe dashboard admin.
-6. Note supervizor (CRUD simplu).
-
-La final: o privire pe profilul oricărui elev = claritate completă fără să sapi.
+1. **Onboarding quiz** — permitem retry (cu re-generare briefing) sau blocăm?
+2. **Rezumate lecție** — vrei să generez draft-uri cu AI din transcript YouTube, sau le scrii tu?
+3. **Format export exerciții** — print-friendly HTML (rapid) sau PDF descărcabil (necesită `jspdf`)?
+4. **Începem cu Val 1 (quick wins) sau sari direct la Val 2 (hub materiale)** — care e mai urgent pentru elevi?
