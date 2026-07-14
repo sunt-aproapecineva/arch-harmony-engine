@@ -754,7 +754,44 @@ export const MODULES: Module[] = [
         order_index: 3,
         is_published: false,
       },
+      {
+        id: 'l-4-4',
+        module_id: 'mod-4',
+        title: 'Contoarele',
+        description:
+          'Fără contoare nu conduci — ghicești. Ce măsori, cum măsori și de ce contează.',
+        video_url: 'https://youtu.be/OVAm24baaBA',
+        pdf_url: '',
+        duration_min: 12,
+        order_index: 4,
+        is_published: true,
+      },
+      {
+        id: 'l-4-5',
+        module_id: 'mod-4',
+        title: 'Cum construiești un KPI viu',
+        description:
+          'Un KPI care se folosește, nu unul care stă într-un fișier. Cum îl definești, cum îl urmărești, cum reacționezi.',
+        video_url: 'https://youtu.be/itL-bhGLKNE',
+        pdf_url: '',
+        duration_min: 12,
+        order_index: 5,
+        is_published: true,
+      },
+      {
+        id: 'l-4-6',
+        module_id: 'mod-4',
+        title: 'Tabloul de bord',
+        description:
+          'Cum arată tabloul de bord al unei afaceri conduse cu contoare. 1 pagină, 5 minute luni dimineața.',
+        video_url: 'https://www.youtube.com/watch?v=EgQ1OkeBMZA',
+        pdf_url: '',
+        duration_min: 12,
+        order_index: 6,
+        is_published: true,
+      },
     ],
+
     exercises: [
       {
         id: 'e-4-1',
