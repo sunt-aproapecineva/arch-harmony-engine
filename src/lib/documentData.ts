@@ -524,7 +524,7 @@ export function aaHeader(docNum: string, topic: string): string {
     <div class="aa-header-accent"></div>`;
 }
 
-function aaFooter(_docNum: string, pageInfo = ''): string {
+export function aaFooter(_docNum: string, pageInfo = ''): string {
   return `
     <div class="aa-footer-sep"></div>
     <div class="aa-footer">
