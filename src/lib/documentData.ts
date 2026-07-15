@@ -2256,7 +2256,7 @@ export const PLATFORM_DOCUMENTS: PlatformDocument[] = [
       'Template tipăribil pentru un KPI complet: rol, produsul funcției, cele 6 elemente (nume, legătura cu produsul, unitate, țintă, frecvență, responsabil) + testul final. Companion pentru Lecția 15.',
     downloadUrl: '',
     topic: 'KPI',
-    color: 'amber',
+    color: 'gold',
     steps: doc7Steps,
     generate: generateDoc7,
   },
