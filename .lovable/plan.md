@@ -1,106 +1,75 @@
-# Plan îmbunătățiri UX platformă
+# Exerciții Săptămâna 6 — Contoarele, KPI Viu, Tabloul de bord
 
-Analiză pe fiecare cerere: **ce vrea elevul**, **ce avem deja**, **complexitate**, **cum executăm**. Le-am grupat pe priorități ca să livrăm în valuri, nu tot deodată (fiecare val = ~1 sesiune de lucru).
+Reutilizez 100% sistemul UI/UX existent (tipuri de exerciții, tokens de culoare, `documentData.ts` shell, `materialsExport.ts`). Zero componente vizuale noi — doar compun ce am deja.
 
----
+## Contextul lecțiilor (din DOCX-urile trimise)
 
-## VAL 1 — Quick wins (impact mare, efort mic)
+- **L15 · Contoarele** — cele 6 elemente ale unui KPI (nume, legătură cu produsul funcției, unitate, țintă, frecvență, responsabil) + testul final „dacă KPI-ul e atins perfect, firma poate să nu câștige nimic?" + 4 criterii de verificare.
+- **L16 · KPI Viu** — reia cele 6 elemente + Poarta de calitate + 3 praguri (roșu/galben/verde față de țintă) + Legătura cu salariul (fix + variabil pe prag, cu proporții pe rol) + checklist final 6 puncte.
+- **L17 · Tabloul de bord** — un singur indicator de rezultat pe cele 7 funcții, cu țintă / realizat / tendință / stare pe culori + regula desfacerii + sistem de raportare.
 
-### 1.1 Numerotare lecții „6.1 / 6.2" ⭐
-- **Ce vrea:** claritate — „Lecția 1 din Etapa 6".
-- **Avem:** `MODULES[].order_index` + `lessons[].order_index` (excluzând exerciții).
-- **Complexitate:** XS.
-- **Execuție:** un singur helper `formatLessonNumber(module, lesson)` → afișat în `ModuleCard`, `LessonPage` header, timeline, sidebar breadcrumb, Dashboard. Fără migrație DB — pur UI.
+## Ce am deja și reutilizez
 
-### 1.2 Autosave „draft" universal pe toate câmpurile text ⭐
-- **Ce vrea:** „scriu ceva, vin alte idei, nicăieri nu se salvează" — teamă că pierde ce a scris.
-- **Avem:** exerciții deja salvează local+cloud (ok). Dar **notițele lecției** (`lesson_notes`) și **răspunsurile quiz** nu au feedback vizual de „salvat".
-- **Complexitate:** S.
-- **Execuție:**
-  - Indicator vizibil „Se salvează… / Salvat acum 3s" pe fiecare card de notiță și exercițiu (reuse pattern din `exerciseSync`).
-  - Debounce 800ms → localStorage instant + cloud sync cu status.
-  - Warning „Ai modificări nesalvate" la close tab dacă e ceva pending.
+- **Tipuri exerciții:** `form-fields`, `checklist`, `quiz-mcq`, `dynamic-table` (folosite deja la Manifest, Fișa de Post, Matricea decizională, Instrucțiune).
+- **Sablon Doc:** `documentData.ts` cu `htmlShell`, `aaHeader`, `aaFooter`, tipografie Aboreto+Arimo, monogramă, accent auriu (Doc 04-06 sunt exemplele vii).
+- **Culori praguri:** deja am `success`/`warning`/`danger` în `Badge.tsx` cu variante identice cu roșu/galben/verde din Word.
+- **Autosave + hidratare cloud:** deja funcționează pe toate `form-fields` prin `exerciseSync`.
+- **Export PDF branded:** `materialsExport.ts` mapează automat răspunsurile.
 
-### 1.3 Retry quiz cu istoric note
-- **Ce vrea:** dacă a luat 4/5 să poată reface pentru scor mai bun.
-- **Avem:** `quiz_responses` — o singură rândă per user (upsert).
-- **Complexitate:** S-M.
-- **Execuție:**
-  - Adăugăm `quiz_attempts` (user_id, quiz_id, score, answers jsonb, created_at) — istoric complet.
-  - Buton „Refă quiz-ul" pe pagina de rezultate.
-  - Afișăm cel mai bun scor + timeline încercări („Ai făcut de 3 ori: 3/5 → 4/5 → 5/5").
-  - **Excepție onboarding quiz** (profilul de maturitate) — acela rămâne one-shot ca să nu strice `studentInsights`; sau permitem re-editare dar re-generăm briefing-ul admin. Decide-tu.
+## Cele 3 exerciții (câte unul per lecție, atașate ca `l-4-4`, `l-4-5`, `l-4-6`)
 
----
+### Exercițiul 6.1 · „Construiește primul tău KPI" (lecția 15)
 
-## VAL 2 — Materialele mele (hub central) ⭐⭐
+- **Tip:** `form-fields` — un singur exercițiu, 9 câmpuri.
+- **Structura (identică cu Word):**
+  1. Header `input`: Rol · Funcție · Produsul rolului (3 câmpuri).
+  2. Cele 6 elemente — fiecare = un `textarea` cu `label` = numele elementului, `helper` = descrierea (ℹ) din Word, `placeholder` = întrebarea de control (?).
+  3. Testul final = `checklist` cu 1 opțiune „Da, imposibil să-l atingă fără ca firma să câștige" (elevul o bifează când e sigur).
+  4. Verificare finală = `checklist` cu cele 4 criterii din Word.
+- **Zero componente noi.** Layout-ul îl dă `form-fields` deja stilizat.
+- **Buton „+ Adaugă încă un KPI"** = reutilizez pattern-ul dinamic din `decision-matrix` (deja există) — elevul poate defini 2-3 KPI succesive.
 
-### 2.1 Pagină nouă `/materialele-mele`
-- **Ce vor:** „toate într-un loc" — download exerciții completate, notițe, documente generate, PDF-uri lecție.
-- **Complexitate:** M.
-- **Execuție:**
-  - Rută nouă `_app.materials.index.tsx` — link în Sidebar sub „Biblioteca".
-  - 4 taburi:
-    1. **Exerciții completate** — listă cu buton „Descarcă PDF" per exercițiu, filtrat pe săptămână/modul.
-    2. **Notițe** — toate `lesson_notes` grupate pe lecție, buton „Descarcă toate ca PDF" + „.md".
-    3. **Documente** — templatele deja completate în DocumentsPage (deja există, doar link).
-    4. **Resurse curs** — PDF-uri / rezumate lecție (vezi 3.1).
-  - Buton mare „📦 Descarcă TOT (ZIP)" — generează un ZIP cu toate PDF-urile.
+### Exercițiul 6.2 · „KPI Viu — de la cifră la sistem" (lecția 16)
 
-### 2.2 Export PDF per exercițiu completat
-- **Ce vor:** print / arhivare.
-- **Avem:** deja avem generatoare HTML→print pentru documente (Manifest, SOP, Fișă Post).
-- **Complexitate:** M.
-- **Execuție:**
-  - Extindem pattern-ul existent din `DocumentsPage`: un template HTML per tip exercițiu (quiz-mcq, function-roles, decision-matrix etc.) cu răspunsurile elevului injectate.
-  - Buton „Printează" (window.print cu CSS `@media print`) — fără librărie nouă, gratis.
-  - Alternativ: `jspdf` + `html2canvas` pentru download direct (dar print e mai fiabil).
+- **Tip:** combinație de secțiuni `form-fields` + `dynamic-table` + `checklist` — exact structura din Word (Partea 1-4).
+- **Partea 1 · Cele 6 elemente** = `form-fields` (identic cu 6.1, redus la label-uri scurte pentru că elevul le știe deja).
+- **Partea 2 · Poarta de calitate** = un singur `textarea` cu 3 exemple în placeholder.
+- **Partea 3 · Cele 3 praguri** = `dynamic-table` fix 3 rânduri × 2 coloane (Rând-uri pre-populate: ROȘU / GALBEN / VERDE ca text, coloane: „La ce nivel de cifră" + „Ce se întâmplă"). Culorile rândurilor = badge-urile `danger`/`warning`/`success` deja existente.
+- **Partea 4 · Legătura cu salariul** = `form-fields` cu 2 inputuri (fix / variabil) + `dynamic-table` 3 rânduri × 2 coloane (Prag / Ce primește) cu regula pre-scrisă în label.
+- **Verificare finală** = `checklist` cu cele 6 criterii din Word.
+- **Zero componente noi**, zero simulatoare — respect cererea de a rămâne în sistemul existent.
 
-### 2.3 Export ZIP total
-- **Complexitate:** M.
-- **Execuție:** `jszip` (30kb) — client-side, adună HTML-urile generate + notițele markdown → download ca `arhitectura-afacerii-{nume}-{data}.zip`. Fără backend.
+### Exercițiul 6.3 · „Tabloul de bord al firmei tale" (lecția 17)
 
----
+- **Tip:** `dynamic-table` fix 7 rânduri × 5 coloane (Funcție / Indicator / Țintă / Realizat / Responsabil).
+- **Rânduri pre-populate imutabil** cu numele celor 7 funcții (elevul completează doar restul) — reutilizez logica din `decision-matrix` unde primul rând e read-only.
+- **Coloana Stare** = calculată în render (dacă Realizat < Țintă → badge `danger`, egal → `warning`, peste → `success`) folosind exact `Badge.tsx` existent. E o coloană afișată, nu editabilă — nici o componentă nouă, doar un helper mic în `ExerciseBlock.tsx` care randează badge-ul potrivit în coloana finală când tipul e `dynamic-table` cu flag-ul `computed-status: true`.
+- **Bloc informativ deasupra** cu exemplul din Word = `info` field (tip existent).
+- **Regula desfacerii** = `quiz-mcq` cu 1 întrebare aplicată: „Vânzările sunt roșu. Ce faci întâi?" — 3 opțiuni + feedback din lecție.
+- **Sistem raportare** = 3 `input`-uri (cine / când / 3 întrebări) sub tabel.
 
-## VAL 3 — Rezumate & resurse per lecție
+## Documentele printabile (Doc 07, 08, 09)
 
-### 3.1 Rezumat text + slide-uri per lecție
-- **Ce vor:** ceva de citit/revizuit fără să reia videoul.
-- **Complexitate:** M-L (depinde cine scrie conținutul).
-- **Execuție tehnică:**
-  - Adăugăm `lessons.summary_md` (text markdown) + `lessons.slides_url` (PDF/link) în DB.
-  - Afișăm pe `LessonPage` un tab „📝 Rezumat" + „🎞️ Slide-uri".
-  - Admin poate edita din `AdminLessons`.
-- **Execuție conținut:** două opțiuni:
-  - (a) Tu scrii manual rezumatele — control total, timp mare.
-  - (b) Generăm draft cu AI (transcript YouTube → Gemini Flash) → tu verifici și publici. Rapid, dar necesită revizie.
-  - Recomand (b) pentru bootstrap, apoi editezi.
+Le fac în același val, cu shell-ul existent din `documentData.ts` (așa cum sunt Doc 04-06):
 
-### 3.2 Notițe descărcabile
-- **Complexitate:** XS (parte din 2.1 tab 2).
+- **Doc 07 · Fișă KPI** — sablon printabil identic cu Word L15, wizard de completare pe platformă cu autosave, print cu răspunsurile pre-completate. Reutilizează exact `htmlShell`, `aaHeader`, `aaFooter`.
+- **Doc 08 · Fișă KPI Viu** — sablon printabil identic cu Word L16 (4 părți).
+- **Doc 09 · Tabloul de bord** — sablon printabil cu exemplul + tabelul gol + legenda culorilor + sistemul de raportare.
 
----
+Toate 3 cu buton pe DocumentsPage (cardul e identic cu Doc 05/06).
 
-## VAL 4 — Nice-to-have (după feedback val 1-3)
+## Fișiere modificate
 
-- **Ordonare exerciții după completare** — badge „✓ Completat 12 iun" în timeline.
-- **Resume video** (deja pe roadmap) — `progress` cu `last_position_sec`.
-- **Notificări „materiale noi"** — când adaugi rezumat/slide la o lecție veche, elevul vede badge.
+- `src/lib/exerciseData.ts` — 3 template-uri noi (ID: `ex-6-1-kpi-fisa`, `ex-6-2-kpi-viu`, `ex-6-3-tablou-bord`).
+- `src/lib/data.ts` — cablaj exercițiu ↔ lecție pe `l-4-4`, `l-4-5`, `l-4-6`.
+- `src/components/exercises/ExerciseBlock.tsx` — 1 modificare mică: în `dynamic-table` adaug suportul pentru flag-ul `computedStatus` (randează Badge-ul din `Badge.tsx`). Nici un tip nou.
+- `src/lib/documentData.ts` — 3 documente noi (Doc 07/08/09) folosind shell-ul existent.
+- `src/pages/DocumentsPage.tsx` — 3 carduri noi (identice ca stil cu 05/06).
 
----
+## Ordinea execuției
 
-## Complexitate totală & ordine sugerată
-
-| Val | Ce livrează | Efort | Impact vizibil |
-|-----|-------------|-------|----------------|
-| 1   | Numerotare + autosave feedback + retry quiz | ~1 sesiune | Mare — rezolvă frustrări zilnice |
-| 2   | Hub „Materialele mele" + export PDF/ZIP | ~1-2 sesiuni | Foarte mare — feature nou vizibil |
-| 3   | Rezumate + slide-uri per lecție | ~1 sesiune tehnic + timp conținut | Mare — depinde de conținut |
-| 4   | Polish | ad-hoc | Mediu |
-
-## Decizii de luat înainte să încep
-
-1. **Onboarding quiz** — permitem retry (cu re-generare briefing) sau blocăm?
-2. **Rezumate lecție** — vrei să generez draft-uri cu AI din transcript YouTube, sau le scrii tu?
-3. **Format export exerciții** — print-friendly HTML (rapid) sau PDF descărcabil (necesită `jspdf`)?
-4. **Începem cu Val 1 (quick wins) sau sari direct la Val 2 (hub materiale)** — care e mai urgent pentru elevi?
+1. Template-urile celor 3 exerciții în `exerciseData.ts`.
+2. Cablarea în `data.ts`.
+3. Micul flag `computedStatus` în `ExerciseBlock.tsx` pentru coloana Stare din 6.3.
+4. Cele 3 documente în `documentData.ts` + carduri în `DocumentsPage.tsx`.
+5. Verificare vizuală (Playwright screenshot) pe una din lecții ca să confirm că nimic nu iese din sistem.
