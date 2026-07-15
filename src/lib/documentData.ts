@@ -1860,10 +1860,12 @@ function generateDoc7(answers: Record<string, string>): string {
       <div class="field-value multiline${!val ? ' empty' : ''}" style="white-space:pre-wrap;">${val || '&nbsp;'}</div>
     </div>`;
 
-  const sec6 = section('Cele 6 elemente', undefined, sectionBg, sectionColor,
+  const sec6a = section('Cele 6 elemente · 1-3', undefined, sectionBg, sectionColor,
     elemBlock(1, 'Numele indicatorului', 'Ce măsori exact.', a('kpi_e1'), 'Doi oameni diferiți vor număra același lucru?') +
     elemBlock(2, 'Legătura cu produsul funcției', 'Veriga care ține lanțul întreg. Nu sări.', a('kpi_e2'), 'Dacă KPI-ul e atins, apare garantat produsul funcției?') +
-    elemBlock(3, 'Unitatea de măsură', 'Număr, procent, lei, ore, zile.', a('kpi_e3'), 'E clar în ce unitate măsor?') +
+    elemBlock(3, 'Unitatea de măsură', 'Număr, procent, lei, ore, zile.', a('kpi_e3'), 'E clar în ce unitate măsor?'));
+
+  const sec6b = section('Cele 6 elemente · 4-6', undefined, sectionBg, sectionColor,
     elemBlock(4, 'Ținta', 'Cât înseamnă „bine". Fără țintă, o cifră nu înseamnă nimic.', a('kpi_e4'), 'Am decis concret cât înseamnă bine? E realistă?') +
     elemBlock(5, 'Frecvența', 'Cât de des măsori.', a('kpi_e5'), 'Îmi dă timp să intervin dacă merge prost?') +
     elemBlock(6, 'Cine răspunde', 'Un singur responsabil + cine verifică.', a('kpi_e6'), 'Omul poate mișca direct această cifră prin munca lui?'));
@@ -1883,10 +1885,11 @@ function generateDoc7(answers: Record<string, string>): string {
       </div>
     </div>`;
 
-  const totalPages = 2;
+  const totalPages = 3;
   const pagesHtml = [
-    renderPage('07', 'Contoarele', 1, totalPages, `${secIdent}${sec6}`, titleBand),
-    renderPage('07', 'Contoarele', 2, totalPages, `${secTest}${secVerif}${docFooter()}`),
+    renderPage('07', 'Contoarele', 1, totalPages, `${secIdent}${sec6a}`, titleBand),
+    renderPage('07', 'Contoarele', 2, totalPages, `${sec6b}`),
+    renderPage('07', 'Contoarele', 3, totalPages, `${secTest}${secVerif}${docFooter()}`),
   ].join('');
 
   return htmlShell('', pagesHtml, `Fișa KPI · ${rol}`);
