@@ -974,6 +974,159 @@ export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
       { id: 'mf_descoperire', type: 'textarea', label: 'Ce ai descoperit construind fluxul vizual pe care nu ai văzut în SOP?', placeholder: 'Suprapuneri, pași inutili, decizii ascunse...' },
     ],
   },
+
+  // ═══════════════════════════════════════════════════════════════════
+  // SĂPTĂMÂNA 6 · CONTOARELE — L15/L16/L17 (KPI, KPI Viu, Tabloul de bord)
+  // ═══════════════════════════════════════════════════════════════════
+
+  // ex-6-1-kpi-fisa — L15 „Contoarele" · Cele 6 elemente + testul final
+  {
+    exerciseId: 'ex-6-1-kpi-fisa',
+    type: 'form-fields',
+    title: 'Fișa KPI · Cele 6 elemente',
+    instructions:
+      'Un KPI măsoară produsul funcției, nu o activitate la întâmplare. Pornește de la produsul rolului și verifică lanțul: produsul funcției → strategia → guideline → KPI.',
+    fields: [
+      { id: 'kpi_info', type: 'info', text: 'Înainte să completezi: alege UN rol din firma ta și produsul lui finit. Vei construi un singur KPI de la zero. Poți relua fișa pentru fiecare rol cheie.' },
+      { id: 'kpi_rol', type: 'input', label: 'Rolul', placeholder: 'ex: Director de Vânzări' },
+      { id: 'kpi_functia', type: 'input', label: 'Funcția', placeholder: 'ex: Vânzări' },
+      { id: 'kpi_produs', type: 'textarea', label: 'Produsul rolului', placeholder: 'Ce livrează concret rolul, în cifre. Ex: „Contracte semnate luna asta".' },
+
+      { id: 'kpi_e1_info', type: 'info', text: 'ELEMENTUL 1 · Numele indicatorului — ce măsori exact. Un nume clar pe care oricine îl citește îl înțelege la fel.' },
+      { id: 'kpi_e1', type: 'textarea', label: '1 · Numele indicatorului', placeholder: 'Control: dacă dau acest nume la doi oameni diferiți, vor număra același lucru?' },
+
+      { id: 'kpi_e2_info', type: 'info', text: 'ELEMENTUL 2 · Legătura cu produsul funcției — veriga care ține lanțul întreg. NU sări acest element.' },
+      { id: 'kpi_e2', type: 'textarea', label: '2 · Legătura cu produsul funcției', placeholder: 'Control: dacă KPI-ul e atins, apare garantat produsul funcției? Sau poate fi atins pe lângă el?' },
+
+      { id: 'kpi_e3_info', type: 'info', text: 'ELEMENTUL 3 · Unitatea de măsură — număr, procent, lei, ore, zile.' },
+      { id: 'kpi_e3', type: 'input', label: '3 · Unitatea de măsură', placeholder: 'Control: e clar în ce unitate măsor, ca să nu numere doi oameni diferit?' },
+
+      { id: 'kpi_e4_info', type: 'info', text: 'ELEMENTUL 4 · Ținta — cât trebuie să fie cifra ca să spunem că e bine. Fără țintă, o cifră nu înseamnă nimic.' },
+      { id: 'kpi_e4', type: 'input', label: '4 · Ținta', placeholder: 'Control: am decis concret cât înseamnă „bine"? E realistă pentru acest rol?' },
+
+      { id: 'kpi_e5_info', type: 'info', text: 'ELEMENTUL 5 · Frecvența — cât de des măsori. Depinde de cât de repede vrei să reacționezi.' },
+      { id: 'kpi_e5', type: 'input', label: '5 · Frecvența', placeholder: 'ex: săptămânal / lunar. Control: frecvența îmi dă timp să intervin dacă merge prost?' },
+
+      { id: 'kpi_e6_info', type: 'info', text: 'ELEMENTUL 6 · Cine răspunde — un singur om responsabil să îl urmărească și să îl raporteze. Și cine verifică.' },
+      { id: 'kpi_e6', type: 'input', label: '6 · Cine răspunde / cine verifică', placeholder: 'Control: omul care răspunde poate, prin munca lui, să miște direct această cifră?' },
+
+      { id: 'kpi_test_info', type: 'info', text: 'TESTUL FINAL — răspunde cinstit: „Dacă omul atinge perfect acest KPI, dar firma nu câștigă nimic din asta — e posibil?" Dacă răspunsul e DA, KPI-ul e dezlegat de strategie: reia Elementul 2 înainte să continui.' },
+      { id: 'kpi_test', type: 'textarea', label: 'Testul final — răspunsul tău', placeholder: 'NU, e imposibil / DA, e posibil — și ce corectezi.' },
+
+      { id: 'kpi_verif_info', type: 'info', text: 'VERIFICARE FINALĂ — cele 4 criterii: (1) Măsurabil — e o cifră clară, nu o dorință. (2) În puterea omului — el o poate mișca direct prin munca lui. (3) Legat de strategie — măsoară produsul funcției. (4) Cu prag de calitate — numără lucrurile bune, nu doar lucrurile.' },
+    ],
+  },
+
+  // ex-6-2-kpi-viu — L16 „Cum construiești un KPI viu"
+  {
+    exerciseId: 'ex-6-2-kpi-viu',
+    type: 'form-fields',
+    title: 'KPI Viu · De la o cifră la un sistem care mișcă oameni',
+    instructions:
+      'Un KPI viu are 4 părți: cele 6 elemente + poarta de calitate + cele 3 praguri (roșu/galben/verde față de țintă) + legătura cu salariul. Reia KPI-ul din Fișa KPI (L15) sau construiește unul nou.',
+    fields: [
+      { id: 'viu_rol', type: 'input', label: 'Rolul', placeholder: 'ex: Director de Vânzări' },
+      { id: 'viu_functia', type: 'input', label: 'Funcția', placeholder: 'ex: Vânzări' },
+      { id: 'viu_produs', type: 'textarea', label: 'Produsul rolului', placeholder: 'Ce livrează rolul, în cifre.' },
+
+      // Partea 1 — cele 6 elemente (concis)
+      { id: 'viu_p1_info', type: 'info', text: 'PARTEA 1 · Cele 6 elemente — reia pe scurt (dacă vii din Fișa KPI, le poți copia).' },
+      { id: 'viu_e1', type: 'input', label: '1 · Numele indicatorului', placeholder: 'ex: Contracte semnate luna asta' },
+      { id: 'viu_e2', type: 'textarea', label: '2 · Legătura cu produsul funcției', placeholder: 'De ce contribuie direct la produsul rolului?' },
+      { id: 'viu_e3', type: 'input', label: '3 · Unitatea de măsură', placeholder: 'nr / procent / lei / ore' },
+      { id: 'viu_e4', type: 'input', label: '4 · Ținta', placeholder: 'ex: 20 contracte / lună' },
+      { id: 'viu_e5', type: 'input', label: '5 · Frecvența', placeholder: 'ex: săptămânal' },
+      { id: 'viu_e6', type: 'input', label: '6 · Cine răspunde / cine verifică', placeholder: 'Un singur responsabil + verificator.' },
+
+      // Partea 2 — poarta de calitate
+      { id: 'viu_p2_info', type: 'info', text: 'PARTEA 2 · Poarta de calitate — ce condiție trebuie să îndeplinească un rezultat ca să se NUMERE la KPI. Se numără doar ce respectă standardul, nu orice.' },
+      { id: 'viu_poarta', type: 'textarea', label: 'Se numără doar rezultatele care îndeplinesc:', placeholder: 'ex: vânzări peste 200 lei / proiecte acceptate fără refacere / clienți care au plătit avansul.' },
+
+      // Partea 3 — cele 3 praguri
+      { id: 'viu_p3_info', type: 'info', text: 'PARTEA 3 · Cele 3 praguri — regula universală: sub țintă = ROȘU, la țintă = GALBEN, peste țintă = VERDE. Definește nivelul cifrei și ce se întâmplă la fiecare prag.' },
+      { id: 'viu_rosu_nivel', type: 'input', label: '🔴 ROȘU · nivelul cifrei', placeholder: 'ex: sub 15 contracte / lună' },
+      { id: 'viu_rosu_actiune', type: 'textarea', label: '🔴 ROȘU · ce se întâmplă', placeholder: 'ex: doar fixul, fără bonus + plan de recuperare săptămâna următoare.' },
+      { id: 'viu_galben_nivel', type: 'input', label: '🟡 GALBEN · nivelul cifrei', placeholder: 'ex: 15–20 contracte / lună' },
+      { id: 'viu_galben_actiune', type: 'textarea', label: '🟡 GALBEN · ce se întâmplă', placeholder: 'ex: fix + bonus întreg.' },
+      { id: 'viu_verde_nivel', type: 'input', label: '🟢 VERDE · nivelul cifrei', placeholder: 'ex: peste 20 contracte / lună' },
+      { id: 'viu_verde_actiune', type: 'textarea', label: '🟢 VERDE · ce se întâmplă', placeholder: 'ex: fix + bonus + stimulent depășire (X lei per contract în plus).' },
+
+      // Partea 4 — legătura cu salariul
+      { id: 'viu_p4_info', type: 'info', text: 'PARTEA 4 · Legătura cu salariul — legi de bani DOAR un KPI complet în puterea omului. Proporții orientative: vânzător variabilă 30–50%, roluri de mijloc ~20%, roluri de suport (contabil) variabilă ~10%.' },
+      { id: 'viu_fix', type: 'input', label: 'Componenta fixă (lunar)', placeholder: 'ex: 800 EUR echivalent' },
+      { id: 'viu_var', type: 'input', label: 'Componenta variabilă maximă', placeholder: 'ex: 400 EUR (~33% din total)' },
+      { id: 'viu_rosu_pay', type: 'input', label: '🔴 ROȘU → primește', placeholder: 'ex: doar fixul (800 EUR)' },
+      { id: 'viu_galben_pay', type: 'input', label: '🟡 GALBEN → primește', placeholder: 'ex: fix + bonus întreg (1200 EUR)' },
+      { id: 'viu_verde_pay', type: 'input', label: '🟢 VERDE → primește', placeholder: 'ex: fix + bonus + 15 EUR/contract peste țintă' },
+
+      { id: 'viu_verif_info', type: 'info', text: 'VERIFICARE FINALĂ · bifează în minte: (1) numele e măsurabil, (2) are poartă de calitate, (3) are cele 3 praguri față de țintă, (4) KPI-ul de care leg banii e complet în puterea omului, (5) nu plătesc bonus sub țintă — doar fixul la roșu, (6) omul poate calcula singur, din pragul lui, cât va primi.' },
+    ],
+  },
+
+  // ex-6-3-tablou-bord — L17 „Tabloul de bord"
+  {
+    exerciseId: 'ex-6-3-tablou-bord',
+    type: 'form-fields',
+    title: 'Tabloul de bord · Cele 7 funcții',
+    instructions:
+      'Un singur indicator de rezultat pe fiecare din cele 7 funcții ale firmei. Țintă + Realizat + Responsabil pentru fiecare. Când o cifră devine roșie, o desfaci — dar nu monitorizezi zilnic sub-indicatorii.',
+    fields: [
+      { id: 'tb_firma', type: 'input', label: 'Numele firmei', placeholder: 'ex: Firma SRL' },
+      { id: 'tb_saptamana', type: 'input', label: 'Săptămâna', placeholder: 'ex: 20–26 iulie 2026' },
+
+      { id: 'tb_exemplu_info', type: 'info', text: 'EXEMPLU (o firmă cu toate funcțiile active): 1·Echipă — Retenție 90% țintă / 93% realizat 🟢 · 2·Vânzări — Venit 400k țintă / 356k 🔴 · 3·Finanțe — Cash >200k / 245k 🟢 · 4·Producție — Livrări la timp 95% / 91% 🟡 · 5·Calitate — Reclamații <5 / 3 🟢 · 6·PR — Creștere +800 / +610 🟡 · 7·Conducere — Profit net 80k / 61k 🔴. Ochiul merge direct la cele două roșii. Nu citești numere, vezi unde arde.' },
+
+      { id: 'tb_f1_info', type: 'info', text: '1 · CONSTRUCȚIA ECHIPEI — indicator de rezultat pentru cum ține echipa (ex: rata de retenție).' },
+      { id: 'tb_f1_ind', type: 'input', label: '1 · Indicatorul', placeholder: 'ex: Rata de retenție a angajaților' },
+      { id: 'tb_f1_tinta', type: 'input', label: '1 · Ținta', placeholder: 'ex: 90%' },
+      { id: 'tb_f1_real', type: 'input', label: '1 · Realizat', placeholder: 'ex: 93%' },
+      { id: 'tb_f1_resp', type: 'input', label: '1 · Responsabil', placeholder: 'Cine completează această cifră.' },
+
+      { id: 'tb_f2_info', type: 'info', text: '2 · MARKETING ȘI VÂNZĂRI — un singur indicator (venit din vânzări). Când e roșu, îl desfaci: lead-uri calificate + conversie.' },
+      { id: 'tb_f2_ind', type: 'input', label: '2 · Indicatorul', placeholder: 'ex: Venit din vânzări pe lună' },
+      { id: 'tb_f2_tinta', type: 'input', label: '2 · Ținta', placeholder: 'ex: 400.000' },
+      { id: 'tb_f2_real', type: 'input', label: '2 · Realizat', placeholder: 'ex: 356.000' },
+      { id: 'tb_f2_resp', type: 'input', label: '2 · Responsabil', placeholder: '' },
+
+      { id: 'tb_f3_info', type: 'info', text: '3 · FINANȚE — indicator de sănătate financiară (ex: cash flow disponibil).' },
+      { id: 'tb_f3_ind', type: 'input', label: '3 · Indicatorul', placeholder: 'ex: Cash flow disponibil' },
+      { id: 'tb_f3_tinta', type: 'input', label: '3 · Ținta', placeholder: 'ex: > 200.000' },
+      { id: 'tb_f3_real', type: 'input', label: '3 · Realizat', placeholder: 'ex: 245.000' },
+      { id: 'tb_f3_resp', type: 'input', label: '3 · Responsabil', placeholder: '' },
+
+      { id: 'tb_f4_info', type: 'info', text: '4 · PRODUCȚIE / SERVICIU — livrări la timp și la calitate.' },
+      { id: 'tb_f4_ind', type: 'input', label: '4 · Indicatorul', placeholder: 'ex: % livrări la timp și la calitate' },
+      { id: 'tb_f4_tinta', type: 'input', label: '4 · Ținta', placeholder: 'ex: 95%' },
+      { id: 'tb_f4_real', type: 'input', label: '4 · Realizat', placeholder: 'ex: 91%' },
+      { id: 'tb_f4_resp', type: 'input', label: '4 · Responsabil', placeholder: '' },
+
+      { id: 'tb_f5_info', type: 'info', text: '5 · CALITATEA — reclamații / retururi / refaceri.' },
+      { id: 'tb_f5_ind', type: 'input', label: '5 · Indicatorul', placeholder: 'ex: Reclamații pe lună' },
+      { id: 'tb_f5_tinta', type: 'input', label: '5 · Ținta', placeholder: 'ex: < 5' },
+      { id: 'tb_f5_real', type: 'input', label: '5 · Realizat', placeholder: 'ex: 3' },
+      { id: 'tb_f5_resp', type: 'input', label: '5 · Responsabil', placeholder: '' },
+
+      { id: 'tb_f6_info', type: 'info', text: '6 · PR ȘI IMAGINEA — creștere audiență relevantă / mențiuni / reach.' },
+      { id: 'tb_f6_ind', type: 'input', label: '6 · Indicatorul', placeholder: 'ex: Creștere audiență relevantă' },
+      { id: 'tb_f6_tinta', type: 'input', label: '6 · Ținta', placeholder: 'ex: +800' },
+      { id: 'tb_f6_real', type: 'input', label: '6 · Realizat', placeholder: 'ex: +610' },
+      { id: 'tb_f6_resp', type: 'input', label: '6 · Responsabil', placeholder: '' },
+
+      { id: 'tb_f7_info', type: 'info', text: '7 · CONDUCEREA — profit net / marjă / obiectiv strategic.' },
+      { id: 'tb_f7_ind', type: 'input', label: '7 · Indicatorul', placeholder: 'ex: Profit net lunar' },
+      { id: 'tb_f7_tinta', type: 'input', label: '7 · Ținta', placeholder: 'ex: 80.000' },
+      { id: 'tb_f7_real', type: 'input', label: '7 · Realizat', placeholder: 'ex: 61.000' },
+      { id: 'tb_f7_resp', type: 'input', label: '7 · Responsabil', placeholder: '' },
+
+      { id: 'tb_desfacere_info', type: 'info', text: 'REGULA DESFACERII — când un indicator e roșu, îl desfaci ca să vezi unde s-a rupt lanțul. Ex: Vânzări roșu → puține lead-uri = problemă la marketing; multe lead-uri + conversie mică = problemă la vânzare. Desfaci doar ca să diagnostichezi, NU ca să monitorizezi zilnic.' },
+      { id: 'tb_desfacere', type: 'textarea', label: 'Aplică regula pentru firma ta: ce indicator e roșu acum și cum îl desfaci?', placeholder: 'Indicator roșu: ...\nCum îl desfac (2–3 sub-indicatori): ...' },
+
+      { id: 'tb_raport_info', type: 'info', text: 'SISTEMUL DE RAPORTARE — fiecare responsabil își pune propria cifră (nu proprietarul), până la un moment fix înainte de ședința săptămânală. Lângă cifră, 3 întrebări: ce s-a făcut, ce rezultat, ce blocaje.' },
+      { id: 'tb_cine', type: 'input', label: 'Cine completează', placeholder: 'ex: Fiecare responsabil își pune propria cifră' },
+      { id: 'tb_cand', type: 'input', label: 'Când (termen limită)', placeholder: 'ex: Vineri, 18:00' },
+      { id: 'tb_intrebari', type: 'textarea', label: 'Cele 3 întrebări lângă cifră', placeholder: '1. Ce s-a făcut?\n2. Ce rezultat?\n3. Ce blocaje?' },
+    ],
+  },
 ];
 
 export function getExerciseTemplate(exerciseId: string): ExerciseTemplate | undefined {
