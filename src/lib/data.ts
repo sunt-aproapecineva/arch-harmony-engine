@@ -790,6 +790,45 @@ export const MODULES: Module[] = [
         order_index: 6,
         is_published: true,
       },
+      {
+        id: 'l-4-ex-1',
+        module_id: 'mod-4',
+        title: 'Fișa KPI · Cele 6 elemente',
+        description:
+          'Săptămâna 6 · Lecția 15. Construiești primul tău KPI de la zero: rolul, produsul, cele 6 elemente (nume, legătura cu produsul funcției, unitate, țintă, frecvență, responsabil) + testul final „dacă atinge KPI-ul dar firma nu câștigă — e posibil?".',
+        video_url: '',
+        duration_min: 25,
+        order_index: 7,
+        is_published: true,
+        type: 'exercise',
+        exercise_id: 'ex-6-1-kpi-fisa',
+      },
+      {
+        id: 'l-4-ex-2',
+        module_id: 'mod-4',
+        title: 'KPI Viu · Praguri și legătura cu salariul',
+        description:
+          'Săptămâna 6 · Lecția 16. Treci de la o cifră la un sistem care mișcă oameni: cele 6 elemente + poarta de calitate + 3 praguri (roșu/galben/verde față de țintă) + legătura cu salariul (fix + variabil pe prag).',
+        video_url: '',
+        duration_min: 30,
+        order_index: 8,
+        is_published: true,
+        type: 'exercise',
+        exercise_id: 'ex-6-2-kpi-viu',
+      },
+      {
+        id: 'l-4-ex-3',
+        module_id: 'mod-4',
+        title: 'Tabloul de bord · Cele 7 funcții',
+        description:
+          'Săptămâna 6 · Lecția 17. Un singur indicator de rezultat pe cele 7 funcții (Echipă, Vânzări, Finanțe, Producție, Calitate, PR, Conducere) + regula desfacerii (când e roșu) + sistem de raportare săptămânal.',
+        video_url: '',
+        duration_min: 30,
+        order_index: 9,
+        is_published: true,
+        type: 'exercise',
+        exercise_id: 'ex-6-3-tablou-bord',
+      },
     ],
 
     exercises: [

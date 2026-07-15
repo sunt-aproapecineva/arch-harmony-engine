@@ -1789,8 +1789,377 @@ function generateDoc6(answers: Record<string, string>): string {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
+// DOCUMENT 7 — Fișa KPI (L15 · Contoarele)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const doc7Steps: DocWizardStep[] = [
+  {
+    title: 'Identificare',
+    subtitle: 'Firma, rolul, produsul funcției',
+    questions: [
+      { id: 'kpi_firma',   label: 'Numele firmei',       placeholder: 'ex: Firma SRL',            type: 'text' },
+      { id: 'kpi_data',    label: 'Data',                 placeholder: '',                          type: 'date' },
+      { id: 'kpi_rol',     label: 'Rolul',                placeholder: 'ex: Director de Vânzări',   type: 'text' },
+      { id: 'kpi_functia', label: 'Funcția',              placeholder: 'ex: Vânzări',               type: 'text' },
+      { id: 'kpi_produs',  label: 'Produsul rolului',     placeholder: 'Ce livrează concret rolul, în cifre.', type: 'textarea' },
+    ],
+  },
+  {
+    title: 'Cele 6 elemente ale KPI-ului',
+    subtitle: 'Un KPI complet — verifică lanțul produs → strategie → guideline → KPI',
+    questions: [
+      { id: 'kpi_e1', label: '1 · Numele indicatorului',           placeholder: 'Doi oameni ar număra același lucru?', type: 'textarea' },
+      { id: 'kpi_e2', label: '2 · Legătura cu produsul funcției',  placeholder: 'Dacă KPI-ul e atins, apare garantat produsul funcției?', type: 'textarea' },
+      { id: 'kpi_e3', label: '3 · Unitatea de măsură',             placeholder: 'nr / procent / lei / ore / zile',       type: 'text' },
+      { id: 'kpi_e4', label: '4 · Ținta',                          placeholder: 'ex: 20 contracte / lună',              type: 'text' },
+      { id: 'kpi_e5', label: '5 · Frecvența',                      placeholder: 'ex: săptămânal / lunar',                type: 'text' },
+      { id: 'kpi_e6', label: '6 · Cine răspunde / cine verifică',  placeholder: 'Un singur responsabil + verificator.', type: 'text' },
+    ],
+  },
+  {
+    title: 'Testul final și verificarea',
+    subtitle: '„Dacă atinge KPI-ul dar firma nu câștigă — e posibil?"',
+    questions: [
+      { id: 'kpi_test', label: 'Răspunsul la testul final',
+        placeholder: 'NU, e imposibil — KPI corect. / DA, e posibil — reia Elementul 2.',
+        type: 'textarea' },
+      { id: 'kpi_notite', label: 'Notițe / concluzii', placeholder: 'Ce ai învățat construind acest KPI. Ce reglezi la Elementul 2 dacă e cazul.', type: 'textarea' },
+    ],
+  },
+];
+
+function generateDoc7(answers: Record<string, string>): string {
+  const a = (k: string) => ans(answers, k);
+  const sectionBg = '#f5eddb';
+  const sectionColor = '#a07840';
+
+  const firma = a('kpi_firma') || '[Numele firmei]';
+  const data = a('kpi_data') || '';
+  const rol = a('kpi_rol') || '[Rolul]';
+  const functia = a('kpi_functia') || '[Funcția]';
+
+  const titleBand = `
+    <div class="title-band" style="background: linear-gradient(135deg, #a07840 0%, #C9A96E 100%);">
+      <div class="doc-num">DOCUMENT 07 · FIȘA KPI</div>
+      <h1>Indicator cheie de performanță</h1>
+      <span class="topic-tag">${firma}${data ? ' · ' + data : ''}</span>
+    </div>`;
+
+  const secIdent = section('Identificare', 'Rolul și produsul funcției', sectionBg, sectionColor,
+    `${fieldRow(field('Rolul', rol), field('Funcția', functia))}
+     ${fieldMulti('Produsul rolului', a('kpi_produs'))}`);
+
+  const elemBlock = (num: number, title: string, hint: string, val: string, question: string) => `
+    <div style="margin-bottom:10px;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:var(--paper-dark);">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px;">
+        <div style="width:26px;height:26px;border-radius:50%;background:#a07840;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Aboreto',serif;font-size:12px;">${num}</div>
+        <div style="font-family:'Aboreto',serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink);">${title}</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);font-style:italic;margin-bottom:4px;">ℹ ${hint}</div>
+      <div style="font-size:11px;color:var(--muted);font-style:italic;margin-bottom:6px;">? ${question}</div>
+      <div class="field-value multiline${!val ? ' empty' : ''}" style="white-space:pre-wrap;">${val || '&nbsp;'}</div>
+    </div>`;
+
+  const sec6 = section('Cele 6 elemente', undefined, sectionBg, sectionColor,
+    elemBlock(1, 'Numele indicatorului', 'Ce măsori exact.', a('kpi_e1'), 'Doi oameni diferiți vor număra același lucru?') +
+    elemBlock(2, 'Legătura cu produsul funcției', 'Veriga care ține lanțul întreg. Nu sări.', a('kpi_e2'), 'Dacă KPI-ul e atins, apare garantat produsul funcției?') +
+    elemBlock(3, 'Unitatea de măsură', 'Număr, procent, lei, ore, zile.', a('kpi_e3'), 'E clar în ce unitate măsor?') +
+    elemBlock(4, 'Ținta', 'Cât înseamnă „bine". Fără țintă, o cifră nu înseamnă nimic.', a('kpi_e4'), 'Am decis concret cât înseamnă bine? E realistă?') +
+    elemBlock(5, 'Frecvența', 'Cât de des măsori.', a('kpi_e5'), 'Îmi dă timp să intervin dacă merge prost?') +
+    elemBlock(6, 'Cine răspunde', 'Un singur responsabil + cine verifică.', a('kpi_e6'), 'Omul poate mișca direct această cifră prin munca lui?'));
+
+  const secTest = section('Testul final', '„Dacă atinge KPI-ul dar firma nu câștigă — e posibil?"', sectionBg, sectionColor,
+    `${fieldMulti('Răspunsul tău', a('kpi_test'))}
+     ${fieldMulti('Notițe / concluzii', a('kpi_notite'))}`);
+
+  const secVerif = `
+    <div class="section-block">
+      <div class="section-title" style="background:${sectionBg};color:${sectionColor};">Verificare finală · cele 4 criterii</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;">
+        <div style="padding:10px 12px;border:1px solid var(--line);border-radius:4px;font-size:12px;">☐ <strong>Măsurabil</strong> — e o cifră clară, nu o dorință</div>
+        <div style="padding:10px 12px;border:1px solid var(--line);border-radius:4px;font-size:12px;">☐ <strong>În puterea omului</strong> — o poate mișca direct</div>
+        <div style="padding:10px 12px;border:1px solid var(--line);border-radius:4px;font-size:12px;">☐ <strong>Legat de strategie</strong> — măsoară produsul funcției</div>
+        <div style="padding:10px 12px;border:1px solid var(--line);border-radius:4px;font-size:12px;">☐ <strong>Cu prag de calitate</strong> — numără lucrurile bune</div>
+      </div>
+    </div>`;
+
+  const totalPages = 2;
+  const pagesHtml = [
+    renderPage('07', 'Contoarele', 1, totalPages, `${secIdent}${sec6}`, titleBand),
+    renderPage('07', 'Contoarele', 2, totalPages, `${secTest}${secVerif}${docFooter()}`),
+  ].join('');
+
+  return htmlShell('', pagesHtml, `Fișa KPI · ${rol}`);
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DOCUMENT 8 — Fișa KPI Viu (L16)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const doc8Steps: DocWizardStep[] = [
+  {
+    title: 'Identificare',
+    questions: [
+      { id: 'viu_firma',   label: 'Numele firmei',    placeholder: 'ex: Firma SRL',            type: 'text' },
+      { id: 'viu_data',    label: 'Data',              placeholder: '',                          type: 'date' },
+      { id: 'viu_rol',     label: 'Rolul',             placeholder: 'ex: Director de Vânzări',   type: 'text' },
+      { id: 'viu_functia', label: 'Funcția',           placeholder: 'ex: Vânzări',               type: 'text' },
+      { id: 'viu_produs',  label: 'Produsul rolului',  placeholder: 'Ce livrează concret rolul.', type: 'textarea' },
+    ],
+  },
+  {
+    title: 'Cele 6 elemente',
+    questions: [
+      { id: 'viu_e1', label: '1 · Numele indicatorului',           placeholder: '', type: 'textarea' },
+      { id: 'viu_e2', label: '2 · Legătura cu produsul funcției',  placeholder: '', type: 'textarea' },
+      { id: 'viu_e3', label: '3 · Unitatea de măsură',             placeholder: '', type: 'text' },
+      { id: 'viu_e4', label: '4 · Ținta',                          placeholder: '', type: 'text' },
+      { id: 'viu_e5', label: '5 · Frecvența',                      placeholder: '', type: 'text' },
+      { id: 'viu_e6', label: '6 · Cine răspunde / verifică',       placeholder: '', type: 'text' },
+    ],
+  },
+  {
+    title: 'Poarta de calitate',
+    subtitle: 'Ce condiție trebuie să îndeplinească un rezultat ca să se numere',
+    questions: [
+      { id: 'viu_poarta', label: 'Se numără doar rezultatele care îndeplinesc:', placeholder: 'ex: vânzări peste 200 lei / proiecte fără refacere', type: 'textarea' },
+    ],
+  },
+  {
+    title: 'Cele 3 praguri (față de țintă)',
+    subtitle: 'Sub țintă = roșu · La țintă = galben · Peste țintă = verde',
+    questions: [
+      { id: 'viu_rosu_nivel',    label: '🔴 ROȘU · nivelul cifrei',      placeholder: 'ex: sub 15', type: 'text' },
+      { id: 'viu_rosu_actiune',  label: '🔴 ROȘU · ce se întâmplă',      placeholder: 'ex: doar fixul, plan de recuperare', type: 'textarea' },
+      { id: 'viu_galben_nivel',  label: '🟡 GALBEN · nivelul cifrei',    placeholder: 'ex: 15–20', type: 'text' },
+      { id: 'viu_galben_actiune',label: '🟡 GALBEN · ce se întâmplă',    placeholder: 'ex: fix + bonus întreg', type: 'textarea' },
+      { id: 'viu_verde_nivel',   label: '🟢 VERDE · nivelul cifrei',     placeholder: 'ex: peste 20', type: 'text' },
+      { id: 'viu_verde_actiune', label: '🟢 VERDE · ce se întâmplă',     placeholder: 'ex: fix + bonus + stimulent depășire', type: 'textarea' },
+    ],
+  },
+  {
+    title: 'Legătura cu salariul',
+    subtitle: 'Legi bani DOAR de un KPI complet în puterea omului',
+    questions: [
+      { id: 'viu_fix',        label: 'Componenta fixă',            placeholder: 'ex: 800 EUR', type: 'text' },
+      { id: 'viu_var',        label: 'Componenta variabilă max',    placeholder: 'ex: 400 EUR (~33%)', type: 'text' },
+      { id: 'viu_rosu_pay',   label: '🔴 ROȘU → primește',          placeholder: 'ex: doar fixul', type: 'text' },
+      { id: 'viu_galben_pay', label: '🟡 GALBEN → primește',        placeholder: 'ex: fix + bonus întreg', type: 'text' },
+      { id: 'viu_verde_pay',  label: '🟢 VERDE → primește',         placeholder: 'ex: fix + bonus + X lei/unitate peste țintă', type: 'text' },
+    ],
+  },
+];
+
+function generateDoc8(answers: Record<string, string>): string {
+  const a = (k: string) => ans(answers, k);
+  const sectionBg = '#f7ecec';
+  const sectionColor = '#8B1A1A';
+  const firma = a('viu_firma') || '[Numele firmei]';
+  const data = a('viu_data') || '';
+  const rol = a('viu_rol') || '[Rolul]';
+
+  const titleBand = `
+    <div class="title-band" style="background: linear-gradient(135deg, #8B1A1A 0%, #a82020 100%);">
+      <div class="doc-num">DOCUMENT 08 · FIȘA KPI VIU</div>
+      <h1>De la o cifră la un sistem care mișcă oameni</h1>
+      <span class="topic-tag">${firma}${data ? ' · ' + data : ''}</span>
+    </div>`;
+
+  const secIdent = section('Identificare', undefined, sectionBg, sectionColor,
+    `${fieldRow(field('Rolul', rol), field('Funcția', a('viu_functia')))}
+     ${fieldMulti('Produsul rolului', a('viu_produs'))}`);
+
+  const sec6 = section('Partea 1 · Cele 6 elemente', undefined, sectionBg, sectionColor,
+    `${fieldRow(field('1 · Nume', a('viu_e1')))}
+     ${fieldMulti('2 · Legătura cu produsul funcției', a('viu_e2'))}
+     ${fieldRow(field('3 · Unitate', a('viu_e3')), field('4 · Ținta', a('viu_e4')))}
+     ${fieldRow(field('5 · Frecvența', a('viu_e5')), field('6 · Cine răspunde', a('viu_e6')))}`);
+
+  const secPoarta = section('Partea 2 · Poarta de calitate', 'Se numără doar ce respectă standardul', sectionBg, sectionColor,
+    `${fieldMulti('Condiția de calitate', a('viu_poarta'))}`);
+
+  const pragRow = (color: string, bg: string, name: string, nivel: string, act: string) => `
+    <tr>
+      <td style="padding:10px 12px;border:1px solid var(--line);background:${bg};color:${color};font-family:'Aboreto',serif;font-size:11px;letter-spacing:1.5px;vertical-align:top;width:22%;">${name}</td>
+      <td style="padding:10px 12px;border:1px solid var(--line);font-size:12px;vertical-align:top;width:28%;">${nivel || '&nbsp;'}</td>
+      <td style="padding:10px 12px;border:1px solid var(--line);font-size:12px;vertical-align:top;white-space:pre-wrap;">${act || '&nbsp;'}</td>
+    </tr>`;
+
+  const secPraguri = section('Partea 3 · Cele 3 praguri', 'Sub țintă = roșu · la țintă = galben · peste țintă = verde', sectionBg, sectionColor, `
+    <table style="width:100%;border-collapse:collapse;margin-top:4px;">
+      <thead><tr>
+        <th style="text-align:left;padding:8px 10px;background:#8B1A1A;color:#fff;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #8B1A1A;">Prag</th>
+        <th style="text-align:left;padding:8px 10px;background:#8B1A1A;color:#fff;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #8B1A1A;">Nivelul cifrei</th>
+        <th style="text-align:left;padding:8px 10px;background:#8B1A1A;color:#fff;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #8B1A1A;">Ce se întâmplă</th>
+      </tr></thead>
+      <tbody>
+        ${pragRow('#8B1A1A', '#fce8e8', 'ROȘU · sub țintă', a('viu_rosu_nivel'), a('viu_rosu_actiune'))}
+        ${pragRow('#8a6d1a', '#fdf3d0', 'GALBEN · la țintă', a('viu_galben_nivel'), a('viu_galben_actiune'))}
+        ${pragRow('#1A5C38', '#dff0e5', 'VERDE · peste țintă', a('viu_verde_nivel'), a('viu_verde_actiune'))}
+      </tbody>
+    </table>`);
+
+  const secSalariu = section('Partea 4 · Legătura cu salariul', 'Legi bani DOAR de un KPI complet în puterea omului', sectionBg, sectionColor,
+    `${fieldRow(field('Componenta fixă', a('viu_fix')), field('Componenta variabilă max', a('viu_var')))}
+     <table style="width:100%;border-collapse:collapse;margin-top:8px;">
+       <thead><tr>
+         <th style="text-align:left;padding:8px 10px;background:#8B1A1A;color:#fff;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #8B1A1A;">Prag</th>
+         <th style="text-align:left;padding:8px 10px;background:#8B1A1A;color:#fff;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #8B1A1A;">Regula</th>
+         <th style="text-align:left;padding:8px 10px;background:#8B1A1A;color:#fff;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #8B1A1A;">Ce primește</th>
+       </tr></thead>
+       <tbody>
+         <tr><td style="padding:10px 12px;border:1px solid var(--line);background:#fce8e8;color:#8B1A1A;font-family:'Aboreto',serif;font-size:11px;">ROȘU</td><td style="padding:10px 12px;border:1px solid var(--line);font-size:12px;">Doar fixul, fără bonus</td><td style="padding:10px 12px;border:1px solid var(--line);font-size:12px;">${a('viu_rosu_pay') || '&nbsp;'}</td></tr>
+         <tr><td style="padding:10px 12px;border:1px solid var(--line);background:#fdf3d0;color:#8a6d1a;font-family:'Aboreto',serif;font-size:11px;">GALBEN</td><td style="padding:10px 12px;border:1px solid var(--line);font-size:12px;">Fix + bonus întreg</td><td style="padding:10px 12px;border:1px solid var(--line);font-size:12px;">${a('viu_galben_pay') || '&nbsp;'}</td></tr>
+         <tr><td style="padding:10px 12px;border:1px solid var(--line);background:#dff0e5;color:#1A5C38;font-family:'Aboreto',serif;font-size:11px;">VERDE</td><td style="padding:10px 12px;border:1px solid var(--line);font-size:12px;">Fix + bonus + stimulent depășire</td><td style="padding:10px 12px;border:1px solid var(--line);font-size:12px;">${a('viu_verde_pay') || '&nbsp;'}</td></tr>
+       </tbody>
+     </table>`);
+
+  const secVerif = `
+    <div class="section-block">
+      <div class="section-title" style="background:${sectionBg};color:${sectionColor};">Verificare finală · 6 criterii</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;">
+        <div style="padding:10px 12px;border:1px solid var(--line);border-radius:4px;font-size:12px;">☐ Numele e măsurabil</div>
+        <div style="padding:10px 12px;border:1px solid var(--line);border-radius:4px;font-size:12px;">☐ Are poartă de calitate</div>
+        <div style="padding:10px 12px;border:1px solid var(--line);border-radius:4px;font-size:12px;">☐ Are cele 3 praguri față de țintă</div>
+        <div style="padding:10px 12px;border:1px solid var(--line);border-radius:4px;font-size:12px;">☐ KPI-ul e complet în puterea omului</div>
+        <div style="padding:10px 12px;border:1px solid var(--line);border-radius:4px;font-size:12px;">☐ Nu plătesc bonus sub țintă</div>
+        <div style="padding:10px 12px;border:1px solid var(--line);border-radius:4px;font-size:12px;">☐ Omul poate calcula singur cât primește</div>
+      </div>
+    </div>`;
+
+  const totalPages = 3;
+  const pagesHtml = [
+    renderPage('08', 'Contoarele', 1, totalPages, `${secIdent}${sec6}${secPoarta}`, titleBand),
+    renderPage('08', 'Contoarele', 2, totalPages, `${secPraguri}${secSalariu}`),
+    renderPage('08', 'Contoarele', 3, totalPages, `${secVerif}${docFooter()}`),
+  ].join('');
+
+  return htmlShell('', pagesHtml, `Fișa KPI Viu · ${rol}`);
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DOCUMENT 9 — Tabloul de bord (L17)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const doc9Steps: DocWizardStep[] = [
+  {
+    title: 'Identificare',
+    questions: [
+      { id: 'tb_firma',     label: 'Numele firmei', placeholder: 'ex: Firma SRL',            type: 'text' },
+      { id: 'tb_saptamana', label: 'Săptămâna',      placeholder: 'ex: 20–26 iulie 2026',    type: 'text' },
+    ],
+  },
+  {
+    title: 'Cele 7 funcții — indicatorii de rezultat',
+    subtitle: 'Un singur indicator pe fiecare funcție',
+    questions: ([1,2,3,4,5,6,7] as const).flatMap(i => [
+      { id: `tb_f${i}_ind`,   label: `${i} · Indicator`,   placeholder: '', type: 'text' as const },
+      { id: `tb_f${i}_tinta`, label: `${i} · Ținta`,        placeholder: '', type: 'text' as const },
+      { id: `tb_f${i}_real`,  label: `${i} · Realizat`,     placeholder: '', type: 'text' as const },
+      { id: `tb_f${i}_resp`,  label: `${i} · Responsabil`,  placeholder: '', type: 'text' as const },
+    ]),
+  },
+  {
+    title: 'Sistemul de raportare',
+    questions: [
+      { id: 'tb_cine',      label: 'Cine completează',     placeholder: 'ex: Fiecare responsabil își pune propria cifră', type: 'text' },
+      { id: 'tb_cand',      label: 'Când (termen limită)', placeholder: 'ex: Vineri, 18:00',                              type: 'text' },
+      { id: 'tb_intrebari', label: 'Cele 3 întrebări lângă cifră', placeholder: '1. Ce s-a făcut?\n2. Ce rezultat?\n3. Ce blocaje?', type: 'textarea' },
+    ],
+  },
+];
+
+function generateDoc9(answers: Record<string, string>): string {
+  const a = (k: string) => ans(answers, k);
+  const sectionBg = '#eaf3ed';
+  const sectionColor = '#1A5C38';
+  const firma = a('tb_firma') || '[Numele firmei]';
+  const saptamana = a('tb_saptamana') || '';
+
+  const FUNCTII = [
+    '1 · Construcția echipei',
+    '2 · Marketing și Vânzări',
+    '3 · Finanțe',
+    '4 · Producție / Serviciu',
+    '5 · Calitatea',
+    '6 · PR și Imaginea',
+    '7 · Conducerea',
+  ];
+
+  const stareBadge = (tinta: string, real: string) => {
+    const t = parseFloat((tinta || '').replace(/[^0-9.,-]/g, '').replace(',', '.'));
+    const r = parseFloat((real || '').replace(/[^0-9.,-]/g, '').replace(',', '.'));
+    if (isNaN(t) || isNaN(r) || !tinta || !real) return `<span style="color:var(--muted);">—</span>`;
+    if (r < t) return `<span style="display:inline-block;padding:2px 8px;border-radius:3px;background:#fce8e8;color:#8B1A1A;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1px;">ROȘU</span>`;
+    if (r > t) return `<span style="display:inline-block;padding:2px 8px;border-radius:3px;background:#dff0e5;color:#1A5C38;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1px;">VERDE</span>`;
+    return `<span style="display:inline-block;padding:2px 8px;border-radius:3px;background:#fdf3d0;color:#8a6d1a;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1px;">GALBEN</span>`;
+  };
+
+  const titleBand = `
+    <div class="title-band" style="background: linear-gradient(135deg, #1A5C38 0%, #2a7a4f 100%);">
+      <div class="doc-num">DOCUMENT 09 · TABLOUL DE BORD</div>
+      <h1>Cele 7 funcții · un indicator de rezultat fiecare</h1>
+      <span class="topic-tag">${firma}${saptamana ? ' · ' + saptamana : ''}</span>
+    </div>`;
+
+  const rows = FUNCTII.map((f, idx) => {
+    const i = idx + 1;
+    const ind = a(`tb_f${i}_ind`);
+    const tinta = a(`tb_f${i}_tinta`);
+    const real = a(`tb_f${i}_real`);
+    const resp = a(`tb_f${i}_resp`);
+    return `<tr>
+      <td style="padding:10px 12px;border:1px solid var(--line);font-size:12px;vertical-align:top;background:var(--paper-dark);"><strong>${f}</strong><br><span style="color:var(--muted);font-size:11px;">${ind || '&nbsp;'}</span></td>
+      <td style="padding:10px 12px;border:1px solid var(--line);font-size:12px;vertical-align:top;text-align:center;">${tinta || '&nbsp;'}</td>
+      <td style="padding:10px 12px;border:1px solid var(--line);font-size:12px;vertical-align:top;text-align:center;">${real || '&nbsp;'}</td>
+      <td style="padding:10px 12px;border:1px solid var(--line);font-size:12px;vertical-align:top;text-align:center;">${stareBadge(tinta, real)}</td>
+      <td style="padding:10px 12px;border:1px solid var(--line);font-size:12px;vertical-align:top;">${resp || '&nbsp;'}</td>
+    </tr>`;
+  }).join('');
+
+  const secTablou = section('Tabloul de bord', 'Sub țintă = roșu · La țintă = galben · Peste țintă = verde', sectionBg, sectionColor, `
+    <table style="width:100%;border-collapse:collapse;margin-top:4px;">
+      <thead><tr>
+        <th style="text-align:left;padding:8px 10px;background:#1A5C38;color:#fff;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #1A5C38;">Funcția / Indicator</th>
+        <th style="text-align:center;padding:8px 10px;background:#1A5C38;color:#fff;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #1A5C38;">Țintă</th>
+        <th style="text-align:center;padding:8px 10px;background:#1A5C38;color:#fff;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #1A5C38;">Realizat</th>
+        <th style="text-align:center;padding:8px 10px;background:#1A5C38;color:#fff;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #1A5C38;">Stare</th>
+        <th style="text-align:left;padding:8px 10px;background:#1A5C38;color:#fff;font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #1A5C38;">Responsabil</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`);
+
+  const secRaport = section('Sistemul de raportare', undefined, sectionBg, sectionColor,
+    `${fieldRow(field('Cine completează', a('tb_cine')), field('Termen', a('tb_cand')))}
+     ${fieldMulti('Cele 3 întrebări lângă cifră', a('tb_intrebari'))}`);
+
+  const secRegula = `
+    <div class="section-block">
+      <div class="section-title" style="background:${sectionBg};color:${sectionColor};">Regula desfacerii</div>
+      <div style="padding:12px 14px;font-size:12px;line-height:1.6;color:var(--ink);">
+        Atât timp cât un indicator e <strong>verde</strong>, nu te uiți mai adânc. Când devine <strong>roșu</strong>, îl desfaci ca să vezi unde s-a rupt lanțul.
+        Exemplu la vânzări: puține lead-uri calificate → problemă la <em>marketing</em>. Multe lead-uri, conversie mică → problemă la <em>vânzare</em>.
+        Desfaci doar ca să diagnostichezi, NU ca să monitorizezi zilnic.
+      </div>
+    </div>`;
+
+  const totalPages = 2;
+  const pagesHtml = [
+    renderPage('09', 'Contoarele', 1, totalPages, `${secTablou}`, titleBand),
+    renderPage('09', 'Contoarele', 2, totalPages, `${secRegula}${secRaport}${docFooter()}`),
+  ].join('');
+
+  return htmlShell('', pagesHtml, `Tabloul de bord · ${firma}`);
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
 // PLATFORM_DOCUMENTS export
 // ─────────────────────────────────────────────────────────────────────────────
+
+
 
 export const PLATFORM_DOCUMENTS: PlatformDocument[] = [
   {
@@ -1876,5 +2245,47 @@ export const PLATFORM_DOCUMENTS: PlatformDocument[] = [
     color: 'red',
     steps: doc6Steps,
     generate: generateDoc6,
+  },
+  {
+    id: 'doc-kpi',
+    lessonIds: ['l-4-4', 'l-4-ex-1'],
+    docNumber: '07',
+    title: 'Fișa KPI',
+    shortTitle: 'Fișa KPI',
+    description:
+      'Template tipăribil pentru un KPI complet: rol, produsul funcției, cele 6 elemente (nume, legătura cu produsul, unitate, țintă, frecvență, responsabil) + testul final. Companion pentru Lecția 15.',
+    downloadUrl: '',
+    topic: 'KPI',
+    color: 'gold',
+    steps: doc7Steps,
+    generate: generateDoc7,
+  },
+  {
+    id: 'doc-kpi-viu',
+    lessonIds: ['l-4-5', 'l-4-ex-2'],
+    docNumber: '08',
+    title: 'Fișa KPI Viu',
+    shortTitle: 'KPI Viu',
+    description:
+      'Template tipăribil pentru un KPI viu: cele 6 elemente + poarta de calitate + cele 3 praguri (roșu / galben / verde) + legătura cu salariul (fix + variabil pe prag). Companion pentru Lecția 16.',
+    downloadUrl: '',
+    topic: 'KPI Viu',
+    color: 'red',
+    steps: doc8Steps,
+    generate: generateDoc8,
+  },
+  {
+    id: 'doc-tablou-bord',
+    lessonIds: ['l-4-6', 'l-4-ex-3'],
+    docNumber: '09',
+    title: 'Tabloul de bord',
+    shortTitle: 'Tabloul de bord',
+    description:
+      'Template tipăribil cu cele 7 funcții ale firmei: indicator, țintă, realizat, stare (roșu / galben / verde) și responsabil. Plus regula desfacerii și sistemul de raportare săptămânal. Companion pentru Lecția 17.',
+    downloadUrl: '',
+    topic: 'Tablou de bord',
+    color: 'green',
+    steps: doc9Steps,
+    generate: generateDoc9,
   },
 ];
