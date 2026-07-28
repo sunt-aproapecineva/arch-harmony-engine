@@ -11,12 +11,13 @@ export interface ChecklistItem {
 
 export interface FormField {
   id: string;
-  type: 'info' | 'textarea' | 'input' | 'dynamic-table';
+  type: 'info' | 'textarea' | 'input' | 'dynamic-table' | 'checkboxes';
   label?: string;
   placeholder?: string;
   text?: string;
   columns?: string[];
   addLabel?: string;
+  options?: string[];
 }
 
 export interface MCQOption {
@@ -1125,6 +1126,123 @@ export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
       { id: 'tb_cine', type: 'input', label: 'Cine completează', placeholder: 'ex: Fiecare responsabil își pune propria cifră' },
       { id: 'tb_cand', type: 'input', label: 'Când (termen limită)', placeholder: 'ex: Vineri, 18:00' },
       { id: 'tb_intrebari', type: 'textarea', label: 'Cele 3 întrebări lângă cifră', placeholder: '1. Ce s-a făcut?\n2. Ce rezultat?\n3. Ce blocaje?' },
+    ],
+  },
+
+  // ex-7-1 — L18 „Ce e delegarea reală" · Testul celor 3 ingrediente
+  {
+    exerciseId: 'ex-7-1-trei-ingrediente',
+    type: 'form-fields',
+    title: 'Testul celor trei ingrediente',
+    instructions:
+      'Delegarea reală are 3 ingrediente: responsabilitate pentru un REZULTAT, AUTORITATE de decizie și un PROCES SCRIS. Treci fiecare rol prin test — aici te păcălești cel mai ușor.',
+    fields: [
+      { id: 'ti_info', type: 'info', text: 'DE CE FACI ASTA: Descoperi, rol cu rol, unde ai delegat cu adevărat și unde doar ai mutat munca lângă tine. Nu poți preda cheile până nu vezi care uși le ții încă în mână.' },
+      {
+        id: 'ti_tabel',
+        type: 'dynamic-table',
+        label: 'Rolurile / oamenii cărora crezi că le-ai delegat ceva',
+        columns: ['Rol / Om', 'Răspunde de un rezultat? (DA/NU)', 'Are autoritate să decidă? (DA/NU)', 'Are proces scris? (DA/NU)'],
+        addLabel: 'Adaugă rol',
+      },
+      { id: 'ti_test_info', type: 'info', text: '⚑ TESTUL CINSTIT: pentru fiecare rol, imaginează-ți că pleci două săptămâni complet. Ce s-ar rupe la acel rol? Dacă ceva s-ar bloca așteptând decizia ta — acolo nu ai delegat, lipsește autoritatea.' },
+      { id: 'ti_test', type: 'textarea', label: 'Ce s-ar rupe dacă ai pleca 2 săptămâni?', placeholder: 'Rol cu rol: ce se blochează și de ce.' },
+      { id: 'ti_a', type: 'textarea', label: 'a. La care roluri lipsește cel puțin un ingredient?', placeholder: 'Acolo nu ai delegat — ai mutat sarcina lângă tine.' },
+      { id: 'ti_b', type: 'textarea', label: 'b. Care ingredient lipsește cel mai des la tine?', placeholder: 'Autoritatea / rezultatul clar / procesul scris — acela e tiparul tău de corectat.' },
+      { id: 'ti_final', type: 'info', text: '✓ CE AI LA FINAL: O hartă clară a rolurilor unde delegarea ta e reală și unde e falsă — și tiparul pe care îl repeți.' },
+    ],
+  },
+
+  // ex-7-2 — L19 „Cum ieși treptat din operațional" · Planul primei retrageri
+  {
+    exerciseId: 'ex-7-2-plan-retragere',
+    type: 'form-fields',
+    title: 'Planul primei tale retrageri',
+    instructions:
+      'Construiește planul de retragere pentru UN singur proces — primul. Pas cu pas, în ordinea din lecție: alegi procesul, transferi complet, confirmi în rodaj, faci pasul înapoi.',
+    fields: [
+      { id: 'pr_info', type: 'info', text: 'DE CE FACI ASTA: Ieși cu un plan concret, nu cu o intenție. După acest exercițiu știi exact ce proces predai primul, cui, ce transferi și când faci pasul înapoi — gata de pornit săptămâna asta.' },
+
+      { id: 'pr_a_info', type: 'info', text: 'PASUL A · ALEGEREA PROCESULUI — trece cele 3 criterii. Dacă vreunul nu e bifat, alege alt proces pentru început.' },
+      {
+        id: 'pr_criterii',
+        type: 'checkboxes',
+        label: 'Cele 3 criterii',
+        options: [
+          'Risc controlat — dacă omul greșește la început, firma nu se scufundă',
+          'Om aproape gata — am deja pe cineva care îl poate prelua, nu angajez de la zero',
+          'Ușor de scris — procesul se poate pune pe hârtie, nu depinde de mii de nuanțe din capul meu',
+        ],
+      },
+      { id: 'pr_proces', type: 'input', label: 'Procesul ales', placeholder: 'ex: Gestiunea stocurilor' },
+      { id: 'pr_responsabil', type: 'input', label: 'Responsabilul căruia îi predau', placeholder: 'ex: Șeful de depozit — Andrei' },
+      { id: 'pr_data', type: 'input', label: 'Data începerii predării', placeholder: 'ex: 03.08.2026' },
+
+      { id: 'pr_b_info', type: 'info', text: 'PASUL B · TRANSFERUL COMPLET — un transfer incomplet e cauza numărul unu a eșecului. Bifează ce ai deja și notează concret ce mai lipsește.' },
+      {
+        id: 'pr_transfer',
+        type: 'checkboxes',
+        label: 'Cele 4 lucruri de transferat',
+        options: [
+          'Cunoștințele — procesul e scris (SOP), îl poate reciti fără mine',
+          'Accesul — are instrumentele, conturile, datele din prima zi',
+          'KPI și raportare — știm amândoi ce cifră și când raportează',
+          'Supravegherea — am stabilit cât de des verific la început',
+        ],
+      },
+      { id: 'pr_transfer_detalii', type: 'textarea', label: 'Concret, la procesul meu: ce anume am / ce mai lipsește', placeholder: 'Cunoștințe: ...\nAcces: ...\nKPI și raportare: ...\nSupraveghere: ...' },
+
+      { id: 'pr_c_info', type: 'info', text: 'PASUL C · CONFIRMAREA — perioada de rodaj. În primele săptămâni ești aproape, nu deasupra. Corectați împreună golurile rămase cât sunt mici.' },
+      { id: 'pr_rodaj', type: 'input', label: 'Cât durează rodajul (câte săptămâni supraveghez mai atent)', placeholder: 'ex: 3 săptămâni' },
+      { id: 'pr_goluri', type: 'textarea', label: 'Ce goluri din transfer au apărut și le-am astupat', placeholder: 'Ce a lipsit din SOP, acces sau înțelegere.' },
+      { id: 'pr_intrebari', type: 'textarea', label: 'Ce întrebări a avut responsabilul cel mai des', placeholder: 'Astea arată exact unde procesul nu era clar.' },
+
+      { id: 'pr_d_info', type: 'info', text: 'PASUL D · PASUL ÎNAPOI — nu te retragi când te simți gata; sentimentul te ține agățat. Te retragi când cifra e bună constant, fără tine.' },
+      { id: 'pr_cifra', type: 'input', label: 'Cifra din tablou care îmi spune că procesul merge fără mine', placeholder: 'ex: zero rupturi de stoc pe produsele cheie' },
+      { id: 'pr_cicluri', type: 'input', label: 'Câte cicluri bune la rând aștept înainte să mă retrag complet', placeholder: 'ex: 4 săptămâni consecutive (nu unul — câteva)' },
+      {
+        id: 'pr_verificare',
+        type: 'checkboxes',
+        label: 'Verificarea finală înainte de pasul înapoi',
+        options: [
+          'Cifra a fost bună mai multe cicluri la rând, fără intervenția mea',
+          'Responsabilul a rezolvat singur situațiile care au apărut',
+          'Nu am mai fost întrebat despre decizii care sunt acum ale lui',
+        ],
+      },
+      { id: 'pr_test_info', type: 'info', text: '⚑ TESTUL PLANULUI: citește planul și întreabă-te — aș putea să îl dau altcuiva să îl execute mâine, fără să mai explic nimic din gură? Dacă nu, mai e o gaură de astupat înainte să predai.' },
+      { id: 'pr_final', type: 'info', text: '✓ CE AI LA FINAL: Planul concret al primei tale predări — proces, responsabil, transfer, cifră și momentul pasului înapoi. Companion tipăribil: Documentul 10 · Plan de predare a unui proces.' },
+    ],
+  },
+
+  // ex-7-3 — L20 „Greșelile controlate" · Cei 5 de ce
+  {
+    exerciseId: 'ex-7-3-cinci-de-ce',
+    type: 'form-fields',
+    title: 'Cei 5 de ce pe o greșeală reală',
+    instructions:
+      'Ia o greșeală reală, recentă, din firma ta — una care te-a enervat sau te-a costat. Treci-o prin metoda completă: de la „cine e vinovat" la „ce reparăm în sistem".',
+    fields: [
+      { id: 'cd_info', type: 'info', text: 'DE CE FACI ASTA: Exersezi pe o greșeală adevărată trecerea de la vinovat la sistem. Când prinzi metoda o dată, o aplici la orice greșeală de acum înainte — și firma începe să se îmbunătățească singură.' },
+      { id: 'cd_1', type: 'textarea', label: '1 · Ce s-a întâmplat, concret', placeholder: 'Două-trei propoziții. Fapte, nu interpretări.' },
+      { id: 'cd_2', type: 'textarea', label: '2 · Care a fost primul tău reflex?', placeholder: 'Ai căutat vinovatul sau gaura din sistem? Fii cinstit.' },
+      { id: 'cd_de_ce_info', type: 'info', text: '3 · APLICĂ CEI 5 DE CE — pornești de la greșeală și întrebi „de ce" până ajungi la cauza reală din sistem. Fiecare răspuns devine întrebarea următoare.' },
+      { id: 'cd_dc1', type: 'input', label: 'De ce 1', placeholder: 'De ce s-a întâmplat?' },
+      { id: 'cd_dc2', type: 'input', label: 'De ce 2', placeholder: 'Și de ce s-a întâmplat asta?' },
+      { id: 'cd_dc3', type: 'input', label: 'De ce 3', placeholder: '' },
+      { id: 'cd_dc4', type: 'input', label: 'De ce 4', placeholder: '' },
+      { id: 'cd_dc5', type: 'input', label: 'De ce 5', placeholder: 'Aici ar trebui să apară cauza de sistem.' },
+      { id: 'cd_4', type: 'textarea', label: '4 · Cauza reală pe care ai găsit-o. E în sistem sau în om?', placeholder: 'Aproape mereu e în sistem.' },
+      { id: 'cd_5', type: 'textarea', label: '5 · Ce corectezi concret în sistem și în ce SOP actualizezi reparația?', placeholder: 'Reparația + SOP-ul actualizat, ca să rămână permanentă.' },
+      { id: 'cd_test_info', type: 'info', text: '⚑ TESTUL REPARAȚIEI: după corectarea asta, greșeala se mai poate întâmpla cu următorul om care face procesul? Dacă da — nu ai reparat sistemul, doar ai cârpit omul. Sapă mai adânc.' },
+      {
+        id: 'cd_registru',
+        type: 'dynamic-table',
+        label: 'Registrul de greșeli — o linie pentru fiecare greșeală importantă',
+        columns: ['Data', 'Ce s-a întâmplat', 'Cauza reală (5 de ce)', 'Ce am reparat în sistem', 'SOP actualizat'],
+        addLabel: 'Adaugă linie',
+      },
+      { id: 'cd_final', type: 'info', text: '✓ Bucla completă: Apare → Sapi (5 de ce) → Repari sistemul și actualizezi SOP-ul → Notezi în registru → Nu se mai repetă. Companion tipăribil: Documentul 11 · Registrul de greșeli.' },
     ],
   },
 ];

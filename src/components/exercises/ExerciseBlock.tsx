@@ -180,6 +180,123 @@ const FormFieldsExercise: React.FC<{ template: ExerciseTemplate; storageKey: str
               </div>
             );
           }
+          if (field.type === 'checkboxes') {
+            let checked: string[] = [];
+            try { checked = JSON.parse(values[field.id] || '[]'); } catch { checked = []; }
+            const toggle = (opt: string) => {
+              const next = checked.includes(opt) ? checked.filter(o => o !== opt) : [...checked, opt];
+              handleChange(field.id, JSON.stringify(next));
+            };
+            return (
+              <div key={field.id}>
+                {field.label && (
+                  <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', display: 'block', marginBottom: 8 }}>
+                    {field.label}
+                  </label>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {(field.options || []).map(opt => {
+                    const on = checked.includes(opt);
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => toggle(opt)}
+                        style={{
+                          display: 'flex', alignItems: 'flex-start', gap: 10, textAlign: 'left',
+                          padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
+                          background: on ? 'rgba(196,240,228,0.08)' : 'var(--bg-3)',
+                          border: `1px solid ${on ? 'rgba(196,240,228,0.35)' : 'var(--border)'}`,
+                          color: 'var(--fg)', fontSize: 12.5, lineHeight: 1.5,
+                        }}
+                      >
+                        <span style={{
+                          width: 16, height: 16, borderRadius: 4, flexShrink: 0, marginTop: 1,
+                          border: `1px solid ${on ? 'var(--accent)' : 'var(--border)'}`,
+                          background: on ? 'var(--accent)' : 'transparent',
+                          color: 'var(--bg)', fontSize: 11, display: 'flex',
+                          alignItems: 'center', justifyContent: 'center', fontWeight: 700,
+                        }}>{on ? '✓' : ''}</span>
+                        <span>{opt}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          }
+          if (field.type === 'dynamic-table') {
+            const cols = field.columns || [];
+            let rows: Record<string, string>[] = [];
+            try {
+              const p = JSON.parse(values[field.id] || '[]');
+              rows = Array.isArray(p) && p.length ? p : [{}];
+            } catch { rows = [{}]; }
+            const commit = (next: Record<string, string>[]) =>
+              handleChange(field.id, JSON.stringify(next.length ? next : [{}]));
+            return (
+              <div key={field.id}>
+                {field.label && (
+                  <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg)', display: 'block', marginBottom: 8 }}>
+                    {field.label}
+                  </label>
+                )}
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                    <thead>
+                      <tr>
+                        {cols.map(c => (
+                          <th key={c} style={{
+                            padding: '8px 10px', textAlign: 'left', fontSize: 10, fontWeight: 600,
+                            letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--fg-3)',
+                            borderBottom: '1px solid var(--border)', whiteSpace: 'nowrap',
+                          }}>{c}</th>
+                        ))}
+                        <th style={{ width: 32, borderBottom: '1px solid var(--border)' }} />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((row, i) => (
+                        <tr key={i}>
+                          {cols.map(c => (
+                            <td key={c} style={{ padding: '4px 4px', borderBottom: '1px solid var(--border)' }}>
+                              <input
+                                type="text"
+                                value={row[c] || ''}
+                                onChange={e => commit(rows.map((r, ri) => ri === i ? { ...r, [c]: e.target.value } : r))}
+                                style={{
+                                  width: '100%', minWidth: 110, padding: '7px 8px', fontSize: 12,
+                                  background: 'var(--bg-3)', border: '1px solid var(--border)',
+                                  borderRadius: 6, color: 'var(--fg)', boxSizing: 'border-box',
+                                }}
+                              />
+                            </td>
+                          ))}
+                          <td style={{ padding: '4px', borderBottom: '1px solid var(--border)', textAlign: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => commit(rows.filter((_, ri) => ri !== i))}
+                              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--fg-3)', fontSize: 14 }}
+                              aria-label="Șterge rândul"
+                            >×</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => commit([...rows, {}])}
+                  style={{
+                    marginTop: 8, padding: '7px 12px', fontSize: 12, borderRadius: 8,
+                    background: 'var(--bg-3)', border: '1px solid var(--border)',
+                    color: 'var(--fg-2)', cursor: 'pointer',
+                  }}
+                >+ {field.addLabel || 'Adaugă rând'}</button>
+              </div>
+            );
+          }
           return null;
         })}
       </div>
