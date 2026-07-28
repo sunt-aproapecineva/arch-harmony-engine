@@ -35,14 +35,41 @@ function deleteCookie(name: string) {
   document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax`;
 }
 
-/** Store (or refresh) the 12h backup. `expiresAt` is preserved across token refreshes. */
+/**
+ * Absolute deadline (epoch ms) of the current 12h window, or null when the
+ * user did not opt in. The deadline is stored in the flag itself so it can
+ * never be silently renewed by a later token refresh.
+ */
+export function getRememberDeadline(): number | null {
+  if (typeof window === 'undefined') return null;
+  let raw: string | null = null;
+  try { raw = localStorage.getItem(FLAG); } catch { raw = null; }
+  if (!raw) raw = readCookie(FLAG);
+  if (!raw) return null;
+  const ts = Number(raw);
+  if (!Number.isFinite(ts) || ts <= 0) return null;
+  return ts;
+}
+
+/** True when the user opted into the 12h window on this device (even if expired). */
+export function isRememberMode(): boolean {
+  return getRememberDeadline() !== null;
+}
+
+/** True when the opted-in 12h window has elapsed — the user must be signed out. */
+export function isRememberExpired(): boolean {
+  const deadline = getRememberDeadline();
+  return deadline !== null && deadline <= Date.now();
+}
+
+/** Store (or refresh) the 12h backup. The window start time is never extended. */
 export function saveSessionBackup(session: { access_token?: string; refresh_token?: string } | null | undefined) {
   if (typeof window === 'undefined') return;
   if (!session?.access_token || !session?.refresh_token) return;
 
-  const existing = readSessionBackup();
-  const expires_at = existing?.expires_at ?? Date.now() + MAX_AGE_MS;
-  if (expires_at <= Date.now()) return;
+  const expires_at = getRememberDeadline();
+  if (!expires_at) return;
+  if (expires_at <= Date.now()) { clearSessionBackup(); return; }
 
   const payload: Backup = {
     access_token: session.access_token,
@@ -56,19 +83,14 @@ export function saveSessionBackup(session: { access_token?: string; refresh_toke
 }
 
 /** Start a fresh 12h window (called right after a successful login with "ține-mă minte"). */
-/** True when the user opted into the 12h window on this device. */
-export function isRememberMode(): boolean {
-  if (typeof window === 'undefined') return false;
-  try { if (localStorage.getItem(FLAG) === '1') return true; } catch { /* noop */ }
-  return readCookie(FLAG) === '1';
-}
-
 export function startRememberWindow(session: { access_token?: string; refresh_token?: string } | null | undefined) {
   clearSessionBackup();
-  try { localStorage.setItem(FLAG, '1'); } catch { /* noop */ }
-  writeCookie(FLAG, '1', MAX_AGE_MS / 1000);
+  const deadline = Date.now() + MAX_AGE_MS;
+  try { localStorage.setItem(FLAG, String(deadline)); } catch { /* noop */ }
+  writeCookie(FLAG, String(deadline), MAX_AGE_MS / 1000);
   saveSessionBackup(session);
 }
+
 
 export function readSessionBackup(): Backup | null {
   if (typeof window === 'undefined') return null;

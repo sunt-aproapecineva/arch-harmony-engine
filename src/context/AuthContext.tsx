@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, WhitelistEntry, Tariff } from '../lib/types';
-import { saveSessionBackup, readSessionBackup, clearSessionBackup, startRememberWindow, isRememberMode } from '../lib/sessionPersistence';
+import { saveSessionBackup, readSessionBackup, clearSessionBackup, startRememberWindow, isRememberMode, isRememberExpired } from '../lib/sessionPersistence';
 
 interface AuthContextType {
   user: User | null;
@@ -113,6 +113,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         let { data: { session } } = await supabase.auth.getSession();
 
+        // The 12h window elapsed while the app was closed → sign out for real.
+        if (isRememberExpired()) {
+          clearSessionBackup();
+          if (session) { try { await supabase.auth.signOut(); } catch { /* noop */ } }
+          if (!cancelled) { setUser(null); setLoading(false); }
+          return;
+        }
+
         // Mobile browsers (notably iOS Safari) can drop the Supabase storage
         // entry when the browser is closed. If a valid 12h "remember me"
         // backup exists, restore the session from it instead of logging out.
@@ -135,6 +143,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!cancelled) { setUser(null); setLoading(false); }
       }
     })();
+
 
     // Only react to identity changes. Skip INITIAL_SESSION and
     // TOKEN_REFRESHED — those fire on every mount / ~hourly and used to
@@ -162,17 +171,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => { cancelled = true; subscription.unsubscribe(); };
   }, []);
 
-  // Enforce the 12h window: once the backup expires, sign the user out.
+  // Enforce the 12h window: once the deadline passes, sign the user out.
   useEffect(() => {
     if (!user || !isRememberMode()) return;
     const check = () => {
-      if (isRememberMode() && !readSessionBackup()) {
+      if (isRememberExpired()) {
+        clearSessionBackup();
         supabase.auth.signOut().catch(() => {});
       }
     };
-    const id = setInterval(check, 60 * 1000);
-    return () => clearInterval(id);
+    check();
+    const id = setInterval(check, 30 * 1000);
+    // Mobile browsers freeze timers in background tabs — re-check on wake.
+    document.addEventListener('visibilitychange', check);
+    window.addEventListener('focus', check);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', check);
+      window.removeEventListener('focus', check);
+    };
   }, [user]);
+
 
   const login = async (email: string, password: string, rememberMe = false) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
