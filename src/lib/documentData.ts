@@ -2302,11 +2302,12 @@ function generateDoc10(answers: Record<string, string>): string {
       <div style="font-size:11.5px;color:var(--ink-light);line-height:1.6;">Acum treci la următorul proces și iei o copie nouă a acestui plan. Unul câte unul, până ai predat toate cheile.</div>
     </div>`;
 
-  const totalPages = 3;
+  const totalPages = 4;
   const pagesHtml = [
     renderPage('10', 'Predarea Cheilor', 1, totalPages, `${intro}${secIdent}${sec1}`, titleBand),
-    renderPage('10', 'Predarea Cheilor', 2, totalPages, `${sec2}${sec3}`),
-    renderPage('10', 'Predarea Cheilor', 3, totalPages, `${sec4}${secFinal}${docFooter()}`),
+    renderPage('10', 'Predarea Cheilor', 2, totalPages, `${sec2}`),
+    renderPage('10', 'Predarea Cheilor', 3, totalPages, `${sec3}`),
+    renderPage('10', 'Predarea Cheilor', 4, totalPages, `${sec4}${secFinal}${docFooter()}`),
   ].join('');
 
   return htmlShell('', pagesHtml, `Plan de predare · ${proces}`);
