@@ -11,12 +11,13 @@ export interface ChecklistItem {
 
 export interface FormField {
   id: string;
-  type: 'info' | 'textarea' | 'input' | 'dynamic-table';
+  type: 'info' | 'textarea' | 'input' | 'dynamic-table' | 'checkboxes';
   label?: string;
   placeholder?: string;
   text?: string;
   columns?: string[];
   addLabel?: string;
+  options?: string[];
 }
 
 export interface MCQOption {
