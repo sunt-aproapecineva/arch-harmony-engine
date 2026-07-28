@@ -2580,4 +2580,32 @@ export const PLATFORM_DOCUMENTS: PlatformDocument[] = [
     steps: doc9Steps,
     generate: generateDoc9,
   },
+  {
+    id: 'doc-plan-predare',
+    lessonIds: ['l-5-2', 'l-5-ex-2'],
+    docNumber: '10',
+    title: 'Planul de predare a unui proces',
+    shortTitle: 'Plan de predare',
+    description:
+      'Template tipăribil pentru predarea unui proces: alegerea prin cele 3 criterii, transferul complet (cunoștințe, acces, KPI, supraveghere), rodajul și pasul înapoi. Companion pentru Lecția 19.',
+    downloadUrl: '',
+    topic: 'Predarea Cheilor',
+    color: 'green',
+    steps: doc10Steps,
+    generate: generateDoc10,
+  },
+  {
+    id: 'doc-registru-greseli',
+    lessonIds: ['l-5-3', 'l-5-ex-3'],
+    docNumber: '11',
+    title: 'Registrul de greșeli',
+    shortTitle: 'Registrul de greșeli',
+    description:
+      'Template tipăribil unde fiecare greșeală devine o îmbunătățire permanentă: ce s-a întâmplat, cauza reală (cei 5 de ce), ce ai reparat în sistem și ce SOP ai actualizat. Companion pentru Lecția 20.',
+    downloadUrl: '',
+    topic: 'Predarea Cheilor',
+    color: 'red',
+    steps: doc11Steps,
+    generate: generateDoc11,
+  },
 ];
