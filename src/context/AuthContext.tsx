@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, WhitelistEntry, Tariff } from '../lib/types';
-import { saveSessionBackup, readSessionBackup, clearSessionBackup, startRememberWindow, isRememberMode } from '../lib/sessionPersistence';
+import { saveSessionBackup, readSessionBackup, clearSessionBackup, startRememberWindow, isRememberMode, isRememberExpired } from '../lib/sessionPersistence';
 
 interface AuthContextType {
   user: User | null;
