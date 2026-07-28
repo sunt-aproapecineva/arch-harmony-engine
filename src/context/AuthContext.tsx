@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, WhitelistEntry, Tariff } from '../lib/types';
+import { saveSessionBackup, readSessionBackup, clearSessionBackup, startRememberWindow, isRememberMode } from '../lib/sessionPersistence';
 
 interface AuthContextType {
   user: User | null;
@@ -127,7 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
 
-        if (session) saveSessionBackup(session);
+        if (session && isRememberMode()) saveSessionBackup(session);
         await runHydration(session?.user);
       } catch (error) {
         console.warn('[Auth] initial session failed', error);
@@ -142,7 +143,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       // Keep the 12h backup in sync with the freshest tokens (window start
       // time is preserved, so it still expires exactly 12h after login).
-      if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+      if (isRememberMode() && (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN' || event === 'USER_UPDATED')) {
         saveSessionBackup(session);
       }
       if (event !== 'SIGNED_IN' && event !== 'SIGNED_OUT' && event !== 'USER_UPDATED') return;
@@ -163,9 +164,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Enforce the 12h window: once the backup expires, sign the user out.
   useEffect(() => {
-    if (!user) return;
+    if (!user || !isRememberMode()) return;
     const check = () => {
-      if (!readSessionBackup()) {
+      if (isRememberMode() && !readSessionBackup()) {
         supabase.auth.signOut().catch(() => {});
       }
     };

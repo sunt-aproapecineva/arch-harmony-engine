@@ -7,6 +7,7 @@
 // and restore it on boot when Supabase itself has no session.
 
 const KEY = 'aa_session_backup';
+const FLAG = 'aa_remember_mode';
 export const REMEMBER_HOURS = 12;
 const MAX_AGE_MS = REMEMBER_HOURS * 60 * 60 * 1000;
 
@@ -55,8 +56,17 @@ export function saveSessionBackup(session: { access_token?: string; refresh_toke
 }
 
 /** Start a fresh 12h window (called right after a successful login with "ține-mă minte"). */
+/** True when the user opted into the 12h window on this device. */
+export function isRememberMode(): boolean {
+  if (typeof window === 'undefined') return false;
+  try { if (localStorage.getItem(FLAG) === '1') return true; } catch { /* noop */ }
+  return readCookie(FLAG) === '1';
+}
+
 export function startRememberWindow(session: { access_token?: string; refresh_token?: string } | null | undefined) {
   clearSessionBackup();
+  try { localStorage.setItem(FLAG, '1'); } catch { /* noop */ }
+  writeCookie(FLAG, '1', MAX_AGE_MS / 1000);
   saveSessionBackup(session);
 }
 
@@ -81,6 +91,7 @@ export function readSessionBackup(): Backup | null {
 
 export function clearSessionBackup() {
   if (typeof window === 'undefined') return;
-  try { localStorage.removeItem(KEY); } catch { /* noop */ }
+  try { localStorage.removeItem(KEY); localStorage.removeItem(FLAG); } catch { /* noop */ }
   deleteCookie(KEY);
+  deleteCookie(FLAG);
 }
