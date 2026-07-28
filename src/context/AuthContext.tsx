@@ -171,17 +171,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => { cancelled = true; subscription.unsubscribe(); };
   }, []);
 
-  // Enforce the 12h window: once the backup expires, sign the user out.
+  // Enforce the 12h window: once the deadline passes, sign the user out.
   useEffect(() => {
     if (!user || !isRememberMode()) return;
     const check = () => {
-      if (isRememberMode() && !readSessionBackup()) {
+      if (isRememberExpired()) {
+        clearSessionBackup();
         supabase.auth.signOut().catch(() => {});
       }
     };
-    const id = setInterval(check, 60 * 1000);
-    return () => clearInterval(id);
+    check();
+    const id = setInterval(check, 30 * 1000);
+    // Mobile browsers freeze timers in background tabs — re-check on wake.
+    document.addEventListener('visibilitychange', check);
+    window.addEventListener('focus', check);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', check);
+      window.removeEventListener('focus', check);
+    };
   }, [user]);
+
 
   const login = async (email: string, password: string, rememberMe = false) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
