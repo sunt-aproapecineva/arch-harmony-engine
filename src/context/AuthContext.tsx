@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, WhitelistEntry, Tariff } from '../lib/types';
+import { saveSessionBackup, readSessionBackup, clearSessionBackup, startRememberWindow, isRememberMode } from '../lib/sessionPersistence';
 
 interface AuthContextType {
   user: User | null;
@@ -108,21 +109,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Initial hydration from persisted session (storage). This is the only
     // path that runs on mount — avoids the race where INITIAL_SESSION fires
     // before getSession() returns and re-hydrates with stale state.
-    supabase.auth.getSession()
-      .then(({ data: { session } }) => runHydration(session?.user))
-      .catch((error) => {
+    (async () => {
+      try {
+        let { data: { session } } = await supabase.auth.getSession();
+
+        // Mobile browsers (notably iOS Safari) can drop the Supabase storage
+        // entry when the browser is closed. If a valid 12h "remember me"
+        // backup exists, restore the session from it instead of logging out.
+        if (!session) {
+          const backup = readSessionBackup();
+          if (backup) {
+            const { data, error } = await supabase.auth.setSession({
+              access_token: backup.access_token,
+              refresh_token: backup.refresh_token,
+            });
+            if (error || !data.session) clearSessionBackup();
+            else session = data.session;
+          }
+        }
+
+        if (session && isRememberMode()) saveSessionBackup(session);
+        await runHydration(session?.user);
+      } catch (error) {
         console.warn('[Auth] initial session failed', error);
         if (!cancelled) { setUser(null); setLoading(false); }
-      });
+      }
+    })();
 
     // Only react to identity changes. Skip INITIAL_SESSION and
     // TOKEN_REFRESHED — those fire on every mount / ~hourly and used to
     // re-fetch profile+quiz, briefly flipping quiz_completed=false and
     // hiding the lesson video behind the onboarding gate.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // Keep the 12h backup in sync with the freshest tokens (window start
+      // time is preserved, so it still expires exactly 12h after login).
+      if (isRememberMode() && (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN' || event === 'USER_UPDATED')) {
+        saveSessionBackup(session);
+      }
       if (event !== 'SIGNED_IN' && event !== 'SIGNED_OUT' && event !== 'USER_UPDATED') return;
       if (event === 'SIGNED_OUT') {
         hydrationSeq++;
+        clearSessionBackup();
         setUser(null);
         setLoading(false);
         return;
@@ -135,11 +162,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => { cancelled = true; subscription.unsubscribe(); };
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+  // Enforce the 12h window: once the backup expires, sign the user out.
+  useEffect(() => {
+    if (!user || !isRememberMode()) return;
+    const check = () => {
+      if (isRememberMode() && !readSessionBackup()) {
+        supabase.auth.signOut().catch(() => {});
+      }
+    };
+    const id = setInterval(check, 60 * 1000);
+    return () => clearInterval(id);
+  }, [user]);
+
+  const login = async (email: string, password: string, rememberMe = false) => {
+    const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
     if (error) return { error: error.message === 'Invalid login credentials' ? 'Email sau parolă incorectă.' : error.message };
+    if (rememberMe) startRememberWindow(data.session);
+    else clearSessionBackup();
     return { error: null };
   };
+
 
   const register = async (email: string, password: string, fullName: string) => {
     const cleanEmail = email.trim().toLowerCase();
