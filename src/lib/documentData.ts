@@ -2159,6 +2159,295 @@ function generateDoc9(answers: Record<string, string>): string {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
+// DOCUMENT 10 — Planul de predare a unui proces (L19 · Predarea Cheilor)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const doc10Steps: DocWizardStep[] = [
+  {
+    title: 'Procesul și responsabilul',
+    subtitle: 'Un singur proces — primul. Nu începe al doilea până acesta nu merge stabil fără tine.',
+    questions: [
+      { id: 'pp_firma',       label: 'Numele firmei',            placeholder: 'ex: Firma SRL',                    type: 'text' },
+      { id: 'pp_proces',      label: 'Numele procesului',        placeholder: 'ex: Gestiunea stocurilor',         type: 'text' },
+      { id: 'pp_data_start',  label: 'Data începerii predării',  placeholder: '',                                  type: 'date' },
+      { id: 'pp_responsabil', label: 'Responsabilul căruia îi predau', placeholder: 'ex: Andrei — Șef de depozit', type: 'text' },
+    ],
+  },
+  {
+    title: '1 · Alegerea procesului',
+    subtitle: 'Trece cele 3 criterii? Dacă vreunul nu e bifat, alege alt proces pentru început.',
+    questions: [
+      { id: 'pp_c1', label: 'Risc controlat — de ce firma nu se scufundă dacă omul greșește la început?', placeholder: 'ex: erorile de stoc se corectează în aceeași zi, fără pierdere de clienți.', type: 'textarea' },
+      { id: 'pp_c2', label: 'Om aproape gata — cine îl preia și de ce e pregătit?', placeholder: 'ex: Andrei lucrează în depozit de 2 ani, cunoaște produsele.', type: 'textarea' },
+      { id: 'pp_c3', label: 'Ușor de scris — se poate pune pe hârtie?', placeholder: 'ex: da, SOP-ul are 9 pași, fără excepții complicate.', type: 'textarea' },
+    ],
+  },
+  {
+    title: '2 · Transferul complet',
+    subtitle: 'Un transfer incomplet e cauza numărul unu a eșecului',
+    questions: [
+      { id: 'pp_t1', label: 'Cunoștințele — procesul e scris (SOP), îl poate reciti fără mine', placeholder: 'Ce am / ce mai lipsește.', type: 'textarea' },
+      { id: 'pp_t2', label: 'Accesul — instrumente, conturi, date din prima zi',                 placeholder: 'Ce am / ce mai lipsește.', type: 'textarea' },
+      { id: 'pp_t3', label: 'KPI și raportare — ce cifră și când raportează',                     placeholder: 'Ce am / ce mai lipsește.', type: 'textarea' },
+      { id: 'pp_t4', label: 'Supravegherea — cât de des verific la început',                      placeholder: 'Ce am / ce mai lipsește.', type: 'textarea' },
+    ],
+  },
+  {
+    title: '3 · Confirmarea (rodajul)',
+    subtitle: 'În primele săptămâni ești aproape, nu deasupra',
+    questions: [
+      { id: 'pp_rodaj',     label: 'Cât durează perioada de rodaj', placeholder: 'ex: 3 săptămâni', type: 'text' },
+      { id: 'pp_goluri',    label: 'Ce goluri din transfer au apărut și le-am astupat', placeholder: 'Ce a lipsit din SOP, acces sau înțelegere.', type: 'textarea' },
+      { id: 'pp_intrebari', label: 'Ce întrebări a avut responsabilul cel mai des',      placeholder: 'Astea arată unde procesul nu era clar.', type: 'textarea' },
+    ],
+  },
+  {
+    title: '4 · Pasul înapoi',
+    subtitle: 'Te retragi când cifra e bună constant, fără tine — nu când te simți gata',
+    questions: [
+      { id: 'pp_cifra',    label: 'Cifra din tablou care îmi spune că procesul merge fără mine', placeholder: 'ex: zero rupturi de stoc pe produsele cheie', type: 'text' },
+      { id: 'pp_cicluri',  label: 'Câte cicluri bune la rând aștept înainte să mă retrag',        placeholder: 'ex: 4 săptămâni consecutive',              type: 'text' },
+      { id: 'pp_data_pas', label: 'Data la care am făcut pasul înapoi complet',                    placeholder: '',                                          type: 'date' },
+    ],
+  },
+];
+
+function generateDoc10(answers: Record<string, string>): string {
+  const a = (k: string) => ans(answers, k);
+  const sectionBg = '#e7f0ea';
+  const sectionColor = '#1A5C38';
+
+  const firma = a('pp_firma') || '[Numele firmei]';
+  const proces = a('pp_proces') || '[Numele procesului]';
+
+  const titleBand = `
+    <div class="title-band" style="background: linear-gradient(135deg, #1A5C38 0%, #2a7a4f 100%);">
+      <div class="doc-num">DOCUMENT 10 · PREDAREA CHEILOR</div>
+      <h1>Planul de predare a unui proces</h1>
+      <span class="topic-tag">${firma}${a('pp_data_start') ? ' · ' + a('pp_data_start') : ''}</span>
+    </div>`;
+
+  const intro = `
+    <div style="margin-bottom:18px;padding:11px 13px;border:1px solid var(--line);border-left:3px solid ${sectionColor};border-radius:4px;background:var(--paper-dark);font-size:11.5px;line-height:1.6;color:var(--ink-light);">
+      <strong>Regula de aur:</strong> predai un proces câte unul. Nu începe al doilea până primul nu merge stabil fără tine.
+      Completezi cele patru secțiuni în ordine — ele urmează exact formula din Lecția 19: alegi procesul, transferi complet, confirmi, faci pasul înapoi.
+    </div>`;
+
+  const secIdent = section('Procesul și responsabilul', undefined, sectionBg, sectionColor,
+    `${fieldRow(field('Numele procesului', proces), field('Data începerii', a('pp_data_start')))}
+     ${fieldRow(field('Responsabilul căruia îi predau', a('pp_responsabil')))}`);
+
+  const critRow = (label: string, val: string) => `
+    <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:9px;padding:9px 11px;border:1px solid var(--line);border-radius:4px;background:var(--paper-dark);">
+      <div style="width:15px;height:15px;border:1.5px solid ${sectionColor};border-radius:3px;flex-shrink:0;margin-top:2px;"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:4px;">${label}</div>
+        <div style="font-size:11.5px;color:var(--ink-light);white-space:pre-wrap;border-bottom:1px solid var(--line);min-height:20px;padding-bottom:3px;">${val || '&nbsp;'}</div>
+      </div>
+    </div>`;
+
+  const sec1 = section('1 · Alegerea procesului', 'Trece cele 3 criterii — bifează toate trei', sectionBg, sectionColor,
+    critRow('Risc controlat — dacă omul greșește la început, firma nu se scufundă', a('pp_c1')) +
+    critRow('Om aproape gata — am deja pe cineva care îl poate prelua', a('pp_c2')) +
+    critRow('Ușor de scris — procesul se poate pune pe hârtie', a('pp_c3')) +
+    `<div style="font-size:10.5px;color:var(--muted);font-style:italic;margin-top:2px;">Exemplu: Gestiunea stocurilor → predată șefului de depozit. Risc controlat, om deja bun pe poziție, proces ușor de scris.</div>`);
+
+  const trRow = (label: string, sub: string, val: string) => `
+    <tr>
+      <td style="width:26px;padding:9px 8px;border:1px solid var(--line);text-align:center;vertical-align:top;">
+        <div style="width:14px;height:14px;border:1.5px solid ${sectionColor};border-radius:3px;margin:2px auto;"></div>
+      </td>
+      <td style="width:34%;padding:9px 11px;border:1px solid var(--line);vertical-align:top;background:var(--paper-dark);">
+        <div style="font-size:11.5px;font-weight:700;color:var(--ink);">${label}</div>
+        <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">${sub}</div>
+      </td>
+      <td style="padding:9px 11px;border:1px solid var(--line);font-size:11.5px;vertical-align:top;white-space:pre-wrap;min-height:36px;">${val || '&nbsp;'}</td>
+    </tr>`;
+
+  const sec2 = section('2 · Transferul complet · cele 4 lucruri', 'Un transfer incomplet e cauza numărul unu a eșecului', sectionBg, sectionColor, `
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr>
+        <th style="padding:7px 8px;background:${sectionColor};color:#fff;border:1px solid ${sectionColor};font-size:10px;">✓</th>
+        <th style="text-align:left;padding:7px 10px;background:${sectionColor};color:#fff;border:1px solid ${sectionColor};font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;">Ce transfer</th>
+        <th style="text-align:left;padding:7px 10px;background:${sectionColor};color:#fff;border:1px solid ${sectionColor};font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;">Concret, la procesul meu</th>
+      </tr></thead>
+      <tbody>
+        ${trRow('Cunoștințele', 'Procesul e scris (SOP), îl poate reciti fără mine', a('pp_t1'))}
+        ${trRow('Accesul', 'Are instrumentele, conturile, datele din prima zi', a('pp_t2'))}
+        ${trRow('KPI și raportare', 'Știm amândoi ce cifră și când raportează', a('pp_t3'))}
+        ${trRow('Supravegherea', 'Am stabilit cât de des verific la început', a('pp_t4'))}
+      </tbody>
+    </table>`);
+
+  const sec3 = section('3 · Confirmarea · perioada de rodaj', 'Ești aproape, nu deasupra. Corectați golurile cât sunt mici.', sectionBg, sectionColor,
+    `${fieldRow(field('Cât durează rodajul', a('pp_rodaj')))}
+     ${fieldMulti('Ce goluri din transfer au apărut și le-am astupat', a('pp_goluri'))}
+     ${fieldMulti('Ce întrebări a avut responsabilul cel mai des', a('pp_intrebari'))}`);
+
+  const sec4 = section('4 · Pasul înapoi · când mă retrag complet', 'Nu te retragi când te simți gata — te retragi când cifra e bună constant, fără tine', sectionBg, sectionColor,
+    `${fieldRow(field('Cifra care îmi spune că procesul merge fără mine', a('pp_cifra')), field('Câte cicluri bune la rând aștept', a('pp_cicluri')))}
+     <div style="margin-top:12px;">
+       <div class="field-label">Verificarea finală înainte de pasul înapoi</div>
+       <div style="display:flex;flex-direction:column;gap:7px;margin-top:6px;">
+         <div style="padding:9px 12px;border:1px solid var(--line);border-radius:4px;font-size:11.5px;">☐ Cifra a fost bună mai multe cicluri la rând, fără intervenția mea</div>
+         <div style="padding:9px 12px;border:1px solid var(--line);border-radius:4px;font-size:11.5px;">☐ Responsabilul a rezolvat singur situațiile care au apărut</div>
+         <div style="padding:9px 12px;border:1px solid var(--line);border-radius:4px;font-size:11.5px;">☐ Nu am mai fost întrebat despre decizii care sunt acum ale lui</div>
+       </div>
+     </div>
+     <div style="margin-top:12px;">${field('Data la care am făcut pasul înapoi complet', a('pp_data_pas'))}</div>`);
+
+  const secFinal = `
+    <div style="margin-top:14px;padding:13px 15px;border:1px solid ${sectionColor};border-radius:5px;background:#e7f0ea;">
+      <div style="font-family:'Aboreto',serif;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:${sectionColor};margin-bottom:5px;">Ai predat o cheie</div>
+      <div style="font-size:11.5px;color:var(--ink-light);line-height:1.6;">Acum treci la următorul proces și iei o copie nouă a acestui plan. Unul câte unul, până ai predat toate cheile.</div>
+    </div>`;
+
+  const totalPages = 3;
+  const pagesHtml = [
+    renderPage('10', 'Predarea Cheilor', 1, totalPages, `${intro}${secIdent}${sec1}`, titleBand),
+    renderPage('10', 'Predarea Cheilor', 2, totalPages, `${sec2}${sec3}`),
+    renderPage('10', 'Predarea Cheilor', 3, totalPages, `${sec4}${secFinal}${docFooter()}`),
+  ].join('');
+
+  return htmlShell('', pagesHtml, `Plan de predare · ${proces}`);
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DOCUMENT 11 — Registrul de greșeli (L20 · Predarea Cheilor)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const doc11Steps: DocWizardStep[] = [
+  {
+    title: 'Identificare',
+    subtitle: 'Registrul îl ții deschis, la vedere — o linie la fiecare greșeală importantă',
+    questions: [
+      { id: 'rg_firma', label: 'Numele firmei', placeholder: 'ex: Firma SRL', type: 'text' },
+      { id: 'rg_data',  label: 'Data',          placeholder: '',              type: 'date' },
+    ],
+  },
+  {
+    title: 'Linia 1',
+    subtitle: 'Nu ții evidența vinovaților. Ții evidența îmbunătățirilor.',
+    questions: [
+      { id: 'rg_1_data',  label: 'Data',                        placeholder: 'ex: 12.03',                              type: 'text' },
+      { id: 'rg_1_ce',    label: 'Ce s-a întâmplat',            placeholder: 'ex: Clientul a primit alt produs decât cel comandat.', type: 'textarea' },
+      { id: 'rg_1_cauza', label: 'Cauza reală (cei 5 de ce)',   placeholder: 'ex: Două produse asemănătoare stau pe raft fără etichetă; nimeni nu răspunde de organizarea depozitului.', type: 'textarea' },
+      { id: 'rg_1_rep',   label: 'Ce am reparat în sistem',     placeholder: 'ex: Etichetat raftul; regulă de aranjare; depozitul dat în responsabilitatea șefului de depozit.', type: 'textarea' },
+      { id: 'rg_1_sop',   label: 'SOP actualizat',              placeholder: 'ex: SOP Expediere — pas de verificare adăugat', type: 'text' },
+    ],
+  },
+  {
+    title: 'Linia 2',
+    questions: [
+      { id: 'rg_2_data',  label: 'Data',                      placeholder: '', type: 'text' },
+      { id: 'rg_2_ce',    label: 'Ce s-a întâmplat',          placeholder: '', type: 'textarea' },
+      { id: 'rg_2_cauza', label: 'Cauza reală (cei 5 de ce)', placeholder: '', type: 'textarea' },
+      { id: 'rg_2_rep',   label: 'Ce am reparat în sistem',   placeholder: '', type: 'textarea' },
+      { id: 'rg_2_sop',   label: 'SOP actualizat',            placeholder: '', type: 'text' },
+    ],
+  },
+  {
+    title: 'Linia 3',
+    questions: [
+      { id: 'rg_3_data',  label: 'Data',                      placeholder: '', type: 'text' },
+      { id: 'rg_3_ce',    label: 'Ce s-a întâmplat',          placeholder: '', type: 'textarea' },
+      { id: 'rg_3_cauza', label: 'Cauza reală (cei 5 de ce)', placeholder: '', type: 'textarea' },
+      { id: 'rg_3_rep',   label: 'Ce am reparat în sistem',   placeholder: '', type: 'textarea' },
+      { id: 'rg_3_sop',   label: 'SOP actualizat',            placeholder: '', type: 'text' },
+    ],
+  },
+];
+
+function generateDoc11(answers: Record<string, string>): string {
+  const a = (k: string) => ans(answers, k);
+  const sectionBg = '#f7ecec';
+  const sectionColor = '#8B1A1A';
+  const firma = a('rg_firma') || '[Numele firmei]';
+
+  const titleBand = `
+    <div class="title-band" style="background: linear-gradient(135deg, #8B1A1A 0%, #a82020 100%);">
+      <div class="doc-num">DOCUMENT 11 · PREDAREA CHEILOR</div>
+      <h1>Registrul de greșeli</h1>
+      <span class="topic-tag">${firma}${a('rg_data') ? ' · ' + a('rg_data') : ''}</span>
+    </div>`;
+
+  const intro = `
+    <div style="margin-bottom:16px;padding:11px 13px;border:1px solid var(--line);border-left:3px solid ${sectionColor};border-radius:4px;background:var(--paper-dark);font-size:11.5px;line-height:1.6;color:var(--ink-light);">
+      <strong>Nu ții evidența vinovaților. Ții evidența îmbunătățirilor.</strong> La fiecare greșeală importantă adaugi o linie — nu ca să notezi cine a greșit, ci ce ai reparat în sistem ca să nu se mai repete. Îl completezi împreună cu responsabilul, calm, căutând cauza.
+    </div>
+    <div style="margin-bottom:16px;padding:11px 13px;border:1px solid var(--line);border-radius:4px;font-size:11.5px;line-height:1.6;color:var(--ink);text-align:center;">
+      <span style="font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:${sectionColor};display:block;margin-bottom:5px;">Bucla la fiecare greșeală</span>
+      Apare → Sapi (cei 5 de ce) → Repari sistemul și actualizezi SOP-ul → Notezi aici → Nu se mai repetă
+      <div style="font-size:10.5px;color:var(--muted);font-style:italic;margin-top:6px;">Pasul pe care aproape toți îl sar: actualizarea SOP-ului. Fără el, reparația se pierde.</div>
+    </div>`;
+
+  const th = (label: string, w: string) =>
+    `<th style="width:${w};text-align:left;padding:7px 9px;background:${sectionColor};color:#fff;border:1px solid ${sectionColor};font-family:'Aboreto',serif;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;">${label}</th>`;
+
+  const td = (val: string, minH = 60) =>
+    `<td style="padding:8px 9px;border:1px solid var(--line);font-size:11px;vertical-align:top;white-space:pre-wrap;height:${minH}px;">${val || '&nbsp;'}</td>`;
+
+  const row = (n: string) => `<tr>
+      ${td(a(`rg_${n}_data`))}
+      ${td(a(`rg_${n}_ce`))}
+      ${td(a(`rg_${n}_cauza`))}
+      ${td(a(`rg_${n}_rep`))}
+      ${td(a(`rg_${n}_sop`))}
+    </tr>`;
+
+  const emptyRow = () => `<tr>${td('')}${td('')}${td('')}${td('')}${td('')}</tr>`;
+
+  const tableHead = `<thead><tr>
+      ${th('Data', '10%')}${th('Ce s-a întâmplat', '23%')}${th('Cauza reală (5 de ce)', '25%')}${th('Ce am reparat în sistem', '25%')}${th('SOP actualizat', '17%')}
+    </tr></thead>`;
+
+  const secExemplu = section('Exemplu completat', undefined, sectionBg, sectionColor, `
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+      ${tableHead}
+      <tbody><tr>
+        ${td('12.03', 50)}
+        ${td('Clientul a primit alt produs decât cel comandat.', 50)}
+        ${td('Două produse asemănătoare stau pe raft fără etichetă; nimeni nu răspunde de organizarea depozitului.', 50)}
+        ${td('Etichetat raftul; regulă de aranjare; depozitul dat în responsabilitatea șefului de depozit.', 50)}
+        ${td('SOP Expediere — pas de verificare adăugat', 50)}
+      </tr></tbody>
+    </table>`);
+
+  const secRegistru = section('Registrul tău', 'Completează o linie la fiecare greșeală importantă', sectionBg, sectionColor, `
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+      ${tableHead}
+      <tbody>
+        ${row('1')}
+        ${row('2')}
+        ${row('3')}
+      </tbody>
+    </table>`);
+
+  const secGol = section('Linii libere', 'Tipărește pagina de câte ori ai nevoie', sectionBg, sectionColor, `
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+      ${tableHead}
+      <tbody>
+        ${emptyRow()}${emptyRow()}${emptyRow()}${emptyRow()}${emptyRow()}
+      </tbody>
+    </table>`);
+
+  const secTest = `
+    <div style="margin-top:14px;padding:12px 14px;border:1px solid ${sectionColor};border-radius:5px;background:#f7ecec;font-size:11.5px;line-height:1.6;color:var(--ink-light);">
+      <strong>⚑ Testul reparației:</strong> înainte să închizi o linie, întreabă-te — după reparația asta, greșeala se mai poate întâmpla cu următorul om care face procesul? Dacă da, nu ai reparat sistemul, doar ai cârpit omul. Sapă mai adânc.
+    </div>`;
+
+  const totalPages = 2;
+  const pagesHtml = [
+    renderPage('11', 'Predarea Cheilor', 1, totalPages, `${intro}${secExemplu}${secRegistru}`, titleBand),
+    renderPage('11', 'Predarea Cheilor', 2, totalPages, `${secGol}${secTest}${docFooter()}`),
+  ].join('');
+
+  return htmlShell('', pagesHtml, `Registrul de greșeli · ${firma}`);
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
 // PLATFORM_DOCUMENTS export
 // ─────────────────────────────────────────────────────────────────────────────
 
