@@ -29,7 +29,9 @@ export function LiveContentProvider({ children }: { children: React.ReactNode })
   const [ready, setReady] = useState(false);
   const [loadedForUserId, setLoadedForUserId] = useState<string | null>(null);
   const appliedRef = useRef(false);
-  const reloadRef = useRef(0);
+  const lastPayloadRef = useRef<string | null>(null);
+  const lastFetchRef = useRef(0);
+  const [reloadTick, setReloadTick] = useState(0);
 
   const applyOverlay = React.useCallback((dbMods: any[], dbLessons: any[]) => {
     if (!dbMods || dbMods.length === 0) return false;
@@ -78,6 +80,7 @@ export function LiveContentProvider({ children }: { children: React.ReactNode })
         const cached = JSON.parse(raw);
         if (applyOverlay(cached.mods, cached.lessons)) {
           appliedRef.current = true;
+          lastPayloadRef.current = JSON.stringify({ mods: cached.mods, lessons: cached.lessons });
           setVersion((v) => v + 1);
         }
       }
@@ -135,15 +138,18 @@ export function LiveContentProvider({ children }: { children: React.ReactNode })
 
         applyOverlay(dbMods, dbLessons);
         appliedRef.current = true;
+        lastFetchRef.current = Date.now();
+        const payload = JSON.stringify({ mods: dbMods, lessons: dbLessons });
+        const changed = lastPayloadRef.current !== payload;
+        lastPayloadRef.current = payload;
         try {
-          window.localStorage.setItem(
-            CACHE_KEY,
-            JSON.stringify({ mods: dbMods, lessons: dbLessons, at: Date.now() })
-          );
+          window.localStorage.setItem(CACHE_KEY, payload);
         } catch {
           /* storage full / blocked */
         }
-        setVersion((v) => v + 1);
+        // Only remount the tree when the content actually changed, so a
+        // background re-sync never disturbs what the student is doing.
+        if (changed) setVersion((v) => v + 1);
         setLoadedForUserId(user.id);
         setReady(true);
       } catch (e) {
@@ -168,23 +174,25 @@ export function LiveContentProvider({ children }: { children: React.ReactNode })
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [authLoading, user?.id, applyOverlay, reloadRef.current]);
+  }, [authLoading, user?.id, applyOverlay, reloadTick]);
 
   const refresh = React.useCallback(() => {
-    reloadRef.current += 1;
-    setVersion((v) => v + 1);
+    setReloadTick((t) => t + 1);
   }, []);
 
   // 3) Re-sync when the tab comes back or the network returns (mobile Safari).
   useEffect(() => {
     if (!user?.id) return;
-    const onWake = () => {
-      if (document.visibilityState === 'visible') refresh();
+    const maybeRefresh = () => {
+      if (Date.now() - lastFetchRef.current > 5 * 60 * 1000) refresh();
     };
-    window.addEventListener('visibilitychange', onWake);
+    const onWake = () => {
+      if (document.visibilityState === 'visible') maybeRefresh();
+    };
+    document.addEventListener('visibilitychange', onWake);
     window.addEventListener('online', refresh);
     return () => {
-      window.removeEventListener('visibilitychange', onWake);
+      document.removeEventListener('visibilitychange', onWake);
       window.removeEventListener('online', refresh);
     };
   }, [user?.id, refresh]);
