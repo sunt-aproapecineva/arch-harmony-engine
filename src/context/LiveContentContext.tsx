@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 import { supabase } from '@/integrations/supabase/client';
 import { MODULES } from '@/lib/data';
 import { useAuthContext } from '@/context/AuthContext';
+import { CONTENT_SNAPSHOT } from '@/lib/contentSnapshot';
 
 type Ctx = { version: number; ready: boolean; refresh: () => void };
 const LiveCtx = createContext<Ctx>({ version: 0, ready: false, refresh: () => {} });
@@ -23,17 +24,7 @@ const CACHE_KEY = 'aa_content_overlay_v1';
  * make already-published lessons "disappear". Failures retry with backoff and
  * the overlay is refreshed when the tab regains focus or the network returns.
  */
-export function LiveContentProvider({ children }: { children: React.ReactNode }) {
-  const { user, loading: authLoading } = useAuthContext();
-  const [version, setVersion] = useState(0);
-  const [ready, setReady] = useState(false);
-  const [loadedForUserId, setLoadedForUserId] = useState<string | null>(null);
-  const appliedRef = useRef(false);
-  const lastPayloadRef = useRef<string | null>(null);
-  const lastFetchRef = useRef(0);
-  const [reloadTick, setReloadTick] = useState(0);
-
-  const applyOverlay = React.useCallback((dbMods: any[], dbLessons: any[]) => {
+function overlayContent(dbMods: any[], dbLessons: any[]) {
     if (!dbMods || dbMods.length === 0) return false;
 
     const dbModByIdx = new Map<number, any>();
@@ -69,7 +60,28 @@ export function LiveContentProvider({ children }: { children: React.ReactNode })
       });
     });
     return true;
-  }, []);
+}
+
+// Base layer: apply the bundled snapshot of published content immediately at
+// module load, so lessons are always present even offline, before auth, or if
+// the database call fails.
+try {
+  overlayContent(CONTENT_SNAPSHOT.mods as any[], CONTENT_SNAPSHOT.lessons as any[]);
+} catch {
+  /* never block the app on the snapshot */
+}
+
+export function LiveContentProvider({ children }: { children: React.ReactNode }) {
+  const { user, loading: authLoading } = useAuthContext();
+  const [version, setVersion] = useState(0);
+  const [ready, setReady] = useState(false);
+  const [loadedForUserId, setLoadedForUserId] = useState<string | null>(null);
+  const appliedRef = useRef(false);
+  const lastPayloadRef = useRef<string | null>(null);
+  const lastFetchRef = useRef(0);
+  const [reloadTick, setReloadTick] = useState(0);
+
+  const applyOverlay = React.useCallback(overlayContent, []);
 
   // 1) Apply cached overlay synchronously-ish at boot (before any network call).
   useEffect(() => {
