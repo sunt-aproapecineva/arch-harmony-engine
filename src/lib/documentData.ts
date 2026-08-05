@@ -2447,6 +2447,308 @@ function generateDoc11(answers: Record<string, string>): string {
   return htmlShell('', pagesHtml, `Registrul de greșeli · ${firma}`);
 }
 
+// ─── Doc 12 · Fișa de recepție finală ────────────────────────────────────────
+
+const doc12Steps: DocWizardStep[] = [
+  {
+    title: 'Identificare',
+    subtitle: 'Recepția finală — nu mai construiești nimic nou, verifici că totul lucrează împreună',
+    questions: [
+      { id: 'rf_firma', label: 'Numele firmei', placeholder: 'ex: Firma SRL', type: 'text' },
+      { id: 'rf_data', label: 'Data recepției', placeholder: '', type: 'date' },
+      { id: 'rf_flux', label: 'Fluxul pe care îl verific', placeholder: 'ex: de la lead la încasare', type: 'text' },
+    ],
+  },
+  {
+    title: 'Testul de flux',
+    subtitle: 'Urmărește fluxul pas cu pas: curge de la un capăt la altul fără să se oprească în tine?',
+    questions: [
+      { id: 'rf_p1_pas', label: 'Pasul 1', placeholder: 'ex: Lead-ul intră pe site', type: 'text' },
+      { id: 'rf_p1_cine', label: 'Cine îl face / se blochează în mine?', placeholder: 'ex: Vânzătorul · NU', type: 'text' },
+      { id: 'rf_p2_pas', label: 'Pasul 2', placeholder: '', type: 'text' },
+      { id: 'rf_p2_cine', label: 'Cine îl face / se blochează în mine?', placeholder: '', type: 'text' },
+      { id: 'rf_p3_pas', label: 'Pasul 3', placeholder: '', type: 'text' },
+      { id: 'rf_p3_cine', label: 'Cine îl face / se blochează în mine?', placeholder: '', type: 'text' },
+      { id: 'rf_p4_pas', label: 'Pasul 4', placeholder: '', type: 'text' },
+      { id: 'rf_p4_cine', label: 'Cine îl face / se blochează în mine?', placeholder: '', type: 'text' },
+      { id: 'rf_blocaje', label: 'Unde s-a oprit fluxul în mine', placeholder: 'Punctele concrete în care eu am fost liantul.', type: 'textarea' },
+    ],
+  },
+  {
+    title: 'Planul de întărire',
+    subtitle: 'Pentru fiecare semn nebifat, la ce etapă te întorci și ce faci concret',
+    questions: [
+      { id: 'rf_i1_semn', label: 'Semnul nebifat 1', placeholder: 'ex: Deciziile tot vin la mine', type: 'text' },
+      { id: 'rf_i1_plan', label: 'Etapa + ce fac concret + până când', placeholder: 'ex: Delegarea (S7) — scriu autoritatea în acordul de responsabilitate, până pe 15.09', type: 'textarea' },
+      { id: 'rf_i2_semn', label: 'Semnul nebifat 2', placeholder: '', type: 'text' },
+      { id: 'rf_i2_plan', label: 'Etapa + ce fac concret + până când', placeholder: '', type: 'textarea' },
+      { id: 'rf_i3_semn', label: 'Semnul nebifat 3', placeholder: '', type: 'text' },
+      { id: 'rf_i3_plan', label: 'Etapa + ce fac concret + până când', placeholder: '', type: 'textarea' },
+    ],
+  },
+  {
+    title: 'Noul tău rol',
+    subtitle: 'Nu ești inutil când firma merge fără tine. Ești liber. Maxim 5 zone rămân ale tale.',
+    questions: [
+      { id: 'rf_rol', label: 'Cum arată noul meu rol de proprietar', placeholder: 'Ce fac, ce nu mai fac, cu ce îmi umplu ziua.', type: 'textarea' },
+      { id: 'rf_z1', label: 'Zona 1', placeholder: 'ex: Strategie — 4h/săptămână', type: 'text' },
+      { id: 'rf_z2', label: 'Zona 2', placeholder: '', type: 'text' },
+      { id: 'rf_z3', label: 'Zona 3', placeholder: '', type: 'text' },
+      { id: 'rf_z4', label: 'Zona 4', placeholder: '', type: 'text' },
+      { id: 'rf_z5', label: 'Zona 5', placeholder: '', type: 'text' },
+      { id: 'rf_absenta', label: 'Ce s-ar rupe dacă aș pleca 2 săptămâni, azi', placeholder: 'Fii cinstit. Ce mai scârțâie și la ce etapă e legat.', type: 'textarea' },
+    ],
+  },
+];
+
+function generateDoc12(answers: Record<string, string>): string {
+  const a = (k: string) => ans(answers, k);
+  const sectionBg = '#f0f4f0';
+  const sectionColor = '#2F5233';
+  const firma = a('rf_firma') || '[Numele firmei]';
+
+  const titleBand = `
+    <div class="title-band" style="background: linear-gradient(135deg, #2F5233 0%, #3d6b42 100%);">
+      <div class="doc-num">DOCUMENT 12 · RECEPȚIA FINALĂ</div>
+      <h1>Fișa de recepție finală</h1>
+      <span class="topic-tag">${firma}${a('rf_data') ? ' · ' + a('rf_data') : ''}</span>
+    </div>`;
+
+  const intro = `
+    <div style="margin-bottom:16px;padding:11px 13px;border:1px solid var(--line);border-left:3px solid ${sectionColor};border-radius:4px;background:var(--paper-dark);font-size:11.5px;line-height:1.6;color:var(--ink-light);">
+      <strong>Astăzi nu mai construiești nimic nou.</strong> Verifici că piesele construite în cele cinci etape lucrează împreună, ca un singur organism. La final ai o radiografie clară: ce merge, ce mai ai de întărit și cine devii de acum.
+    </div>`;
+
+  const th = (label: string, w: string) =>
+    `<th style="width:${w};text-align:left;padding:7px 9px;background:${sectionColor};color:#fff;border:1px solid ${sectionColor};font-family:'Aboreto',serif;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;">${label}</th>`;
+
+  const td = (val: string, minH = 44) =>
+    `<td style="padding:8px 9px;border:1px solid var(--line);font-size:11px;vertical-align:top;white-space:pre-wrap;height:${minH}px;">${val || '&nbsp;'}</td>`;
+
+  const secFlux = section('1 · Testul de flux', `Fluxul verificat: ${a('rf_flux') || '_______________'}`, sectionBg, sectionColor, `
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+      <thead><tr>${th('Pasul', '52%')}${th('Cine îl face · se blochează în mine?', '48%')}</tr></thead>
+      <tbody>
+        <tr>${td(a('rf_p1_pas'))}${td(a('rf_p1_cine'))}</tr>
+        <tr>${td(a('rf_p2_pas'))}${td(a('rf_p2_cine'))}</tr>
+        <tr>${td(a('rf_p3_pas'))}${td(a('rf_p3_cine'))}</tr>
+        <tr>${td(a('rf_p4_pas'))}${td(a('rf_p4_cine'))}</tr>
+      </tbody>
+    </table>
+    ${field('Unde s-a oprit fluxul în mine', a('rf_blocaje'))}`);
+
+  const semne = [
+    'Deciziile zilnice se iau fără mine — oamenii au autoritate și o folosesc',
+    'Cifrele vin la mine singure, în tablou — nu le mai adun eu întrebând',
+    'Când apare o problemă, responsabilul funcției o rezolvă, nu eu',
+    'Pot lipsi câteva zile și firma merge',
+    'Ziua mea nu mai e plină de operațional — am timp să gândesc direcția',
+    'Nu mai sunt singura sursă de adevăr despre cum merge firma',
+  ]
+    .map(
+      (s) =>
+        `<div style="display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--line);font-size:11.5px;line-height:1.5;">
+          <span style="display:inline-block;width:13px;height:13px;border:1.4px solid ${sectionColor};border-radius:2px;flex-shrink:0;margin-top:2px;"></span>
+          <span>${s}</span>
+        </div>`
+    )
+    .join('');
+
+  const secSemne = section('2 · Cele 6 semne ale recepției reușite', 'Bifează doar ce e adevărat astăzi, nu ce ți-ai dori', sectionBg, sectionColor, semne);
+
+  const secHarta = section('3 · Harta de întărire', 'Un semn nebifat nu e un eșec. E o hartă.', sectionBg, sectionColor, `
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin-bottom:12px;">
+      <thead><tr>${th('Dacă semnul lipsește...', '50%')}${th('...întoarce-te la etapa asta', '50%')}</tr></thead>
+      <tbody>
+        <tr>${td('Deciziile tot vin la tine', 26)}${td('Delegarea, S7 — lipsește autoritatea', 26)}</tr>
+        <tr>${td('Nu vezi cum merge firma fără să întrebi', 26)}${td('Contoarele, S6 — tabloul e incomplet', 26)}</tr>
+        <tr>${td('Oamenii nu știu cum se face o treabă', 26)}${td('Instalațiile, S4 — lipsește un SOP', 26)}</tr>
+        <tr>${td('Nu e clar cine răspunde de ce', 26)}${td('Pereții, S3 — rol neclar în organigramă', 26)}</tr>
+        <tr>${td('Aluneci mereu înapoi în operațional', 26)}${td('Fundația, S1 — rolul tău nu e scris clar', 26)}</tr>
+      </tbody>
+    </table>
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+      <thead><tr>${th('Semnul nebifat', '38%')}${th('Etapa · ce fac concret · până când', '62%')}</tr></thead>
+      <tbody>
+        <tr>${td(a('rf_i1_semn'))}${td(a('rf_i1_plan'))}</tr>
+        <tr>${td(a('rf_i2_semn'))}${td(a('rf_i2_plan'))}</tr>
+        <tr>${td(a('rf_i3_semn'))}${td(a('rf_i3_plan'))}</tr>
+      </tbody>
+    </table>`);
+
+  const zone = ['rf_z1', 'rf_z2', 'rf_z3', 'rf_z4', 'rf_z5']
+    .map((k, i) => `<tr>${td(String(i + 1), 24)}${td(a(k), 24)}</tr>`)
+    .join('');
+
+  const secRol = section('4 · Noul meu rol de proprietar', 'Nu ești inutil când firma merge fără tine. Ești liber.', sectionBg, sectionColor, `
+    ${field('Cum arată noul meu rol', a('rf_rol'))}
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin-top:10px;">
+      <thead><tr>${th('#', '8%')}${th('Zonele care rămân ale mele (maxim 5)', '92%')}</tr></thead>
+      <tbody>${zone}</tbody>
+    </table>`);
+
+  const secTest = `
+    <div style="margin-top:14px;padding:12px 14px;border:1px solid ${sectionColor};border-radius:5px;background:${sectionBg};font-size:11.5px;line-height:1.6;color:var(--ink-light);">
+      <strong>⚑ Testul adevărat:</strong> dacă ai pleca două săptămâni, complet deconectat — ce s-ar rupe? Dacă răspunsul e „nimic esențial", ai reușit ce încearcă majoritatea antreprenorilor toată viața.
+    </div>
+    ${field('Ce s-ar rupe dacă aș pleca 2 săptămâni, azi', a('rf_absenta'))}`;
+
+  const totalPages12 = 3;
+  const pagesHtml12 = [
+    renderPage('12', 'Recepția Finală', 1, totalPages12, `${intro}${secFlux}${secSemne}`, titleBand),
+    renderPage('12', 'Recepția Finală', 2, totalPages12, secHarta),
+    renderPage('12', 'Recepția Finală', 3, totalPages12, `${secRol}${secTest}${docFooter()}`),
+  ].join('');
+
+  return htmlShell('', pagesHtml12, `Fișa de recepție finală · ${firma}`);
+}
+
+// ─── Doc 13 · Ritmul de conducere ────────────────────────────────────────────
+
+const doc13Steps: DocWizardStep[] = [
+  {
+    title: 'Identificare',
+    subtitle: 'Dacă nu e în calendar, nu există',
+    questions: [
+      { id: 'rc_firma', label: 'Numele firmei', placeholder: 'ex: Firma SRL', type: 'text' },
+      { id: 'rc_data', label: 'Data', placeholder: '', type: 'date' },
+    ],
+  },
+  {
+    title: 'Ședința săptămânală',
+    subtitle: 'Inima ritmului — 30–60 de minute, aceeași zi, aceeași agendă',
+    questions: [
+      { id: 'rc_sed_zi', label: 'Ziua și ora', placeholder: 'ex: Luni, 09:00', type: 'text' },
+      { id: 'rc_sed_durata', label: 'Durata', placeholder: 'ex: 45 minute', type: 'text' },
+      { id: 'rc_sed_cine', label: 'Cine participă', placeholder: 'Responsabilii de funcții, nu toată echipa.', type: 'textarea' },
+    ],
+  },
+  {
+    title: 'Analiza lunară',
+    subtitle: 'Săptămânal repari ce arde. Lunar repari ce face lucrurile să ardă.',
+    questions: [
+      { id: 'rc_luna_zi', label: 'Ce zi din lună', placeholder: 'ex: prima vineri a lunii', type: 'text' },
+      { id: 'rc_luna_q1', label: '1 · Ce a fost roșu repetat?', placeholder: '', type: 'textarea' },
+      { id: 'rc_luna_q2', label: '2 · Ce arată registrul de greșeli?', placeholder: '', type: 'textarea' },
+      { id: 'rc_luna_q3', label: '3 · Țintele mai sunt corecte?', placeholder: '', type: 'textarea' },
+      { id: 'rc_luna_q4', label: '4 · Unde mă trage înapoi firma?', placeholder: '', type: 'textarea' },
+    ],
+  },
+  {
+    title: 'Calendarul și disciplina',
+    subtitle: 'Blocul de gândire e cel pe care îl sare toată lumea și e cel mai valoros',
+    questions: [
+      { id: 'rc_b_tablou', label: 'Privirea la tablou — când', placeholder: 'ex: zilnic, 08:30, 5 min', type: 'text' },
+      { id: 'rc_b_sedinta', label: 'Ședința de conducere — când', placeholder: 'ex: luni, 09:00, 45 min', type: 'text' },
+      { id: 'rc_b_unu', label: 'Unu la unu cu responsabilii — când', placeholder: 'ex: prima săptămână din lună, 30 min fiecare', type: 'text' },
+      { id: 'rc_b_analiza', label: 'Analiza lunară — când', placeholder: 'ex: prima vineri, 10:00–12:00', type: 'text' },
+      { id: 'rc_b_gandire', label: 'Timp de gândire — când (2 ore, singur, fără telefon)', placeholder: 'ex: vineri, 15:00–17:00', type: 'text' },
+      { id: 'rc_regula', label: 'Regula mea de disciplină', placeholder: 'ex: Când vine o decizie care nu e a mea, nu o iau. „Asta o decide [rolul]."', type: 'textarea' },
+    ],
+  },
+];
+
+function generateDoc13(answers: Record<string, string>): string {
+  const a = (k: string) => ans(answers, k);
+  const sectionBg = '#f6f1e7';
+  const sectionColor = '#8A6D2F';
+  const firma = a('rc_firma') || '[Numele firmei]';
+
+  const titleBand = `
+    <div class="title-band" style="background: linear-gradient(135deg, #8A6D2F 0%, #C9A96E 100%);">
+      <div class="doc-num">DOCUMENT 13 · RECEPȚIA FINALĂ</div>
+      <h1>Ritmul de conducere</h1>
+      <span class="topic-tag">${firma}${a('rc_data') ? ' · ' + a('rc_data') : ''}</span>
+    </div>`;
+
+  const intro = `
+    <div style="margin-bottom:16px;padding:11px 13px;border:1px solid var(--line);border-left:3px solid ${sectionColor};border-radius:4px;background:var(--paper-dark);font-size:11.5px;line-height:1.6;color:var(--ink-light);">
+      <strong>Un rol nou fără un ritm nou se pierde.</strong> Golul lăsat de operațional se umple cu operațional dacă nu îl umpli tu cu conducere. Dacă nu e în calendar, nu există.
+    </div>`;
+
+  const th = (label: string, w: string) =>
+    `<th style="width:${w};text-align:left;padding:7px 9px;background:${sectionColor};color:#fff;border:1px solid ${sectionColor};font-family:'Aboreto',serif;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;">${label}</th>`;
+
+  const td = (val: string, minH = 30) =>
+    `<td style="padding:8px 9px;border:1px solid var(--line);font-size:11px;vertical-align:top;white-space:pre-wrap;height:${minH}px;">${val || '&nbsp;'}</td>`;
+
+  const agenda = [
+    ['1', 'Deschizi tabloul', '5 minute. Toți văd aceleași cifre. Fără comentarii.'],
+    ['2', 'Treci doar pe rândurile roșii', 'Pentru fiecare: ce s-a făcut, ce rezultat a ieșit, ce te-a blocat.'],
+    ['3', 'Deciziile care se cer de la tine', 'Doar cele care nu sunt ale lor.'],
+    ['4', 'Cine ce face până săptămâna viitoare', 'Acțiune + responsabil, notate.'],
+  ]
+    .map(([n, t, d]) => `<tr>${td(n, 24)}${td(`<strong>${t}</strong>`, 24)}${td(d, 24)}</tr>`)
+    .join('');
+
+  const secSedinta = section('1 · Ședința săptămânală', 'Inima ritmului', sectionBg, sectionColor, `
+    ${field('Ziua și ora', a('rc_sed_zi'))}
+    ${field('Durata', a('rc_sed_durata'))}
+    ${field('Cine participă', a('rc_sed_cine'))}
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin-top:10px;">
+      <thead><tr>${th('#', '7%')}${th('Pasul', '32%')}${th('Ce faci', '61%')}</tr></thead>
+      <tbody>${agenda}</tbody>
+    </table>
+    <div style="margin-top:9px;font-size:10.5px;color:var(--muted);font-style:italic;">Ce NU se face: nu le rezolvi tu problemele, nu cobori în detalii operaționale, nu vânezi vinovați la roșu — cauți ce a lipsit din sistem.</div>`);
+
+  const secLuna = section('2 · Analiza lunară', `1–2 ore, ${a('rc_luna_zi') || '_______________'}`, sectionBg, sectionColor, `
+    ${field('1 · Ce a fost roșu repetat?', a('rc_luna_q1'))}
+    ${field('2 · Ce arată registrul de greșeli?', a('rc_luna_q2'))}
+    ${field('3 · Țintele mai sunt corecte?', a('rc_luna_q3'))}
+    ${field('4 · Unde mă trage înapoi firma?', a('rc_luna_q4'))}`);
+
+  const blocuri = [
+    ['Privirea la tablou', 'Zilnic, 5 min', a('rc_b_tablou')],
+    ['Ședința de conducere', 'Săptămânal, 30–60 min', a('rc_b_sedinta')],
+    ['Unu la unu cu responsabilii', 'Lunar, 30 min fiecare', a('rc_b_unu')],
+    ['Analiza lunară', 'Lunar, 1–2 ore', a('rc_b_analiza')],
+    ['Timp de gândire', 'Săptămânal, 2 ore, singur', a('rc_b_gandire')],
+  ]
+    .map(([b, f, v]) => `<tr>${td(`<strong>${b}</strong>`)}${td(f)}${td(v)}</tr>`)
+    .join('');
+
+  const secCalendar = section('3 · Calendarul de conducere', 'Un bloc pe care îl muți mereu nu există', sectionBg, sectionColor, `
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+      <thead><tr>${th('Blocul', '32%')}${th('Cât de des', '28%')}${th('Când, în calendarul meu', '40%')}</tr></thead>
+      <tbody>${blocuri}</tbody>
+    </table>
+    <div style="margin-top:9px;font-size:10.5px;color:var(--muted);font-style:italic;">Blocul de gândire e singura activitate pe care nu o poate face nimeni altcineva pentru tine. Tratează-l ca pe o ședință cu cea mai importantă persoană din firmă — pentru că este.</div>`);
+
+  const semnale = [
+    'Răspund la întrebări care nu sunt ale mele — și mi se pare normal',
+    'Iau decizii peste responsabili, „ca să meargă mai repede"',
+    'Ședința săptămânală se amână sau se anulează pentru că „e aglomerat"',
+    'Nu mai am timp de blocul de gândire, săptămână după săptămână',
+    'Mă uit la tablou mai rar, pentru că oricum știu eu ce se întâmplă',
+    'Oamenii au început iar să vină la mine, nu la responsabilul lor',
+  ]
+    .map(
+      (s) =>
+        `<div style="display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--line);font-size:11.5px;line-height:1.5;">
+          <span style="display:inline-block;width:13px;height:13px;border:1.4px solid ${sectionColor};border-radius:2px;flex-shrink:0;margin-top:2px;"></span>
+          <span>${s}</span>
+        </div>`
+    )
+    .join('');
+
+  const secSemnale = section('4 · Semnalele de alunecare', 'Alunecarea e ușor de oprit la început și grea după trei luni', sectionBg, sectionColor, semnale);
+
+  const secRegula = `
+    <div style="margin-top:14px;padding:14px 16px;border:1.5px solid ${sectionColor};border-radius:5px;background:${sectionBg};text-align:center;">
+      <span style="font-family:'Aboreto',serif;font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:${sectionColor};display:block;margin-bottom:7px;">Regula de disciplină — ține-o la vedere</span>
+      <div style="font-size:12.5px;line-height:1.6;color:var(--ink);">${a('rc_regula') || 'Când vine o decizie care nu e a mea, nu o iau. „Asta o decide [rolul], vorbește cu el." De fiecare dată.'}</div>
+    </div>`;
+
+  const totalPages13 = 3;
+  const pagesHtml13 = [
+    renderPage('13', 'Recepția Finală', 1, totalPages13, `${intro}${secSedinta}`, titleBand),
+    renderPage('13', 'Recepția Finală', 2, totalPages13, secLuna),
+    renderPage('13', 'Recepția Finală', 3, totalPages13, `${secCalendar}${secSemnale}${secRegula}${docFooter()}`),
+  ].join('');
+
+  return htmlShell('', pagesHtml13, `Ritmul de conducere · ${firma}`);
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PLATFORM_DOCUMENTS export
@@ -2608,5 +2910,33 @@ export const PLATFORM_DOCUMENTS: PlatformDocument[] = [
     color: 'red',
     steps: doc11Steps,
     generate: generateDoc11,
+  },
+  {
+    id: 'doc-receptie-finala',
+    lessonIds: ['l-6-1', 'l-6-ex-1'],
+    docNumber: '12',
+    title: 'Fișa de recepție finală',
+    shortTitle: 'Recepția finală',
+    description:
+      'Template tipăribil pentru recepția firmei: testul de flux de la lead la încasare, cele 6 semne ale recepției reușite, harta de întărire pe etape și fișa noului tău rol de proprietar. Companion pentru Lecția 21.',
+    downloadUrl: '',
+    topic: 'Recepția Finală',
+    color: 'green',
+    steps: doc12Steps,
+    generate: generateDoc12,
+  },
+  {
+    id: 'doc-ritm-conducere',
+    lessonIds: ['l-6-2', 'l-6-ex-2'],
+    docNumber: '13',
+    title: 'Ritmul de conducere',
+    shortTitle: 'Ritmul de conducere',
+    description:
+      'Template tipăribil cu ritmul tău de proprietar: ședința săptămânală cu agendă fixă, analiza lunară cu cele 4 întrebări, blocurile din calendar și regula de disciplină împotriva alunecării. Companion pentru Lecția 22.',
+    downloadUrl: '',
+    topic: 'Recepția Finală',
+    color: 'gold',
+    steps: doc13Steps,
+    generate: generateDoc13,
   },
 ];

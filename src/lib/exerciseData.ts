@@ -1245,6 +1245,172 @@ export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
       { id: 'cd_final', type: 'info', text: '✓ Bucla completă: Apare → Sapi (5 de ce) → Repari sistemul și actualizezi SOP-ul → Notezi în registru → Nu se mai repetă. Companion tipăribil: Documentul 11 · Registrul de greșeli.' },
     ],
   },
+
+  // ─── SĂPTĂMÂNA 8 — Etapa 6 · Recepția Finală ─────────────────────────────────
+
+  // ex-8-1 — L21 „De la a construi la a conduce" · Recepția finală a firmei tale
+  {
+    exerciseId: 'ex-8-1-receptia-finala',
+    type: 'form-fields',
+    title: 'Recepția finală a firmei tale',
+    instructions:
+      'Nu mai construiești nimic nou astăzi. Verifici că piesele construite în cele 5 etape lucrează împreună, ca un singur organism. La final ai o radiografie clară: ce merge, ce mai ai de întărit și cine devii de acum.',
+    fields: [
+      { id: 'rf_info', type: 'info', text: 'DE CE FACI ASTA: Până acum ai verificat fiecare piesă separat — fișa de post, SOP-ul, KPI-ul. Recepția verifică altceva: că fluxul curge de la un capăt la altul fără să te oprească pe tine la mijloc.' },
+
+      { id: 'rf_a_info', type: 'info', text: 'PASUL A · TESTUL DE FLUX — alege un flux real (de la lead la încasare) și urmărește-l pas cu pas. La fiecare pas notează cine îl face și dacă se oprește în tine.' },
+      { id: 'rf_flux', type: 'input', label: 'Fluxul pe care îl verific', placeholder: 'ex: de la lead la încasare' },
+      {
+        id: 'rf_flux_tabel',
+        type: 'dynamic-table',
+        label: 'Pașii fluxului',
+        columns: ['Pasul', 'Cine îl face', 'Se blochează în mine? (DA/NU)', 'Ce lipsește ca să nu se mai blocheze'],
+        addLabel: 'Adaugă pas',
+      },
+      { id: 'rf_blocaje', type: 'textarea', label: 'Unde s-a oprit fluxul în tine', placeholder: 'Scrie punctele concrete în care tu ai fost liantul.' },
+
+      { id: 'rf_b_info', type: 'info', text: 'PASUL B · CELE 6 SEMNE — bifează doar ce e adevărat astăzi, nu ce ți-ai dori. Un semn nebifat nu e un eșec, e o hartă.' },
+      {
+        id: 'rf_semne',
+        type: 'checkboxes',
+        label: 'Semnele recepției reușite',
+        options: [
+          'Deciziile zilnice se iau fără mine — oamenii au autoritate și o folosesc',
+          'Cifrele vin la mine singure, în tablou — nu le mai adun eu întrebând',
+          'Când apare o problemă, responsabilul funcției o rezolvă, nu eu',
+          'Pot lipsi câteva zile și firma merge — am făcut sau aș putea face testul',
+          'Ziua mea nu mai e plină de operațional — am timp să gândesc direcția',
+          'Nu mai sunt singura sursă de adevăr despre cum merge firma',
+        ],
+      },
+
+      { id: 'rf_c_info', type: 'info', text: 'PASUL C · HARTA DE ÎNTĂRIRE — pentru fiecare semn nebifat, te întorci punctual la etapa lui. Deciziile tot vin la tine → Delegarea (S7, lipsește autoritatea). Nu vezi cum merge firma fără să întrebi → Contoarele (S6, tabloul e incomplet). Oamenii nu știu cum se face o treabă → Instalațiile (S4, lipsește un SOP). Nu e clar cine răspunde de ce → Pereții (S3, rol neclar). Aluneci mereu înapoi în operațional → Fundația (S1, rolul tău nu e scris clar).' },
+      {
+        id: 'rf_intarire',
+        type: 'dynamic-table',
+        label: 'Planul de întărire',
+        columns: ['Semnul nebifat', 'Etapa la care mă întorc', 'Ce fac concret', 'Până când'],
+        addLabel: 'Adaugă semn',
+      },
+
+      { id: 'rf_d_info', type: 'info', text: 'PASUL D · NOUL TĂU ROL — nu ești inutil când firma merge fără tine. Ești liber. Scrie cu ce îți umpli ziua de acum: maxim 5 zone.' },
+      { id: 'rf_rol', type: 'textarea', label: 'Cum arată noul meu rol de proprietar', placeholder: 'Câteva rânduri: ce fac, ce nu mai fac, cu ce îmi umplu ziua.' },
+      { id: 'rf_zone', type: 'dynamic-table', label: 'Cele maxim 5 zone care rămân ale mele', columns: ['Zona', 'Ce fac concret acolo', 'Cât timp pe săptămână'], addLabel: 'Adaugă zonă' },
+      { id: 'rf_test_info', type: 'info', text: '⚑ TESTUL ADEVĂRAT: dacă ai pleca două săptămâni, complet deconectat — ce s-ar rupe? Dacă răspunsul e „nimic esențial", ai reușit ce încearcă majoritatea antreprenorilor toată viața.' },
+      { id: 'rf_absenta', type: 'textarea', label: 'Ce s-ar rupe dacă aș pleca 2 săptămâni, azi', placeholder: 'Fii cinstit. Ce mai scârțâie și la ce etapă e legat.' },
+      { id: 'rf_final', type: 'info', text: '✓ CE AI LA FINAL: Radiografia firmei tale — fluxul verificat, semnele bifate, planul de întărire și noul tău rol. Companion tipăribil: Documentul 12 · Fișa de recepție finală.' },
+    ],
+  },
+
+  // ex-8-2 — L22 „Ritmul de conducere" · Ritmul meu de conducere
+  {
+    exerciseId: 'ex-8-2-ritmul-de-conducere',
+    type: 'form-fields',
+    title: 'Ritmul meu de conducere',
+    instructions:
+      'Un rol nou fără un ritm nou se pierde. Golul lăsat de operațional se umple cu operațional dacă nu îl umpli tu cu conducere. Pune ritmul în calendar chiar azi.',
+    fields: [
+      { id: 'rc_info', type: 'info', text: 'DE CE FACI ASTA: Mulți antreprenori ies din operațional și se întorc în trei luni — nu pentru că sistemul cedează, ci pentru că nu au avut cu ce umple locul rămas gol. Ritmul e ce te ține deasupra sistemului.' },
+
+      { id: 'rc_a_info', type: 'info', text: 'PASUL A · ȘEDINȚA SĂPTĂMÂNALĂ — inima ritmului. 30–60 de minute, la aceeași oră, cu aceeași agendă fixă în 4 pași: (1) deschizi tabloul, (2) treci doar pe rândurile roșii — pentru fiecare, cele 3 întrebări: ce s-a făcut, ce rezultat a ieșit, ce te-a blocat, (3) deciziile care se cer de la tine, (4) cine ce face până săptămâna viitoare.' },
+      { id: 'rc_sed_zi', type: 'input', label: 'Ziua și ora ședinței', placeholder: 'ex: Luni, 09:00' },
+      { id: 'rc_sed_durata', type: 'input', label: 'Durata (max. 60 min)', placeholder: 'ex: 45 minute' },
+      { id: 'rc_sed_cine', type: 'textarea', label: 'Cine participă', placeholder: 'Responsabilii de funcții, nu toată echipa.' },
+      {
+        id: 'rc_sed_agenda',
+        type: 'checkboxes',
+        label: 'Agenda fixă — confirm că o țin în această ordine',
+        options: [
+          '1 · Deschid tabloul — 5 minute, toți văd aceleași cifre, fără comentarii',
+          '2 · Trec doar pe rândurile roșii — cele 3 întrebări pentru fiecare responsabil',
+          '3 · Deciziile care se cer de la mine — doar cele care nu sunt ale lor',
+          '4 · Cine ce face până săptămâna viitoare — acțiune + responsabil, notate',
+        ],
+      },
+      { id: 'rc_sed_nu', type: 'info', text: 'CE NU SE FACE ÎN ȘEDINȚĂ: nu le rezolvi tu problemele, nu cobori în detalii operaționale, nu vânezi vinovați la roșu — cauți ce a lipsit din sistem.' },
+
+      { id: 'rc_b_info', type: 'info', text: 'PASUL B · ANALIZA LUNARĂ — 1–2 ore, o dată pe lună. Săptămânal repari ce arde; lunar repari ce face lucrurile să ardă.' },
+      { id: 'rc_luna_zi', type: 'input', label: 'Ce zi din lună fac analiza', placeholder: 'ex: prima zi de vineri a lunii' },
+      { id: 'rc_luna_q1', type: 'textarea', label: '1 · Ce a fost roșu repetat?', placeholder: 'Un roșu într-o săptămână e incident. Același roșu 3 săptămâni e problemă de sistem sau de om.' },
+      { id: 'rc_luna_q2', type: 'textarea', label: '2 · Ce arată registrul de greșeli?', placeholder: 'Ce s-a repetat, ce SOP-uri au fost actualizate. Firma s-a îmbunătățit sau doar a mers?' },
+      { id: 'rc_luna_q3', type: 'textarea', label: '3 · Țintele mai sunt corecte?', placeholder: 'Toți verzi de 3 luni = ținte prea mici. Roșu constant cu efort real = țintă nerealistă sau KPI prost.' },
+      { id: 'rc_luna_q4', type: 'textarea', label: '4 · Unde mă trage înapoi firma?', placeholder: 'În ce zonă am fost cel mai des chemat luna asta. Acolo e etapa de întărit.' },
+
+      { id: 'rc_c_info', type: 'info', text: 'PASUL C · CALENDARUL DE CONDUCERE — dacă nu e în calendar, nu există. Blocul pe care îl sare toată lumea e cel mai valoros: 2 ore de gândire, singur, fără telefon.' },
+      {
+        id: 'rc_blocuri',
+        type: 'dynamic-table',
+        label: 'Blocurile mele din calendar',
+        columns: ['Blocul', 'Când (zi și oră)', 'Cât durează', 'Pus în calendar? (DA/NU)'],
+        addLabel: 'Adaugă bloc',
+      },
+      { id: 'rc_blocuri_info', type: 'info', text: 'Blocurile de referință: privirea la tablou (zilnic, 5 min) · ședința de conducere (săptămânal, 30–60 min) · unu la unu cu responsabilii (lunar, 30 min fiecare) · analiza lunară (lunar, 1–2 ore) · timp de gândire (săptămânal, 2 ore, singur, fără telefon).' },
+      { id: 'rc_gandire', type: 'textarea', label: 'Cum îmi apăr blocul de gândire', placeholder: 'Ce reguli îmi pun ca să nu îl mut și să nu îl anulez.' },
+
+      { id: 'rc_d_info', type: 'info', text: 'PASUL D · DISCIPLINA — alunecarea e ușor de oprit la început și grea după trei luni.' },
+      {
+        id: 'rc_semnale',
+        type: 'checkboxes',
+        label: 'Semnalele că alunec înapoi în operațional (bifez ce recunosc deja la mine)',
+        options: [
+          'Răspund la întrebări care nu sunt ale mele — și mi se pare normal',
+          'Iau decizii peste responsabili, „ca să meargă mai repede"',
+          'Ședința săptămânală se amână sau se anulează pentru că „e aglomerat"',
+          'Nu mai am timp de blocul de gândire, săptămână după săptămână',
+          'Mă uit la tablou mai rar, pentru că oricum știu eu ce se întâmplă',
+          'Oamenii au început iar să vină la mine, nu la responsabilul lor',
+        ],
+      },
+      { id: 'rc_regula', type: 'textarea', label: 'Regula mea de disciplină, scrisă la vedere', placeholder: 'ex: Când vine o decizie care nu e a mea, nu o iau. „Asta o decide [rolul], vorbește cu el." De fiecare dată.' },
+      { id: 'rc_test_info', type: 'info', text: '⚑ TESTUL RITMULUI: deschide calendarul de săptămâna viitoare. Dacă ședința, privirea la tablou și cele 2 ore de gândire nu sunt deja acolo, ritmul nu există încă — există doar intenția.' },
+      { id: 'rc_final', type: 'info', text: '✓ CE AI LA FINAL: Un calendar de proprietar, nu de executant. Companion tipăribil: Documentul 13 · Ritmul de conducere.' },
+    ],
+  },
+
+  // ex-8-3 — L23 „Scalarea și închiderea" · Unde ai ajuns și ce crești primul
+  {
+    exerciseId: 'ex-8-3-scalarea-si-inchiderea',
+    type: 'form-fields',
+    title: 'Unde ai ajuns și ce crești primul',
+    instructions:
+      'Ultimul exercițiu al practicumului. Două lucruri: decizi ce crești primul, citind din tablou, și te uiți înapoi la tot ce ai construit în opt săptămâni.',
+    fields: [
+      { id: 'sc_info', type: 'info', text: 'DE CE FACI ASTA: Creșterea nu creează haosul — îl scoate la suprafață și îl amplifică. Ce scârțâie la douăzeci de clienți se rupe la patruzeci. Peste un sistem ca al tău, un client în plus adaugă doar volum.' },
+
+      { id: 'sc_a_info', type: 'info', text: 'PASUL A · GÂTUL DE STICLĂ — viteza întregului lanț e dată de veriga cea mai slabă. Înainte să crești, lărgește strâmtoarea; nu împinge și mai tare partea care merge deja bine.' },
+      { id: 'sc_veriga', type: 'input', label: 'Veriga cea mai slabă, citită din tablou', placeholder: 'ex: producția — 60 comenzi/lună față de 100 vândute' },
+      { id: 'sc_dovada', type: 'textarea', label: 'Ce cifră din tablou îmi arată asta', placeholder: 'KPI-ul concret și valoarea lui.' },
+      { id: 'sc_largire', type: 'textarea', label: 'Cum lărgesc strâmtoarea', placeholder: 'Ce fac concret: om în plus, proces schimbat, utilaj, SOP nou.' },
+
+      { id: 'sc_b_info', type: 'info', text: 'PASUL B · CE FEL DE CREȘTERE ALEG — mai mult volum (aceiași oameni, mai mulți clienți; cere procese care nu depind de tine și contoare) · oameni în plus (dublezi roluri; cere fișe de post și SOP-uri bune) · replicare (a doua locație/linie; cere tot sistemul scris + oameni care conduc în locul tău). Sfat: nu sări la replicare.' },
+      {
+        id: 'sc_fel',
+        type: 'checkboxes',
+        label: 'Felul de creștere pe care îl aleg pentru următoarele luni',
+        options: [
+          'Mai mult volum — aceiași oameni, aceleași procese, mai mulți clienți',
+          'Oameni în plus — dublez roluri existente',
+          'Replicare — a doua locație / altă linie de business',
+        ],
+      },
+      { id: 'sc_cere', type: 'textarea', label: 'Ce îmi cere asta de la sistem și ce am deja pregătit', placeholder: 'Ce e gata și ce mai trebuie întărit înainte să pornesc.' },
+      { id: 'sc_prim_pas', type: 'input', label: 'Primul pas concret, în următoarele 30 de zile', placeholder: 'ex: angajez al doilea om în producție până pe 30.09' },
+
+      { id: 'sc_c_info', type: 'info', text: 'PASUL C · PRIVIREA ÎNAPOI — pentru fiecare etapă, scrie ce ai construit efectiv. Uită-te la ce ai făcut, nu la ce nu ai făcut.' },
+      { id: 'sc_e1', type: 'textarea', label: 'Fundația (S1–2) — ce am construit', placeholder: 'Ce am clarificat despre ce fac eu și ce nu mai fac.' },
+      { id: 'sc_e2', type: 'textarea', label: 'Pereții portanți (S3) — ce am construit', placeholder: 'Organigrama, fișele de post.' },
+      { id: 'sc_e3', type: 'textarea', label: 'Instalațiile (S4–5) — ce am construit', placeholder: 'Procesele scrise, SOP-urile, instrucțiunile.' },
+      { id: 'sc_e4', type: 'textarea', label: 'Contoarele (S6) — ce am construit', placeholder: 'KPI-urile vii și tabloul de bord.' },
+      { id: 'sc_e5', type: 'textarea', label: 'Predarea cheilor (S7) — ce am construit', placeholder: 'Ce am delegat cu adevărat, registrul de greșeli.' },
+      { id: 'sc_e6', type: 'textarea', label: 'Recepția finală (S8) — ce am construit', placeholder: 'Recepția, noul rol, ritmul de conducere.' },
+
+      { id: 'sc_d_info', type: 'info', text: 'PASUL D · CINE AI DEVENIT — casa se poate schimba. Competența rămâne. Acum, când vezi o problemă, nu te mai întrebi cine o rezolvă repede, ci ce lipsește din sistem.' },
+      { id: 'sc_inainte', type: 'textarea', label: 'Cum arăta ziua mea acum 8 săptămâni', placeholder: 'Sincer, cum era.' },
+      { id: 'sc_acum', type: 'textarea', label: 'Cum arată ziua mea acum', placeholder: 'Ce s-a schimbat concret.' },
+      { id: 'sc_urmator', type: 'textarea', label: 'Ce implementez în următoarele 30 de zile', placeholder: 'Dacă nu ai implementat tot — alege un singur lucru și pornește de acolo.' },
+      { id: 'sc_final', type: 'info', text: '✓ Ai construit un sistem. Dar mai important: ai devenit omul care știe să construiască sisteme. Materialele, lecțiile și templateurile rămân la tine — te poți întoarce oricând, din „Materialele mele" și din Bibliotecă.' },
+    ],
+  },
 ];
 
 export function getExerciseTemplate(exerciseId: string): ExerciseTemplate | undefined {
