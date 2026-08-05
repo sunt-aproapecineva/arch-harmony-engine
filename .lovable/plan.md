@@ -1,75 +1,62 @@
-# Exerciții Săptămâna 6 — Contoarele, KPI Viu, Tabloul de bord
+# Recepția Finală (Săptămâna 8) — plan de implementare
 
-Reutilizez 100% sistemul UI/UX existent (tipuri de exerciții, tokens de culoare, `documentData.ts` shell, `materialsExport.ts`). Zero componente vizuale noi — doar compun ce am deja.
+## Ce spun materialele
 
-## Contextul lecțiilor (din DOCX-urile trimise)
+Cele trei scripturi conțin exact 2 livrabile grele + o închidere:
 
-- **L15 · Contoarele** — cele 6 elemente ale unui KPI (nume, legătură cu produsul funcției, unitate, țintă, frecvență, responsabil) + testul final „dacă KPI-ul e atins perfect, firma poate să nu câștige nimic?" + 4 criterii de verificare.
-- **L16 · KPI Viu** — reia cele 6 elemente + Poarta de calitate + 3 praguri (roșu/galben/verde față de țintă) + Legătura cu salariul (fix + variabil pe prag, cu proporții pe rol) + checklist final 6 puncte.
-- **L17 · Tabloul de bord** — un singur indicator de rezultat pe cele 7 funcții, cu țintă / realizat / tendință / stare pe culori + regula desfacerii + sistem de raportare.
+- **Lecția 21 — De la a construi la a conduce**: test de flux (lead → încasare), lista celor 6 semne ale recepției reușite, plan de întărire pentru semnele nebifate, descrierea noului rol de proprietar.
+- **Lecția 22 — Ritmul de conducere**: ședința săptămânală cu agendă fixă în 4 pași, analiza lunară cu 4 întrebări, blocurile din calendarul de proprietar, regula de disciplină + semnalele de alunecare.
+- **Lecția 23 — Scalarea și închiderea**: fără unelte noi. Doar: ce crești primul (citit din tablou), cele 3 feluri de creștere, privirea înapoi peste cele 6 etape, încurajare + ușă deschisă.
 
-## Ce am deja și reutilizez
+## Ce există deja
 
-- **Tipuri exerciții:** `form-fields`, `checklist`, `quiz-mcq`, `dynamic-table` (folosite deja la Manifest, Fișa de Post, Matricea decizională, Instrucțiune).
-- **Sablon Doc:** `documentData.ts` cu `htmlShell`, `aaHeader`, `aaFooter`, tipografie Aboreto+Arimo, monogramă, accent auriu (Doc 04-06 sunt exemplele vii).
-- **Culori praguri:** deja am `success`/`warning`/`danger` în `Badge.tsx` cu variante identice cu roșu/galben/verde din Word.
-- **Autosave + hidratare cloud:** deja funcționează pe toate `form-fields` prin `exerciseSync`.
-- **Export PDF branded:** `materialsExport.ts` mapează automat răspunsurile.
+Modulul 6 are 3 lecții video corecte și 4 exerciții vechi (`e-6-1` … `e-6-4`) care nu urmează scripturile: „Fișa Noului Tău Rol", „Calendarul Săptămânii", „Calendarul Trimestrial", „Vacanța-Test". Nu există niciun document printabil pentru Săptămâna 8 (ultimul e Doc 11 · Registrul de greșeli).
 
-## Cele 3 exerciții (câte unul per lecție, atașate ca `l-4-4`, `l-4-5`, `l-4-6`)
+## Ce construim
 
-### Exercițiul 6.1 · „Construiește primul tău KPI" (lecția 15)
+### 1. Exerciții rescrise, legate de lecții (`src/lib/exerciseData.ts` + `src/lib/data.ts`)
 
-- **Tip:** `form-fields` — un singur exercițiu, 9 câmpuri.
-- **Structura (identică cu Word):**
-  1. Header `input`: Rol · Funcție · Produsul rolului (3 câmpuri).
-  2. Cele 6 elemente — fiecare = un `textarea` cu `label` = numele elementului, `helper` = descrierea (ℹ) din Word, `placeholder` = întrebarea de control (?).
-  3. Testul final = `checklist` cu 1 opțiune „Da, imposibil să-l atingă fără ca firma să câștige" (elevul o bifează când e sigur).
-  4. Verificare finală = `checklist` cu cele 4 criterii din Word.
-- **Zero componente noi.** Layout-ul îl dă `form-fields` deja stilizat.
-- **Buton „+ Adaugă încă un KPI"** = reutilizez pattern-ul dinamic din `decision-matrix` (deja există) — elevul poate defini 2-3 KPI succesive.
+**Lecția 21 → `ex-8-1 · Recepția finală a firmei tale`** (înlocuiește e-6-1)
+- pas 1: alegi un flux și notezi în ce puncte se oprește în tine (dynamic-table: pas / cine face / se blochează în mine? da-nu)
+- pas 2: checklist cu cele 6 semne ale recepției reușite
+- pas 3: pentru fiecare semn nebifat — la ce etapă te întorci (câmp condiționat, alegere din cele 6 etape)
+- pas 4: „noul meu rol" — text scurt, cu 5 zone de responsabilitate
 
-### Exercițiul 6.2 · „KPI Viu — de la cifră la sistem" (lecția 16)
+**Lecția 22 → `ex-8-2 · Ritmul meu de conducere`** (înlocuiește e-6-2/e-6-3)
+- ședința săptămânală: zi, oră, participanți + agenda fixă în 4 pași afișată ca reper
+- analiza lunară: ziua din lună + răspuns la cele 4 întrebări
+- blocuri de calendar: privirea zilnică la tablou, unu-la-unu, 2 ore de gândire
+- regula de disciplină (o frază) + checklist cu semnalele de alunecare
 
-- **Tip:** combinație de secțiuni `form-fields` + `dynamic-table` + `checklist` — exact structura din Word (Partea 1-4).
-- **Partea 1 · Cele 6 elemente** = `form-fields` (identic cu 6.1, redus la label-uri scurte pentru că elevul le știe deja).
-- **Partea 2 · Poarta de calitate** = un singur `textarea` cu 3 exemple în placeholder.
-- **Partea 3 · Cele 3 praguri** = `dynamic-table` fix 3 rânduri × 2 coloane (Rând-uri pre-populate: ROȘU / GALBEN / VERDE ca text, coloane: „La ce nivel de cifră" + „Ce se întâmplă"). Culorile rândurilor = badge-urile `danger`/`warning`/`success` deja existente.
-- **Partea 4 · Legătura cu salariul** = `form-fields` cu 2 inputuri (fix / variabil) + `dynamic-table` 3 rânduri × 2 coloane (Prag / Ce primește) cu regula pre-scrisă în label.
-- **Verificare finală** = `checklist` cu cele 6 criterii din Word.
-- **Zero componente noi**, zero simulatoare — respect cererea de a rămâne în sistemul existent.
+**Lecția 23 → `ex-8-3 · Unde ai ajuns și ce crești primul`** (înlocuiește e-6-4)
+- ce crești primul, citit din tablou (alegere + motiv)
+- ce fel de creștere alegi: mai mult din același / servicii noi / locație nouă — cu ce cere fiecare de la sistem
+- retrospectiva celor 6 etape: pentru fiecare, un rând cu ce ai construit efectiv
+- închidere: „cine am devenit în 8 săptămâni" — text liber
 
-### Exercițiul 6.3 · „Tabloul de bord al firmei tale" (lecția 17)
+### 2. Două documente printabile noi (`src/lib/documentData.ts`)
 
-- **Tip:** `dynamic-table` fix 7 rânduri × 5 coloane (Funcție / Indicator / Țintă / Realizat / Responsabil).
-- **Rânduri pre-populate imutabil** cu numele celor 7 funcții (elevul completează doar restul) — reutilizez logica din `decision-matrix` unde primul rând e read-only.
-- **Coloana Stare** = calculată în render (dacă Realizat < Țintă → badge `danger`, egal → `warning`, peste → `success`) folosind exact `Badge.tsx` existent. E o coloană afișată, nu editabilă — nici o componentă nouă, doar un helper mic în `ExerciseBlock.tsx` care randează badge-ul potrivit în coloana finală când tipul e `dynamic-table` cu flag-ul `computed-status: true`.
-- **Bloc informativ deasupra** cu exemplul din Word = `info` field (tip existent).
-- **Regula desfacerii** = `quiz-mcq` cu 1 întrebare aplicată: „Vânzările sunt roșu. Ce faci întâi?" — 3 opțiuni + feedback din lecție.
-- **Sistem raportare** = 3 `input`-uri (cine / când / 3 întrebări) sub tabel.
+- **Doc 12 · Fișa de recepție finală** — flux verificat, cele 6 semne bifate, plan de întărire, noul rol. Paginat pe 2 pagini.
+- **Doc 13 · Ritmul de conducere** — agenda fixă a ședinței, cele 4 întrebări lunare, calendarul de proprietar, regula de disciplină. Format „de pus pe perete", 2 pagini.
 
-## Documentele printabile (Doc 07, 08, 09)
+Ambele urmează exact structura existentă (antet negru cu monogramă, accente aurii, câmpuri completabile pe platformă + export PDF), deci nu apar tipare noi de design.
 
-Le fac în același val, cu shell-ul existent din `documentData.ts` (așa cum sunt Doc 04-06):
+### 3. Legături și consistență
 
-- **Doc 07 · Fișă KPI** — sablon printabil identic cu Word L15, wizard de completare pe platformă cu autosave, print cu răspunsurile pre-completate. Reutilizează exact `htmlShell`, `aaHeader`, `aaFooter`.
-- **Doc 08 · Fișă KPI Viu** — sablon printabil identic cu Word L16 (4 părți).
-- **Doc 09 · Tabloul de bord** — sablon printabil cu exemplul + tabelul gol + legenda culorilor + sistemul de raportare.
+- exercițiile apar în timeline-ul modulului sub lecția lor (ca la Modulul 3/5), nu ca listă separată
+- documentele noi apar în „Documente" și linkate din exercițiile 8-1 și 8-2
+- răspunsurile intră automat în „Materialele mele" (export PDF branded) prin `materialsExport.ts`
+- Modulul 6 primește un card de final de practicum după ultimul exercițiu (mesaj de felicitare + trimitere la Bibliotecă și Materiale), în stilul cardului „Livrabilul etapei"
 
-Toate 3 cu buton pe DocumentsPage (cardul e identic cu Doc 05/06).
+## Detalii tehnice
 
-## Fișiere modificate
+- tipuri de câmpuri refolosite: `checklist`, `checkboxes`, `dynamic-table`, `form-fields`, `radio` — toate există deja în `ExerciseBlock.tsx`, nu e nevoie de tipuri noi
+- migrare: exercițiile vechi `e-6-1…e-6-4` se înlocuiesc cu ID-uri noi; răspunsurile vechi rămân în `exercise_responses` fără să strice nimic (citirea e pe `exercise_id`)
+- `src/lib/data.ts` + `src/lib/contentSnapshot.ts` se actualizează împreună, ca lecțiile/exercițiile să fie disponibile și offline
+- fără schimbări de schemă în bază
 
-- `src/lib/exerciseData.ts` — 3 template-uri noi (ID: `ex-6-1-kpi-fisa`, `ex-6-2-kpi-viu`, `ex-6-3-tablou-bord`).
-- `src/lib/data.ts` — cablaj exercițiu ↔ lecție pe `l-4-4`, `l-4-5`, `l-4-6`.
-- `src/components/exercises/ExerciseBlock.tsx` — 1 modificare mică: în `dynamic-table` adaug suportul pentru flag-ul `computedStatus` (randează Badge-ul din `Badge.tsx`). Nici un tip nou.
-- `src/lib/documentData.ts` — 3 documente noi (Doc 07/08/09) folosind shell-ul existent.
-- `src/pages/DocumentsPage.tsx` — 3 carduri noi (identice ca stil cu 05/06).
+## Ordinea livrării
 
-## Ordinea execuției
-
-1. Template-urile celor 3 exerciții în `exerciseData.ts`.
-2. Cablarea în `data.ts`.
-3. Micul flag `computedStatus` în `ExerciseBlock.tsx` pentru coloana Stare din 6.3.
-4. Cele 3 documente în `documentData.ts` + carduri în `DocumentsPage.tsx`.
-5. Verificare vizuală (Playwright screenshot) pe una din lecții ca să confirm că nimic nu iese din sistem.
+1. exercițiile 8-1, 8-2, 8-3 + integrarea în timeline
+2. Doc 12 și Doc 13 cu export PDF verificat pe pagini
+3. cardul de final de practicum
