@@ -2911,4 +2911,32 @@ export const PLATFORM_DOCUMENTS: PlatformDocument[] = [
     steps: doc11Steps,
     generate: generateDoc11,
   },
+  {
+    id: 'doc-receptie-finala',
+    lessonIds: ['l-6-1', 'l-6-ex-1'],
+    docNumber: '12',
+    title: 'Fișa de recepție finală',
+    shortTitle: 'Recepția finală',
+    description:
+      'Template tipăribil pentru recepția firmei: testul de flux de la lead la încasare, cele 6 semne ale recepției reușite, harta de întărire pe etape și fișa noului tău rol de proprietar. Companion pentru Lecția 21.',
+    downloadUrl: '',
+    topic: 'Recepția Finală',
+    color: 'green',
+    steps: doc12Steps,
+    generate: generateDoc12,
+  },
+  {
+    id: 'doc-ritm-conducere',
+    lessonIds: ['l-6-2', 'l-6-ex-2'],
+    docNumber: '13',
+    title: 'Ritmul de conducere',
+    shortTitle: 'Ritmul de conducere',
+    description:
+      'Template tipăribil cu ritmul tău de proprietar: ședința săptămânală cu agendă fixă, analiza lunară cu cele 4 întrebări, blocurile din calendar și regula de disciplină împotriva alunecării. Companion pentru Lecția 22.',
+    downloadUrl: '',
+    topic: 'Recepția Finală',
+    color: 'gold',
+    steps: doc13Steps,
+    generate: generateDoc13,
+  },
 ];
