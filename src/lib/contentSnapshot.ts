@@ -268,17 +268,6 @@ export const CONTENT_SNAPSHOT = {
       "is_published": true
     },
     {
-      "id": "ec92ab82-d749-4f68-b2e0-e990d54eecb6",
-      "module_id": "f728d8b1-c836-4a14-aa29-27c2da892398",
-      "order_index": 3,
-      "title": "Măsurarea succesului — testul de absență de 2 săptămâni",
-      "description": null,
-      "video_url": null,
-      "pdf_url": null,
-      "duration_min": 14,
-      "is_published": false
-    },
-    {
       "id": "6b096509-5128-4cd6-9aad-e3ce2f4ba7e4",
       "module_id": "fceaf485-9834-4e78-8b77-f37a37f798f9",
       "order_index": 0,

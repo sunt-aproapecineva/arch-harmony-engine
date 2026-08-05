@@ -1047,18 +1047,6 @@ export const MODULES: Module[] = [
         order_index: 3,
         is_published: true,
       },
-      {
-        id: 'l-6-4',
-        module_id: 'mod-6',
-        title: 'Măsurarea corectă a succesului',
-        description:
-          'Testul de absență de 2 săptămâni. Ce decizii s-au luat fără tine, ce a mers, ce a crăpat. Dacă crapă ceva — știi exact ce mai trebuie construit.',
-        video_url: '',
-        pdf_url: '',
-        duration_min: 14,
-        order_index: 4,
-        is_published: false,
-      },
     ],
     exercises: [
       {
