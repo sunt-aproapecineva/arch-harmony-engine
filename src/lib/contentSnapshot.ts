@@ -238,33 +238,33 @@ export const CONTENT_SNAPSHOT = {
       "id": "97b40883-55a4-4574-b55e-e3996ff146a8",
       "module_id": "f728d8b1-c836-4a14-aa29-27c2da892398",
       "order_index": 0,
-      "title": "Nivelul de management — când îl introduci și cum recunoști momentul",
+      "title": "De la a construi sistemul la a conduce sistemul",
       "description": null,
-      "video_url": null,
+      "video_url": "https://youtu.be/_tofm3bzJ-M",
       "pdf_url": null,
-      "duration_min": 13,
+      "duration_min": 14,
       "is_published": true
     },
     {
       "id": "96f39b68-f3ab-48dc-a072-69acd7ef463d",
       "module_id": "f728d8b1-c836-4a14-aa29-27c2da892398",
       "order_index": 1,
-      "title": "Owner de sistem — ce faci tu de luni încolo",
+      "title": "Ritmul de conducere: ședința, ciclul, planul",
       "description": null,
-      "video_url": null,
+      "video_url": "https://youtu.be/UmkHNaNbi58",
       "pdf_url": null,
-      "duration_min": 12,
+      "duration_min": 18,
       "is_published": true
     },
     {
       "id": "fda7f17c-d66e-4eed-a22b-85f78ea0d7ce",
       "module_id": "f728d8b1-c836-4a14-aa29-27c2da892398",
       "order_index": 2,
-      "title": "Optimizarea continuă — revizuirea trimestrială",
+      "title": "Cum crești fără să se rupă și unde ai ajuns",
       "description": null,
-      "video_url": null,
+      "video_url": "https://www.youtube.com/watch?v=oAJ_ZTcdWpU",
       "pdf_url": null,
-      "duration_min": 10,
+      "duration_min": 13,
       "is_published": true
     },
     {
@@ -276,7 +276,7 @@ export const CONTENT_SNAPSHOT = {
       "video_url": null,
       "pdf_url": null,
       "duration_min": 14,
-      "is_published": true
+      "is_published": false
     },
     {
       "id": "6b096509-5128-4cd6-9aad-e3ce2f4ba7e4",
