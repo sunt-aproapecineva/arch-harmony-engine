@@ -31,6 +31,7 @@ import { Route as AdminStudentUserIdRouteImport } from './routes/admin.student.$
 import { Route as AppModuleIdRouteImport } from './routes/_app.module.$id'
 import { Route as AppLibrarySlugRouteImport } from './routes/_app.library.$slug'
 import { Route as AppLessonIdRouteImport } from './routes/_app.lesson.$id'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as AppDocumentsDocIdFillRouteImport } from './routes/_app.documents.$docId.fill'
 
 const WelcomeRoute = WelcomeRouteImport.update({
@@ -142,6 +143,12 @@ const AppLessonIdRoute = AppLessonIdRouteImport.update({
   path: '/lesson/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AppDocumentsDocIdFillRoute = AppDocumentsDocIdFillRouteImport.update({
   id: '/documents/$docId/fill',
   path: '/documents/$docId/fill',
@@ -171,6 +178,7 @@ export interface FileRoutesByFullPath {
   '/library/': typeof AppLibraryIndexRoute
   '/materials/': typeof AppMaterialsIndexRoute
   '/documents/$docId/fill': typeof AppDocumentsDocIdFillRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -194,6 +202,7 @@ export interface FileRoutesByTo {
   '/library': typeof AppLibraryIndexRoute
   '/materials': typeof AppMaterialsIndexRoute
   '/documents/$docId/fill': typeof AppDocumentsDocIdFillRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -220,6 +229,7 @@ export interface FileRoutesById {
   '/_app/library/': typeof AppLibraryIndexRoute
   '/_app/materials/': typeof AppMaterialsIndexRoute
   '/_app/documents/$docId/fill': typeof AppDocumentsDocIdFillRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -246,6 +256,7 @@ export interface FileRouteTypes {
     | '/library/'
     | '/materials/'
     | '/documents/$docId/fill'
+    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -269,6 +280,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/materials'
     | '/documents/$docId/fill'
+    | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/'
@@ -294,6 +306,7 @@ export interface FileRouteTypes {
     | '/_app/library/'
     | '/_app/materials/'
     | '/_app/documents/$docId/fill'
+    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -306,6 +319,7 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   WelcomeRoute: typeof WelcomeRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -464,6 +478,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLessonIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/documents/$docId/fill': {
       id: '/_app/documents/$docId/fill'
       path: '/documents/$docId/fill'
@@ -528,6 +549,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   WelcomeRoute: WelcomeRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
