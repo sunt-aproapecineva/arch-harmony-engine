@@ -128,7 +128,9 @@ export const ResetPassword: React.FC = () => {
             <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--fg)', marginBottom: 10 }}>Link invalid sau expirat</h2>
             <p style={{ fontSize: 14, color: 'var(--fg-3)', lineHeight: 1.7, marginBottom: 20 }}>
               Linkul de resetare nu este valid sau a expirat. Cere unul nou de la pagina de login.
+              {error && <><br /><span style={{ fontSize: 12, color: '#f87171' }}>{error}</span></>}
             </p>
+
             <button
               onClick={() => navigate('/forgot-password')}
               style={{
