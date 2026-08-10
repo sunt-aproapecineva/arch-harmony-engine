@@ -14,26 +14,14 @@ export const ResetPassword: React.FC = () => {
   const [focused, setFocused] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Supabase pune access_token + type=recovery în URL hash. Detect session readiness.
+  // Linkul de reset poate ajunge în 3 forme, în funcție de template/flux:
+  //  1) #access_token=...&type=recovery  (implicit)
+  //  2) ?code=...                        (PKCE)
+  //  3) ?token_hash=...&type=recovery    (verify OTP)
+  // Le tratăm pe toate + erorile trimise de Supabase în URL.
   useEffect(() => {
     let mounted = true;
 
-    // Verificare imediată — dacă e deja o sesiune (linkul a fost procesat), suntem gata
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
-      const hash = window.location.hash || '';
-      const isRecovery = hash.includes('type=recovery') || hash.includes('access_token');
-      if (session && isRecovery) {
-        setStatus('ready');
-      } else if (session) {
-        // Sesiune validă dar fără token de recovery — permitem totuși schimbarea parolei
-        setStatus('ready');
-      } else if (!isRecovery) {
-        setStatus('invalid');
-      }
-    });
-
-    // Ascultă PASSWORD_RECOVERY (eveniment dedicat când linkul de reset e procesat)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
       if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) {
@@ -41,19 +29,62 @@ export const ResetPassword: React.FC = () => {
       }
     });
 
-    // Fallback: dacă după 4s nu avem nimic, marcăm linkul ca invalid
-    const timeout = setTimeout(() => {
-      if (mounted) {
-        setStatus(prev => (prev === 'checking' ? 'invalid' : prev));
+    (async () => {
+      const hash = new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
+      const query = new URLSearchParams(window.location.search || '');
+      const get = (k: string) => hash.get(k) || query.get(k);
+
+      const urlError = get('error_description') || get('error');
+      if (urlError) {
+        if (!mounted) return;
+        setError(decodeURIComponent(urlError));
+        setStatus('invalid');
+        return;
       }
-    }, 4000);
+
+      const cleanUrl = () => {
+        try { window.history.replaceState({}, '', window.location.pathname); } catch { /* noop */ }
+      };
+
+      try {
+        const accessToken = get('access_token');
+        const refreshToken = get('refresh_token');
+        const code = query.get('code');
+        const tokenHash = get('token_hash') || get('token');
+
+        if (accessToken && refreshToken) {
+          const { error: e } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+          if (!mounted) return;
+          if (!e) { cleanUrl(); setStatus('ready'); return; }
+          setError(e.message);
+        } else if (code) {
+          const { error: e } = await supabase.auth.exchangeCodeForSession(code);
+          if (!mounted) return;
+          if (!e) { cleanUrl(); setStatus('ready'); return; }
+          setError(e.message);
+        } else if (tokenHash) {
+          const { error: e } = await supabase.auth.verifyOtp({ type: 'recovery', token_hash: tokenHash });
+          if (!mounted) return;
+          if (!e) { cleanUrl(); setStatus('ready'); return; }
+          setError(e.message);
+        }
+      } catch (e) {
+        if (mounted) setError(e instanceof Error ? e.message : '');
+      }
+
+      // Fallback: dacă SDK-ul a procesat deja linkul (detectSessionInUrl), avem sesiune.
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!mounted) return;
+      if (session) { cleanUrl(); setStatus('ready'); return; }
+      setStatus(prev => (prev === 'ready' ? prev : 'invalid'));
+    })();
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
-      clearTimeout(timeout);
     };
   }, []);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
