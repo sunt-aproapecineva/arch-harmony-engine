@@ -111,10 +111,10 @@ export const MODULES: Module[] = [
         module_id: 'mod-0',
         title: 'Bun venit. Hai să începem.',
         description:
-          'Cine este Victor Morar, de ce a creat acest practicum, ce construim împreună în 8 săptămâni și ce se așteaptă de la tine.',
+          'Mesaj de bun venit în practicum: ce construiești în 8 săptămâni, cum să folosești platforma și cum să lucrezi direct pe firma ta.',
         video_url: '',
         pdf_url: '',
-        duration_min: 18,
+        duration_min: 0,
         order_index: 1,
         is_published: true,
       },
