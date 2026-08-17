@@ -1,0 +1,1 @@
+UPDATE public.lessons SET video_url = 'https://www.youtube.com/watch?v=j7VRnpGQn7s', duration_min = 12, is_published = true WHERE id = 'c6cff6cd-fec9-4fcd-b44d-d98f8bdd0087';
