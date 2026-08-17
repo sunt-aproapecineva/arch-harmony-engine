@@ -46,18 +46,50 @@ function overlayContent(dbMods: any[], dbLessons: any[]) {
       if (dbMod.etapa) staticMod.etapa = dbMod.etapa;
       if (dbMod.saptamana) staticMod.saptamana = dbMod.saptamana;
 
-      const dbLessonList = dbLessonsByMod[dbMod.id] || [];
+      const dbLessonList = dbLessonList0(dbLessonsByMod[dbMod.id]);
       const videoLessons = staticMod.lessons.filter((l: any) => l.type !== 'exercise');
+
+      // Match DB rows to static lessons by normalized title first (stable even
+      // if rows are added/reordered), then fall back to positional matching for
+      // whatever is left. Positional-only matching used to shift video URLs onto
+      // the wrong lessons whenever the counts drifted.
+      const norm = (s: any) =>
+        String(s || '')
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, ' ')
+          .trim();
+      const used = new Set<number>();
+      const pairs: Array<[any, any]> = [];
+      videoLessons.forEach((sl: any) => {
+        const i = dbLessonList.findIndex(
+          (d: any, di: number) => !used.has(di) && norm(d.title) === norm(sl.title)
+        );
+        if (i >= 0) {
+          used.add(i);
+          pairs.push([sl, dbLessonList[i]]);
+        }
+      });
       videoLessons.forEach((sl: any, idx: number) => {
-        const db = dbLessonList[idx];
-        if (!db) return;
+        if (pairs.some(([s]) => s === sl)) return;
+        if (used.has(idx)) return;
+        if (dbLessonList[idx]) {
+          used.add(idx);
+          pairs.push([sl, dbLessonList[idx]]);
+        }
+      });
+
+      pairs.forEach(([sl, db]) => {
         if (db.title != null && db.title !== '') sl.title = db.title;
         if (db.description != null) sl.description = db.description;
         if (typeof db.video_url === 'string' && db.video_url.trim() !== '') sl.video_url = db.video_url.trim();
         if (typeof db.pdf_url === 'string' && db.pdf_url.trim() !== '') sl.pdf_url = db.pdf_url.trim();
         if (db.duration_min != null) sl.duration_min = db.duration_min;
-        if (db.is_published != null) sl.is_published = db.is_published;
+        // Never let a DB row hide a lesson that already has a playable video.
+        if (db.is_published != null) sl.is_published = db.is_published || !!sl.video_url;
       });
+
     });
     return true;
 }
