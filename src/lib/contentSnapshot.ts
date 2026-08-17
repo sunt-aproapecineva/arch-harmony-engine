@@ -74,10 +74,10 @@ export const CONTENT_SNAPSHOT = {
       "module_id": "1f2cd77d-826b-42be-89e8-3ce7dc2d30d5",
       "order_index": 0,
       "title": "Bun venit. Hai să începem.",
-      "description": "Video introductiv — ce vei construi în 8 săptămâni.",
+      "description": "Mesaj de bun venit în practicum: ce construiești în 8 săptămâni, cum să folosești platforma și cum să lucrezi direct pe firma ta.",
       "video_url": null,
       "pdf_url": null,
-      "duration_min": 18,
+      "duration_min": 0,
       "is_published": true
     },
     {
