@@ -229,7 +229,8 @@ export const CONTENT_SNAPSHOT = {
       "order_index": 3,
       "title": "Ce este un flux și tipurile lui",
       "description": null,
-      "video_url": null,
+      "video_url": "https://www.youtube.com/watch?v=j7VRnpGQn7s",
+
       "pdf_url": null,
       "duration_min": 12,
       "is_published": true
