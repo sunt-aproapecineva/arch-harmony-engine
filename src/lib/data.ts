@@ -114,9 +114,9 @@ export const MODULES: Module[] = [
           'Cine este Victor Morar, de ce a creat acest practicum, ce construim împreună în 8 săptămâni și ce se așteaptă de la tine.',
         video_url: '',
         pdf_url: '',
-        duration_min: 20,
+        duration_min: 18,
         order_index: 1,
-        is_published: false,
+        is_published: true,
       },
       {
         id: 'l-0-2',
@@ -124,11 +124,11 @@ export const MODULES: Module[] = [
         title: 'Unde ești și de ce ești blocat acolo',
         description:
           'Cele 3 roluri (Specialist, Director, Proprietar), cele 5 stadii de maturitate ale unei afaceri și de ce nu ieși din operațional.',
-        video_url: '',
+        video_url: 'https://youtu.be/nWW0xHxytgs',
         pdf_url: '',
-        duration_min: 18,
+        duration_min: 40,
         order_index: 2,
-        is_published: false,
+        is_published: true,
       },
       {
         id: 'l-0-3',
@@ -136,10 +136,10 @@ export const MODULES: Module[] = [
         title: 'Parteneriatul.',
         description:
           '6 tipuri de parteneriate, de ce fiecare e problematic și cum îl rezolvi. Dacă ești singur în afacere poți sări această lecție.',
-        video_url: '',
+        video_url: 'https://youtu.be/J-J-U8pGoqE',
         duration_min: 38,
         order_index: 3,
-        is_published: false,
+        is_published: true,
         documents: [
           {
             docNumber: '01',
@@ -304,11 +304,11 @@ export const MODULES: Module[] = [
         title: 'Misiunea Viziunea Valorile',
         description:
           'Cei 3 piloni ai Fundației. Misiunea — de ce există firma ta. Viziunea — unde ești în 3 ani, cu cifre reale. Valorile — regulile echipei când tu nu ești în cameră.',
-        video_url: '',
+        video_url: 'https://youtu.be/xITojkYD7xw',
         pdf_url: '',
-        duration_min: 0,
+        duration_min: 24,
         order_index: 1,
-        is_published: false,
+        is_published: true,
       },
       {
         id: 'l-1-2',
@@ -316,11 +316,11 @@ export const MODULES: Module[] = [
         title: 'Cum comunici echipei, Fundația companiei?',
         description:
           'Cum prezinți Misiunea, Viziunea și Valorile echipei tale astfel încât să fie înțelese, asumate și aplicate zilnic — nu doar afișate pe perete.',
-        video_url: '',
+        video_url: 'https://youtu.be/BBd1kcMvxmc',
         pdf_url: '',
-        duration_min: 0,
+        duration_min: 20,
         order_index: 2,
-        is_published: false,
+        is_published: true,
       },
       // ─── Exercițiile Săptămânii 2 ───────────────────────────────────────────
       {
@@ -557,9 +557,9 @@ export const MODULES: Module[] = [
           'Nu toate procesele sunt egale. Cum le scorezi pe impact financiar și frecvență și alegi pe care să le documentezi acum.',
         video_url: 'https://youtu.be/K9h1QLDjC9c',
         pdf_url: '',
-        duration_min: 10,
+        duration_min: 28,
         order_index: 1,
-        is_published: false,
+        is_published: true,
       },
       {
         id: 'l-3-2',
@@ -567,11 +567,11 @@ export const MODULES: Module[] = [
         title: 'Ce este un proces și cum îl documentezi?',
         description:
           'Nu cum ar trebui să fie — cum se face azi. Diferența critică: "contactează rapid clientul" vs "sună clientul în maxim 2 ore de la primirea cererii".',
-        video_url: '',
+        video_url: 'https://youtu.be/6oJwKh3ydM4',
         pdf_url: '',
-        duration_min: 18,
+        duration_min: 32,
         order_index: 2,
-        is_published: false,
+        is_published: true,
       },
       {
         id: 'l-3-3',
@@ -579,11 +579,11 @@ export const MODULES: Module[] = [
         title: 'Harta proceselor firmei tale',
         description:
           'Cum scoți butonul tău de OK din mijlocul firmei. Matricea decizională: cine decide ce și până la ce nivel de autoritate.',
-        video_url: '',
+        video_url: 'https://www.youtube.com/watch?v=8wgFZ0BuWjw',
         pdf_url: '',
         duration_min: 14,
         order_index: 3,
-        is_published: false,
+        is_published: true,
       },
       {
         id: 'l-3-4',
@@ -724,11 +724,11 @@ export const MODULES: Module[] = [
         title: 'Produsul finit al fiecărui rol',
         description:
           'Cum îl identifici și de ce contează. Test: poți măsura asta în cifre? Dacă nu — nu e produs finit, e activitate.',
-        video_url: '',
+        video_url: 'https://youtu.be/eqtiz2MSLEA',
         pdf_url: '',
         duration_min: 12,
         order_index: 1,
-        is_published: false,
+        is_published: true,
       },
       {
         id: 'l-4-2',
@@ -736,11 +736,11 @@ export const MODULES: Module[] = [
         title: 'De ce indicatorii complicați nu se folosesc',
         description:
           'Și cei simpli, da. Testul celor 3 condiții: e o cifră? e verificabilă? omul are control asupra ei?',
-        video_url: '',
+        video_url: 'https://www.youtube.com/watch?v=hhI3-ezBlvo',
         pdf_url: '',
         duration_min: 10,
         order_index: 2,
-        is_published: false,
+        is_published: true,
       },
       {
         id: 'l-4-3',
@@ -748,11 +748,11 @@ export const MODULES: Module[] = [
         title: 'Sistemul de raportare în 3 întrebări',
         description:
           'Ce s-a întâmplat? Ce a cauzat asta? Ce fac diferit săptămâna viitoare? Tabloul de bord în 1 pagină, citit în 5 minute luni dimineața.',
-        video_url: '',
+        video_url: 'https://www.youtube.com/watch?v=GtSTmX48Mmc',
         pdf_url: '',
         duration_min: 11,
         order_index: 3,
-        is_published: false,
+        is_published: true,
       },
       {
         id: 'l-4-4',
