@@ -46,7 +46,7 @@ function overlayContent(dbMods: any[], dbLessons: any[]) {
       if (dbMod.etapa) staticMod.etapa = dbMod.etapa;
       if (dbMod.saptamana) staticMod.saptamana = dbMod.saptamana;
 
-      const dbLessonList = dbLessonList0(dbLessonsByMod[dbMod.id]);
+      const dbLessonList = dbLessonsByMod[dbMod.id] || [];
       const videoLessons = staticMod.lessons.filter((l: any) => l.type !== 'exercise');
 
       // Match DB rows to static lessons by normalized title first (stable even
