@@ -455,10 +455,33 @@ export const LessonPage: React.FC = () => {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }} className="lg:flex-row lg:gap-6">
         <div style={{ flex: 1, minWidth: 0 }}>
-          {/* Video */}
+          {/* Video / Welcome card */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
             style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, overflow: 'hidden', marginBottom: 24, boxShadow: 'var(--shadow)' }}>
-            {youtubeId ? (
+            {lesson.id === 'l-0-1' ? (
+              <div style={{ padding: '36px 32px', background: 'linear-gradient(135deg, rgba(196,240,228,0.08) 0%, rgba(201,169,110,0.08) 100%)', borderBottom: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)' }}>
+                    <span style={{ fontSize: 24 }}>👋</span>
+                  </div>
+                  <div>
+                    <p className="font-aboreto" style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 4 }}>Bun venit în practicum</p>
+                    <h2 style={{ fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)', color: 'var(--fg)', lineHeight: 1.2, fontWeight: 600 }}>Ne bucurăm că ești aici.</h2>
+                  </div>
+                </div>
+                <div style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.8 }}>
+                  <p style={{ marginBottom: 14 }}>
+                    În următoarele 8 săptămâni vei construi, pas cu pas, arhitectura afacerii tale: de la claritatea rolurilor și proceselor, până la KPI-urile și obiceiurile de conducere care îți permit să ieși treptat din operațional.
+                  </p>
+                  <p style={{ marginBottom: 14 }}>
+                    Fiecare lecție și exercițiu sunt gândite ca să lucrezi direct pe firma ta — nu teorie în aer. Completează-le în ordine, fă-ți notițele aici în platformă și folosește documentele oficiale pentru a pune totul în practică.
+                  </p>
+                  <p>
+                    Dacă ai întrebări, sesiunile live de grup și supervizorul tău sunt alături de tine. Succes — să începem construcția! 🚀
+                  </p>
+                </div>
+              </div>
+            ) : youtubeId ? (
               <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}>
                 <iframe style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
                   src={`https://www.youtube.com/embed/${youtubeId}?rel=0`} title={lesson.title}
@@ -479,7 +502,7 @@ export const LessonPage: React.FC = () => {
             )}
           </motion.div>
 
-          {youtubeId2 && (
+          {youtubeId2 && lesson.id !== 'l-0-1' && (
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}
               style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, overflow: 'hidden', marginBottom: 24, boxShadow: 'var(--shadow)' }}>
               <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}>
