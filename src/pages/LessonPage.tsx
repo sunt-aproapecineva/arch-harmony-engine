@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft, ChevronRight, CheckCircle2, FileText, Play,
   ExternalLink, ChevronDown, Lock, ClipboardList, ArrowRight,
-  Pencil, Clock, BookOpen,
+  Pencil, Clock, BookOpen, Hand,
 } from 'lucide-react';
 import { MODULES } from '../lib/data';
 import { Lesson, Module } from '../lib/types';
