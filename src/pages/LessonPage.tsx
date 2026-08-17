@@ -462,7 +462,7 @@ export const LessonPage: React.FC = () => {
               <div style={{ padding: '36px 32px', background: 'linear-gradient(135deg, rgba(196,240,228,0.08) 0%, rgba(201,169,110,0.08) 100%)', borderBottom: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
                   <div style={{ width: 48, height: 48, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)' }}>
-                    <span style={{ fontSize: 24 }}>👋</span>
+                    <Hand size={24} style={{ color: 'var(--accent)' }} />
                   </div>
                   <div>
                     <p className="font-aboreto" style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 4 }}>Bun venit în practicum</p>
@@ -477,7 +477,7 @@ export const LessonPage: React.FC = () => {
                     Fiecare lecție și exercițiu sunt gândite ca să lucrezi direct pe firma ta — nu teorie în aer. Completează-le în ordine, fă-ți notițele aici în platformă și folosește documentele oficiale pentru a pune totul în practică.
                   </p>
                   <p>
-                    Dacă ai întrebări, sesiunile live de grup și supervizorul tău sunt alături de tine. Succes — să începem construcția! 🚀
+                    Dacă ai întrebări, sesiunile live de grup și supervizorul tău sunt alături de tine. Succes — să începem construcția!
                   </p>
                 </div>
               </div>
