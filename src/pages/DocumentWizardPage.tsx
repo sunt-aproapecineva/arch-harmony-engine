@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, FileText, ArrowLeft, Printer } from 'lucide-react';
 import { PLATFORM_DOCUMENTS, openPrintWindow } from '../lib/documentData';
 import { useAuthContext } from '../context/AuthContext';
+import { readLocalDocs, saveDocEntry, hydrateDocsFromCloud } from '../lib/documentSync';
 
 export function DocumentWizardPage() {
   const { docId } = useParams<{ docId: string }>();
@@ -19,16 +20,13 @@ export function DocumentWizardPage() {
   useEffect(() => {
     if (editId) {
       const userId = user?.id ?? 'anon';
-      const storageKey = `aa_my_docs_${userId}`;
-      try {
-        const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
-        const docToEdit = existing.find((item: any) => item.id === editId);
-        if (docToEdit && docToEdit.answers) {
-          setAnswers(docToEdit.answers);
-        }
-      } catch (e) {
-        console.error('Failed to load doc for editing', e);
-      }
+      const applyFrom = (list: any[]) => {
+        const docToEdit = list.find((item: any) => item.id === editId);
+        if (docToEdit && docToEdit.answers) setAnswers(docToEdit.answers);
+      };
+      applyFrom(readLocalDocs(userId));
+      // Cloud copy may hold a fresher version (other browser / device).
+      hydrateDocsFromCloud(user?.id).then(cloud => { if (cloud) applyFrom(cloud); });
     }
   }, [editId, user?.id]);
 
@@ -74,14 +72,11 @@ export function DocumentWizardPage() {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     const html = doc.generate(answers);
 
-    // Save to localStorage (per user)
+    // Save local-first, then sync to the cloud (survives browser changes)
     const userId = user?.id ?? 'anon';
-    const storageKey = `aa_my_docs_${userId}`;
-    const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    
     const targetId = editId || Date.now().toString();
     const newEntry = {
       id: targetId,
@@ -96,18 +91,7 @@ export function DocumentWizardPage() {
       answers, // Save raw answers for editing later
       answersPreview: Object.values(answers).filter(Boolean).slice(0, 2).join(' · '),
     };
-
-    if (editId) {
-      const existingIndex = existing.findIndex((item: any) => item.id === editId);
-      if (existingIndex > -1) {
-        existing[existingIndex] = newEntry;
-      } else {
-        existing.unshift(newEntry);
-      }
-    } else {
-      existing.unshift(newEntry);
-    }
-    localStorage.setItem(storageKey, JSON.stringify(existing));
+    await saveDocEntry(user?.id, newEntry, editId);
 
     // Open print window (PDF via browser Save as PDF)
     openPrintWindow(html);

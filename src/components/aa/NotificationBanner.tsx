@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Info, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getActiveAnnouncement } from '../../lib/announcements';
 
 interface NotificationData {
   message: string;
@@ -14,31 +15,26 @@ export const NotificationBanner: React.FC = () => {
   const [notification, setNotification] = useState<NotificationData | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
+  const [activeId, setActiveId] = useState<string | null>(null);
+
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('aa_notification');
-      if (!raw) return;
-      const data: NotificationData = JSON.parse(raw);
-      if (data.exp && Date.now() > data.exp) {
-        localStorage.removeItem('aa_notification');
-        return;
-      }
-      const dismissedVal = sessionStorage.getItem(DISMISSED_KEY);
-      if (dismissedVal === raw) {
-        setDismissed(true);
-        return;
-      }
-      setNotification(data);
-    } catch {
-      // ignore
-    }
+    let cancelled = false;
+    getActiveAnnouncement().then(a => {
+      if (cancelled || !a) return;
+      try {
+        if (sessionStorage.getItem(DISMISSED_KEY) === a.id) {
+          setDismissed(true);
+          return;
+        }
+      } catch {}
+      setActiveId(a.id);
+      setNotification({ message: a.message, type: (a.type as any) || 'info', exp: 0 });
+    });
+    return () => { cancelled = true; };
   }, []);
 
   const handleDismiss = () => {
-    try {
-      const raw = localStorage.getItem('aa_notification');
-      if (raw) sessionStorage.setItem(DISMISSED_KEY, raw);
-    } catch {}
+    try { if (activeId) sessionStorage.setItem(DISMISSED_KEY, activeId); } catch {}
     setDismissed(true);
   };
 

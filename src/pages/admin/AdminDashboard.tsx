@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect, useCallback } from 'react';
+import { useAuthContext } from '../../context/AuthContext';
 import { getActiveAnnouncement, publishAnnouncement, clearAnnouncements } from '../../lib/announcements';
 import { useNavigate } from '@/lib/router-compat';
 import { motion } from 'framer-motion';
@@ -29,6 +30,7 @@ function ActivityIcon({ type }: { type: ActivityType }) {
 
 export const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuthContext();
   const [users, setUsers] = useState<AdminUserRow[]>([]);
   const [progress, setProgress] = useState<AdminProgressRow[]>([]);
   const [activity, setActivity] = useState<ActivityEvent[]>([]);
