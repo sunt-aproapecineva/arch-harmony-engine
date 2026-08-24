@@ -76,7 +76,7 @@ export const AdminActivity: React.FC = () => {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
         {[
           { label: 'Evenimente azi', value: eventsToday.length, color: 'var(--accent)' },
           { label: 'Utilizatori unici azi', value: uniqueUsersToday, color: 'var(--info)' },

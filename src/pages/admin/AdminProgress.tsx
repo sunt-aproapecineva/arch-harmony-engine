@@ -151,7 +151,7 @@ export const AdminProgress: React.FC = () => {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 24 }}>
+      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 24 }}>
         {[
           { label: 'Progres mediu', value: `${avgProgress}%`, color: 'var(--accent)' },
           { label: 'Total completări', value: totalCompletions, color: 'var(--ok)' },

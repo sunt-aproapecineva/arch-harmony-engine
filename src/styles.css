@@ -350,17 +350,52 @@ input::placeholder, textarea::placeholder { color: var(--fg-3); }
 }
 
 /* ============================================
+   UTILITARE RESPONSIVE
+   ============================================
+   Platforma stilizează masiv inline, deci media queries pure nu ajung la componente.
+   Clasele de mai jos sunt punctele de agățare — le aplici pe elementul care are nevoie,
+   iar comportamentul la ecrane mici stă aici, într-un singur loc.
+
+   ATENȚIE: nu adăuga o clasă aici fără s-o și aplici. Versiunea anterioară avea 8 clase
+   definite și zero folosite, ceea ce dădea impresia falsă că platforma e adaptată. */
+
+/* Derulare orizontală controlată, pentru tabelele care nu pot fi comprimate.
+   Mai bine un tabel care se trage cu degetul decât unul tăiat sau ilizibil. */
+.aa-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+.aa-scroll-x::-webkit-scrollbar { height: 5px; }
+
+/* Rândul lat dinăuntrul unui .aa-scroll-x: își păstrează lățimea minimă utilizabilă. */
+.aa-row-wide { min-width: 720px; }
+.aa-row-medium { min-width: 560px; }
+
+/* Grilă care devine o coloană sub 640px. */
+@media (max-width: 640px) {
+  .aa-stack-sm { grid-template-columns: 1fr !important; }
+}
+
+/* Ținte de atingere: sub 768px, orice control interactiv marcat capătă înălțime minimă
+   de 40px. Sub 40px, degetul ratează. */
+@media (max-width: 768px) {
+  .aa-tap { min-height: 40px; }
+}
+
+/* Ascunde pe mobil ce nu încape (etichete lungi, coloane secundare). */
+@media (max-width: 640px) {
+  .aa-hide-sm { display: none !important; }
+}
+
+/* ============================================
    MOBILE RESPONSIVE
    ============================================ */
 @media (max-width: 768px) {
-  .desktop-sidebar-wrapper { display: none !important; }
-  .admin-sidebar-wrapper { display: none !important; }
-  .login-left-panel { display: none !important; }
-  .page-content { padding: 16px !important; }
-  .admin-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  /* Aplicate în Dashboard.tsx. Restul claselor de aici au fost șterse — erau definite
+     și nefolosite, deci nu adaptau nimic. */
   .module-grid { grid-template-columns: 1fr !important; }
   .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-  .progress-ring-container { transform: scale(0.75); transform-origin: left center; }
 }
 
 @media (max-width: 480px) {

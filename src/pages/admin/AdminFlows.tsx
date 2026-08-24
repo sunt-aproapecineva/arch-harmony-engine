@@ -168,7 +168,7 @@ export const AdminFlows: React.FC = () => {
             const evts = events[c.id] || [];
             return (
               <div key={c.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: 16 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(120px,1fr) 130px minmax(160px,1.2fr) auto auto', gap: 10, alignItems: 'end' }}>
+                <div className="aa-stack-sm" style={{ display: 'grid', gridTemplateColumns: 'minmax(120px,1fr) 130px minmax(160px,1.2fr) auto auto', gap: 10, alignItems: 'end' }}>
                   <Field label="Nume" value={c.name} onChange={v => setFlows(p => p.map(x => x.id === c.id ? { ...x, name: v } : x))} />
                   <Field label="Start" type="date" value={c.starts_on} onChange={v => setFlows(p => p.map(x => x.id === c.id ? { ...x, starts_on: v } : x))} />
                   <Field label="Grup Telegram" value={c.telegram_url || ''} placeholder="https://t.me/…" onChange={v => setFlows(p => p.map(x => x.id === c.id ? { ...x, telegram_url: v } : x))} />
@@ -178,7 +178,7 @@ export const AdminFlows: React.FC = () => {
 
                 {/* Fereastra de acces. Data explicită bate durata: dacă e completată,
                     `access_weeks` devine doar o notă informativă. */}
-                <div style={{ display: 'grid', gridTemplateColumns: '150px 150px 1fr', gap: 10, alignItems: 'end', marginTop: 10 }}>
+                <div className="aa-stack-sm" style={{ display: 'grid', gridTemplateColumns: '150px 150px 1fr', gap: 10, alignItems: 'end', marginTop: 10 }}>
                   <Field label="Acces până la (manual)" type="date" value={c.ends_on || ''} onChange={v => setFlows(p => p.map(x => x.id === c.id ? { ...x, ends_on: v || null } : x))} />
                   <Field label="…sau durată (săptămâni)" type="number" value={c.access_weeks ?? ''} onChange={v => setFlows(p => p.map(x => x.id === c.id ? { ...x, access_weeks: v === '' ? null : Number(v) } : x))} />
                   <p style={{ fontSize: 11, color: 'var(--fg-3)', lineHeight: 1.5, margin: 0 }}>
@@ -230,7 +230,7 @@ export const AdminFlows: React.FC = () => {
                     </button>
                     <div style={{ display: 'grid', gap: 8, marginTop: 10 }}>
                       {evts.map(e => (
-                        <div key={e.id} style={{ display: 'grid', gridTemplateColumns: '100px minmax(140px,1.6fr) 120px 90px 90px auto auto', gap: 8, alignItems: 'end' }}>
+                        <div key={e.id} className="aa-stack-sm" style={{ display: 'grid', gridTemplateColumns: '100px minmax(140px,1.6fr) 120px 90px 90px auto auto', gap: 8, alignItems: 'end' }}>
                           <SelectField label="Tip" value={e.type} options={[['zoom', 'Zoom'], ['workshop', 'Workshop']]} onChange={v => setEvents(p => ({ ...p, [c.id]: p[c.id].map(x => x.id === e.id ? { ...x, type: v } : x) }))} />
                           <Field label="Titlu" value={e.title} onChange={v => setEvents(p => ({ ...p, [c.id]: p[c.id].map(x => x.id === e.id ? { ...x, title: v } : x) }))} />
                           <Field label="Data" type="date" value={e.event_date} onChange={v => setEvents(p => ({ ...p, [c.id]: p[c.id].map(x => x.id === e.id ? { ...x, event_date: v } : x) }))} />

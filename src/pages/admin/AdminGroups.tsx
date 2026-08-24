@@ -162,7 +162,7 @@ export const AdminGroups: React.FC = () => {
 
             return (
               <div key={g.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: 16 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(160px,1fr) minmax(180px,1.4fr) auto auto', gap: 10, alignItems: 'end' }}>
+                <div className="aa-stack-sm" style={{ display: 'grid', gridTemplateColumns: 'minmax(160px,1fr) minmax(180px,1.4fr) auto auto', gap: 10, alignItems: 'end' }}>
                   <Field label="Nume grupă" value={g.name} onChange={v => setGroups(p => p.map(x => x.id === g.id ? { ...x, name: v } : x))} />
                   <Field label="Descriere" value={g.description || ''} placeholder="ex. cei care au achitat în ianuarie" onChange={v => setGroups(p => p.map(x => x.id === g.id ? { ...x, description: v } : x))} />
                   <button title="Salvează" onClick={async () => { await renameGroup(g.id, g.name, g.description || ''); load(); }} style={iconBtn('var(--accent)')}><Save size={14} /></button>

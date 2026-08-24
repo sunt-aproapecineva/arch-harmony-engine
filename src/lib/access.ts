@@ -44,6 +44,40 @@ export function hasCompletedOnboarding(
   return false;
 }
 
+/** Cheia sub care ține o trimitere de quiz care n-a ajuns în cloud. */
+export function quizPendingKey(userId: string, courseId: string): string {
+  return `aa_quiz_pending_${userId}_${courseId}`;
+}
+
+/**
+ * Reține o trimitere de quiz care a eșuat în cloud, ca să fie reîncercată la
+ * următoarea hidratare.
+ *
+ * De ce există: flagul local deschide practicumul instant (local-first, invariantul 3),
+ * dar dacă scrierea în DB eșuează, elevul trece de poartă iar mentorul nu vede niciun
+ * diagnostic — și pe alt dispozitiv elevul e pus să-l dea din nou. Coada asta închide
+ * gaura fără să-l blocheze pe elev.
+ */
+export function queuePendingQuiz(userId: string, courseId: string, payload: unknown) {
+  if (!userId || !courseId || typeof window === 'undefined') return;
+  try { window.localStorage.setItem(quizPendingKey(userId, courseId), JSON.stringify(payload)); } catch { /* noop */ }
+}
+
+export function readPendingQuiz(userId: string, courseId: string): any | null {
+  if (!userId || !courseId || typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(quizPendingKey(userId, courseId));
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearPendingQuiz(userId: string, courseId: string) {
+  if (!userId || !courseId || typeof window === 'undefined') return;
+  try { window.localStorage.removeItem(quizPendingKey(userId, courseId)); } catch { /* noop */ }
+}
+
 /** Marchează local quizul ca terminat, imediat după trimiterea răspunsurilor. */
 export function markOnboardingDoneLocally(userId: string, courseId: string) {
   if (!userId || !courseId || typeof window === 'undefined') return;

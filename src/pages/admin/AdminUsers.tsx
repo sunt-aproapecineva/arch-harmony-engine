@@ -199,7 +199,7 @@ export const AdminUsers: React.FC = () => {
         )}
       </AnimatePresence>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
         {[
           { label: 'Total utilizatori', value: users.length, color: 'var(--fg)' },
           { label: 'Studenți', value: totalStudents, color: 'var(--accent)' },
@@ -309,8 +309,9 @@ export const AdminUsers: React.FC = () => {
         </div>
       </div>
 
-      {/* Users list */}
-      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, overflow: 'hidden' }}>
+      {/* Users list — pe ecran îngust se trage orizontal, în loc să fie strivită. */}
+      <div className="aa-scroll-x" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16 }}>
+       <div className="aa-row-wide">
         <div style={{ display: 'grid', gridTemplateColumns: '36px 1fr 100px 130px 110px 90px 130px 32px', gap: 12, padding: '10px 20px', borderBottom: '1px solid var(--border)', alignItems: 'center' }}>
           {['', 'Nume & Email', 'Tarif', 'Ultima activitate', 'Progres', 'Quiz', 'Acțiuni', ''].map((h, i) => (
             <div key={i} style={{ fontSize: 10, fontWeight: 700, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{h}</div>
@@ -458,6 +459,7 @@ export const AdminUsers: React.FC = () => {
             );
           })
         )}
+       </div>
       </div>
     </div>
   );

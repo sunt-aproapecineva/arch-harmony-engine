@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate } from '@/lib/router-compat';
 import { useCourse } from '../context/CourseContext';
 import { courseDashboardPath } from '../lib/navigation';
-import { markOnboardingDoneLocally } from '../lib/access';
+import { markOnboardingDoneLocally, queuePendingQuiz, clearPendingQuiz } from '../lib/access';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
@@ -178,17 +178,36 @@ export const OnboardingQuiz: React.FC = () => {
         try {
           localStorage.setItem(`aa_quiz_answers_${user.id}_${courseId}`, JSON.stringify(finalAnswers));
         } catch {}
+        // Scrierea în cloud NU e „best-effort" tăcut: supabase întoarce {error}, nu
+        // aruncă, deci vechiul try/catch nu prindea nimic. Dacă eșuează, punem
+        // trimiterea în coadă — altfel elevul trece de poartă local, mentorul nu vede
+        // niciun diagnostic, iar pe alt dispozitiv elevul e pus să-l dea din nou.
         try {
           const profile = quizDef ? quizDef.generateProfile(finalAnswers as any) : {};
-          await supabase.from('quiz_responses').upsert({
+          const payload = {
             user_id: user.id,
             course_id: courseId,
             answers: finalAnswers,
             profile: profile as any,
             completed_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-          }, { onConflict: 'user_id,course_id' });
-        } catch (e) { /* best-effort */ }
+          };
+          const { error: quizErr } = await supabase
+            .from('quiz_responses')
+            .upsert(payload, { onConflict: 'user_id,course_id' });
+          if (quizErr) {
+            console.warn('[Quiz] scrierea în cloud a eșuat; pun în coadă', quizErr);
+            queuePendingQuiz(user.id, courseId, payload);
+          } else {
+            clearPendingQuiz(user.id, courseId);
+          }
+        } catch (e) {
+          console.warn('[Quiz] scrierea în cloud a eșuat; pun în coadă', e);
+          queuePendingQuiz(user.id, courseId, {
+            user_id: user.id, course_id: courseId, answers: finalAnswers,
+            completed_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+          });
+        }
         logActivity({
           userId: user.id,
           userEmail: user.email,

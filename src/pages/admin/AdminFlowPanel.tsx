@@ -207,6 +207,7 @@ export const AdminFlowPanel: React.FC = () => {
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.22, delay: Math.min(i, 12) * 0.02 }}
+              className="aa-stack-sm"
               style={{
                 background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12,
                 padding: '14px 16px', display: 'grid',

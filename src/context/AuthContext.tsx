@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import type { User, WhitelistEntry, Tariff } from '../lib/types';
 import { saveSessionBackup, readSessionBackup, clearSessionBackup, startRememberWindow, isRememberMode, isRememberExpired } from '../lib/sessionPersistence';
 import { fetchEnrollments, readCachedEnrollments, clearCachedEnrollments } from '../lib/enrollments';
-import { quizDoneKey, legacyQuizDoneKey } from '../lib/access';
+import { quizDoneKey, legacyQuizDoneKey, readPendingQuiz, clearPendingQuiz } from '../lib/access';
+import { COURSES } from '../lib/courses';
 
 interface AuthContextType {
   user: User | null;
@@ -67,6 +68,31 @@ async function fetchQuizRows(userId: string) {
     .eq('user_id', userId);
 }
 
+/**
+ * Retrimite quizurile care n-au ajuns în cloud la trimiterea inițială.
+ *
+ * Închide gaura dintre flagul local (care deschide practicumul instant) și baza de
+ * date (de unde mentorul își ia briefingul). Rulează la fiecare hidratare, e ieftină
+ * — de obicei nu are nimic de făcut — și nu blochează niciodată încărcarea aplicației.
+ */
+async function flushPendingQuizzes(userId: string): Promise<string[]> {
+  const recovered: string[] = [];
+  for (const course of COURSES) {
+    const pending = readPendingQuiz(userId, course.id);
+    if (!pending) continue;
+    try {
+      const { error } = await supabase
+        .from('quiz_responses')
+        .upsert(pending, { onConflict: 'user_id,course_id' });
+      if (!error) {
+        clearPendingQuiz(userId, course.id);
+        recovered.push(course.id);
+      }
+    } catch { /* rămâne în coadă pentru data viitoare */ }
+  }
+  return recovered;
+}
+
 async function hydrateUser(authUser: any): Promise<User | null> {
   if (!authUser) return null;
 
@@ -79,8 +105,11 @@ async function hydrateUser(authUser: any): Promise<User | null> {
     ]);
     const isAdmin = (roles || []).some((r: any) => r.role === 'admin');
 
+    // Quizuri rămase în coadă de la o trimitere eșuată — le împingem acum.
+    const recovered = await flushPendingQuizzes(authUser.id);
+
     // Oglindește starea quizului în localStorage, per curs, pentru gating instant.
-    const quizCourses: string[] = [];
+    const quizCourses: string[] = [...recovered];
     try {
       for (const row of quizRows || []) {
         if (!row?.completed_at) continue;
