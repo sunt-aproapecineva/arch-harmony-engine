@@ -77,6 +77,42 @@ export type Database = {
         }
         Relationships: []
       }
+      courses: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          order_index: number
+          slug: string
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id: string
+          is_active?: boolean
+          order_index?: number
+          slug: string
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          order_index?: number
+          slug?: string
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       document_responses: {
         Row: {
           created_at: string
@@ -190,6 +226,47 @@ export type Database = {
           used_at?: string | null
         }
         Relationships: []
+      }
+      enrollments: {
+        Row: {
+          course_id: string
+          created_at: string
+          granted_at: string
+          granted_by: string | null
+          id: string
+          tariff: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          tariff?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          tariff?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrollments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       exercise_completions: {
         Row: {
@@ -357,6 +434,7 @@ export type Database = {
       }
       modules: {
         Row: {
+          course_id: string
           created_at: string | null
           description: string | null
           etapa: string | null
@@ -367,6 +445,7 @@ export type Database = {
           title: string
         }
         Insert: {
+          course_id?: string
           created_at?: string | null
           description?: string | null
           etapa?: string | null
@@ -377,6 +456,7 @@ export type Database = {
           title: string
         }
         Update: {
+          course_id?: string
           created_at?: string | null
           description?: string | null
           etapa?: string | null
@@ -386,7 +466,15 @@ export type Database = {
           subtitle?: string | null
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "modules_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -448,6 +536,7 @@ export type Database = {
         Row: {
           answers: Json
           completed_at: string
+          course_id: string
           id: string
           profile: Json | null
           updated_at: string
@@ -456,6 +545,7 @@ export type Database = {
         Insert: {
           answers?: Json
           completed_at?: string
+          course_id?: string
           id?: string
           profile?: Json | null
           updated_at?: string
@@ -464,15 +554,25 @@ export type Database = {
         Update: {
           answers?: Json
           completed_at?: string
+          course_id?: string
           id?: string
           profile?: Json | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "quiz_responses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       student_insights: {
         Row: {
+          course_id: string
           created_at: string
           generated_at: string
           id: string
@@ -483,6 +583,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          course_id?: string
           created_at?: string
           generated_at?: string
           id?: string
@@ -493,6 +594,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          course_id?: string
           created_at?: string
           generated_at?: string
           id?: string
@@ -502,7 +604,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "student_insights_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       supervisor_notes: {
         Row: {
@@ -583,6 +693,7 @@ export type Database = {
         Row: {
           added_at: string | null
           added_by: string | null
+          course_id: string
           email: string
           id: string
           tariff: string
@@ -590,6 +701,7 @@ export type Database = {
         Insert: {
           added_at?: string | null
           added_by?: string | null
+          course_id?: string
           email: string
           id?: string
           tariff?: string
@@ -597,11 +709,20 @@ export type Database = {
         Update: {
           added_at?: string | null
           added_by?: string | null
+          course_id?: string
           email?: string
           id?: string
           tariff?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "whitelist_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
