@@ -49,36 +49,44 @@ export type Database = {
       }
       announcements: {
         Row: {
-          flow_id: string | null
           created_at: string
           created_by: string | null
           expires_at: string | null
+          flow_id: string | null
           id: string
           message: string
           type: string
           updated_at: string
         }
         Insert: {
-          flow_id?: string | null
           created_at?: string
           created_by?: string | null
           expires_at?: string | null
+          flow_id?: string | null
           id?: string
           message: string
           type?: string
           updated_at?: string
         }
         Update: {
-          flow_id?: string | null
           created_at?: string
           created_by?: string | null
           expires_at?: string | null
+          flow_id?: string | null
           id?: string
           message?: string
           type?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "announcements_flow_id_fkey"
+            columns: ["flow_id"]
+            isOneToOne: false
+            referencedRelation: "flows"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       courses: {
         Row: {
@@ -113,213 +121,6 @@ export type Database = {
           subtitle?: string | null
           title?: string
           updated_at?: string
-        }
-        Relationships: []
-      }
-      enrollments: {
-        Row: {
-          source_group_id: string | null
-          access_until: string | null
-          flow_id: string | null
-          course_id: string
-          created_at: string
-          granted_at: string
-          granted_by: string | null
-          id: string
-          tariff: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          source_group_id?: string | null
-          access_until?: string | null
-          flow_id?: string | null
-          course_id: string
-          created_at?: string
-          granted_at?: string
-          granted_by?: string | null
-          id?: string
-          tariff?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          source_group_id?: string | null
-          access_until?: string | null
-          flow_id?: string | null
-          course_id?: string
-          created_at?: string
-          granted_at?: string
-          granted_by?: string | null
-          id?: string
-          tariff?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      flows: {
-        Row: {
-          access_weeks: number | null
-          course_id: string
-          created_at: string
-          ends_on: string | null
-          id: string
-          is_active: boolean
-          name: string
-          notes: string | null
-          slug: string
-          starts_on: string
-          telegram_url: string | null
-          updated_at: string
-        }
-        Insert: {
-          access_weeks?: number | null
-          course_id: string
-          created_at?: string
-          ends_on?: string | null
-          id: string
-          is_active?: boolean
-          name: string
-          notes?: string | null
-          slug: string
-          starts_on: string
-          telegram_url?: string | null
-          updated_at?: string
-        }
-        Update: {
-          access_weeks?: number | null
-          course_id?: string
-          created_at?: string
-          ends_on?: string | null
-          id?: string
-          is_active?: boolean
-          name?: string
-          notes?: string | null
-          slug?: string
-          starts_on?: string
-          telegram_url?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      flow_events: {
-        Row: {
-          created_at: string
-          description: string | null
-          duration: string | null
-          event_date: string
-          event_time: string | null
-          flow_id: string
-          id: string
-          title: string
-          type: string
-          updated_at: string
-          workshop_themes: Json | null
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          duration?: string | null
-          event_date: string
-          event_time?: string | null
-          flow_id: string
-          id?: string
-          title: string
-          type?: string
-          updated_at?: string
-          workshop_themes?: Json | null
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          duration?: string | null
-          event_date?: string
-          event_time?: string | null
-          flow_id?: string
-          id?: string
-          title?: string
-          type?: string
-          updated_at?: string
-          workshop_themes?: Json | null
-        }
-        Relationships: []
-      }
-      groups: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          description: string | null
-          id: string
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          name?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      group_members: {
-        Row: {
-          added_at: string
-          added_by: string | null
-          group_id: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          added_at?: string
-          added_by?: string | null
-          group_id: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          added_at?: string
-          added_by?: string | null
-          group_id?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      group_flow_assignments: {
-        Row: {
-          assigned_at: string
-          assigned_by: string | null
-          flow_id: string
-          group_id: string
-          id: string
-          tariff: string
-        }
-        Insert: {
-          assigned_at?: string
-          assigned_by?: string | null
-          flow_id: string
-          group_id: string
-          id?: string
-          tariff?: string
-        }
-        Update: {
-          assigned_at?: string
-          assigned_by?: string | null
-          flow_id?: string
-          group_id?: string
-          id?: string
-          tariff?: string
         }
         Relationships: []
       }
@@ -437,6 +238,70 @@ export type Database = {
         }
         Relationships: []
       }
+      enrollments: {
+        Row: {
+          access_until: string | null
+          course_id: string
+          created_at: string
+          flow_id: string | null
+          granted_at: string
+          granted_by: string | null
+          id: string
+          source_group_id: string | null
+          tariff: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_until?: string | null
+          course_id: string
+          created_at?: string
+          flow_id?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          source_group_id?: string | null
+          tariff?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_until?: string | null
+          course_id?: string
+          created_at?: string
+          flow_id?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          source_group_id?: string | null
+          tariff?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrollments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollments_flow_id_fkey"
+            columns: ["flow_id"]
+            isOneToOne: false
+            referencedRelation: "flows"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollments_source_group_id_fkey"
+            columns: ["source_group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exercise_completions: {
         Row: {
           completed_at: string
@@ -526,6 +391,210 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      flow_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration: string | null
+          event_date: string
+          event_time: string | null
+          flow_id: string
+          id: string
+          title: string
+          type: string
+          updated_at: string
+          workshop_themes: Json | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          event_date: string
+          event_time?: string | null
+          flow_id: string
+          id?: string
+          title: string
+          type?: string
+          updated_at?: string
+          workshop_themes?: Json | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          event_date?: string
+          event_time?: string | null
+          flow_id?: string
+          id?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          workshop_themes?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flow_events_flow_id_fkey"
+            columns: ["flow_id"]
+            isOneToOne: false
+            referencedRelation: "flows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flows: {
+        Row: {
+          access_weeks: number | null
+          course_id: string
+          created_at: string
+          ends_on: string | null
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          slug: string
+          starts_on: string
+          telegram_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_weeks?: number | null
+          course_id: string
+          created_at?: string
+          ends_on?: string | null
+          id: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          slug: string
+          starts_on: string
+          telegram_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_weeks?: number | null
+          course_id?: string
+          created_at?: string
+          ends_on?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          slug?: string
+          starts_on?: string
+          telegram_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flows_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_flow_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          flow_id: string
+          group_id: string
+          id: string
+          tariff: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          flow_id: string
+          group_id: string
+          id?: string
+          tariff?: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          flow_id?: string
+          group_id?: string
+          id?: string
+          tariff?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_flow_assignments_flow_id_fkey"
+            columns: ["flow_id"]
+            isOneToOne: false
+            referencedRelation: "flows"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_flow_assignments_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_members: {
+        Row: {
+          added_at: string
+          added_by: string | null
+          group_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          added_by?: string | null
+          group_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          added_by?: string | null
+          group_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groups: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       lesson_notes: {
         Row: {
@@ -635,7 +704,15 @@ export type Database = {
           subtitle?: string | null
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "modules_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -695,33 +772,41 @@ export type Database = {
       }
       quiz_responses: {
         Row: {
-          course_id: string
           answers: Json
           completed_at: string
+          course_id: string
           id: string
           profile: Json | null
           updated_at: string
           user_id: string
         }
         Insert: {
-          course_id?: string
           answers?: Json
           completed_at?: string
+          course_id?: string
           id?: string
           profile?: Json | null
           updated_at?: string
           user_id: string
         }
         Update: {
-          course_id?: string
           answers?: Json
           completed_at?: string
+          course_id?: string
           id?: string
           profile?: Json | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "quiz_responses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       student_insights: {
         Row: {
@@ -757,7 +842,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "student_insights_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       supervisor_notes: {
         Row: {
@@ -836,36 +929,48 @@ export type Database = {
       }
       whitelist: {
         Row: {
-          course_id: string
           added_at: string | null
           added_by: string | null
+          course_id: string
           email: string
           id: string
           tariff: string
         }
         Insert: {
-          course_id?: string
           added_at?: string | null
           added_by?: string | null
+          course_id?: string
           email: string
           id?: string
           tariff?: string
         }
         Update: {
-          course_id?: string
           added_at?: string | null
           added_by?: string | null
+          course_id?: string
           email?: string
           id?: string
           tariff?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "whitelist_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      apply_group_to_flow: {
+        Args: { _flow_id: string; _group_id: string }
+        Returns: number
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -875,9 +980,6 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
-      apply_group_to_flow: { Args: { _group_id: string; _flow_id: string }; Returns: number }
-      revoke_group_from_flow: { Args: { _group_id: string; _flow_id: string }; Returns: number }
-      max_tariff: { Args: { a: string; b: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -886,6 +988,7 @@ export type Database = {
         Returns: boolean
       }
       is_email_whitelisted: { Args: { _email: string }; Returns: boolean }
+      max_tariff: { Args: { a: string; b: string }; Returns: string }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -902,6 +1005,10 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      revoke_group_from_flow: {
+        Args: { _flow_id: string; _group_id: string }
+        Returns: number
       }
     }
     Enums: {
