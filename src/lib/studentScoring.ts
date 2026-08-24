@@ -177,11 +177,11 @@ export const STATUS_LABEL: Record<StudentScores['status'], string> = {
 };
 
 export const STATUS_COLOR: Record<StudentScores['status'], string> = {
-  active: '#4ade80',
-  slow: '#fbbf24',
-  stuck: '#fb923c',
-  inactive: '#f87171',
-  done: '#86efac',
+  active: 'var(--ok)',
+  slow: 'var(--warn)',
+  stuck: 'var(--warn-strong)',
+  inactive: 'var(--error)',
+  done: 'var(--ok-soft)',
   new: 'var(--fg-3)',
 };
 

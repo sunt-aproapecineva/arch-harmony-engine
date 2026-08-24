@@ -76,7 +76,7 @@ const LessonSidebar: React.FC<{
             >
               <div style={{ flexShrink: 0 }}>
                 {isDone
-                  ? <CheckCircle2 size={13} style={{ color: '#4ade80' }} />
+                  ? <CheckCircle2 size={13} style={{ color: 'var(--ok)' }} />
                   : isExercise
                   ? <div style={{ width: 13, height: 13, borderRadius: 3, border: `1.5px solid ${isActive ? 'var(--gold)' : 'var(--border)'}` }} />
                   : <div style={{ width: 13, height: 13, borderRadius: '50%', border: `1.5px solid ${isActive ? 'var(--accent)' : 'var(--border)'}` }} />
@@ -171,7 +171,7 @@ const CompleteButton: React.FC<{
     <AnimatePresence mode="wait">
       {done || justCompleted ? (
         <motion.div key="done" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-          style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.25)', borderRadius: 12, color: '#4ade80', fontSize: 14, fontWeight: 600 }}>
+          style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.25)', borderRadius: 12, color: 'var(--ok)', fontSize: 14, fontWeight: 600 }}>
           <CheckCircle2 size={18} />
           {isExercise ? 'Exercițiu finalizat' : 'Lecție finalizată'}
         </motion.div>
@@ -349,11 +349,11 @@ export const LessonPage: React.FC = () => {
           <div style={{ marginBottom: 28 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
               <span>Exercițiu {exNumber} din {exTotal} · {module.title}</span>
-              <span style={{ color: progressPct === 100 ? '#4ade80' : 'var(--gold)' }}>{progressPct}%</span>
+              <span style={{ color: progressPct === 100 ? 'var(--ok)' : 'var(--gold)' }}>{progressPct}%</span>
             </div>
             <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
               <motion.div initial={{ width: 0 }} animate={{ width: `${progressPct}%` }} transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
-                style={{ height: '100%', background: progressPct === 100 ? '#4ade80' : 'var(--gold)', borderRadius: 2 }} />
+                style={{ height: '100%', background: progressPct === 100 ? 'var(--ok)' : 'var(--gold)', borderRadius: 2 }} />
             </div>
           </div>
 
@@ -378,7 +378,7 @@ export const LessonPage: React.FC = () => {
                       <Clock size={10} /> {lesson.duration_min} min
                     </span>
                     {(done || justCompleted) && (
-                      <span style={{ fontSize: 10, color: '#4ade80', background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.25)', padding: '4px 10px', borderRadius: 99, fontWeight: 700 }}>
+                      <span style={{ fontSize: 10, color: 'var(--ok)', background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.25)', padding: '4px 10px', borderRadius: 99, fontWeight: 700 }}>
                         ✓ Finalizat
                       </span>
                     )}
@@ -406,7 +406,7 @@ export const LessonPage: React.FC = () => {
                     onConfettiDone={() => setShowConfetti(false)} isExercise
                   />
                   {completeError && (
-                    <p style={{ marginTop: 10, fontSize: 13, color: '#f87171' }}>{completeError}</p>
+                    <p style={{ marginTop: 10, fontSize: 13, color: 'var(--error)' }}>{completeError}</p>
                   )}
                 </div>
                 <NavButtons prev={prevLesson} next={nextLesson} nextModuleLesson={nextModuleLesson} nextModuleTitle={nextModule?.title} module={module} />
@@ -445,11 +445,11 @@ export const LessonPage: React.FC = () => {
       <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
           <span>Lecția {formatLessonNumber(module, lesson)} · {module.title}</span>
-          <span style={{ color: progressPct === 100 ? '#4ade80' : 'var(--accent)' }}>{progressPct}%</span>
+          <span style={{ color: progressPct === 100 ? 'var(--ok)' : 'var(--accent)' }}>{progressPct}%</span>
         </div>
         <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
           <motion.div initial={{ width: 0 }} animate={{ width: `${progressPct}%` }} transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
-            style={{ height: '100%', background: progressPct === 100 ? '#4ade80' : 'var(--accent)', borderRadius: 2 }} />
+            style={{ height: '100%', background: progressPct === 100 ? 'var(--ok)' : 'var(--accent)', borderRadius: 2 }} />
         </div>
       </motion.div>
 
@@ -523,7 +523,7 @@ export const LessonPage: React.FC = () => {
                 <Clock size={10} /> {lesson.duration_min} min
               </span>
               {(done || justCompleted) && (
-                <span style={{ fontSize: 11, color: '#4ade80', background: 'rgba(74,222,128,0.12)', border: '1px solid rgba(74,222,128,0.25)', padding: '3px 10px', borderRadius: 99, fontWeight: 600 }}>✓ Finalizat</span>
+                <span style={{ fontSize: 11, color: 'var(--ok)', background: 'rgba(74,222,128,0.12)', border: '1px solid rgba(74,222,128,0.25)', padding: '3px 10px', borderRadius: 99, fontWeight: 600 }}>✓ Finalizat</span>
               )}
             </div>
             <h1 className="font-aboreto" style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', color: 'var(--fg)', lineHeight: 1.15, marginBottom: 12 }}>{lesson.title}</h1>
@@ -599,7 +599,7 @@ export const LessonPage: React.FC = () => {
           <motion.div ref={completeRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} style={{ marginBottom: 24 }}>
             <CompleteButton done={done} justCompleted={justCompleted} completing={completing} showConfetti={scopedShowConfetti} onComplete={handleComplete} onConfettiDone={() => setShowConfetti(false)} />
             {completeError && (
-              <p style={{ marginTop: 10, fontSize: 13, color: '#f87171' }}>{completeError}</p>
+              <p style={{ marginTop: 10, fontSize: 13, color: 'var(--error)' }}>{completeError}</p>
             )}
           </motion.div>
 
@@ -631,11 +631,11 @@ export const LessonPage: React.FC = () => {
                           Se salvează…
                         </span>
                       ) : noteStatus === 'saved' ? (
-                        <span style={{ fontSize: 11, color: '#4ade80', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ fontSize: 11, color: 'var(--ok)', display: 'flex', alignItems: 'center', gap: 4 }}>
                           <CheckCircle2 size={12} /> Salvat automat în cloud
                         </span>
                       ) : noteStatus === 'error' ? (
-                        <span style={{ fontSize: 11, color: '#f87171' }}>Eroare la salvare — retrimit</span>
+                        <span style={{ fontSize: 11, color: 'var(--error)' }}>Eroare la salvare — retrimit</span>
                       ) : (
                         <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>{note ? `${note.length} caractere · autosave activ` : 'Se salvează automat pe măsură ce scrii'}</span>
                       )}

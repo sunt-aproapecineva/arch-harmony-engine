@@ -720,7 +720,7 @@ export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
     miroTemplateUrl: 'https://miro.com/app/board/uXjVHMYB6CI=/?share_link_id=356253360599',
     colorLegend: [
       { color: '#1F6B3A', name: 'Verde închis', meaning: 'Conducere — tu', action: 'Ești CEO. Apari doar aici.' },
-      { color: '#4ADE80', name: 'Verde', meaning: 'Funcție ocupată OK', action: 'Un om dedicat, cu produs final clar.' },
+      { color: 'var(--ok)', name: 'Verde', meaning: 'Funcție ocupată OK', action: 'Un om dedicat, cu produs final clar.' },
       { color: '#EF4444', name: 'Roșu', meaning: 'Tu ești acolo acum', action: 'Prioritatea ta: găsești un înlocuitor.' },
       { color: '#F59E0B', name: 'Portocaliu', meaning: 'Un om, mai multe funcții', action: 'Supraîncărcat — clarifici sau angajezi.' },
       { color: '#9CA3AF', name: 'Gri punctat', meaning: 'Funcție lipsă', action: 'Lista ta de angajări viitoare.' },

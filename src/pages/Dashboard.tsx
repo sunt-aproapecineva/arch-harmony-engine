@@ -61,7 +61,7 @@ const StatCard: React.FC<{
         {value}
       </div>
       {sub && (
-        <div style={{ fontSize: 11, color: accent ? 'var(--accent)' : '#4ade80', marginTop: 3, fontWeight: 600 }}>
+        <div style={{ fontSize: 11, color: accent ? 'var(--accent)' : 'var(--ok)', marginTop: 3, fontWeight: 600 }}>
           {sub}
         </div>
       )}
@@ -243,7 +243,7 @@ export const Dashboard: React.FC = () => {
                   <span style={{
                     display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 700,
                     letterSpacing: '0.09em', textTransform: 'uppercase', padding: '3px 10px', borderRadius: 99,
-                    color: nextEvent.type === 'zoom' ? '#4ade80' : 'var(--gold)',
+                    color: nextEvent.type === 'zoom' ? 'var(--ok)' : 'var(--gold)',
                     background: nextEvent.type === 'zoom' ? 'rgba(74,222,128,0.1)' : 'rgba(201,169,110,0.1)',
                     border: `1px solid ${nextEvent.type === 'zoom' ? 'rgba(74,222,128,0.25)' : 'rgba(201,169,110,0.25)'}`,
                   }}>
@@ -286,7 +286,7 @@ export const Dashboard: React.FC = () => {
                     </div>
                     {upcomingEvents.slice(1, 3).map(ev => (
                       <div key={ev.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{ width: 6, height: 6, borderRadius: '50%', flexShrink: 0, background: ev.type === 'zoom' ? '#4ade80' : 'var(--gold)' }} />
+                        <div style={{ width: 6, height: 6, borderRadius: '50%', flexShrink: 0, background: ev.type === 'zoom' ? 'var(--ok)' : 'var(--gold)' }} />
                         <div style={{ fontSize: 11, color: 'var(--fg-2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                           {ev.title}
                         </div>
@@ -361,7 +361,7 @@ export const Dashboard: React.FC = () => {
                       border: `1px solid ${done ? 'rgba(74,222,128,0.3)' : active ? 'rgba(196,240,228,0.25)' : 'rgba(255,255,255,0.07)'}`,
                     }}>
                       {locked ? <Lock size={11} style={{ color: 'var(--fg-3)' }} />
-                        : done ? <CheckCircle2 size={13} style={{ color: '#4ade80' }} />
+                        : done ? <CheckCircle2 size={13} style={{ color: 'var(--ok)' }} />
                         : <span className="font-aboreto" style={{ fontSize: 10, color: active ? 'var(--accent)' : 'var(--fg-3)', lineHeight: 1 }}>{idx}</span>}
                     </div>
                     {/* Label */}
@@ -383,13 +383,13 @@ export const Dashboard: React.FC = () => {
                             initial={{ width: 0 }}
                             animate={{ width: `${pct}%` }}
                             transition={{ duration: 0.9, delay: 0.3 + idx * 0.05, ease: 'easeOut' }}
-                            style={{ height: '100%', borderRadius: 2, background: done ? '#4ade80' : active ? 'var(--accent)' : 'rgba(255,255,255,0.2)' }}
+                            style={{ height: '100%', borderRadius: 2, background: done ? 'var(--ok)' : active ? 'var(--accent)' : 'rgba(255,255,255,0.2)' }}
                           />
                         </div>
                       )}
                     </div>
                     {/* Percentage */}
-                    <div style={{ fontSize: 12, fontWeight: 600, color: done ? '#4ade80' : active ? 'var(--accent)' : 'var(--fg-3)', flexShrink: 0, minWidth: 36, textAlign: 'right' }}>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: done ? 'var(--ok)' : active ? 'var(--accent)' : 'var(--fg-3)', flexShrink: 0, minWidth: 36, textAlign: 'right' }}>
                       {locked ? '—' : `${pct}%`}
                     </div>
                   </div>

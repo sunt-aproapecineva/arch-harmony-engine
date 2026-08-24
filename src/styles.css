@@ -57,6 +57,16 @@
   --border-hi:   rgba(255,255,255,0.14);
   --shadow:      0 4px 24px rgba(0,0,0,0.4);
   --shadow-lg:   0 12px 48px rgba(0,0,0,0.5);
+  --ok:          #4ADE80;
+  --ok-soft:     #86EFAC;
+  --ok-dim:      rgba(74,222,128,0.12);
+  --warn:        #FBBF24;
+  --warn-strong: #FB923C;
+  --warn-dim:    rgba(251,191,36,0.12);
+  --error:       #F87171;
+  --error-dim:   rgba(248,113,113,0.12);
+  --info:        #A78BFA;
+  --info-dim:    rgba(167,139,250,0.12);
   --radius: 0.625rem;
 }
 
@@ -80,6 +90,16 @@
   --border-hi:   rgba(0,0,0,0.16);
   --shadow:      0 4px 24px rgba(0,0,0,0.08);
   --shadow-lg:   0 12px 48px rgba(0,0,0,0.12);
+  --ok:          #15803D;
+  --ok-soft:     #22A45D;
+  --ok-dim:      rgba(21,128,61,0.1);
+  --warn:        #B45309;
+  --warn-strong: #C2410C;
+  --warn-dim:    rgba(180,83,9,0.1);
+  --error:       #C0392B;
+  --error-dim:   rgba(192,57,43,0.1);
+  --info:        #6D28D9;
+  --info-dim:    rgba(109,40,217,0.1);
 }
 
 html { scroll-behavior: smooth; }

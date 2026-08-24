@@ -199,7 +199,7 @@ export const Calendar: React.FC<CalendarProps> = ({ events, moduleUnlocks }) => 
                 {(hasZoom || hasWorkshop || hasUnlocks) && (
                   <div style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                     {hasZoom && (
-                      <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#4ade80', flexShrink: 0 }} />
+                      <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--ok)', flexShrink: 0 }} />
                     )}
                     {hasWorkshop && (
                       <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--gold)', flexShrink: 0 }} />
@@ -218,7 +218,7 @@ export const Calendar: React.FC<CalendarProps> = ({ events, moduleUnlocks }) => 
       {/* Legend */}
       <div style={{ display: 'flex', gap: 16, padding: '0 20px 14px', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--fg-3)' }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#4ade80' }} /> Zoom
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--ok)' }} /> Zoom
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--fg-3)' }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--gold)' }} /> Workshop
@@ -249,7 +249,7 @@ export const Calendar: React.FC<CalendarProps> = ({ events, moduleUnlocks }) => 
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                 <div style={{
                   width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
-                  background: ev.type === 'zoom' ? '#4ade80' : 'var(--gold)',
+                  background: ev.type === 'zoom' ? 'var(--ok)' : 'var(--gold)',
                 }} />
                 <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)' }}>{ev.title}</div>
               </div>

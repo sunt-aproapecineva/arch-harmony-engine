@@ -9,7 +9,7 @@ const BuildingBlocks: React.FC = () => {
   const blocks = [
     { num: 0, label: 'Diagnostic', color: '#C4F0E4' },
     { num: 1, label: 'Fundație', color: '#C9A96E' },
-    { num: 2, label: 'Structură', color: '#a78bfa' },
+    { num: 2, label: 'Structură', color: 'var(--info)' },
     { num: 3, label: 'Procese', color: '#93c5fd' },
     { num: 4, label: 'Control', color: '#fca5a5' },
     { num: 5, label: 'Delegare', color: '#6ee7b7' },
@@ -167,7 +167,7 @@ const Step2: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNext, o
         title="Livrabilul etapei"
         description="Nu treci la etapa următoare fără livrabilul etapei curente. Aceasta este regula #1 a practicumului."
         delay={0.3}
-        color="#a78bfa"
+        color="var(--info)"
       />
     </div>
 

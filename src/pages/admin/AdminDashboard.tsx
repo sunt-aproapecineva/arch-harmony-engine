@@ -16,12 +16,12 @@ import { AttentionQueueCard } from '../../components/admin/AttentionQueueCard';
 function ActivityIcon({ type }: { type: ActivityType }) {
   const size = 13;
   switch (type) {
-    case 'login': return <LogIn size={size} style={{ color: '#86efac' }} />;
+    case 'login': return <LogIn size={size} style={{ color: 'var(--ok-soft)' }} />;
     case 'lesson_complete': return <CheckCircle size={size} style={{ color: 'var(--accent)' }} />;
     case 'note_saved': return <FileText size={size} style={{ color: '#93c5fd' }} />;
-    case 'quiz_complete': return <Award size={size} style={{ color: '#fbbf24' }} />;
+    case 'quiz_complete': return <Award size={size} style={{ color: 'var(--warn)' }} />;
     case 'platform_register': return <UserPlus size={size} style={{ color: 'var(--fg-3)' }} />;
-    case 'exercise_complete': return <Pencil size={size} style={{ color: '#fb923c' }} />;
+    case 'exercise_complete': return <Pencil size={size} style={{ color: 'var(--warn-strong)' }} />;
     default: return <div style={{ width: size, height: size, borderRadius: '50%', background: 'var(--border)' }} />;
   }
 }
@@ -77,8 +77,8 @@ export const AdminDashboard: React.FC = () => {
   const stats = [
     { icon: <Users size={18} />, label: 'Studenți înregistrați', value: String(users.length), accent: 'var(--accent)' },
     { icon: <BookOpen size={18} />, label: 'Lecții completate total', value: String(totalCompletions), accent: 'var(--gold)' },
-    { icon: <Award size={18} />, label: 'Quiz-uri finalizate', value: `${quizCount} (${quizPct}%)`, accent: '#fbbf24' },
-    { icon: <Activity size={18} />, label: 'Activi azi', value: String(activeToday), accent: '#86efac' },
+    { icon: <Award size={18} />, label: 'Quiz-uri finalizate', value: `${quizCount} (${quizPct}%)`, accent: 'var(--warn)' },
+    { icon: <Activity size={18} />, label: 'Activi azi', value: String(activeToday), accent: 'var(--ok-soft)' },
   ];
 
   const recentActivity = activity.slice(0, 30);
@@ -165,7 +165,7 @@ export const AdminDashboard: React.FC = () => {
                     onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-3)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
-                    <div style={{ width: 34, height: 34, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#0D0907' }}>
+                    <div style={{ width: 34, height: 34, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, var(--ok) 0%, #22c55e 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#0D0907' }}>
                       {u.full_name?.charAt(0)?.toUpperCase() || 'U'}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -194,7 +194,7 @@ export const AdminDashboard: React.FC = () => {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
           style={{ ...cardStyle, flex: '2 1 360px', minWidth: 300 }}>
           <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--fg-3)', textTransform: 'uppercase', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', display: 'inline-block', boxShadow: '0 0 6px #4ade80' }} />
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--ok)', display: 'inline-block', boxShadow: '0 0 6px var(--ok)' }} />
             Feed activitate live
           </div>
           {recentActivity.length === 0 ? (
@@ -232,7 +232,7 @@ export const AdminDashboard: React.FC = () => {
             onKeyDown={e => e.key === 'Enter' && handleAddWhitelist()}
             style={{ flex: 1, padding: '8px 12px', fontSize: 13, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)' }} />
           <button onClick={handleAddWhitelist}
-            style={{ padding: '8px 16px', background: addedEmail ? 'rgba(74,222,128,0.15)' : 'var(--accent)', color: addedEmail ? '#4ade80' : '#0D0907', border: addedEmail ? '1px solid rgba(74,222,128,0.3)' : 'none', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
+            style={{ padding: '8px 16px', background: addedEmail ? 'rgba(74,222,128,0.15)' : 'var(--accent)', color: addedEmail ? 'var(--ok)' : '#0D0907', border: addedEmail ? '1px solid rgba(74,222,128,0.3)' : 'none', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
             {addedEmail ? <><Check size={13} /> Adăugat</> : '+ Adaugă'}
           </button>
         </div>
@@ -246,7 +246,7 @@ export const AdminDashboard: React.FC = () => {
         {currentNotif && (
           <div style={{ padding: '10px 14px', background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.25)', borderRadius: 8, marginBottom: 16, fontSize: 12, color: 'var(--gold)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
             <span>Notificare activă: "{currentNotif.message}"</span>
-            <button onClick={handleDeleteNotif} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#f87171', padding: 2, display: 'flex' }}>
+            <button onClick={handleDeleteNotif} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--error)', padding: 2, display: 'flex' }}>
               <Trash2 size={13} />
             </button>
           </div>
@@ -263,7 +263,7 @@ export const AdminDashboard: React.FC = () => {
               </button>
             ))}
             <button onClick={handlePublishNotif}
-              style={{ marginLeft: 'auto', padding: '7px 16px', background: notifPublished ? 'rgba(74,222,128,0.15)' : 'var(--gold)', color: notifPublished ? '#4ade80' : '#0D0907', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
+              style={{ marginLeft: 'auto', padding: '7px 16px', background: notifPublished ? 'rgba(74,222,128,0.15)' : 'var(--gold)', color: notifPublished ? 'var(--ok)' : '#0D0907', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
               {notifPublished ? <><Check size={13} /> Publicat</> : 'Publică'}
             </button>
           </div>

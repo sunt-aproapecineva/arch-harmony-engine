@@ -87,7 +87,7 @@ export const AdminLayout: React.FC = () => {
             onClick={async () => { await logout(); navigate('/login'); }}
             style={{
               display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 8,
-              background: 'none', border: 'none', cursor: 'pointer', color: '#f87171', fontSize: 12, width: '100%',
+              background: 'none', border: 'none', cursor: 'pointer', color: 'var(--error)', fontSize: 12, width: '100%',
               textAlign: 'left', transition: 'background 0.15s',
             }}
             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(248,113,113,0.1)')}

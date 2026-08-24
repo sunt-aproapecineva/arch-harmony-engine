@@ -27,7 +27,7 @@ const CellPopover: React.FC<{ userName: string; moduleName: string; lessons: { t
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {lessons.map((l, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13 }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: l.completed ? '#4ade80' : 'var(--border)' }} />
+            <div style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: l.completed ? 'var(--ok)' : 'var(--border)' }} />
             <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: l.completed ? 'var(--fg)' : 'var(--fg-3)' }}>{l.title}</span>
             {l.completed && l.completedAt && (
               <span style={{ fontSize: 11, color: 'var(--fg-3)', flexShrink: 0 }}>
@@ -96,7 +96,7 @@ export const AdminProgress: React.FC = () => {
 
   const cellStyle = (pct: number) => {
     if (pct === 0) return { background: 'rgba(255,255,255,0.04)', color: 'var(--fg-3)' };
-    if (pct === 100) return { background: 'rgba(74,222,128,0.15)', color: '#4ade80' };
+    if (pct === 100) return { background: 'rgba(74,222,128,0.15)', color: 'var(--ok)' };
     return { background: 'rgba(201,169,110,0.15)', color: 'var(--gold)' };
   };
 
@@ -152,8 +152,8 @@ export const AdminProgress: React.FC = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 24 }}>
         {[
           { label: 'Progres mediu', value: `${avgProgress}%`, color: 'var(--accent)' },
-          { label: 'Total completări', value: totalCompletions, color: '#4ade80' },
-          { label: 'Studenți activi', value: users.filter(u => getUserOverallPct(u.id) > 0).length, color: '#a78bfa' },
+          { label: 'Total completări', value: totalCompletions, color: 'var(--ok)' },
+          { label: 'Studenți activi', value: users.filter(u => getUserOverallPct(u.id) > 0).length, color: 'var(--info)' },
         ].map(({ label, value, color }) => (
           <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '18px 20px' }}>
             <div style={{ fontSize: 28, fontWeight: 700, color, lineHeight: 1, marginBottom: 6 }}>{value}</div>
@@ -178,7 +178,7 @@ export const AdminProgress: React.FC = () => {
                   </div>
                   <span style={{ flex: 1, fontSize: 13, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.full_name || user.email}</span>
                   <div style={{ width: 100, height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
-                    <div style={{ width: `${pct}%`, height: '100%', background: pct === 100 ? '#4ade80' : 'var(--accent)' }} />
+                    <div style={{ width: `${pct}%`, height: '100%', background: pct === 100 ? 'var(--ok)' : 'var(--accent)' }} />
                   </div>
                   <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)', minWidth: 36, textAlign: 'right' }}>{pct}%</span>
                 </div>
@@ -264,7 +264,7 @@ export const AdminProgress: React.FC = () => {
                       );
                     })}
                     <td style={{ padding: '10px 16px', textAlign: 'center' }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: overallPct === 100 ? '#4ade80' : 'var(--fg)' }}>{overallPct}%</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: overallPct === 100 ? 'var(--ok)' : 'var(--fg)' }}>{overallPct}%</span>
                     </td>
                   </tr>
                 );
@@ -284,7 +284,7 @@ export const AdminProgress: React.FC = () => {
                 <span style={{ fontSize: 12, color: 'var(--fg-2)', minWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{mod.title}</span>
                 <div style={{ flex: 1, height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
                   <motion.div initial={{ width: 0 }} animate={{ width: `${moduleAvgs[i]}%` }} transition={{ duration: 0.8, delay: i * 0.06 }}
-                    style={{ height: '100%', background: moduleAvgs[i] === 100 ? '#4ade80' : moduleAvgs[i] > 50 ? 'var(--accent)' : 'var(--gold)' }} />
+                    style={{ height: '100%', background: moduleAvgs[i] === 100 ? 'var(--ok)' : moduleAvgs[i] > 50 ? 'var(--accent)' : 'var(--gold)' }} />
                 </div>
                 <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg)', minWidth: 36, textAlign: 'right' }}>{moduleAvgs[i]}%</span>
               </div>

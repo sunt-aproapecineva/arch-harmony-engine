@@ -45,7 +45,7 @@ const MATURITY_COLOR: Record<QuizProfile['maturityLevel'], string> = {
   startup: '#93c5fd',
   manual: '#fca5a5',
   illusion: '#fdba74',
-  systemic: '#86efac',
+  systemic: 'var(--ok-soft)',
 };
 
 // ── Quiz question data (mirrors OnboardingQuiz) ───────────────────────────────
@@ -71,12 +71,12 @@ const QUIZ_QUESTIONS: { id: string; block: string; question: string }[] = [
 function ActivityIcon({ type }: { type: ActivityType }) {
   const size = 15;
   switch (type) {
-    case 'login': return <LogIn size={size} style={{ color: '#86efac' }} />;
+    case 'login': return <LogIn size={size} style={{ color: 'var(--ok-soft)' }} />;
     case 'lesson_complete': return <CheckCircle size={size} style={{ color: 'var(--accent)' }} />;
     case 'note_saved': return <FileText size={size} style={{ color: '#93c5fd' }} />;
-    case 'quiz_complete': return <Award size={size} style={{ color: '#fbbf24' }} />;
+    case 'quiz_complete': return <Award size={size} style={{ color: 'var(--warn)' }} />;
     case 'platform_register': return <UserPlus size={size} style={{ color: 'var(--fg-3)' }} />;
-    case 'exercise_complete': return <Pencil size={size} style={{ color: '#fb923c' }} />;
+    case 'exercise_complete': return <Pencil size={size} style={{ color: 'var(--warn-strong)' }} />;
     default: return <div style={{ width: size, height: size, borderRadius: '50%', background: 'var(--border)' }} />;
   }
 }
@@ -132,7 +132,7 @@ function renderReadableAnswer(
     const rows = parsed.filter((r: any) => r && typeof r === 'object' && Object.keys(r).length > 0);
     return {
       metric: `${rows.length} ${rows.length === 1 ? 'rând' : 'rânduri'}`,
-      metricColor: rows.length > 0 ? '#4ade80' : 'var(--fg-3)',
+      metricColor: rows.length > 0 ? 'var(--ok)' : 'var(--fg-3)',
       node: rows.length === 0 ? (
         <p style={{ fontSize: 12, color: 'var(--fg-3)', fontStyle: 'italic' }}>Niciun rând completat</p>
       ) : (
@@ -162,7 +162,7 @@ function renderReadableAnswer(
       const conclusion = typeof parsed.conclusion === 'string' ? parsed.conclusion.trim() : '';
       return {
         metric: `${rows.length} ${rows.length === 1 ? 'rând' : 'rânduri'}${conclusion ? ' • concluzie' : ''}`,
-        metricColor: rows.length > 0 || conclusion ? '#4ade80' : 'var(--fg-3)',
+        metricColor: rows.length > 0 || conclusion ? 'var(--ok)' : 'var(--fg-3)',
         node: (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {rows.map((row: any, i: number) => (
@@ -199,14 +199,14 @@ function renderReadableAnswer(
       const pct = total > 0 ? Math.round((checked / total) * 100) : 0;
       return {
         metric: `${checked}/${total} bifate (${pct}%)`,
-        metricColor: pct === 100 ? '#4ade80' : 'var(--fg-3)',
+        metricColor: pct === 100 ? 'var(--ok)' : 'var(--fg-3)',
         node: (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {(template?.items || entries.map(([id]) => ({ id, label: id }))).map((it: any) => {
               const isChecked = !!(parsed as any)[it.id];
               return (
                 <div key={it.id} style={{ display: 'flex', gap: 8, fontSize: 12, alignItems: 'flex-start' }}>
-                  <span style={{ color: isChecked ? '#4ade80' : 'var(--fg-3)', flexShrink: 0, marginTop: 1 }}>
+                  <span style={{ color: isChecked ? 'var(--ok)' : 'var(--fg-3)', flexShrink: 0, marginTop: 1 }}>
                     {isChecked ? '✓' : '○'}
                   </span>
                   <span style={{ color: isChecked ? 'var(--fg)' : 'var(--fg-3)', textDecoration: isChecked ? 'none' : 'none' }}>
@@ -229,14 +229,14 @@ function renderReadableAnswer(
       const max = Math.max(...nums);
       return {
         metric: `Medie: ${avg.toFixed(2)} • ${nums.length} întrebări`,
-        metricColor: avg >= 4 ? '#4ade80' : avg >= 3 ? 'var(--accent)' : avg >= 2 ? '#fb923c' : '#f87171',
+        metricColor: avg >= 4 ? 'var(--ok)' : avg >= 3 ? 'var(--accent)' : avg >= 2 ? 'var(--warn-strong)' : 'var(--error)',
         node: (
           <div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
               {[1, 2, 3, 4, 5].map(score => {
                 const count = distribution[score] || 0;
                 const pctOfMax = max > 0 ? (count / nums.length) * 100 : 0;
-                const color = score <= 2 ? '#f87171' : score === 3 ? '#fb923c' : '#4ade80';
+                const color = score <= 2 ? 'var(--error)' : score === 3 ? 'var(--warn-strong)' : 'var(--ok)';
                 return (
                   <div key={score} style={{ flex: 1, minWidth: 60, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 8px' }}>
                     <div style={{ fontSize: 10, color: 'var(--fg-3)' }}>Scor {score}</div>
@@ -260,7 +260,7 @@ function renderReadableAnswer(
     const filled = entries.filter(([, v]) => v !== null && v !== undefined && String(v).trim() !== '');
     return {
       metric: `${filled.length}/${entries.length} câmpuri`,
-      metricColor: filled.length === entries.length ? '#4ade80' : 'var(--fg-3)',
+      metricColor: filled.length === entries.length ? 'var(--ok)' : 'var(--fg-3)',
       node: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {entries.map(([k, v]) => {
@@ -491,7 +491,7 @@ export const AdminStudentProfile: React.FC = () => {
           {/* Avatar */}
           <div style={{
             width: 64, height: 64, borderRadius: '50%', flexShrink: 0,
-            background: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
+            background: 'linear-gradient(135deg, var(--ok) 0%, #22c55e 100%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 24, fontWeight: 700, color: '#0D0907',
           }}>
@@ -506,7 +506,7 @@ export const AdminStudentProfile: React.FC = () => {
               </h1>
               <TariffBadge tariff={user.tariff} compact />
               {loggedInToday && (
-                <span style={{ fontSize: 10, background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80', padding: '2px 8px', borderRadius: 99, fontWeight: 600 }}>
+                <span style={{ fontSize: 10, background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)', color: 'var(--ok)', padding: '2px 8px', borderRadius: 99, fontWeight: 600 }}>
                   Activ azi
                 </span>
               )}
@@ -584,7 +584,7 @@ export const AdminStudentProfile: React.FC = () => {
                 {quizProfile.maturityLabel}
               </span>
               <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>
-                Urgență: <strong style={{ color: quizProfile.urgencyScore >= 8 ? '#f87171' : quizProfile.urgencyScore >= 5 ? '#fb923c' : '#86efac' }}>
+                Urgență: <strong style={{ color: quizProfile.urgencyScore >= 8 ? 'var(--error)' : quizProfile.urgencyScore >= 5 ? 'var(--warn-strong)' : 'var(--ok-soft)' }}>
                   {quizProfile.urgencyScore}/10
                 </strong>
               </span>
@@ -596,7 +596,7 @@ export const AdminStudentProfile: React.FC = () => {
                 <div style={{
                   height: '100%',
                   width: `${quizProfile.urgencyScore * 10}%`,
-                  background: quizProfile.urgencyScore >= 8 ? '#f87171' : quizProfile.urgencyScore >= 5 ? '#fb923c' : '#86efac',
+                  background: quizProfile.urgencyScore >= 8 ? 'var(--error)' : quizProfile.urgencyScore >= 5 ? 'var(--warn-strong)' : 'var(--ok-soft)',
                   borderRadius: 3,
                   transition: 'width 0.8s ease',
                 }} />
@@ -618,7 +618,7 @@ export const AdminStudentProfile: React.FC = () => {
                       display: 'inline-flex', alignItems: 'center', gap: 5,
                       fontSize: 11, padding: '4px 10px', borderRadius: 99,
                       background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)',
-                      color: '#f87171',
+                      color: 'var(--error)',
                     }}>
                       <AlertTriangle size={10} /> {flag}
                     </span>
@@ -707,7 +707,7 @@ export const AdminStudentProfile: React.FC = () => {
             const total = mod.lessons.length;
             const pct = total > 0 ? Math.round((done / total) * 100) : 0;
             const status = pct === 100 ? 'Finalizat' : pct > 0 ? 'În progres' : 'Neînceput';
-            const statusColor = pct === 100 ? '#4ade80' : pct > 0 ? 'var(--accent)' : 'var(--fg-3)';
+            const statusColor = pct === 100 ? 'var(--ok)' : pct > 0 ? 'var(--accent)' : 'var(--fg-3)';
             return (
               <div key={mod.id}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
@@ -726,7 +726,7 @@ export const AdminStudentProfile: React.FC = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
                     <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>{done}/{total} lecții</span>
                     <span style={{ fontSize: 11, color: statusColor, fontWeight: 600 }}>{status}</span>
-                    <span style={{ fontSize: 12, color: pct === 100 ? '#4ade80' : 'var(--accent)', fontWeight: 700, minWidth: 36, textAlign: 'right' }}>{pct}%</span>
+                    <span style={{ fontSize: 12, color: pct === 100 ? 'var(--ok)' : 'var(--accent)', fontWeight: 700, minWidth: 36, textAlign: 'right' }}>{pct}%</span>
                   </div>
                 </div>
                 <ProgressBar value={pct} height={4} />

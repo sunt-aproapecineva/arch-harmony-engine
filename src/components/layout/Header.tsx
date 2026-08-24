@@ -150,7 +150,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, sidebarOpen }) => 
                   )}
                   <button
                     onClick={async () => { setOpen(false); await logout(); navigate('/login'); }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 7, width: '100%', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#f87171', transition: 'background 0.15s', textAlign: 'left' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 7, width: '100%', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--error)', transition: 'background 0.15s', textAlign: 'left' }}
                     onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = 'rgba(248,113,113,0.1)'}
                     onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = 'transparent'}
                   >

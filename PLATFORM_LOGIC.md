@@ -245,10 +245,19 @@ trebuie să numere exercițiile din `src/lib/staticExercises.ts` (derivat din `d
 
 1. Conținutul publicat nu are voie să dispară: orice lecție nouă se scrie în **cod**
    (`data.ts` + `contentSnapshot.ts`) **și** în DB, nu doar în DB.
+   *Precizare:* `contentSnapshot.ts` conține **intenționat** doar lecțiile video publicate
+   (≈24), nu toate intrările din `data.ts` (≈51). Exercițiile și lecțiile fără video sunt
+   excluse prin construcție, la fel ca în overlay-ul din DB. Nu e o desincronizare.
 2. Nicio scriere de date de elev fără verificarea sesiunii curente.
 3. Local-first: UI-ul salvează instant local, cloud-ul e best-effort cu reconciliere pe timestamp.
 4. Rolurile stau doar în `user_roles`, verificate prin `has_role()`; niciodată pe `profiles`.
 5. Orice tabel nou în `public`: `CREATE TABLE` → `GRANT` → `ENABLE RLS` → policies.
-6. Fără culori hardcodate în componente — doar tokenii de design.
+6. Fără culori hardcodate în componente — doar tokenii de design din `src/styles.css`.
+   Paleta include acum tokeni de stare cu variantă light/dark: `--ok`, `--ok-soft`,
+   `--warn`, `--warn-strong`, `--error`, `--info` (plus variantele `*-dim`).
+   Valorile literale `#4ade80`, `#f87171`, `#a78bfa` etc. au fost înlocuite cu acești tokeni.
 7. Documentele și exporturile folosesc același template brandat; niciun stil nou ad-hoc.
+   Excepție conștientă: HTML-ul generat pentru PDF nu poate folosi `var(--token)`
+   (rulează în afara contextului CSS al aplicației) — acolo culorile brandului rămân literale.
 8. Exercițiile se numără din cod (`staticExercises.ts`), niciodată din tabelul `exercises`.
+

@@ -34,7 +34,7 @@ export const ModulePage: React.FC = () => {
   const progress = getModuleProgress(module.id);
   const done = progress === 100;
 
-  const statusColor = done ? '#4ade80' : 'var(--accent)';
+  const statusColor = done ? 'var(--ok)' : 'var(--accent)';
 
   // All lessons (video + exercise) + deliverable
   const timelineItems = [
@@ -108,7 +108,7 @@ export const ModulePage: React.FC = () => {
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.8, ease: 'easeOut' }}
-              style={{ height: '100%', background: done ? '#4ade80' : 'var(--accent)', borderRadius: 2 }}
+              style={{ height: '100%', background: done ? 'var(--ok)' : 'var(--accent)', borderRadius: 2 }}
             />
           </div>
         </div>
@@ -199,7 +199,7 @@ export const ModulePage: React.FC = () => {
                 const lessonDone = isCompleted(lesson.id);
                 const isCurrentLesson = !lessonDone && module.lessons.slice(0, entry.idx).every(l => isCompleted(l.id));
                 const accentCol = isExLesson ? 'var(--gold)' : 'var(--accent)';
-                const nodeColor = lessonDone ? '#4ade80' : isCurrentLesson ? accentCol : 'var(--border)';
+                const nodeColor = lessonDone ? 'var(--ok)' : isCurrentLesson ? accentCol : 'var(--border)';
                 const nodeBg = lessonDone ? 'rgba(74,222,128,0.15)' : isCurrentLesson ? (isExLesson ? 'var(--gold-dim)' : 'var(--accent-dim)') : 'var(--bg-3)';
                 const borderColor = lessonDone ? 'rgba(74,222,128,0.2)' : isCurrentLesson ? (isExLesson ? 'rgba(201,169,110,0.25)' : 'rgba(196,240,228,0.2)') : 'var(--border)';
 
@@ -212,7 +212,7 @@ export const ModulePage: React.FC = () => {
                         {locked
                           ? <Lock size={12} style={{ color: 'var(--fg-3)' }} />
                           : lessonDone
-                          ? <CheckCircle2 size={14} style={{ color: '#4ade80' }} />
+                          ? <CheckCircle2 size={14} style={{ color: 'var(--ok)' }} />
                           : isExLesson
                           ? <Pencil size={12} style={{ color: isCurrentLesson ? 'var(--gold)' : 'var(--fg-3)' }} />
                           : <Play size={12} style={{ color: isCurrentLesson ? 'var(--accent)' : 'var(--fg-3)', marginLeft: 2 }} />}
@@ -251,7 +251,7 @@ export const ModulePage: React.FC = () => {
                           <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--accent)', background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)', padding: '2px 6px', borderRadius: 4 }}>PDF</div>
                         )}
                         {lessonDone
-                          ? <CheckCircle2 size={15} style={{ color: '#4ade80' }} />
+                          ? <CheckCircle2 size={15} style={{ color: 'var(--ok)' }} />
                           : locked ? <Lock size={13} style={{ color: 'var(--fg-3)' }} />
                           : isExLesson
                           ? <Pencil size={13} style={{ color: isCurrentLesson ? 'var(--gold)' : 'var(--border)' }} />

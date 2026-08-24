@@ -35,7 +35,7 @@ export const AttentionQueueCard: React.FC = () => {
     <div style={cardStyle}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--fg-3)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <AlertCircle size={12} style={{ color: '#fb923c' }} /> Necesită atenție
+          <AlertCircle size={12} style={{ color: 'var(--warn-strong)' }} /> Necesită atenție
         </div>
         <button onClick={load} disabled={loading}
           style={{ background: 'none', border: 'none', cursor: loading ? 'wait' : 'pointer', color: 'var(--fg-3)', display: 'flex', alignItems: 'center', gap: 4, fontSize: 11 }}>
@@ -63,7 +63,7 @@ export const AttentionQueueCard: React.FC = () => {
               onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-3)')}
               onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
             >
-              <div style={{ width: 30, height: 30, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#0D0907' }}>
+              <div style={{ width: 30, height: 30, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, var(--ok) 0%, #22c55e 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#0D0907' }}>
                 {(r.full_name || r.email).charAt(0).toUpperCase()}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>

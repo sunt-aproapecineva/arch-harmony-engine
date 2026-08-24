@@ -123,12 +123,12 @@ export const ResetPassword: React.FC = () => {
         {status === 'invalid' && (
           <div style={{ textAlign: 'center', padding: '12px 0' }}>
             <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(248,113,113,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
-              <AlertCircle size={28} color="#f87171" />
+              <AlertCircle size={28} color="var(--error)" />
             </div>
             <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--fg)', marginBottom: 10 }}>Link invalid sau expirat</h2>
             <p style={{ fontSize: 14, color: 'var(--fg-3)', lineHeight: 1.7, marginBottom: 20 }}>
               Linkul de resetare nu este valid sau a expirat. Cere unul nou de la pagina de login.
-              {error && <><br /><span style={{ fontSize: 12, color: '#f87171' }}>{error}</span></>}
+              {error && <><br /><span style={{ fontSize: 12, color: 'var(--error)' }}>{error}</span></>}
             </p>
 
             <button
@@ -194,7 +194,7 @@ export const ResetPassword: React.FC = () => {
               ))}
 
               {error && (
-                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} style={{ padding: '10px 14px', background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: 8, fontSize: 13, color: '#f87171' }}>
+                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} style={{ padding: '10px 14px', background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: 8, fontSize: 13, color: 'var(--error)' }}>
                   {error}
                 </motion.div>
               )}

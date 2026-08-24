@@ -144,7 +144,7 @@ const BLOCK_COLORS: Record<number, string> = {
 const BLOCK_TEXT_COLORS: Record<number, string> = {
   1: '#C4F0E4',
   2: '#C9A96E',
-  3: '#a78bfa',
+  3: 'var(--info)',
   4: '#93c5fd',
   5: '#fca5a5',
 };
