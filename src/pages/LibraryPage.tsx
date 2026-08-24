@@ -137,10 +137,11 @@ const Card: React.FC<{ item: LibraryItem; index: number }> = ({ item, index }) =
 };
 
 export const LibraryPage: React.FC = () => {
-  const { course, courseId } = useCourse();
+  const { course, courseId, tariff: courseTariff } = useCourse();
   const courseItems = React.useMemo(() => libraryItemsForCourse(courseId), [courseId]);
   const { user } = useAuthContext();
-  const isArchitect = user?.tariff === 'arhitect';
+  // Tariful contează per curs: un elev poate fi arhitect la Business și student la Start.
+  const isArchitect = courseTariff === 'arhitect';
 
   if (!isArchitect) {
     return (

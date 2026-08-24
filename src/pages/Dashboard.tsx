@@ -79,7 +79,7 @@ export const Dashboard: React.FC = () => {
   const { getModuleProgress, getOverallProgress, isModuleLocked, getCompletedLessonsCount, getTotalLessonsCount } = useProgress();
   const navigate = useNavigate();
 
-  const { course, courseId, modules, liveEvents } = useCourse();
+  const { course, courseId, modules, liveEvents, tariff: courseTariff } = useCourse();
   const quizDone = hasCompletedOnboarding(user, courseId);
   const [quizModalOpen, setQuizModalOpen] = useState(false);
 
@@ -97,7 +97,7 @@ export const Dashboard: React.FC = () => {
   const currentProgress = getModuleProgress(currentModule.id);
 
   const firstName = user?.full_name?.split(' ')[0] || 'Antreprenor';
-  const tariff = (user?.tariff || 'student') as Tariff;
+  const tariff = (courseTariff || 'student') as Tariff;
 
   const today = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
   const upcomingEvents = useMemo(() =>

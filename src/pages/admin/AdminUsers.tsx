@@ -49,7 +49,7 @@ export const AdminUsers: React.FC = () => {
       fetchAdminUsers(courseId),
       fetchAllProgress(),
       fetchModulesWithLessons(courseId),
-      supabase.from('whitelist').select('email,tariff,added_at').order('added_at', { ascending: false }),
+      supabase.from('whitelist').select('email,tariff,added_at').eq('course_id', courseId).order('added_at', { ascending: false }),
     ]);
     setUsers(u);
     setProgress(p);
@@ -74,7 +74,7 @@ export const AdminUsers: React.FC = () => {
       setAddError('Adresa de email nu este validă.');
       return;
     }
-    const { error } = await supabase.from('whitelist').insert({ email, tariff: newTariff });
+    const { error } = await supabase.from('whitelist').insert({ email, tariff: newTariff, course_id: courseId });
     if (error) {
       if (error.code === '23505') setAddError('Acest email este deja în listă.');
       else setAddError(error.message);
@@ -112,18 +112,40 @@ export const AdminUsers: React.FC = () => {
     else alert(error);
   };
 
+  // Tariful e per curs: scriem pe înscrierea de la cursul privit acum, nu pe profil.
+  // `profiles.tariff` rămâne actualizat doar ca plasă pentru conturile nemigrate.
   const handleChangeTariff = async (user: AdminUserRow, tariff: Tariff) => {
     if (tariff === user.tariff) return;
-    // Update profile (active user record)
-    const { error: pErr } = await supabase.from('profiles').update({ tariff }).eq('id', user.id);
-    if (pErr) { alert('Eroare la actualizarea profilului: ' + pErr.message); return; }
-    // Keep whitelist in sync (for future re-registrations / consistency)
-    await supabase.from('whitelist').update({ tariff }).eq('email', user.email.toLowerCase());
+    const { error: eErr } = await supabase
+      .from('enrollments')
+      .upsert({ user_id: user.id, course_id: courseId, tariff }, { onConflict: 'user_id,course_id' });
+    if (eErr) { alert('Eroare la actualizarea înscrierii: ' + eErr.message); return; }
+    await supabase.from('profiles').update({ tariff }).eq('id', user.id);
+    // Ținem whitelist-ul în sincron pentru o eventuală re-înregistrare, dar doar
+    // pentru cursul curent — altfel am schimba tariful și la celelalte programe.
+    await supabase.from('whitelist').update({ tariff })
+      .eq('email', user.email.toLowerCase()).eq('course_id', courseId);
+    reload();
+  };
+
+  /** Înscrie sau retrage accesul unui elev la cursul privit acum. */
+  const handleToggleEnrollment = async (user: AdminUserRow, enroll: boolean) => {
+    if (enroll) {
+      const { error } = await supabase
+        .from('enrollments')
+        .upsert({ user_id: user.id, course_id: courseId, tariff: user.tariff || 'student' }, { onConflict: 'user_id,course_id' });
+      if (error) { alert('Eroare la înscriere: ' + error.message); return; }
+    } else {
+      const { error } = await supabase
+        .from('enrollments').delete().eq('user_id', user.id).eq('course_id', courseId);
+      if (error) { alert('Eroare la retragerea accesului: ' + error.message); return; }
+    }
     reload();
   };
 
   const handleChangeWhitelistTariff = async (email: string, tariff: Tariff) => {
-    const { error } = await supabase.from('whitelist').update({ tariff }).eq('email', email.toLowerCase());
+    const { error } = await supabase.from('whitelist').update({ tariff })
+      .eq('email', email.toLowerCase()).eq('course_id', courseId);
     if (error) { alert('Eroare: ' + error.message); return; }
     reload();
   };
@@ -305,18 +327,34 @@ export const AdminUsers: React.FC = () => {
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--fg-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</div>
                   </div>
-                  <select
-                    value={user.tariff}
-                    onClick={e => e.stopPropagation()}
-                    onChange={e => handleChangeTariff(user, e.target.value as Tariff)}
-                    title="Schimbă tariful"
-                    style={{ fontSize: 10, fontWeight: 700, padding: '4px 8px', borderRadius: 99, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, cursor: 'pointer', appearance: 'none', justifySelf: 'start', outline: 'none' }}>
-                    {TARIFF_OPTIONS.map(opt => (
-                      <option key={opt.value} value={opt.value} style={{ background: '#0D0907', color: 'var(--fg)' }}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifySelf: 'start' }}>
+                    <select
+                      value={user.tariff}
+                      onClick={e => e.stopPropagation()}
+                      onChange={e => handleChangeTariff(user, e.target.value as Tariff)}
+                      disabled={!user.enrolled}
+                      title={user.enrolled ? `Tariful la ${course?.shortTitle || 'curs'}` : 'Elevul nu are acces la acest program'}
+                      style={{ fontSize: 10, fontWeight: 700, padding: '4px 8px', borderRadius: 99, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, cursor: user.enrolled ? 'pointer' : 'not-allowed', opacity: user.enrolled ? 1 : 0.4, appearance: 'none', outline: 'none' }}>
+                      {TARIFF_OPTIONS.map(opt => (
+                        <option key={opt.value} value={opt.value} style={{ background: '#0D0907', color: 'var(--fg)' }}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    {/* Accesul la programul privit acum. Fără asta, adminul n-ar avea de
+                        unde deschide sau retrage un curs pentru un elev. */}
+                    <button
+                      onClick={e => { e.stopPropagation(); handleToggleEnrollment(user, !user.enrolled); }}
+                      title={user.enrolled ? `Retrage accesul la ${course?.shortTitle || 'curs'}` : `Dă acces la ${course?.shortTitle || 'curs'}`}
+                      style={{
+                        fontSize: 10, fontWeight: 700, padding: '3px 7px', borderRadius: 99, cursor: 'pointer',
+                        background: user.enrolled ? 'var(--ok-dim)' : 'transparent',
+                        color: user.enrolled ? 'var(--ok)' : 'var(--fg-3)',
+                        border: `1px solid ${user.enrolled ? 'var(--ok-dim)' : 'var(--border)'}`,
+                      }}>
+                      {user.enrolled ? '✓' : '+'}
+                    </button>
+                  </div>
 
                   <div style={{ fontSize: 11, color: 'var(--fg-3)' }}>{user.last_activity ? timeAgo(user.last_activity) : '—'}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

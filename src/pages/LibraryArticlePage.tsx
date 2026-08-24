@@ -16,7 +16,7 @@ const REGISTRY: Record<string, React.FC> = {
 };
 
 export const LibraryArticlePage: React.FC = () => {
-  const { course, courseId } = useCourse();
+  const { course, courseId, tariff: courseTariff } = useCourse();
   const { slug } = useParams() as { slug: string };
   const navigate = useNavigate();
   const { user } = useAuthContext();
@@ -31,7 +31,7 @@ export const LibraryArticlePage: React.FC = () => {
 
   useEffect(() => { window.scrollTo({ top: 0 }); }, [slug]);
 
-  if (user?.tariff !== 'arhitect') {
+  if (courseTariff !== 'arhitect') {
     return (
       <div style={{ padding: '64px 24px', textAlign: 'center' }}>
         <h2 style={{ color: 'var(--fg)' }}>Acces restricționat</h2>
