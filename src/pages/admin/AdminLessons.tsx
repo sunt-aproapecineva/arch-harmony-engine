@@ -2,6 +2,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
+import { planCourseStructure, publishCourseStructure } from '@/lib/contentSync';
+import { COURSE_ACCENT } from '@/lib/courses';
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor,
   useSensor, useSensors, DragEndEvent,
@@ -190,12 +192,21 @@ const SortableModule: React.FC<{
 // ─── Main Page ───────────────────────────────
 export const AdminLessons: React.FC = () => {
   // Editorul de conținut lucrează pe o singură ramură odată (?curs=).
-  const { course, courseId } = useAdminCourseScope();
+  const { course, courseId, flows } = useAdminCourseScope();
   const [modules, setModules] = useState<Module[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [schemaMissing, setSchemaMissing] = useState(false);
+  const [plan, setPlan] = useState<any>(null);
+  const [publishing, setPublishing] = useState(false);
+
+  // Lecțiile aparțin modulelor, nu direct programului. Numărăm doar pe cele ale
+  // modulelor încărcate — altfel contorul aduna lecțiile tuturor programelor.
+  const courseLessons = React.useMemo(() => {
+    const ids = new Set(modules.map((m: any) => m.id));
+    return lessons.filter((l: any) => ids.has(l.module_id));
+  }, [modules, lessons]);
 
   const load = useCallback(async () => {
     const [m, l] = await Promise.all([
@@ -214,6 +225,9 @@ export const AdminLessons: React.FC = () => {
     setModules((m.data as Module[]) || []);
     setLessons((l.data as Lesson[]) || []);
     setSchemaMissing(!!(m as any).schemaMissing);
+    // Structura din cod care încă n-are rânduri în bază. Pentru un program nou
+    // (START) e totul: fără publicare, editorul n-are ce să arate.
+    planCourseStructure(courseId).then(setPlan).catch(() => setPlan(null));
     setLoading(false);
   }, [courseId]);
 
@@ -316,10 +330,31 @@ export const AdminLessons: React.FC = () => {
           Ca să nu editezi din greșeală conținutul altui curs, lista rămâne goală până la migrație.
         </div>
       )}
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 24, gap: 16, flexWrap: 'wrap' }}>
-        <div>
-          <h1 className="font-aboreto" style={{ fontSize: 22, color: 'var(--fg)', marginBottom: 4 }}>Lecții & Module</h1>
-          <p style={{ fontSize: 13, color: 'var(--fg-3)' }}>{modules.length} module · {lessons.length} lecții · trage de ⋮⋮ pentru a reordona</p>
+      <ScopeNote course={course} flows={flows} plan={plan} publishing={publishing} onPublish={async () => {
+        if (!confirm(`Publici în bază structura din cod pentru ${course?.title}? Se adaugă doar ce lipsește, nu se șterge nimic.`)) return;
+        setPublishing(true);
+        const r = await publishCourseStructure(courseId);
+        setPublishing(false);
+        if (r.error) { alert('Nu am putut publica: ' + r.error); return; }
+        alert(`Publicat: ${r.modules} module și ${r.lessons} lecții adăugate.`);
+        load();
+      }} />
+
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 16, gap: 16, flexWrap: 'wrap' }}>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+            <h1 className="font-aboreto" style={{ fontSize: 22, color: 'var(--fg)' }}>Lecții & Module</h1>
+            {course && (
+              <span style={{
+                fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 99,
+                color: COURSE_ACCENT[course.accent].fg, background: COURSE_ACCENT[course.accent].dim,
+                border: '1px solid var(--border)',
+              }}>
+                {course.title}
+              </span>
+            )}
+          </div>
+          <p style={{ fontSize: 13, color: 'var(--fg-3)' }}>{modules.length} module · {courseLessons.length} lecții · trage de ⋮⋮ pentru a reordona</p>
         </div>
         <button onClick={addModule} style={btnPrimary}><Plus size={14} /> Adaugă modul</button>
       </div>
@@ -381,3 +416,56 @@ const iconBtn: React.CSSProperties = {
 };
 
 export default AdminLessons;
+
+/**
+ * Explică domeniul editorului: conținutul aparține unui PROGRAM și e servit tuturor
+ * fluxurilor lui. Fără nota asta, adminul nu are de unde ști pe cine afectează o
+ * modificare — și exact asta a fost confuzia.
+ */
+const ScopeNote: React.FC<{ course: any; flows: any[]; plan: any; publishing: boolean; onPublish: () => void }> =
+  ({ course, flows, plan, publishing, onPublish }) => {
+    const missing = plan ? plan.modulesMissing + plan.lessonsMissing : 0;
+    return (
+      <div style={{
+        marginBottom: 16, padding: '14px 16px', borderRadius: 12,
+        background: 'var(--bg-card)', border: '1px solid var(--border)',
+      }}>
+        <p style={{ fontSize: 12.5, color: 'var(--fg-2)', lineHeight: 1.65, margin: 0 }}>
+          Editezi conținutul programului <strong style={{ color: 'var(--fg)' }}>{course?.title || '—'}</strong>.
+          {' '}Lecțiile aparțin programului, nu unui flux anume — o modificare se vede în
+          {' '}<strong style={{ color: 'var(--fg)' }}>
+            {flows.length === 0 ? 'toate fluxurile lui' : flows.length === 1 ? `fluxul ${flows[0].name}` : `toate cele ${flows.length} fluxuri`}
+          </strong>.
+          {' '}Ce diferă între fluxuri e calendarul, nu materialul: fiecare flux își deschide
+          aceleași module la datele lui.
+        </p>
+
+        {plan && !plan.schemaMissing && missing > 0 && (
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+            <p style={{ fontSize: 12.5, color: 'var(--warn)', lineHeight: 1.6, margin: '0 0 10px' }}>
+              {plan.modulesMissing > 0 && plan.lessonsMissing > 0
+                ? `${plan.modulesMissing} module și ${plan.lessonsMissing} lecții există în cod, dar n-au încă rânduri în bază — deci nu pot fi editate aici.`
+                : plan.modulesMissing > 0
+                  ? `${plan.modulesMissing} module există în cod, dar n-au încă rânduri în bază.`
+                  : `${plan.lessonsMissing} lecții există în cod, dar n-au încă rânduri în bază.`}
+            </p>
+            <button
+              onClick={onPublish}
+              disabled={publishing}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 7, minHeight: 36, padding: '0 14px',
+                borderRadius: 9, cursor: publishing ? 'wait' : 'pointer', fontSize: 12.5, fontWeight: 600,
+                background: 'var(--warn-dim)', color: 'var(--warn)', border: '1px solid var(--border-hi)',
+                opacity: publishing ? 0.6 : 1,
+              }}
+            >
+              {publishing ? 'Se publică…' : 'Publică structura din cod'}
+            </button>
+            <p style={{ fontSize: 11, color: 'var(--fg-3)', margin: '8px 0 0', lineHeight: 1.5 }}>
+              Se adaugă doar ce lipsește. Nimic nu se șterge și nicio editare existentă nu se pierde.
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  };
