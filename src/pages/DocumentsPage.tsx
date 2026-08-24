@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { readLocalDocs, writeLocalDocs, hydrateDocsFromCloud, pushDocsToCloud } from '../lib/documentSync';
 import { useNavigate, useSearchParams } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, FileText, Printer, Pencil, Trash2, FolderOpen, ExternalLink, X } from 'lucide-react';
@@ -320,10 +321,17 @@ export const DocumentsPage: React.FC = () => {
   const newSavedId = searchParams.get('saved');
   const myDocsRef = useRef<HTMLDivElement>(null);
 
-  const storageKey = `aa_my_docs_${user?.id ?? 'anon'}`;
-  const [myDocs, setMyDocs] = useState<SavedDoc[]>(() => {
-    try { return JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch { return []; }
-  });
+  const [myDocs, setMyDocs] = useState<SavedDoc[]>(() => readLocalDocs(user?.id));
+
+  // Local-first, then reconcile with the cloud copy.
+  useEffect(() => {
+    setMyDocs(readLocalDocs(user?.id));
+    let cancelled = false;
+    hydrateDocsFromCloud(user?.id).then(cloud => {
+      if (!cancelled && cloud) setMyDocs(cloud);
+    });
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   const [activeTab, setActiveTab] = useState<ActiveTab>(() =>
     newSavedId ? 'saved' : 'all'
@@ -341,7 +349,8 @@ export const DocumentsPage: React.FC = () => {
   const handleDelete = (id: string) => {
     const updated = myDocs.filter(d => d.id !== id);
     setMyDocs(updated);
-    localStorage.setItem(storageKey, JSON.stringify(updated));
+    writeLocalDocs(user?.id, updated);
+    pushDocsToCloud(user?.id, updated);
     if (updated.length === 0 && activeTab === 'saved') setActiveTab('all');
   };
 
