@@ -8,6 +8,7 @@ import { NotificationBanner } from '../aa/NotificationBanner';
 import { LayoutDashboard, BookOpen, FolderOpen, ShieldCheck, Library } from 'lucide-react';
 import { useAuthContext } from '../../context/AuthContext';
 import { useCourse } from '../../context/CourseContext';
+import { tierGrants } from '../../lib/courses';
 import { courseDashboardPath, courseDocumentsPath, courseLibraryPath, courseModulePath } from '../../lib/navigation';
 
 const SIDEBAR_KEY = 'aa_sidebar_open';
@@ -111,7 +112,7 @@ export const Layout: React.FC = () => {
               // care nu există (modulele se numesc 'm-0'), deci tabul ducea în gol.
               { to: firstModulePath, icon: <BookOpen size={20} />, label: 'Lecții' },
               { to: courseDocumentsPath(course), icon: <FolderOpen size={20} />, label: 'Documente' },
-              ...(courseTariff === 'arhitect' ? [{ to: courseLibraryPath(course), icon: <Library size={20} />, label: 'Bibliotecă' }] : []),
+              ...(tierGrants(course?.id, courseTariff, 'library') ? [{ to: courseLibraryPath(course), icon: <Library size={20} />, label: 'Bibliotecă' }] : []),
               ...(isAdmin ? [{ to: '/admin', icon: <ShieldCheck size={20} />, label: 'Admin' }] : []),
             ].map(({ to, icon, label }) => (
               <NavLink

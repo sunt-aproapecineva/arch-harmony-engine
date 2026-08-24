@@ -6,7 +6,7 @@ import { useProgress } from '../../hooks/useProgress';
 import { useAuthContext } from '../../context/AuthContext';
 import { useCourse } from '../../context/CourseContext';
 import { courseDocumentsPath, courseLibraryPath, courseMaterialsPath, courseModulePath } from '../../lib/navigation';
-import { COURSE_ACCENT } from '../../lib/courses';
+import { COURSE_ACCENT, tierGrants } from '../../lib/courses';
 import { enrolledCourses, enrollmentForCourse } from '../../lib/enrollments';
 import { flowAccessUntil } from '../../lib/flows';
 import { TariffBadge } from '../aa/TariffBadge';
@@ -137,7 +137,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         </NavLink>
 
         {/* Library — Arhitect only */}
-        {tariff === 'arhitect' && (
+        {tierGrants(course?.id, tariff, 'library') && (
           <NavLink
             to={courseLibraryPath(course)}
             onClick={onClose}

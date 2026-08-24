@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate } from '@/lib/router-compat';
 import { useCourse } from '../context/CourseContext';
+import { tierGrants } from '../lib/courses';
 import { courseLibraryArticlePath } from '../lib/navigation';
 import { motion } from 'framer-motion';
 import { BookOpen, Clock, Lock, ArrowRight, Sparkles, FileText, Film, Wrench, Briefcase } from 'lucide-react';
@@ -145,7 +146,7 @@ export const LibraryPage: React.FC = () => {
   const courseItems = React.useMemo(() => libraryItemsForCourse(courseId), [courseId]);
   const { user } = useAuthContext();
   // Tariful contează per curs: un elev poate fi arhitect la Business și student la Start.
-  const isArchitect = courseTariff === 'arhitect';
+  const isArchitect = tierGrants(courseId, courseTariff, 'library');
 
   if (!isArchitect) {
     return (

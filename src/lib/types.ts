@@ -1,4 +1,9 @@
-export type Tariff = 'student' | 'designer' | 'arhitect';
+/**
+ * Id-ul treptei de preț. NU e o listă fixă: fiecare program își definește treptele în
+ * `src/lib/courses.ts` (Business: student/designer/arhitect, START: singur/pro/ultra).
+ * Coloanele din DB sunt `text`, deci nu e nevoie de nicio migrație pentru un program nou.
+ */
+export type Tariff = string;
 
 export interface Enrollment {
   course_id: string;

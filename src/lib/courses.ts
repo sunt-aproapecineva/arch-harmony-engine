@@ -16,6 +16,38 @@ export type CourseId = 'business' | 'start';
 /** Accente de brand, exprimate ca tokeni de design (vezi invariantul 6). */
 export type CourseAccent = 'accent' | 'gold';
 
+/**
+ * O treaptă de preț a unui program.
+ *
+ * Treptele NU sunt globale. Business vinde Student / Designer / Arhitect, START vinde
+ * Singur / PRO / Ultra — nume, prețuri și beneficii diferite. Înainte, tipul `Tariff`
+ * conținea doar cele trei de la Business, iar accesul la bibliotecă se verifica prin
+ * șirul literal 'arhitect', deci START n-avea cum să încapă.
+ *
+ * `id` e ce se scrie în `enrollments.tariff` și `whitelist.tariff` (coloane text).
+ */
+export interface CourseTier {
+  id: string;
+  label: string;
+  /** Prețul afișat în admin, ca reper pentru cine acordă accesul. */
+  price?: string;
+  /** Ierarhia în interiorul programului. Mai mare = mai mult acces. */
+  order: number;
+  accent: 'neutral' | 'accent' | 'gold';
+  /**
+   * Ce deblochează treapta. Gating-ul se face pe capabilități, nu pe numele treptei —
+   * altfel fiecare program nou ar cere încă un `if` prin toată aplicația.
+   */
+  grants: {
+    /** Biblioteca de materiale bonus. */
+    library?: boolean;
+    /** Mentor dedicat și urmărire personală. */
+    mentor?: boolean;
+    /** Consultație unu-la-unu. */
+    oneOnOne?: boolean;
+  };
+}
+
 export interface Course {
   id: CourseId;
   /** segmentul din URL: /c/<slug>/dashboard */
@@ -34,6 +66,8 @@ export interface Course {
   hasQuiz: boolean;
   /** cursurile inactive nu apar în ecranul de selecție nici dacă există înscriere */
   is_active: boolean;
+  /** Treptele de preț ale programului, de la cea mai mică la cea mai mare. */
+  tiers: CourseTier[];
 }
 
 export const COURSES: Course[] = [
@@ -51,6 +85,11 @@ export const COURSES: Course[] = [
     accent: 'accent',
     hasQuiz: true,
     is_active: true,
+    tiers: [
+      { id: 'student',  label: 'Student',  price: '589€',   order: 1, accent: 'neutral', grants: {} },
+      { id: 'designer', label: 'Designer', price: '777€',   order: 2, accent: 'accent',  grants: { mentor: true } },
+      { id: 'arhitect', label: 'Arhitect', price: '1.129€', order: 3, accent: 'gold',    grants: { library: true, mentor: true, oneOnOne: true } },
+    ],
   },
   {
     id: 'start',
@@ -66,6 +105,12 @@ export const COURSES: Course[] = [
     accent: 'gold',
     hasQuiz: true,
     is_active: true,
+    // Treptele din pagina de vânzare a programului START.
+    tiers: [
+      { id: 'singur', label: 'Singur', price: '397€', order: 1, accent: 'neutral', grants: { library: true } },
+      { id: 'pro',    label: 'PRO',    price: '597€', order: 2, accent: 'accent',  grants: { library: true, mentor: true } },
+      { id: 'ultra',  label: 'Ultra',  price: '997€', order: 3, accent: 'gold',    grants: { library: true, mentor: true, oneOnOne: true } },
+    ],
   },
 ];
 
@@ -107,4 +152,44 @@ export function courseIdFromContentId(contentId: string | null | undefined): Cou
 export const COURSE_ACCENT: Record<CourseAccent, { fg: string; dim: string }> = {
   accent: { fg: 'var(--accent)', dim: 'var(--accent-dim)' },
   gold: { fg: 'var(--gold)', dim: 'var(--gold-dim)' },
+};
+
+// ─── Trepte de preț ───────────────────────────────────────────────────────────
+
+/** Treptele unui program, de la cea mai mică la cea mai mare. */
+export function courseTiers(courseId: string | null | undefined): CourseTier[] {
+  return getCourse(courseId)?.tiers || [];
+}
+
+/** Treapta unui elev la un program. Null dacă id-ul nu aparține programului. */
+export function getTier(courseId: string | null | undefined, tierId: string | null | undefined): CourseTier | null {
+  if (!tierId) return null;
+  return courseTiers(courseId).find(t => t.id === tierId) || null;
+}
+
+/** Treapta implicită (cea mai mică) a unui program. */
+export function defaultTier(courseId: string | null | undefined): CourseTier | null {
+  return courseTiers(courseId)[0] || null;
+}
+
+/**
+ * Treapta elevului deblochează capabilitatea cerută?
+ *
+ * De folosit în locul comparațiilor cu numele treptei. `tariff === 'arhitect'` era
+ * corect doar pentru Business; la START ar fi refuzat biblioteca tuturor, deși acolo
+ * e inclusă din prima treaptă.
+ */
+export function tierGrants(
+  courseId: string | null | undefined,
+  tierId: string | null | undefined,
+  capability: keyof CourseTier['grants'],
+): boolean {
+  return !!getTier(courseId, tierId)?.grants?.[capability];
+}
+
+/** Culorile insignei de treaptă, în tokeni. */
+export const TIER_ACCENT: Record<CourseTier['accent'], { fg: string; bg: string }> = {
+  neutral: { fg: 'var(--fg-2)', bg: 'var(--bg-3)' },
+  accent: { fg: 'var(--accent)', bg: 'var(--accent-dim)' },
+  gold: { fg: 'var(--gold)', bg: 'var(--gold-dim)' },
 };

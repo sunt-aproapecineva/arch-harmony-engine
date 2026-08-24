@@ -9,24 +9,27 @@ import { timeAgo } from '../../lib/activity';
 import { fetchModulesWithLessons, fetchAdminUsers, fetchAllProgress, setUserAdmin, AdminModule, AdminUserRow, AdminProgressRow } from '../../lib/adminData';
 import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
 import { courseLessonIndex, modulePct, overallPct, doneCount, doneByUser } from '@/lib/adminProgress';
+import { courseTiers, getTier, defaultTier, TIER_ACCENT } from '@/lib/courses';
 import type { Tariff } from '../../lib/types';
 
 interface WLEntry { email: string; tariff: Tariff; added_at?: string; }
 
-const TARIFF_OPTIONS: { value: Tariff; label: string; price: string }[] = [
-  { value: 'student', label: 'Student', price: '589€' },
-  { value: 'designer', label: 'Designer', price: '777€' },
-  { value: 'arhitect', label: 'Arhitect', price: '1.129€' },
-];
-
-const tariffColor = (t: Tariff) => {
-  if (t === 'arhitect') return { color: 'var(--gold)', bg: 'var(--gold-dim)', border: 'rgba(201,169,110,0.3)' };
-  if (t === 'designer') return { color: 'var(--accent)', bg: 'rgba(196,240,228,0.1)', border: 'rgba(196,240,228,0.3)' };
-  return { color: 'var(--fg-2)', bg: 'rgba(255,255,255,0.06)', border: 'rgba(255,255,255,0.15)' };
+/**
+ * Culoarea insignei de treaptă, citită din definiția PROGRAMULUI.
+ * Înainte era hardcodată pe 'arhitect'/'designer' — treptele de la START
+ * (Singur / PRO / Ultra) apăreau toate gri.
+ */
+const tierStyle = (courseId: string, tierId: Tariff) => {
+  const tier = getTier(courseId, tierId);
+  const a = TIER_ACCENT[tier?.accent || 'neutral'];
+  return { color: a.fg, bg: a.bg, border: 'var(--border-hi)' };
 };
 
 export const AdminUsers: React.FC = () => {
   const { course, courseId, flows } = useAdminCourseScope();
+  // Treptele programului privit. Business: Student/Designer/Arhitect.
+  // START: Singur/PRO/Ultra. Se schimbă odată cu comutatorul din bara laterală.
+  const tiers = courseTiers(courseId);
   const navigate = useNavigate();
   const [users, setUsers] = useState<AdminUserRow[]>([]);
   const [progress, setProgress] = useState<AdminProgressRow[]>([]);
@@ -63,6 +66,14 @@ export const AdminUsers: React.FC = () => {
   }, [courseId]);
 
   useEffect(() => { reload(); }, [reload]);
+
+  // Treapta selectată aparține unui program: la comutare, o resetăm pe prima a
+  // programului nou. Altfel s-ar adăuga cineva la START cu tariful „student" de la
+  // Business, care nici nu există acolo.
+  useEffect(() => {
+    const first = defaultTier(courseId);
+    if (first && !courseTiers(courseId).some(t => t.id === newTariff)) setNewTariff(first.id);
+  }, [courseId, newTariff]);
 
   // Ca și în AdminProgress: numărăm din cod, nu din tabelul `modules` (id-uri UUID
   // care nu se potrivesc cu progress.lesson_id) și doar lecțiile cursului privit.
@@ -245,11 +256,11 @@ export const AdminUsers: React.FC = () => {
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                   <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>Plan:</span>
-                  {TARIFF_OPTIONS.map(opt => {
-                    const tc = tariffColor(opt.value);
-                    const active = newTariff === opt.value;
+                  {tiers.map(opt => {
+                    const tc = tierStyle(courseId, opt.id);
+                    const active = newTariff === opt.id;
                     return (
-                      <button key={opt.value} onClick={() => setNewTariff(opt.value)}
+                      <button key={opt.id} onClick={() => setNewTariff(opt.id)}
                         style={{ padding: '5px 12px', borderRadius: 8, fontSize: 12, cursor: 'pointer', fontWeight: active ? 700 : 400, background: active ? tc.bg : 'transparent', border: `1px solid ${active ? tc.border : 'var(--border)'}`, color: active ? tc.color : 'var(--fg-3)' }}>
                         {opt.label} · {opt.price}
                       </button>
@@ -267,14 +278,14 @@ export const AdminUsers: React.FC = () => {
               <div key={entry.email} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 8 }}>
                 <span style={{ fontSize: 13, color: 'var(--fg)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: 8 }}>{entry.email}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                  {(() => { const tc = tariffColor(entry.tariff); return (
+                  {(() => { const tc = tierStyle(courseId, entry.tariff); return (
                     <select
                       value={entry.tariff}
                       onChange={e => handleChangeWhitelistTariff(entry.email, e.target.value as Tariff)}
                       title="Schimbă tariful"
                       style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 99, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, cursor: 'pointer', appearance: 'none' }}>
-                      {TARIFF_OPTIONS.map(opt => (
-                        <option key={opt.value} value={opt.value} style={{ background: '#0D0907', color: 'var(--fg)' }}>{opt.label}</option>
+                      {tiers.map(opt => (
+                        <option key={opt.id} value={opt.id} style={{ background: '#0D0907', color: 'var(--fg)' }}>{opt.label}</option>
                       ))}
                     </select>
                   ); })()}
@@ -329,7 +340,7 @@ export const AdminUsers: React.FC = () => {
             const pct = getUserProgress(user.id);
             const lessonCount = getUserLessonCount(user.id);
             const isExpanded = expandedUser === user.id;
-            const tc = tariffColor(user.tariff);
+            const tc = tierStyle(courseId, user.tariff);
             const isMainAdmin = user.email === 'babaradumi@gmail.com';
 
             return (
@@ -356,8 +367,8 @@ export const AdminUsers: React.FC = () => {
                       disabled={!user.enrolled}
                       title={user.enrolled ? `Tariful la ${course?.shortTitle || 'curs'}` : 'Elevul nu are acces la acest program'}
                       style={{ fontSize: 10, fontWeight: 700, padding: '4px 8px', borderRadius: 99, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, cursor: user.enrolled ? 'pointer' : 'not-allowed', opacity: user.enrolled ? 1 : 0.4, appearance: 'none' }}>
-                      {TARIFF_OPTIONS.map(opt => (
-                        <option key={opt.value} value={opt.value} style={{ background: '#0D0907', color: 'var(--fg)' }}>
+                      {tiers.map(opt => (
+                        <option key={opt.id} value={opt.id} style={{ background: '#0D0907', color: 'var(--fg)' }}>
                           {opt.label}
                         </option>
                       ))}

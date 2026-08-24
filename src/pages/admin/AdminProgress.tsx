@@ -6,10 +6,16 @@ import { useNavigate } from '@/lib/router-compat';
 import { fetchModulesWithLessons, fetchAdminUsers, fetchAllProgress, AdminModule, AdminUserRow, AdminProgressRow } from '../../lib/adminData';
 import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
 import { courseLessonIndex, modulePct, overallPct, doneCount, doneByUser } from '@/lib/adminProgress';
+import { courseTiers, getTier, defaultTier } from '@/lib/courses';
 import type { Tariff } from '../../lib/types';
 
 type SortKey = 'name' | 'progress' | 'lastActive';
-type FilterKey = 'all' | Tariff | 'low' | 'mid' | 'high';
+type FilterKey =
+  | 'all'
+  | 'low' | 'mid' | 'high' | 'done'          // după progres
+  | 'inactiv' | 'nedemarat'                  // după activitate
+  | 'fara-quiz' | 'fara-flux'                // după stare administrativă
+  | string;                                  // sau id-ul unei trepte a programului
 
 const CellPopover: React.FC<{ userName: string; moduleName: string; lessons: { title: string; completed: boolean; completedAt?: string }[]; onClose: () => void; }> = ({ userName, moduleName, lessons, onClose }) => (
   <motion.div style={{ position: 'fixed', inset: 0, zIndex: 50 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
@@ -44,7 +50,7 @@ const CellPopover: React.FC<{ userName: string; moduleName: string; lessons: { t
 );
 
 export const AdminProgress: React.FC = () => {
-  const { course, courseId } = useAdminCourseScope();
+  const { course, courseId, flows } = useAdminCourseScope();
   const navigate = useNavigate();
   const [users, setUsers] = useState<AdminUserRow[]>([]);
   const [progress, setProgress] = useState<AdminProgressRow[]>([]);
@@ -58,6 +64,15 @@ export const AdminProgress: React.FC = () => {
       setUsers(u); setProgress(p);
     })();
   }, [courseId]);
+
+  // Filtrul putea rămâne pe o treaptă a programului anterior (ex. „Arhitect" după
+  // comutarea pe START), caz în care tabelul apărea gol fără explicație.
+  useEffect(() => {
+    const generic = ['all','low','mid','high','done','inactiv','nedemarat','fara-quiz','fara-flux'];
+    if (!generic.includes(filterKey) && !courseTiers(courseId).some(t => t.id === filterKey)) {
+      setFilterKey('all');
+    }
+  }, [courseId, filterKey]);
 
   // Structura vine din COD, nu din tabelul `modules`: rândurile de acolo au id-uri UUID
   // care nu se potrivesc niciodată cu progress.lesson_id (id-uri din cod), deci matricea
@@ -83,9 +98,20 @@ export const AdminProgress: React.FC = () => {
 
   const filteredUsers = users.filter(u => {
     if (filterKey === 'all') return true;
-    if (filterKey === 'low') return getUserOverallPct(u.id) < 30;
-    if (filterKey === 'mid') { const p = getUserOverallPct(u.id); return p >= 30 && p < 80; }
-    if (filterKey === 'high') return getUserOverallPct(u.id) >= 80;
+    const pct = getUserOverallPct(u.id);
+    if (filterKey === 'low') return pct > 0 && pct < 30;
+    if (filterKey === 'mid') return pct >= 30 && pct < 80;
+    if (filterKey === 'high') return pct >= 80 && pct < 100;
+    if (filterKey === 'done') return pct === 100;
+    if (filterKey === 'nedemarat') return pct === 0;
+    if (filterKey === 'inactiv') {
+      const last = getLastActive(u.id);
+      if (!last) return true;
+      return (Date.now() - new Date(last).getTime()) / 86400000 >= 14;
+    }
+    if (filterKey === 'fara-quiz') return !u.quiz_done;
+    if (filterKey === 'fara-flux') return !u.flow_id;
+    // Restul sunt id-uri de treaptă ale programului privit.
     return u.tariff === filterKey;
   });
 
@@ -192,8 +218,17 @@ export const AdminProgress: React.FC = () => {
       <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {([
-            { k: 'all', l: 'Toți' }, { k: 'student', l: 'Student' }, { k: 'designer', l: 'Designer' }, { k: 'arhitect', l: 'Arhitect' },
-            { k: 'low', l: '< 30%' }, { k: 'mid', l: '30–80%' }, { k: 'high', l: '≥ 80%' },
+            { k: 'all', l: 'Toți' },
+            // Treptele programului privit — Business și START au trepte diferite.
+            ...courseTiers(courseId).map(t => ({ k: t.id, l: t.label })),
+            { k: 'nedemarat', l: 'N-au început' },
+            { k: 'low', l: '< 30%' },
+            { k: 'mid', l: '30–80%' },
+            { k: 'high', l: '≥ 80%' },
+            { k: 'done', l: 'Finalizat' },
+            { k: 'inactiv', l: 'Inactivi 14+ zile' },
+            { k: 'fara-quiz', l: 'Fără diagnostic' },
+            ...(flows.length ? [{ k: 'fara-flux', l: 'Fără flux' }] : []),
           ] as { k: FilterKey; l: string }[]).map(({ k, l }) => (
             <button key={k} onClick={() => setFilterKey(k)}
               style={{ padding: '5px 11px', borderRadius: 7, border: `1px solid ${filterKey === k ? 'rgba(196,240,228,0.3)' : 'var(--border)'}`, background: filterKey === k ? 'rgba(196,240,228,0.1)' : 'transparent', color: filterKey === k ? 'var(--accent)' : 'var(--fg-3)', fontSize: 11, cursor: 'pointer', fontWeight: filterKey === k ? 600 : 400 }}>

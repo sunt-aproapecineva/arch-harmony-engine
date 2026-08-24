@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from '@/lib/router-compat';
 import { useCourse } from '../context/CourseContext';
+import { tierGrants } from '../lib/courses';
 import { courseLibraryPath } from '../lib/navigation';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { ArrowLeft, Clock, BookOpen, Quote, AlertTriangle, CheckCircle2, XCircle, Target, Users, TrendingDown, Layers, ListChecks } from 'lucide-react';
@@ -31,7 +32,7 @@ export const LibraryArticlePage: React.FC = () => {
 
   useEffect(() => { window.scrollTo({ top: 0 }); }, [slug]);
 
-  if (courseTariff !== 'arhitect') {
+  if (!tierGrants(courseId, courseTariff, 'library')) {
     return (
       <div style={{ padding: '64px 24px', textAlign: 'center' }}>
         <h2 style={{ color: 'var(--fg)' }}>Acces restricționat</h2>
