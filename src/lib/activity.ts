@@ -82,3 +82,25 @@ export function timeAgo(isoStr: string): string {
   if (d < 7) return `acum ${d} zile`;
   return new Date(isoStr).toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' });
 }
+
+/**
+ * Log an event at most once per day per key (per browser).
+ * Used for high-frequency signals (lesson_view, module_view, note_saved,
+ * login) so the activity log stays a useful "last active" signal without
+ * flooding the table.
+ */
+export async function logActivityOnce(
+  key: string,
+  event: Omit<ActivityEvent, 'id' | 'timestamp'>,
+): Promise<void> {
+  try {
+    if (!event.userId) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const storageKey = `aa_act_${event.userId}_${key}_${today}`;
+    if (localStorage.getItem(storageKey)) return;
+    localStorage.setItem(storageKey, '1');
+  } catch {
+    /* if storage is unavailable, still log */
+  }
+  await logActivity(event);
+}
