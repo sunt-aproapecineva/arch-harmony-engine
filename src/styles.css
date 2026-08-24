@@ -457,6 +457,35 @@ input::placeholder, textarea::placeholder { color: var(--fg-3); }
   .aa-doc-actions > * { flex: 1; justify-content: center; min-height: 40px; }
 }
 
+/* Luciu specular — trece O SINGURĂ DATĂ peste panoul de sticlă, la final de intrare.
+   E coda animației, nu un efect care se repetă: un reflex care se plimbă la infinit
+   distrage de la conținut. */
+.aa-sheen { position: relative; overflow: hidden; }
+.aa-sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 38%;
+  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.14) 50%, transparent 100%);
+  transform: translate3d(-150%, 0, 0) skewX(-18deg);
+  animation: aaSheen 1.15s cubic-bezier(.22,.61,.36,1) 1.2s 1 both;
+  pointer-events: none;
+}
+@keyframes aaSheen {
+  from { transform: translate3d(-150%, 0, 0) skewX(-18deg); }
+  to   { transform: translate3d(260%, 0, 0) skewX(-18deg); }
+}
+@media (prefers-reduced-motion: reduce) { .aa-sheen::after { display: none; } }
+
+/* Curba de ritm: linia se desenează, apoi umplerea urmează penița. */
+@keyframes aaDrawLine { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes aaWipeX { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes aaPopIn { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  /* Graficul apare deja desenat, nu se animă. */
+  [style*="aaDrawLine"], [style*="aaWipeX"], [style*="aaPopIn"] { animation: none !important; }
+}
+
 /* Literele cuvântului rotativ intră din blur, una după alta — aceeași animație ca pe
    pagina de prezentare, ca tranziția landing → platformă să nu se simtă ca o ruptură. */
 @keyframes aaWordIn {

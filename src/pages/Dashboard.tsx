@@ -10,6 +10,7 @@ import { useAuthContext } from '../context/AuthContext';
 import { useProgress } from '../hooks/useProgress';
 import { useCourse } from '../context/CourseContext';
 import { moduleUnlockDate } from '../lib/flows';
+import { ProgressCurve } from '../components/aa/ProgressCurve';
 import { courseLessonPath, courseModulePath, courseQuizPath } from '../lib/navigation';
 import { ModuleCard } from '../components/aa/ModuleCard';
 import { ProgressRing } from '../components/aa/ProgressRing';
@@ -89,7 +90,7 @@ function toLocalISODate(d: Date): string {
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuthContext();
-  const { getModuleProgress, getOverallProgress, isModuleLocked, getCompletedLessonsCount, getTotalLessonsCount } = useProgress();
+  const { getModuleProgress, getOverallProgress, isModuleLocked, getCompletedLessonsCount, getTotalLessonsCount, isCompleted, progress } = useProgress();
   const navigate = useNavigate();
 
   const { course, courseId, modules, liveEvents, tariff: courseTariff, flow } = useCourse();
@@ -110,6 +111,19 @@ export const Dashboard: React.FC = () => {
   const currentModule = modules.find((m, i) => !isModuleLocked(i) && getModuleProgress(m.id) < 100) || modules[0] || null;
   const currentLesson = currentModule?.lessons?.[0] || null;
   const currentProgress = currentModule ? getModuleProgress(currentModule.id) : 0;
+  const currentModuleLessons = (currentModule?.lessons || []).filter(
+    (l: any) => l.type === 'exercise' || !!(l.video_url && String(l.video_url).trim()));
+  const currentModuleTrackable = currentModuleLessons.length;
+  const currentModuleDone = currentModuleLessons.filter((l: any) => isCompleted(l.id)).length;
+
+  // Ancora curbei de ritm: data de start a fluxului. Pentru elevii încă neasignați
+  // unui flux, cădem pe prima dată de deblocare scrisă în cod — pentru Business e
+  // exact data la care a pornit prima promoție.
+  const curveStart = useMemo(() => {
+    if (flow?.starts_on) return flow.starts_on;
+    const dates = modules.map((m: any) => m.unlockDate).filter(Boolean).sort();
+    return dates[0] || null;
+  }, [flow, modules]);
 
   const firstName = user?.full_name?.split(' ')[0] || 'Antreprenor';
   const tariff = (courseTariff || 'student') as Tariff;
@@ -197,7 +211,7 @@ export const Dashboard: React.FC = () => {
           {/* Current module hero card */}
           <motion.div
             {...fade(0.06)}
-            className="liquid-glass-accent"
+            className="liquid-glass-accent aa-sheen"
             style={{ borderRadius: 24, padding: '32px 32px', overflow: 'hidden', position: 'relative', minHeight: 240 }}
           >
             {/* Ghost number */}
@@ -360,8 +374,28 @@ export const Dashboard: React.FC = () => {
           <StatCard icon={<BookOpen size={16} />} value={`${animatedLessons}/${totalLessons}`} label="Lecții finalizate" delay={0.13} accent sub={completedLessons > 0 ? `+${completedLessons} completate` : undefined} />
           <StatCard icon={<Layers size={16} />} value={`${animatedModules}/${modules.length}`} label="Module finalizate" delay={0.17} sub={completedModules > 0 ? 'Progres bun!' : 'Începe primul'} />
           <StatCard icon={<TrendingUp size={16} />} value={`${animatedPct}%`} label="Progres global" delay={0.21} accent sub={overallPct >= 50 ? '🔥 Peste jumătate!' : undefined} />
-          <StatCard icon={<CheckCircle2 size={16} />} value={currentModule.lessons.length + '/' + currentModule.lessons.length} label={`Lecții în ${currentModule.etapa}`} delay={0.25} sub="Modul curent" />
+          {/* Arăta mereu X/X: împărțea totalul modulului la el însuși, deci orice
+              modul apărea complet. Acum numără lecțiile chiar bifate de elev. */}
+          <StatCard
+            icon={<CheckCircle2 size={16} />}
+            value={`${currentModuleDone}/${currentModuleTrackable}`}
+            label={`Lecții în ${currentModule.etapa}`}
+            delay={0.25}
+            sub="Modul curent"
+          />
         </div>
+
+        {/* ── RITMUL ÎN TIMP ──
+            Statisticile de mai sus arată totaluri. Asta arată dacă elevul ține pasul
+            cu calendarul fluxului — singura întrebare care contează într-un practicum
+            cu termen. Apare doar dacă are un flux: fără dată de start nu există ritm. */}
+        {curveStart && (
+          <motion.div {...fade(0.26)} style={{ marginBottom: 24 }}>
+            <div className="liquid-glass aa-sheen" style={{ borderRadius: 22, padding: 'clamp(16px, 3vw, 24px)' }}>
+              <ProgressCurve modules={modules} progress={progress} startsOn={curveStart} />
+            </div>
+          </motion.div>
+        )}
 
         {/* ── MODULE PROGRESS LIST ── */}
         <motion.div {...fade(0.28)} style={{ marginBottom: 24 }}>

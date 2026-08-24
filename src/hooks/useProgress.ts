@@ -302,12 +302,16 @@ export function useProgress(explicitCourseId?: string) {
     [modules, isCompleted]
   );
 
+  // Numărătoarea folosește ACEEAȘI definiție ca procentele: elemente trackabile
+  // (lecție cu video sau pagină de exercițiu). Înainte contorul număra doar lecțiile
+  // video, iar procentul se calcula peste tot ce e trackabil — deci același dashboard
+  // arăta „3/24" lângă „6%", două numitoare diferite pentru aceeași realitate.
   const getCompletedLessonsCount = useCallback(() => {
-    const videoLessonIds = new Set(modules.flatMap((m) => m.lessons).filter(hasVideo).map((l) => l.id));
-    return progress.filter((p) => videoLessonIds.has(p.lesson_id)).length;
+    const ids = new Set(modules.flatMap((m) => m.lessons).filter(isTrackableLesson).map((l) => l.id));
+    return progress.filter((p) => ids.has(p.lesson_id)).length;
   }, [progress, modules]);
   const getTotalLessonsCount = useCallback(
-    () => modules.flatMap((m) => m.lessons).filter(hasVideo).length,
+    () => modules.flatMap((m) => m.lessons).filter(isTrackableLesson).length,
     [modules]
   );
 
