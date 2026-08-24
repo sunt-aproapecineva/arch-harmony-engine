@@ -43,3 +43,10 @@ dist-ssr
 # fișier local, niciodată în `.env`.
 .env.local
 .env.*.local
+
+# Local: config de dev al uneltei mele, nu al proiectului.
+.claude/
+
+# Proiectul folosește bun (bun.lock, bunfig.toml). Un package-lock.json alături
+# ar pune build-ul Lovable în fața a două surse de adevăr pentru dependențe.
+package-lock.json
