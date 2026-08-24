@@ -6,7 +6,7 @@ import { useCourse } from '../context/CourseContext';
 import { courseDocumentFillPath } from '../lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, FileText, Printer, Pencil, Trash2, FolderOpen, ExternalLink, X } from 'lucide-react';
-import { PLATFORM_DOCUMENTS, PlatformDocument, openPrintWindow } from '../lib/documentData';
+import { documentsForCourse, PlatformDocument, openPrintWindow } from '../lib/documentData';
 import { useAuthContext } from '../context/AuthContext';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -320,6 +320,7 @@ const TABS: { id: ActiveTab; label: string }[] = [
 // ─── DocumentsPage ────────────────────────────────────────────────────────────
 
 export const DocumentsPage: React.FC = () => {
+  const { course, courseId } = useCourse();
   const { user } = useAuthContext();
   const [searchParams] = useSearchParams();
   const newSavedId = searchParams.get('saved');
@@ -358,14 +359,17 @@ export const DocumentsPage: React.FC = () => {
     if (updated.length === 0 && activeTab === 'saved') setActiveTab('all');
   };
 
+  // Documentele cursului curent — fiecare ramură își are setul ei de printabile.
+  const courseDocuments = useMemo(() => documentsForCourse(courseId), [courseId]);
+
   // Filtered templates
   const filteredTemplates = useMemo(() => {
-    if (!searchQuery.trim()) return PLATFORM_DOCUMENTS;
+    if (!searchQuery.trim()) return courseDocuments;
     const q = searchQuery.toLowerCase();
-    return PLATFORM_DOCUMENTS.filter(d =>
+    return courseDocuments.filter(d =>
       d.title.toLowerCase().includes(q) || d.description.toLowerCase().includes(q)
     );
-  }, [searchQuery]);
+  }, [searchQuery, courseDocuments]);
 
   // Filtered saved docs
   const filteredSaved = useMemo(() => {
@@ -421,7 +425,7 @@ export const DocumentsPage: React.FC = () => {
           }}>
             <FileText size={13} style={{ color: 'var(--fg-3)' }} />
             <span style={{ fontSize: 12, color: 'var(--fg-2)' }}>
-              <strong style={{ color: 'var(--fg)' }}>{PLATFORM_DOCUMENTS.length}</strong> șabloane disponibile
+              <strong style={{ color: 'var(--fg)' }}>{courseDocuments.length}</strong> șabloane disponibile
             </span>
           </div>
           {myDocs.length > 0 && (

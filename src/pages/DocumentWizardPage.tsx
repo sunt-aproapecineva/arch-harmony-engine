@@ -5,12 +5,12 @@ import { useCourse } from '../context/CourseContext';
 import { courseDocumentsPath } from '../lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, FileText, ArrowLeft, Printer } from 'lucide-react';
-import { PLATFORM_DOCUMENTS, openPrintWindow } from '../lib/documentData';
+import { PLATFORM_DOCUMENTS, documentBelongsToCourse, openPrintWindow } from '../lib/documentData';
 import { useAuthContext } from '../context/AuthContext';
 import { readLocalDocs, saveDocEntry, hydrateDocsFromCloud } from '../lib/documentSync';
 
 export function DocumentWizardPage() {
-  const { course } = useCourse();
+  const { course, courseId } = useCourse();
   const { docId } = useParams<{ docId: string }>();
   const navigate = useNavigate();
   const { user } = useAuthContext();
@@ -33,7 +33,10 @@ export function DocumentWizardPage() {
     }
   }, [editId, user?.id]);
 
-  const doc = PLATFORM_DOCUMENTS.find(d => d.id === docId);
+  // Documentul trebuie să existe ȘI să aparțină cursului din URL: altfel un link
+  // spre /c/start/documents/doc-kpi/fill ar deschide un printabil de la Business.
+  const found = PLATFORM_DOCUMENTS.find(d => d.id === docId);
+  const doc = documentBelongsToCourse(found, courseId) ? found : undefined;
 
   if (!doc) {
     return (

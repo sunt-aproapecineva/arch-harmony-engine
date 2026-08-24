@@ -6,7 +6,7 @@ import { courseLibraryPath } from '../lib/navigation';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { ArrowLeft, Clock, BookOpen, Quote, AlertTriangle, CheckCircle2, XCircle, Target, Users, TrendingDown, Layers, ListChecks } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
-import { getLibraryItem } from '../lib/libraryData';
+import { getLibraryItem, libraryItemBelongsToCourse } from '../lib/libraryData';
 import { HiringArticle } from './library/articles/HiringArticle';
 import { MiroFluxuriArticle } from './library/articles/MiroFluxuriArticle';
 
@@ -16,11 +16,13 @@ const REGISTRY: Record<string, React.FC> = {
 };
 
 export const LibraryArticlePage: React.FC = () => {
-  const { course } = useCourse();
+  const { course, courseId } = useCourse();
   const { slug } = useParams() as { slug: string };
   const navigate = useNavigate();
   const { user } = useAuthContext();
-  const item = getLibraryItem(slug);
+  const found = getLibraryItem(slug);
+  // Un articol din altă ramură nu se deschide sub cursul curent.
+  const item = libraryItemBelongsToCourse(found, courseId) ? found : undefined;
   const Article = REGISTRY[slug];
 
   // Reading progress bar

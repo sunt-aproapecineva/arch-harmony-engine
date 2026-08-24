@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/context/AuthContext';
 import { allModulesFlat } from '@/lib/content';
 
-import { PLATFORM_DOCUMENTS as DOCUMENTS } from '@/lib/documentData';
+import { documentsForCourse } from '@/lib/documentData';
 import { formatLessonNumber, getModuleNumber } from '@/lib/lessonNumbering';
 import { exportExercisePDF, exportNotePDF, exportAllPDF } from '@/lib/materialsExport';
 
@@ -86,6 +86,7 @@ export const MaterialsPage: React.FC = () => {
   // Materialele se arată doar pentru cursul curent. Răspunsurile elevului sunt
   // globale în DB (chei text unice), dar pagina asta e sub /c/<curs>/materials —
   // un exercițiu de la Start n-are ce căuta în materialele de la Business.
+  const courseDocuments = useMemo(() => documentsForCourse(courseId), [courseId]);
   const moduleIdsOfCourse = useMemo(() => new Set(modules.map((m: any) => m.id)), [modules]);
 
   // Group by module
@@ -141,7 +142,7 @@ export const MaterialsPage: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 24, flexWrap: 'wrap' }}>
         <TabButton active={tab === 'exercitii'} onClick={() => setTab('exercitii')} icon={FileText} label="Exerciții" count={exercises.length} />
         <TabButton active={tab === 'notite'} onClick={() => setTab('notite')} icon={StickyNote} label="Notițe" count={notes.length} />
-        <TabButton active={tab === 'documente'} onClick={() => setTab('documente')} icon={FolderOpen} label="Documente" count={DOCUMENTS.length} />
+        <TabButton active={tab === 'documente'} onClick={() => setTab('documente')} icon={FolderOpen} label="Documente" count={courseDocuments.length} />
         <div style={{ marginLeft: 'auto' }}>
           {(exercises.length + notes.length) > 0 && (
             <button onClick={handleExportAll}
@@ -219,7 +220,7 @@ export const MaterialsPage: React.FC = () => {
       {!loading && tab === 'documente' && (
         <div style={{ marginTop: 24 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
-            {DOCUMENTS.map((d: any) => (
+            {courseDocuments.map((d: any) => (
               <Link key={d.id} to={courseDocumentFillPath(course, d.id)}
                 style={{
                   display: 'block', padding: 16, borderRadius: 12,

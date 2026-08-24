@@ -5,7 +5,7 @@ import { useCourse } from '../context/CourseContext';
 import { courseLibraryArticlePath } from '../lib/navigation';
 import { motion } from 'framer-motion';
 import { BookOpen, Clock, Lock, ArrowRight, Sparkles, FileText, Film, Wrench, Briefcase } from 'lucide-react';
-import { LIBRARY_ITEMS, LIBRARY_ACCENT, LibraryItem } from '../lib/libraryData';
+import { libraryItemsForCourse, LIBRARY_ACCENT, LibraryItem } from '../lib/libraryData';
 import { useAuthContext } from '../context/AuthContext';
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
@@ -137,6 +137,8 @@ const Card: React.FC<{ item: LibraryItem; index: number }> = ({ item, index }) =
 };
 
 export const LibraryPage: React.FC = () => {
+  const { course, courseId } = useCourse();
+  const courseItems = React.useMemo(() => libraryItemsForCourse(courseId), [courseId]);
   const { user } = useAuthContext();
   const isArchitect = user?.tariff === 'arhitect';
 
@@ -190,7 +192,7 @@ export const LibraryPage: React.FC = () => {
         gridAutoRows: '180px',
         gap: 16,
       }}>
-        {LIBRARY_ITEMS.map((item, i) => (
+        {courseItems.map((item, i) => (
           <Card key={item.slug} item={item} index={i} />
         ))}
       </div>

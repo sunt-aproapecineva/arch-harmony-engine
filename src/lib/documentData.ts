@@ -19,6 +19,11 @@ export interface DocWizardStep {
 
 export interface PlatformDocument {
   id: string;
+  /**
+   * Cursul căruia îi aparține documentul. Lipsa lui înseamnă 'business' — toate
+   * documentele existente (Doc 01…13) sunt din practicumul de Business.
+   */
+  courseId?: string;
   lessonIds: string[];
   docNumber: string;
   title: string;
@@ -2940,3 +2945,13 @@ export const PLATFORM_DOCUMENTS: PlatformDocument[] = [
     generate: generateDoc13,
   },
 ];
+
+/** Documentele unei singure ramuri. Fiecare curs își are setul lui de printabile. */
+export function documentsForCourse(courseId: string | null | undefined): PlatformDocument[] {
+  if (!courseId) return [];
+  return PLATFORM_DOCUMENTS.filter(doc => (doc.courseId || 'business') === courseId);
+}
+
+export function documentBelongsToCourse(doc: PlatformDocument | undefined, courseId: string | null | undefined): boolean {
+  return !!doc && !!courseId && (doc.courseId || 'business') === courseId;
+}

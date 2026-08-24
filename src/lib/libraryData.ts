@@ -6,6 +6,12 @@ export type LibraryAccent = 'green' | 'gold' | 'red' | 'cream';
 
 export interface LibraryItem {
   slug: string;
+  /**
+   * Cursul căruia îi aparține materialul. Lipsa lui înseamnă 'business' — toate
+   * articolele existente au fost scrise pentru practicumul de Business, înainte ca
+   * platforma să aibă mai multe ramuri.
+   */
+  courseId?: string;
   title: string;
   summary: string;
   readingTime?: string;   // e.g. "12 min de lectură"
@@ -65,6 +71,16 @@ export const LIBRARY_ITEMS: LibraryItem[] = [
     available: false,
   },
 ];
+
+/** Materialele unei singure ramuri. Fiecare curs își are biblioteca lui. */
+export function libraryItemsForCourse(courseId: string | null | undefined): LibraryItem[] {
+  if (!courseId) return [];
+  return LIBRARY_ITEMS.filter(item => (item.courseId || 'business') === courseId);
+}
+
+export function libraryItemBelongsToCourse(item: LibraryItem | undefined, courseId: string | null | undefined): boolean {
+  return !!item && !!courseId && (item.courseId || 'business') === courseId;
+}
 
 export function getLibraryItem(slug: string): LibraryItem | undefined {
   return LIBRARY_ITEMS.find((i) => i.slug === slug);
