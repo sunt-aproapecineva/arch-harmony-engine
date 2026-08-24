@@ -9,81 +9,47 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppRouteImport } from './routes/_app'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as CursuriRouteImport } from './routes/cursuri'
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as QuizRouteImport } from './routes/quiz'
-import { Route as RegisterRouteImport } from './routes/register'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as WelcomeRouteImport } from './routes/welcome'
-import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as CursuriRouteImport } from './routes/cursuri'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as AdminActivityRouteImport } from './routes/admin.activity'
-import { Route as AdminCohortaRouteImport } from './routes/admin.cohorta'
-import { Route as AdminFluxuriRouteImport } from './routes/admin.fluxuri'
-import { Route as AdminGrupeRouteImport } from './routes/admin.grupe'
-import { Route as AdminLessonsRouteImport } from './routes/admin.lessons'
-import { Route as AdminProgressRouteImport } from './routes/admin.progress'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
-import { Route as AppCCourseSlugRouteImport } from './routes/_app.c.$courseSlug'
-import { Route as AppDocumentsIndexRouteImport } from './routes/_app.documents.index'
-import { Route as AppLessonIdRouteImport } from './routes/_app.lesson.$id'
-import { Route as AppLibraryIndexRouteImport } from './routes/_app.library.index'
+import { Route as AdminProgressRouteImport } from './routes/admin.progress'
+import { Route as AdminLessonsRouteImport } from './routes/admin.lessons'
+import { Route as AdminGrupeRouteImport } from './routes/admin.grupe'
+import { Route as AdminFluxuriRouteImport } from './routes/admin.fluxuri'
+import { Route as AdminCohortaRouteImport } from './routes/admin.cohorta'
+import { Route as AdminActivityRouteImport } from './routes/admin.activity'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppMaterialsIndexRouteImport } from './routes/_app.materials.index'
-import { Route as AppModuleIdRouteImport } from './routes/_app.module.$id'
-import { Route as AdminStudentUserIdRouteImport } from './routes/admin.student.$userId'
+import { Route as AppLibraryIndexRouteImport } from './routes/_app.library.index'
+import { Route as AppDocumentsIndexRouteImport } from './routes/_app.documents.index'
 import { Route as CCourseSlugQuizRouteImport } from './routes/c.$courseSlug.quiz'
+import { Route as AdminStudentUserIdRouteImport } from './routes/admin.student.$userId'
+import { Route as AppModuleIdRouteImport } from './routes/_app.module.$id'
+import { Route as AppLessonIdRouteImport } from './routes/_app.lesson.$id'
+import { Route as AppCCourseSlugRouteImport } from './routes/_app.c.$courseSlug'
 import { Route as AppCCourseSlugIndexRouteImport } from './routes/_app.c.$courseSlug.index'
-import { Route as AppCCourseSlugDashboardRouteImport } from './routes/_app.c.$courseSlug.dashboard'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
-import { Route as AppCCourseSlugDocumentsIndexRouteImport } from './routes/_app.c.$courseSlug.documents.index'
-import { Route as AppCCourseSlugLessonIdRouteImport } from './routes/_app.c.$courseSlug.lesson.$id'
-import { Route as AppCCourseSlugLibraryIndexRouteImport } from './routes/_app.c.$courseSlug.library.index'
-import { Route as AppCCourseSlugLibrarySlugRouteImport } from './routes/_app.c.$courseSlug.library.$slug'
+import { Route as AppCCourseSlugDashboardRouteImport } from './routes/_app.c.$courseSlug.dashboard'
 import { Route as AppCCourseSlugMaterialsIndexRouteImport } from './routes/_app.c.$courseSlug.materials.index'
+import { Route as AppCCourseSlugLibraryIndexRouteImport } from './routes/_app.c.$courseSlug.library.index'
+import { Route as AppCCourseSlugDocumentsIndexRouteImport } from './routes/_app.c.$courseSlug.documents.index'
 import { Route as AppCCourseSlugModuleIdRouteImport } from './routes/_app.c.$courseSlug.module.$id'
+import { Route as AppCCourseSlugLibrarySlugRouteImport } from './routes/_app.c.$courseSlug.library.$slug'
+import { Route as AppCCourseSlugLessonIdRouteImport } from './routes/_app.c.$courseSlug.lesson.$id'
 import { Route as AppCCourseSlugDocumentsDocIdFillRouteImport } from './routes/_app.c.$courseSlug.documents.$docId.fill'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppRoute = AppRouteImport.update({
-  id: '/_app',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CursuriRoute = CursuriRouteImport.update({
-  id: '/cursuri',
-  path: '/cursuri',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QuizRoute = QuizRouteImport.update({
-  id: '/quiz',
-  path: '/quiz',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RegisterRoute = RegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -91,49 +57,48 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WelcomeRoute = WelcomeRouteImport.update({
-  id: '/welcome',
-  path: '/welcome',
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppDashboardRoute = AppDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AppRoute,
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CursuriRoute = CursuriRouteImport.update({
+  id: '/cursuri',
+  path: '/cursuri',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminActivityRoute = AdminActivityRouteImport.update({
-  id: '/activity',
-  path: '/activity',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCohortaRoute = AdminCohortaRouteImport.update({
-  id: '/cohorta',
-  path: '/cohorta',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminFluxuriRoute = AdminFluxuriRouteImport.update({
-  id: '/fluxuri',
-  path: '/fluxuri',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminGrupeRoute = AdminGrupeRouteImport.update({
-  id: '/grupe',
-  path: '/grupe',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminLessonsRoute = AdminLessonsRouteImport.update({
-  id: '/lessons',
-  path: '/lessons',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminProgressRoute = AdminProgressRouteImport.update({
-  id: '/progress',
-  path: '/progress',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
@@ -141,24 +106,39 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
-const AppCCourseSlugRoute = AppCCourseSlugRouteImport.update({
-  id: '/c/$courseSlug',
-  path: '/c/$courseSlug',
-  getParentRoute: () => AppRoute,
+const AdminProgressRoute = AdminProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => AdminRoute,
 } as any)
-const AppDocumentsIndexRoute = AppDocumentsIndexRouteImport.update({
-  id: '/documents/',
-  path: '/documents/',
-  getParentRoute: () => AppRoute,
+const AdminLessonsRoute = AdminLessonsRouteImport.update({
+  id: '/lessons',
+  path: '/lessons',
+  getParentRoute: () => AdminRoute,
 } as any)
-const AppLessonIdRoute = AppLessonIdRouteImport.update({
-  id: '/lesson/$id',
-  path: '/lesson/$id',
-  getParentRoute: () => AppRoute,
+const AdminGrupeRoute = AdminGrupeRouteImport.update({
+  id: '/grupe',
+  path: '/grupe',
+  getParentRoute: () => AdminRoute,
 } as any)
-const AppLibraryIndexRoute = AppLibraryIndexRouteImport.update({
-  id: '/library/',
-  path: '/library/',
+const AdminFluxuriRoute = AdminFluxuriRouteImport.update({
+  id: '/fluxuri',
+  path: '/fluxuri',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCohortaRoute = AdminCohortaRouteImport.update({
+  id: '/cohorta',
+  path: '/cohorta',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminActivityRoute = AdminActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMaterialsIndexRoute = AppMaterialsIndexRouteImport.update({
@@ -166,29 +146,44 @@ const AppMaterialsIndexRoute = AppMaterialsIndexRouteImport.update({
   path: '/materials/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppModuleIdRoute = AppModuleIdRouteImport.update({
-  id: '/module/$id',
-  path: '/module/$id',
+const AppLibraryIndexRoute = AppLibraryIndexRouteImport.update({
+  id: '/library/',
+  path: '/library/',
   getParentRoute: () => AppRoute,
 } as any)
-const AdminStudentUserIdRoute = AdminStudentUserIdRouteImport.update({
-  id: '/student/$userId',
-  path: '/student/$userId',
-  getParentRoute: () => AdminRoute,
+const AppDocumentsIndexRoute = AppDocumentsIndexRouteImport.update({
+  id: '/documents/',
+  path: '/documents/',
+  getParentRoute: () => AppRoute,
 } as any)
 const CCourseSlugQuizRoute = CCourseSlugQuizRouteImport.update({
   id: '/c/$courseSlug/quiz',
   path: '/c/$courseSlug/quiz',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminStudentUserIdRoute = AdminStudentUserIdRouteImport.update({
+  id: '/student/$userId',
+  path: '/student/$userId',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AppModuleIdRoute = AppModuleIdRouteImport.update({
+  id: '/module/$id',
+  path: '/module/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLessonIdRoute = AppLessonIdRouteImport.update({
+  id: '/lesson/$id',
+  path: '/lesson/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCCourseSlugRoute = AppCCourseSlugRouteImport.update({
+  id: '/c/$courseSlug',
+  path: '/c/$courseSlug',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCCourseSlugIndexRoute = AppCCourseSlugIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AppCCourseSlugRoute,
-} as any)
-const AppCCourseSlugDashboardRoute = AppCCourseSlugDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
   getParentRoute: () => AppCCourseSlugRoute,
 } as any)
 const LovableEmailQueueProcessRoute =
@@ -197,38 +192,43 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AppCCourseSlugDocumentsIndexRoute =
-  AppCCourseSlugDocumentsIndexRouteImport.update({
-    id: '/documents/',
-    path: '/documents/',
-    getParentRoute: () => AppCCourseSlugRoute,
-  } as any)
-const AppCCourseSlugLessonIdRoute = AppCCourseSlugLessonIdRouteImport.update({
-  id: '/lesson/$id',
-  path: '/lesson/$id',
+const AppCCourseSlugDashboardRoute = AppCCourseSlugDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AppCCourseSlugRoute,
 } as any)
-const AppCCourseSlugLibraryIndexRoute =
-  AppCCourseSlugLibraryIndexRouteImport.update({
-    id: '/library/',
-    path: '/library/',
-    getParentRoute: () => AppCCourseSlugRoute,
-  } as any)
-const AppCCourseSlugLibrarySlugRoute =
-  AppCCourseSlugLibrarySlugRouteImport.update({
-    id: '/library/$slug',
-    path: '/library/$slug',
-    getParentRoute: () => AppCCourseSlugRoute,
-  } as any)
 const AppCCourseSlugMaterialsIndexRoute =
   AppCCourseSlugMaterialsIndexRouteImport.update({
     id: '/materials/',
     path: '/materials/',
     getParentRoute: () => AppCCourseSlugRoute,
   } as any)
+const AppCCourseSlugLibraryIndexRoute =
+  AppCCourseSlugLibraryIndexRouteImport.update({
+    id: '/library/',
+    path: '/library/',
+    getParentRoute: () => AppCCourseSlugRoute,
+  } as any)
+const AppCCourseSlugDocumentsIndexRoute =
+  AppCCourseSlugDocumentsIndexRouteImport.update({
+    id: '/documents/',
+    path: '/documents/',
+    getParentRoute: () => AppCCourseSlugRoute,
+  } as any)
 const AppCCourseSlugModuleIdRoute = AppCCourseSlugModuleIdRouteImport.update({
   id: '/module/$id',
   path: '/module/$id',
+  getParentRoute: () => AppCCourseSlugRoute,
+} as any)
+const AppCCourseSlugLibrarySlugRoute =
+  AppCCourseSlugLibrarySlugRouteImport.update({
+    id: '/library/$slug',
+    path: '/library/$slug',
+    getParentRoute: () => AppCCourseSlugRoute,
+  } as any)
+const AppCCourseSlugLessonIdRoute = AppCCourseSlugLessonIdRouteImport.update({
+  id: '/lesson/$id',
+  path: '/lesson/$id',
   getParentRoute: () => AppCCourseSlugRoute,
 } as any)
 const AppCCourseSlugDocumentsDocIdFillRoute =
@@ -485,60 +485,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_app': {
-      id: '/_app'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cursuri': {
-      id: '/cursuri'
-      path: '/cursuri'
-      fullPath: '/cursuri'
-      preLoaderRoute: typeof CursuriRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quiz': {
-      id: '/quiz'
-      path: '/quiz'
-      fullPath: '/quiz'
-      preLoaderRoute: typeof QuizRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterRouteImport
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -548,67 +499,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/welcome': {
-      id: '/welcome'
-      path: '/welcome'
-      fullPath: '/welcome'
-      preLoaderRoute: typeof WelcomeRouteImport
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/dashboard': {
-      id: '/_app/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AppDashboardRouteImport
-      parentRoute: typeof AppRoute
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cursuri': {
+      id: '/cursuri'
+      path: '/cursuri'
+      fullPath: '/cursuri'
+      preLoaderRoute: typeof CursuriRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/': {
       id: '/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/activity': {
-      id: '/admin/activity'
-      path: '/activity'
-      fullPath: '/admin/activity'
-      preLoaderRoute: typeof AdminActivityRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/cohorta': {
-      id: '/admin/cohorta'
-      path: '/cohorta'
-      fullPath: '/admin/cohorta'
-      preLoaderRoute: typeof AdminCohortaRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/fluxuri': {
-      id: '/admin/fluxuri'
-      path: '/fluxuri'
-      fullPath: '/admin/fluxuri'
-      preLoaderRoute: typeof AdminFluxuriRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/grupe': {
-      id: '/admin/grupe'
-      path: '/grupe'
-      fullPath: '/admin/grupe'
-      preLoaderRoute: typeof AdminGrupeRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/lessons': {
-      id: '/admin/lessons'
-      path: '/lessons'
-      fullPath: '/admin/lessons'
-      preLoaderRoute: typeof AdminLessonsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/progress': {
-      id: '/admin/progress'
-      path: '/progress'
-      fullPath: '/admin/progress'
-      preLoaderRoute: typeof AdminProgressRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/users': {
@@ -618,32 +569,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/_app/c/$courseSlug': {
-      id: '/_app/c/$courseSlug'
-      path: '/c/$courseSlug'
-      fullPath: '/c/$courseSlug'
-      preLoaderRoute: typeof AppCCourseSlugRouteImport
-      parentRoute: typeof AppRoute
+    '/admin/progress': {
+      id: '/admin/progress'
+      path: '/progress'
+      fullPath: '/admin/progress'
+      preLoaderRoute: typeof AdminProgressRouteImport
+      parentRoute: typeof AdminRoute
     }
-    '/_app/documents/': {
-      id: '/_app/documents/'
-      path: '/documents'
-      fullPath: '/documents/'
-      preLoaderRoute: typeof AppDocumentsIndexRouteImport
-      parentRoute: typeof AppRoute
+    '/admin/lessons': {
+      id: '/admin/lessons'
+      path: '/lessons'
+      fullPath: '/admin/lessons'
+      preLoaderRoute: typeof AdminLessonsRouteImport
+      parentRoute: typeof AdminRoute
     }
-    '/_app/lesson/$id': {
-      id: '/_app/lesson/$id'
-      path: '/lesson/$id'
-      fullPath: '/lesson/$id'
-      preLoaderRoute: typeof AppLessonIdRouteImport
-      parentRoute: typeof AppRoute
+    '/admin/grupe': {
+      id: '/admin/grupe'
+      path: '/grupe'
+      fullPath: '/admin/grupe'
+      preLoaderRoute: typeof AdminGrupeRouteImport
+      parentRoute: typeof AdminRoute
     }
-    '/_app/library/': {
-      id: '/_app/library/'
-      path: '/library'
-      fullPath: '/library/'
-      preLoaderRoute: typeof AppLibraryIndexRouteImport
+    '/admin/fluxuri': {
+      id: '/admin/fluxuri'
+      path: '/fluxuri'
+      fullPath: '/admin/fluxuri'
+      preLoaderRoute: typeof AdminFluxuriRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/cohorta': {
+      id: '/admin/cohorta'
+      path: '/cohorta'
+      fullPath: '/admin/cohorta'
+      preLoaderRoute: typeof AdminCohortaRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/activity': {
+      id: '/admin/activity'
+      path: '/activity'
+      fullPath: '/admin/activity'
+      preLoaderRoute: typeof AdminActivityRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/materials/': {
@@ -653,19 +625,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMaterialsIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/module/$id': {
-      id: '/_app/module/$id'
-      path: '/module/$id'
-      fullPath: '/module/$id'
-      preLoaderRoute: typeof AppModuleIdRouteImport
+    '/_app/library/': {
+      id: '/_app/library/'
+      path: '/library'
+      fullPath: '/library/'
+      preLoaderRoute: typeof AppLibraryIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/admin/student/$userId': {
-      id: '/admin/student/$userId'
-      path: '/student/$userId'
-      fullPath: '/admin/student/$userId'
-      preLoaderRoute: typeof AdminStudentUserIdRouteImport
-      parentRoute: typeof AdminRoute
+    '/_app/documents/': {
+      id: '/_app/documents/'
+      path: '/documents'
+      fullPath: '/documents/'
+      preLoaderRoute: typeof AppDocumentsIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/c/$courseSlug/quiz': {
       id: '/c/$courseSlug/quiz'
@@ -674,18 +646,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CCourseSlugQuizRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/student/$userId': {
+      id: '/admin/student/$userId'
+      path: '/student/$userId'
+      fullPath: '/admin/student/$userId'
+      preLoaderRoute: typeof AdminStudentUserIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_app/module/$id': {
+      id: '/_app/module/$id'
+      path: '/module/$id'
+      fullPath: '/module/$id'
+      preLoaderRoute: typeof AppModuleIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/lesson/$id': {
+      id: '/_app/lesson/$id'
+      path: '/lesson/$id'
+      fullPath: '/lesson/$id'
+      preLoaderRoute: typeof AppLessonIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/c/$courseSlug': {
+      id: '/_app/c/$courseSlug'
+      path: '/c/$courseSlug'
+      fullPath: '/c/$courseSlug'
+      preLoaderRoute: typeof AppCCourseSlugRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/c/$courseSlug/': {
       id: '/_app/c/$courseSlug/'
       path: '/'
       fullPath: '/c/$courseSlug/'
       preLoaderRoute: typeof AppCCourseSlugIndexRouteImport
-      parentRoute: typeof AppCCourseSlugRoute
-    }
-    '/_app/c/$courseSlug/dashboard': {
-      id: '/_app/c/$courseSlug/dashboard'
-      path: '/dashboard'
-      fullPath: '/c/$courseSlug/dashboard'
-      preLoaderRoute: typeof AppCCourseSlugDashboardRouteImport
       parentRoute: typeof AppCCourseSlugRoute
     }
     '/lovable/email/queue/process': {
@@ -695,32 +688,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/c/$courseSlug/documents/': {
-      id: '/_app/c/$courseSlug/documents/'
-      path: '/documents'
-      fullPath: '/c/$courseSlug/documents/'
-      preLoaderRoute: typeof AppCCourseSlugDocumentsIndexRouteImport
-      parentRoute: typeof AppCCourseSlugRoute
-    }
-    '/_app/c/$courseSlug/lesson/$id': {
-      id: '/_app/c/$courseSlug/lesson/$id'
-      path: '/lesson/$id'
-      fullPath: '/c/$courseSlug/lesson/$id'
-      preLoaderRoute: typeof AppCCourseSlugLessonIdRouteImport
-      parentRoute: typeof AppCCourseSlugRoute
-    }
-    '/_app/c/$courseSlug/library/': {
-      id: '/_app/c/$courseSlug/library/'
-      path: '/library'
-      fullPath: '/c/$courseSlug/library/'
-      preLoaderRoute: typeof AppCCourseSlugLibraryIndexRouteImport
-      parentRoute: typeof AppCCourseSlugRoute
-    }
-    '/_app/c/$courseSlug/library/$slug': {
-      id: '/_app/c/$courseSlug/library/$slug'
-      path: '/library/$slug'
-      fullPath: '/c/$courseSlug/library/$slug'
-      preLoaderRoute: typeof AppCCourseSlugLibrarySlugRouteImport
+    '/_app/c/$courseSlug/dashboard': {
+      id: '/_app/c/$courseSlug/dashboard'
+      path: '/dashboard'
+      fullPath: '/c/$courseSlug/dashboard'
+      preLoaderRoute: typeof AppCCourseSlugDashboardRouteImport
       parentRoute: typeof AppCCourseSlugRoute
     }
     '/_app/c/$courseSlug/materials/': {
@@ -730,11 +702,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCCourseSlugMaterialsIndexRouteImport
       parentRoute: typeof AppCCourseSlugRoute
     }
+    '/_app/c/$courseSlug/library/': {
+      id: '/_app/c/$courseSlug/library/'
+      path: '/library'
+      fullPath: '/c/$courseSlug/library/'
+      preLoaderRoute: typeof AppCCourseSlugLibraryIndexRouteImport
+      parentRoute: typeof AppCCourseSlugRoute
+    }
+    '/_app/c/$courseSlug/documents/': {
+      id: '/_app/c/$courseSlug/documents/'
+      path: '/documents'
+      fullPath: '/c/$courseSlug/documents/'
+      preLoaderRoute: typeof AppCCourseSlugDocumentsIndexRouteImport
+      parentRoute: typeof AppCCourseSlugRoute
+    }
     '/_app/c/$courseSlug/module/$id': {
       id: '/_app/c/$courseSlug/module/$id'
       path: '/module/$id'
       fullPath: '/c/$courseSlug/module/$id'
       preLoaderRoute: typeof AppCCourseSlugModuleIdRouteImport
+      parentRoute: typeof AppCCourseSlugRoute
+    }
+    '/_app/c/$courseSlug/library/$slug': {
+      id: '/_app/c/$courseSlug/library/$slug'
+      path: '/library/$slug'
+      fullPath: '/c/$courseSlug/library/$slug'
+      preLoaderRoute: typeof AppCCourseSlugLibrarySlugRouteImport
+      parentRoute: typeof AppCCourseSlugRoute
+    }
+    '/_app/c/$courseSlug/lesson/$id': {
+      id: '/_app/c/$courseSlug/lesson/$id'
+      path: '/lesson/$id'
+      fullPath: '/c/$courseSlug/lesson/$id'
+      preLoaderRoute: typeof AppCCourseSlugLessonIdRouteImport
       parentRoute: typeof AppCCourseSlugRoute
     }
     '/_app/c/$courseSlug/documents/$docId/fill': {
