@@ -268,6 +268,31 @@ export function useProgress(explicitCourseId?: string) {
     [modules]
   );
 
+  /**
+   * Modulul-poartă nelivrat încă.
+   *
+   * Metodologia START e explicită: „orice modul ulterior presupune că ai trecut prin
+   * validare. Dacă sari peste asta, construiești pe nisip." Un modul marcat `isGate`
+   * condiționează tot ce vine după el, până când livrabilul lui e bifat.
+   *
+   * Nu blochează navigarea — avertizează. Un elev plătitor care e la jumătatea
+   * conversațiilor de validare are dreptul să se uite înainte; important e să știe,
+   * și să știe și mentorul, că lucrează în afara ordinii.
+   */
+  const getPendingGate = useCallback(
+    (moduleIndex: number) => {
+      for (let i = 0; i < moduleIndex && i < modules.length; i++) {
+        const gate: any = modules[i];
+        if (!gate?.isGate) continue;
+        const deliverables = (gate.lessons || []).filter((l: any) => l.type === 'exercise');
+        const delivered = deliverables.length > 0 && deliverables.every((l: any) => isCompleted(l.id));
+        if (!delivered) return gate;
+      }
+      return null;
+    },
+    [modules, isCompleted]
+  );
+
   const getCompletedLessonsCount = useCallback(() => {
     const videoLessonIds = new Set(modules.flatMap((m) => m.lessons).filter(hasVideo).map((l) => l.id));
     return progress.filter((p) => videoLessonIds.has(p.lesson_id)).length;
@@ -290,6 +315,7 @@ export function useProgress(explicitCourseId?: string) {
     getModuleProgress,
     getOverallProgress,
     getOverallProgressFor,
+    getPendingGate,
     isModuleLocked,
     getCompletedLessonsCount,
     getTotalLessonsCount,

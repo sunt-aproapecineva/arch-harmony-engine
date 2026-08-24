@@ -22,6 +22,7 @@ import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminActivityRouteImport } from './routes/admin.activity'
+import { Route as AdminCohortaRouteImport } from './routes/admin.cohorta'
 import { Route as AdminLessonsRouteImport } from './routes/admin.lessons'
 import { Route as AdminProgressRouteImport } from './routes/admin.progress'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -106,6 +107,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminActivityRoute = AdminActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCohortaRoute = AdminCohortaRouteImport.update({
+  id: '/cohorta',
+  path: '/cohorta',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLessonsRoute = AdminLessonsRouteImport.update({
@@ -232,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
+  '/admin/cohorta': typeof AdminCohortaRoute
   '/admin/lessons': typeof AdminLessonsRoute
   '/admin/progress': typeof AdminProgressRoute
   '/admin/users': typeof AdminUsersRoute
@@ -266,6 +273,7 @@ export interface FileRoutesByTo {
   '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
+  '/admin/cohorta': typeof AdminCohortaRoute
   '/admin/lessons': typeof AdminLessonsRoute
   '/admin/progress': typeof AdminProgressRoute
   '/admin/users': typeof AdminUsersRoute
@@ -302,6 +310,7 @@ export interface FileRoutesById {
   '/welcome': typeof WelcomeRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
+  '/admin/cohorta': typeof AdminCohortaRoute
   '/admin/lessons': typeof AdminLessonsRoute
   '/admin/progress': typeof AdminProgressRoute
   '/admin/users': typeof AdminUsersRoute
@@ -339,6 +348,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/dashboard'
     | '/admin/activity'
+    | '/admin/cohorta'
     | '/admin/lessons'
     | '/admin/progress'
     | '/admin/users'
@@ -373,6 +383,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/dashboard'
     | '/admin/activity'
+    | '/admin/cohorta'
     | '/admin/lessons'
     | '/admin/progress'
     | '/admin/users'
@@ -408,6 +419,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/_app/dashboard'
     | '/admin/activity'
+    | '/admin/cohorta'
     | '/admin/lessons'
     | '/admin/progress'
     | '/admin/users'
@@ -538,6 +550,13 @@ declare module '@tanstack/react-router' {
       path: '/activity'
       fullPath: '/admin/activity'
       preLoaderRoute: typeof AdminActivityRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/cohorta': {
+      id: '/admin/cohorta'
+      path: '/cohorta'
+      fullPath: '/admin/cohorta'
+      preLoaderRoute: typeof AdminCohortaRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/lessons': {
@@ -742,6 +761,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface AdminRouteChildren {
   AdminActivityRoute: typeof AdminActivityRoute
+  AdminCohortaRoute: typeof AdminCohortaRoute
   AdminLessonsRoute: typeof AdminLessonsRoute
   AdminProgressRoute: typeof AdminProgressRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -751,6 +771,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminActivityRoute: AdminActivityRoute,
+  AdminCohortaRoute: AdminCohortaRoute,
   AdminLessonsRoute: AdminLessonsRoute,
   AdminProgressRoute: AdminProgressRoute,
   AdminUsersRoute: AdminUsersRoute,

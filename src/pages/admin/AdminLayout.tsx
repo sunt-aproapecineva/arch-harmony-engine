@@ -2,7 +2,7 @@
 import React from 'react';
 import { NavLink, Outlet, Navigate, useNavigate } from '@/lib/router-compat';
 import {
-  LayoutDashboard, Users, BookOpen, TrendingUp, ShieldCheck, LogOut, Activity,
+  LayoutDashboard, Users, UserCog, BookOpen, TrendingUp, ShieldCheck, LogOut, Activity,
 } from 'lucide-react';
 import { useAuthContext } from '../../context/AuthContext';
 import { Header } from '../../components/layout/Header';
@@ -21,7 +21,8 @@ export const AdminLayout: React.FC = () => {
 
   const navItems = [
     { to: '/admin', icon: <LayoutDashboard size={15} />, label: 'Prezentare generală', end: true },
-    { to: '/admin/users', icon: <Users size={15} />, label: 'Utilizatori' },
+    { to: '/admin/cohorta', icon: <Users size={15} />, label: 'Cohorta' },
+    { to: '/admin/users', icon: <UserCog size={15} />, label: 'Utilizatori' },
     { to: '/admin/lessons', icon: <BookOpen size={15} />, label: 'Lecții' },
     { to: '/admin/progress', icon: <TrendingUp size={15} />, label: 'Progres' },
     { to: '/admin/activity', icon: <Activity size={15} />, label: 'Activitate' },

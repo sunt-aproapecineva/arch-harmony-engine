@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Play, Lock, Clock, FileText, ChevronDown, CheckCircle2, Award, ChevronRight, Star, Pencil,
+  Play, Lock, Clock, FileText, ChevronDown, CheckCircle2, Award, ChevronRight, Star, Pencil, AlertTriangle,
 } from 'lucide-react';
 import { useCourse } from '../context/CourseContext';
-import { courseDashboardPath, courseLessonPath } from '../lib/navigation';
+import { courseDashboardPath, courseLessonPath, courseModulePath } from '../lib/navigation';
 import { useProgress } from '../hooks/useProgress';
 import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
 import { useAuthContext } from '../context/AuthContext';
@@ -16,7 +16,7 @@ export const ModulePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuthContext();
-  const { getModuleProgress, isModuleLocked, isCompleted } = useProgress();
+  const { getModuleProgress, isModuleLocked, isCompleted, getPendingGate } = useProgress();
   const { course, courseId, modules } = useCourse();
   const quizDone = hasCompletedOnboarding(user, courseId);
   const [quizModalOpen, setQuizModalOpen] = useState(false);
@@ -33,6 +33,8 @@ export const ModulePage: React.FC = () => {
   }
 
   const locked = isModuleLocked(moduleIndex);
+  // Modulul-poartă nelivrat (la START: Validarea). Avertizează, nu blochează.
+  const pendingGate = getPendingGate(moduleIndex);
   const progress = getModuleProgress(module.id);
   const done = progress === 100;
 
@@ -57,6 +59,35 @@ export const ModulePage: React.FC = () => {
         <ChevronRight size={12} />
         <span style={{ color: 'var(--fg)' }}>{module.title}</span>
       </div>
+
+      {pendingGate && (
+        <div style={{
+          display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 24,
+          padding: '14px 16px', borderRadius: 12,
+          background: 'var(--warn-dim)', border: '1px solid var(--border-hi)',
+        }}>
+          <AlertTriangle size={16} style={{ color: 'var(--warn)', flexShrink: 0, marginTop: 1 }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)', marginBottom: 4 }}>
+              Încă n-ai livrat „{pendingGate.title}"
+            </div>
+            <p style={{ fontSize: 12.5, color: 'var(--fg-2)', lineHeight: 1.6, marginBottom: 10 }}>
+              Modulul ăsta presupune că ai trecut prin {pendingGate.etapa.toLowerCase()}. Poți citi înainte —
+              dar orice construiești până nu termini acolo se sprijină pe o presupunere, nu pe o dovadă.
+            </p>
+            <button
+              onClick={() => navigate(courseModulePath(course, pendingGate.id))}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px',
+                borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 600,
+                background: 'transparent', color: 'var(--warn)', border: '1px solid var(--border-hi)',
+              }}
+            >
+              Mergi la {pendingGate.etapa} <ChevronRight size={12} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Module header */}
       <motion.div
