@@ -22,7 +22,7 @@ export const ModuleCard: React.FC<Props> = ({ module: mod, progress, locked, act
     ? 'rgba(196,240,228,0.3)'
     : 'var(--border)';
 
-  const statusColor = done ? '#4ade80' : active ? 'var(--accent)' : 'var(--gold)';
+  const statusColor = done ? 'var(--ok)' : active ? 'var(--accent)' : 'var(--gold)';
 
   return (
     <motion.div
@@ -87,7 +87,7 @@ export const ModuleCard: React.FC<Props> = ({ module: mod, progress, locked, act
             {locked
               ? <Lock size={14} style={{ color: 'var(--fg-3)' }} />
               : done
-              ? <CheckCircle2 size={16} style={{ color: '#4ade80' }} />
+              ? <CheckCircle2 size={16} style={{ color: 'var(--ok)' }} />
               : <ChevronRight size={16} style={{ color: 'var(--fg-3)' }} />
             }
           </div>
@@ -117,7 +117,7 @@ export const ModuleCard: React.FC<Props> = ({ module: mod, progress, locked, act
             transition={{ duration: 0.8, delay: index * 0.06 + 0.2, ease: 'easeOut' }}
             style={{
               height: '100%',
-              background: done ? '#4ade80' : active ? 'var(--accent)' : 'var(--fg-3)',
+              background: done ? 'var(--ok)' : active ? 'var(--accent)' : 'var(--fg-3)',
               borderRadius: 2,
             }}
           />
@@ -146,7 +146,7 @@ export const ModuleCard: React.FC<Props> = ({ module: mod, progress, locked, act
                 padding: '6px 14px', borderRadius: 8, fontSize: 11, fontWeight: 700,
                 background: done ? 'rgba(74,222,128,0.1)' : 'rgba(196,240,228,0.1)',
                 border: `1px solid ${done ? 'rgba(74,222,128,0.25)' : 'rgba(196,240,228,0.25)'}`,
-                color: done ? '#4ade80' : 'var(--accent)',
+                color: done ? 'var(--ok)' : 'var(--accent)',
               }}
             >
               {done ? 'Revizuiește' : 'Continuă'}

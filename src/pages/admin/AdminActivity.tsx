@@ -5,15 +5,15 @@ import { getActivity, timeAgo, ActivityEvent, ActivityType } from '../../lib/act
 import { Search, RefreshCw, LogIn, CheckCircle2, FileText, Award, UserPlus, BookOpen } from 'lucide-react';
 
 const TYPE_CONFIG: Record<ActivityType, { icon: React.ReactNode; color: string; bg: string; label: string }> = {
-  login: { icon: <LogIn size={13} />, color: '#4ade80', bg: 'rgba(74,222,128,0.1)', label: 'Login' },
+  login: { icon: <LogIn size={13} />, color: 'var(--ok)', bg: 'rgba(74,222,128,0.1)', label: 'Login' },
   logout: { icon: <LogIn size={13} />, color: 'var(--fg-3)', bg: 'rgba(255,255,255,0.05)', label: 'Logout' },
   lesson_complete: { icon: <CheckCircle2 size={13} />, color: 'var(--accent)', bg: 'rgba(196,240,228,0.1)', label: 'Lecție' },
   lesson_view: { icon: <BookOpen size={13} />, color: 'var(--fg-3)', bg: 'rgba(255,255,255,0.05)', label: 'Vizualizare' },
-  exercise_complete: { icon: <BookOpen size={13} />, color: '#fb923c', bg: 'rgba(251,146,60,0.1)', label: 'Exercițiu' },
+  exercise_complete: { icon: <BookOpen size={13} />, color: 'var(--warn-strong)', bg: 'rgba(251,146,60,0.1)', label: 'Exercițiu' },
   note_saved: { icon: <FileText size={13} />, color: '#60a5fa', bg: 'rgba(96,165,250,0.1)', label: 'Notiță' },
   quiz_complete: { icon: <Award size={13} />, color: 'var(--gold)', bg: 'var(--gold-dim)', label: 'Quiz' },
   module_view: { icon: <BookOpen size={13} />, color: 'var(--fg-3)', bg: 'rgba(255,255,255,0.04)', label: 'Modul' },
-  platform_register: { icon: <UserPlus size={13} />, color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', label: 'Înregistrare' },
+  platform_register: { icon: <UserPlus size={13} />, color: 'var(--info)', bg: 'rgba(167,139,250,0.1)', label: 'Înregistrare' },
 };
 
 const FILTERS: { value: string; label: string }[] = [
@@ -79,8 +79,8 @@ export const AdminActivity: React.FC = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
         {[
           { label: 'Evenimente azi', value: eventsToday.length, color: 'var(--accent)' },
-          { label: 'Utilizatori unici azi', value: uniqueUsersToday, color: '#a78bfa' },
-          { label: 'Lecții completate azi', value: lessonsToday, color: '#4ade80' },
+          { label: 'Utilizatori unici azi', value: uniqueUsersToday, color: 'var(--info)' },
+          { label: 'Lecții completate azi', value: lessonsToday, color: 'var(--ok)' },
           { label: 'Login-uri azi', value: loginsToday, color: 'var(--gold)' },
         ].map(({ label, value, color }) => (
           <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '18px 20px' }}>

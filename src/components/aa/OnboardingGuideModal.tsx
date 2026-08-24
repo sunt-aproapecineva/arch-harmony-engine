@@ -132,7 +132,7 @@ export const OnboardingGuideModal: React.FC<Props> = ({ open, onClose }) => {
                   color: 'var(--fg-2)', display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', transition: 'background 0.15s, color 0.15s',
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(248,113,113,0.12)'; (e.currentTarget as HTMLButtonElement).style.color = '#f87171'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(248,113,113,0.12)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--error)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-3, rgba(255,255,255,0.04))'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--fg-2)'; }}
               >
                 <X size={16} />

@@ -71,10 +71,10 @@ const ChecklistExercise: React.FC<{ template: ExerciseTemplate; storageKey: stri
               width: 20, height: 20, borderRadius: 6, flexShrink: 0, marginTop: 1,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               background: checked[item.id] ? 'rgba(74,222,128,0.2)' : 'var(--bg-2)',
-              border: `1.5px solid ${checked[item.id] ? '#4ade80' : 'var(--border)'}`,
+              border: `1.5px solid ${checked[item.id] ? 'var(--ok)' : 'var(--border)'}`,
               transition: 'all 0.15s',
             }}>
-              {checked[item.id] && <Check size={11} style={{ color: '#4ade80' }} />}
+              {checked[item.id] && <Check size={11} style={{ color: 'var(--ok)' }} />}
             </div>
             <span style={{ fontSize: 13, color: checked[item.id] ? 'var(--fg-2)' : 'var(--fg)', lineHeight: 1.5 }}>
               {item.label}
@@ -407,7 +407,7 @@ const DynamicTableExercise: React.FC<{ template: ExerciseTemplate; storageKey: s
                   <button
                     onClick={() => removeRow(rowIdx)}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--fg-3)', padding: 4, display: 'flex', transition: 'color 0.15s' }}
-                    onMouseEnter={e => (e.currentTarget.style.color = '#f87171')}
+                    onMouseEnter={e => (e.currentTarget.style.color = 'var(--error)')}
                     onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-3)')}
                   >
                     <Trash2 size={12} />
@@ -508,7 +508,7 @@ const QuizExercise: React.FC<{ template: ExerciseTemplate; storageKey: string }>
                 <span style={{ fontSize: 12, color: 'var(--fg)', flex: 1 }}>{qq.text}</span>
                 <span style={{
                   fontSize: 11, fontWeight: 600, flexShrink: 0,
-                  color: isGood ? '#4ade80' : '#f87171',
+                  color: isGood ? 'var(--ok)' : 'var(--error)',
                 }}>
                   {qq.type === 'scale5' ? `${a}/5` : String(a)}
                 </span>
@@ -661,7 +661,7 @@ const ActivityAuditExercise: React.FC<{ storageKey: string }> = ({ storageKey })
   const dTotal = rows.filter(r => r.role === 'D').reduce((a, r) => a + (parseFloat(r.percentage) || 0), 0);
   const pTotal = rows.filter(r => r.role === 'P').reduce((a, r) => a + (parseFloat(r.percentage) || 0), 0);
   const grandTotal = rows.reduce((a, r) => a + (parseFloat(r.percentage) || 0), 0);
-  const roleColors = { S: 'var(--accent)', D: 'var(--gold)', P: '#a78bfa' };
+  const roleColors = { S: 'var(--accent)', D: 'var(--gold)', P: 'var(--info)' };
 
   return (
     <div>
@@ -707,7 +707,7 @@ const ActivityAuditExercise: React.FC<{ storageKey: string }> = ({ storageKey })
                 );
               })}
             </div>
-            <button onClick={() => removeRow(row.id)} style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(248,113,113,0.08)', border: 'none', cursor: 'pointer', color: '#f87171', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+            <button onClick={() => removeRow(row.id)} style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(248,113,113,0.08)', border: 'none', cursor: 'pointer', color: 'var(--error)', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
           </div>
         ))}
       </div>
@@ -726,7 +726,7 @@ const ActivityAuditExercise: React.FC<{ storageKey: string }> = ({ storageKey })
             </div>
           ))}
         </div>
-        <div style={{ fontSize: 12, fontWeight: 600, textAlign: 'center', color: grandTotal > 101 ? '#f87171' : grandTotal >= 98 ? '#4ade80' : 'var(--gold)' }}>
+        <div style={{ fontSize: 12, fontWeight: 600, textAlign: 'center', color: grandTotal > 101 ? 'var(--error)' : grandTotal >= 98 ? 'var(--ok)' : 'var(--gold)' }}>
           Total: {Math.round(grandTotal)}%
           {grandTotal > 101 ? ' — depășești 100%' : grandTotal < 98 && grandTotal > 0 ? ' — mai ai de completat' : grandTotal >= 98 ? ' ✓ Corect' : ''}
         </div>
@@ -801,7 +801,7 @@ const BottleneckMapExercise: React.FC<{ storageKey: string }> = ({ storageKey })
             <div style={{ display: 'flex', gap: 3 }}>
               {(['da', 'nu'] as const).map(val => {
                 const active = row.wasNecessary === val;
-                const c = val === 'da' ? '#4ade80' : '#f87171';
+                const c = val === 'da' ? 'var(--ok)' : 'var(--error)';
                 return (
                   <button key={val} onClick={() => updateRow(row.id, 'wasNecessary', val)} style={{
                     flex: 1, padding: '6px 0', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: 'none', transition: 'all 0.12s',
@@ -819,7 +819,7 @@ const BottleneckMapExercise: React.FC<{ storageKey: string }> = ({ storageKey })
             <input type="number" min={0} value={row.time} onChange={e => updateRow(row.id, 'time', e.target.value)}
               placeholder="min"
               style={{ padding: '7px 8px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', textAlign: 'center', width: '100%' }} />
-            <button onClick={() => removeRow(row.id)} style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(248,113,113,0.08)', border: 'none', cursor: 'pointer', color: '#f87171', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+            <button onClick={() => removeRow(row.id)} style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(248,113,113,0.08)', border: 'none', cursor: 'pointer', color: 'var(--error)', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
           </div>
         ))}
       </div>
@@ -831,7 +831,7 @@ const BottleneckMapExercise: React.FC<{ storageKey: string }> = ({ storageKey })
       {filledRows.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
           {[
-            { label: 'Situații nu necesare', value: notNeeded.length, color: '#f87171' },
+            { label: 'Situații nu necesare', value: notNeeded.length, color: 'var(--error)' },
             { label: 'Minute pierdute', value: wastedTime, color: 'var(--gold)' },
             { label: '% Nu trebuiau la tine', value: filledRows.length > 0 ? Math.round((notNeeded.length / filledRows.length) * 100) : 0, color: 'var(--accent)', suffix: '%' },
           ].map(({ label, value, color, suffix }) => (
@@ -887,7 +887,7 @@ const AbsenceTestExercise: React.FC<{ storageKey: string }> = ({ storageKey }) =
     setRows(next); save(next, conclusion);
   };
 
-  const gravColors: Record<string, string> = { Mare: '#f87171', Medie: 'var(--gold)', Mică: '#4ade80' };
+  const gravColors: Record<string, string> = { Mare: 'var(--error)', Medie: 'var(--gold)', Mică: 'var(--ok)' };
   const count = (g: string) => rows.filter(r => r.gravity === g).length;
 
   return (
@@ -921,7 +921,7 @@ const AbsenceTestExercise: React.FC<{ storageKey: string }> = ({ storageKey }) =
             <textarea value={row.causedBy} onChange={e => updateRow(row.id, 'causedBy', e.target.value)}
               placeholder="Cauzat de: lipsă procedură, lipsă responsabil..." rows={2}
               style={{ padding: '7px 10px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', resize: 'none', lineHeight: 1.5, width: '100%' }} />
-            <button onClick={() => removeRow(row.id)} style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(248,113,113,0.08)', border: 'none', cursor: 'pointer', color: '#f87171', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 4 }}>×</button>
+            <button onClick={() => removeRow(row.id)} style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(248,113,113,0.08)', border: 'none', cursor: 'pointer', color: 'var(--error)', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 4 }}>×</button>
           </div>
         ))}
       </div>
@@ -976,7 +976,7 @@ const DIAG_DIMENSIONS = [
     { id: 'd17', text: 'Organigrama mea actuală reflectă realitatea, nu ce ar trebui să fie' },
     { id: 'd18', text: 'Am deja gândit organigrama companiei pentru următorii 2-3 ani' },
   ]},
-  { id: 'dim3', name: 'Procese', color: '#a78bfa', questions: [
+  { id: 'dim3', name: 'Procese', color: 'var(--info)', questions: [
     { id: 'd19', text: 'Procesele principale ale afacerii mele sunt scrise pas cu pas' },
     { id: 'd20', text: 'Un angajat nou poate executa un proces citind documentul, fără să mă întrebe' },
     { id: 'd21', text: 'Știu care sunt cele 5-7 procese fără de care afacerea nu funcționează' },
@@ -1018,7 +1018,7 @@ const DIAG_DIMENSIONS = [
   ]},
 ];
 
-const SCORE_COLORS: Record<number, string> = { 1: '#f87171', 2: '#fb923c', 3: 'var(--gold)', 4: '#86efac', 5: '#4ade80' };
+const SCORE_COLORS: Record<number, string> = { 1: 'var(--error)', 2: 'var(--warn-strong)', 3: 'var(--gold)', 4: '#86efac', 5: 'var(--ok)' };
 
 const DiagnosticGridExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
   const [answers, setAnswers] = useState<Record<string, number>>(() => {
@@ -1153,7 +1153,7 @@ const DiagnosticGridExercise: React.FC<{ storageKey: string }> = ({ storageKey }
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {sorted.slice(0, 3).map((ds, i) => (
               <div key={ds.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'var(--bg)', borderRadius: 10, border: '1px solid var(--border)' }}>
-                <div style={{ width: 26, height: 26, borderRadius: 8, background: 'rgba(248,113,113,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 12, fontWeight: 700, color: '#f87171' }}>{i + 1}</div>
+                <div style={{ width: 26, height: 26, borderRadius: 8, background: 'rgba(248,113,113,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 12, fontWeight: 700, color: 'var(--error)' }}>{i + 1}</div>
                 <span style={{ flex: 1, fontSize: 13, color: 'var(--fg)', fontWeight: 500 }}>{ds.name}</span>
                 <span style={{ fontSize: 14, fontWeight: 700, color: ds.avg > 0 ? SCORE_COLORS[Math.round(ds.avg) as 1|2|3|4|5] : 'var(--fg-3)' }}>
                   {ds.avg > 0 ? `${ds.avg.toFixed(1)}/5` : '—'}
@@ -1178,9 +1178,9 @@ const DiagnosticGridExercise: React.FC<{ storageKey: string }> = ({ storageKey }
 
 // ─── Partnership Diagnostic (Lecția 2) ───────────────────────────────────────
 const PTYPES = [
-  { num: 1, title: 'Ambii activi, fără CEO clar', desc: 'Amândoi conduc simultan. Angajații nu știu pe cine să asculte. Nimeni nu răspunde de nimic.', color: '#f87171' },
+  { num: 1, title: 'Ambii activi, fără CEO clar', desc: 'Amândoi conduc simultan. Angajații nu știu pe cine să asculte. Nimeni nu răspunde de nimic.', color: 'var(--error)' },
   { num: 2, title: 'CEO activ + partener pasiv / investitor', desc: 'Unul conduce zilnic, celălalt a investit bani sau aduce relații. Probleme când investitorul vrea mai mult control.', color: 'var(--gold)' },
-  { num: 3, title: 'CEO activ + partener cu rol operațional', desc: 'Structura există pe hârtie dar partenerul-Director nu se subordonează real CEO-ului.', color: '#a78bfa' },
+  { num: 3, title: 'CEO activ + partener cu rol operațional', desc: 'Structura există pe hârtie dar partenerul-Director nu se subordonează real CEO-ului.', color: 'var(--info)' },
   { num: 4, title: 'Parteneriat de familie', desc: 'Soț/soție, frați, tată-fiu. Relația personală și business-ul se amestecă. Cel mai frecvent tip în România.', color: '#93c5fd' },
   { num: 5, title: 'Inegal ca implicare în timp', desc: 'Unul muncește 60h/săpt, celălalt 20h. Resentimentul acumulat ani de zile iese violent.', color: 'var(--accent)' },
   { num: 6, title: 'Viziuni divergente', desc: 'Au vrut același lucru la început — cu timpul direcțiile s-au separat. Firma intră în paralizie decizională.', color: '#fca5a5' },
@@ -1609,7 +1609,7 @@ const FoundationManifestExercise: React.FC<{ storageKey: string }> = ({ storageK
 
       {/* ── BLOCUL 3: Valorile ── */}
       <div style={{ padding: '24px', background: 'rgba(167,139,250,0.03)', border: '1px solid rgba(167,139,250,0.15)', borderRadius: 16 }}>
-        {bloc('3', 'Valorile', 'Regulile echipei când tu nu ești în cameră. Maxim 5 valori. Fiecare scrisă ca un comportament concret.', '#a78bfa')}
+        {bloc('3', 'Valorile', 'Regulile echipei când tu nu ești în cameră. Maxim 5 valori. Fiecare scrisă ca un comportament concret.', 'var(--info)')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 18 }}>
           {[
             { id: 'val_apreciez', label: '1. Care sunt comportamentele pe care le apreciezi cel mai mult în echipa ta?', ph: 'Ex: Când cineva spune adevărul chiar dacă e inconfortabil', rows: 3 },
@@ -1625,15 +1625,15 @@ const FoundationManifestExercise: React.FC<{ storageKey: string }> = ({ storageK
             </div>
           ))}
           <div>
-            <label style={{ fontSize: 12, fontWeight: 700, color: '#a78bfa', display: 'block', marginBottom: 10, letterSpacing: '0.04em', textTransform: 'uppercase' }}>✦ Cele 5 valori cu comportamentele asociate</label>
+            <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--info)', display: 'block', marginBottom: 10, letterSpacing: '0.04em', textTransform: 'uppercase' }}>✦ Cele 5 valori cu comportamentele asociate</label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[1,2,3,4,5].map(n => (
                 <div key={n} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8, alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ width: 22, height: 22, borderRadius: 6, background: 'rgba(167,139,250,0.15)', border: '1px solid rgba(167,139,250,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#a78bfa', flexShrink: 0 }}>{n}</div>
+                    <div style={{ width: 22, height: 22, borderRadius: 6, background: 'rgba(167,139,250,0.15)', border: '1px solid rgba(167,139,250,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: 'var(--info)', flexShrink: 0 }}>{n}</div>
                     <input value={vals[`val_v${n}`] || ''} onChange={e => upd(`val_v${n}`, e.target.value)}
                       placeholder={`Valoarea ${n}`}
-                      style={{ width: '100%', padding: '8px 10px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: '#a78bfa', fontWeight: 600, boxSizing: 'border-box' }}
+                      style={{ width: '100%', padding: '8px 10px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--info)', fontWeight: 600, boxSizing: 'border-box' }}
                       onFocus={e => (e.target.style.borderColor = 'rgba(167,139,250,0.4)')}
                       onBlur={e => (e.target.style.borderColor = 'var(--border)')} />
                   </div>
@@ -1653,7 +1653,7 @@ const FoundationManifestExercise: React.FC<{ storageKey: string }> = ({ storageK
           'Pot concedia pe cineva care încalcă fiecare valoare — testul realității',
           'Valorile mele nu pot fi ale oricărei alte firme — sunt specifice mie',
           'Pot angaja pe cineva folosind valorile ca criterii de selecție',
-        ], '#a78bfa')}
+        ], 'var(--info)')}
       </div>
 
       {savedAt && <p style={{ fontSize: 11, color: 'var(--accent)', textAlign: 'right' }}>Salvat automat ✓ {savedAt}</p>}
@@ -1684,7 +1684,7 @@ const QUALITY_CHECKLIST_ITEMS = [
 const GROUP_COLORS: Record<string, string> = {
   'Misiunea': 'var(--accent)',
   'Viziunea': 'var(--gold)',
-  'Valorile': '#a78bfa',
+  'Valorile': 'var(--info)',
   'General': '#93c5fd',
 };
 
@@ -1714,12 +1714,12 @@ const QualityChecklistExercise: React.FC<{ storageKey: string }> = ({ storageKey
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
           <span>{doneCount}/{total} bifate</span>
-          <span style={{ color: allDone ? '#4ade80' : 'var(--fg-3)', fontWeight: allDone ? 700 : 400 }}>
+          <span style={{ color: allDone ? 'var(--ok)' : 'var(--fg-3)', fontWeight: allDone ? 700 : 400 }}>
             {allDone ? '✓ Gata de predat!' : `${pct}%`}
           </span>
         </div>
         <div style={{ height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${pct}%`, background: allDone ? '#4ade80' : 'var(--accent)', borderRadius: 3, transition: 'width 0.4s ease' }} />
+          <div style={{ height: '100%', width: `${pct}%`, background: allDone ? 'var(--ok)' : 'var(--accent)', borderRadius: 3, transition: 'width 0.4s ease' }} />
         </div>
       </div>
 
@@ -1729,9 +1729,9 @@ const QualityChecklistExercise: React.FC<{ storageKey: string }> = ({ storageKey
           animate={{ opacity: 1, scale: 1 }}
           style={{ marginBottom: 20, padding: '16px 20px', background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.25)', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 12 }}
         >
-          <CheckCircle2 size={22} style={{ color: '#4ade80', flexShrink: 0 }} />
+          <CheckCircle2 size={22} style={{ color: 'var(--ok)', flexShrink: 0 }} />
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#4ade80' }}>Toate criteriile bifate!</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ok)' }}>Toate criteriile bifate!</div>
             <div style={{ fontSize: 12, color: 'var(--fg-3)' }}>Manifestul tău e gata de predat. Mergi mai departe la Exercițiul 3.</div>
           </div>
         </motion.div>
@@ -1768,10 +1768,10 @@ const QualityChecklistExercise: React.FC<{ storageKey: string }> = ({ storageKey
                     width: 20, height: 20, borderRadius: 6, flexShrink: 0, marginTop: 1,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     background: checked[item.id] ? 'rgba(74,222,128,0.18)' : 'var(--bg-2)',
-                    border: `1.5px solid ${checked[item.id] ? '#4ade80' : 'var(--border)'}`,
+                    border: `1.5px solid ${checked[item.id] ? 'var(--ok)' : 'var(--border)'}`,
                     transition: 'all 0.15s',
                   }}>
-                    {checked[item.id] && <Check size={11} style={{ color: '#4ade80' }} />}
+                    {checked[item.id] && <Check size={11} style={{ color: 'var(--ok)' }} />}
                   </div>
                   <span style={{ fontSize: 13, color: checked[item.id] ? 'var(--fg-2)' : 'var(--fg)', lineHeight: 1.55 }}>{item.label}</span>
                 </motion.div>
@@ -1895,7 +1895,7 @@ const TeamFeedbackReport: React.FC<{ storageKey: string }> = ({ storageKey }) =>
                   </td>
                   <td style={{ padding: '6px 4px', textAlign: 'center' }}>
                     <button onClick={() => removeObiectie(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--fg-3)', padding: 4, display: 'flex', transition: 'color 0.15s' }}
-                      onMouseEnter={e => (e.currentTarget.style.color = '#f87171')}
+                      onMouseEnter={e => (e.currentTarget.style.color = 'var(--error)')}
                       onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-3)')}>
                       <Trash2 size={12} />
                     </button>
@@ -1912,7 +1912,7 @@ const TeamFeedbackReport: React.FC<{ storageKey: string }> = ({ storageKey }) =>
 
       {/* Secțiunea 3 */}
       <div>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a78bfa', marginBottom: 14 }}>Secțiunea 3 — Ce rămâne de clarificat</div>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--info)', marginBottom: 14 }}>Secțiunea 3 — Ce rămâne de clarificat</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {[
             { key: 's3_neclar', label: '1. Ce a rămas neclar pentru echipă după ședință:', ph: 'Ex: Nu au înțeles diferența dintre misiune și viziune. Vom relua.', rows: 3 },
@@ -1962,8 +1962,8 @@ const TeamFeedbackReport: React.FC<{ storageKey: string }> = ({ storageKey }) =>
               onClick={() => toggleCheck(item.id)}
               style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '9px 12px', borderRadius: 9, cursor: 'pointer', background: data.checklist?.[item.id] ? 'rgba(74,222,128,0.07)' : 'var(--bg-3)', border: `1px solid ${data.checklist?.[item.id] ? 'rgba(74,222,128,0.22)' : 'var(--border)'}`, transition: 'all 0.15s' }}
             >
-              <div style={{ width: 18, height: 18, borderRadius: 5, flexShrink: 0, marginTop: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', background: data.checklist?.[item.id] ? 'rgba(74,222,128,0.18)' : 'var(--bg-2)', border: `1.5px solid ${data.checklist?.[item.id] ? '#4ade80' : 'var(--border)'}`, transition: 'all 0.15s' }}>
-                {data.checklist?.[item.id] && <Check size={10} style={{ color: '#4ade80' }} />}
+              <div style={{ width: 18, height: 18, borderRadius: 5, flexShrink: 0, marginTop: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', background: data.checklist?.[item.id] ? 'rgba(74,222,128,0.18)' : 'var(--bg-2)', border: `1.5px solid ${data.checklist?.[item.id] ? 'var(--ok)' : 'var(--border)'}`, transition: 'all 0.15s' }}>
+                {data.checklist?.[item.id] && <Check size={10} style={{ color: 'var(--ok)' }} />}
               </div>
               <span style={{ fontSize: 12, color: data.checklist?.[item.id] ? 'var(--fg-2)' : 'var(--fg)', lineHeight: 1.5 }}>{item.label}</span>
             </motion.div>
@@ -2259,7 +2259,7 @@ const QuizMCQExercise: React.FC<{ template: ExerciseTemplate; storageKey: string
 
   if (reviewing || allDone) {
     const tier = tiers.find(t => score >= t.min && score <= t.max);
-    const toneColor = tier?.tone === 'good' ? '#4ade80' : tier?.tone === 'ok' ? '#fbbf24' : '#f87171';
+    const toneColor = tier?.tone === 'good' ? 'var(--ok)' : tier?.tone === 'ok' ? 'var(--warn)' : 'var(--error)';
     return (
       <div>
         <p style={{ fontSize: 13, color: 'var(--fg-3)', marginBottom: 16, lineHeight: 1.7 }}>{template.instructions}</p>
@@ -2280,7 +2280,7 @@ const QuizMCQExercise: React.FC<{ template: ExerciseTemplate; storageKey: string
                 border: `1px solid ${isOK ? 'rgba(74,222,128,0.2)' : 'rgba(248,113,113,0.18)'}`,
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: isOK ? '#4ade80' : '#f87171', letterSpacing: '0.08em' }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: isOK ? 'var(--ok)' : 'var(--error)', letterSpacing: '0.08em' }}>
                     {i + 1}. {isOK ? 'CORECT' : 'GREȘIT'}
                   </span>
                 </div>
@@ -2292,7 +2292,7 @@ const QuizMCQExercise: React.FC<{ template: ExerciseTemplate; storageKey: string
                     return (
                       <div key={oi} style={{
                         fontSize: 12, padding: '6px 10px', borderRadius: 6,
-                        color: isCorrect ? '#4ade80' : isChosen ? '#f87171' : 'var(--fg-3)',
+                        color: isCorrect ? 'var(--ok)' : isChosen ? 'var(--error)' : 'var(--fg-3)',
                         background: isCorrect ? 'rgba(74,222,128,0.08)' : isChosen ? 'rgba(248,113,113,0.06)' : 'transparent',
                         fontWeight: isCorrect || isChosen ? 500 : 400,
                       }}>
@@ -2307,7 +2307,7 @@ const QuizMCQExercise: React.FC<{ template: ExerciseTemplate; storageKey: string
                   </div>
                 )}
                 {!isOK && s.options[correctIdx]?.explanation && (
-                  <div style={{ marginTop: 4, fontSize: 11, color: '#4ade80', lineHeight: 1.6 }}>
+                  <div style={{ marginTop: 4, fontSize: 11, color: 'var(--ok)', lineHeight: 1.6 }}>
                     Răspuns corect: {s.options[correctIdx].explanation}
                   </div>
                 )}
@@ -2486,7 +2486,7 @@ const FunctionRolesExercise: React.FC<{ template: ExerciseTemplate; storageKey: 
       {/* Diferența funcție vs rol */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
         <div style={{ padding: 12, background: 'rgba(74,222,128,0.05)', border: '1px solid rgba(74,222,128,0.18)', borderRadius: 10 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: '#4ade80', letterSpacing: '0.08em', marginBottom: 6 }}>FUNCȚIA</div>
+          <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--ok)', letterSpacing: '0.08em', marginBottom: 6 }}>FUNCȚIA</div>
           <ul style={{ margin: 0, paddingLeft: 16, fontSize: 11, color: 'var(--fg-2)', lineHeight: 1.7 }}>
             <li>Există în organigramă</li>
             <li>Nu dispare când pleacă omul</li>
@@ -2783,9 +2783,9 @@ const DecisionMatrixExercise: React.FC<{ template: ExerciseTemplate; storageKey:
   };
 
   const colHeaders: { key: 'alone' | 'manager' | 'ceo'; label: string; color: string }[] = [
-    { key: 'alone', label: 'Decide SINGUR', color: '#4ade80' },
-    { key: 'manager', label: 'Decide MANAGERUL', color: '#fbbf24' },
-    { key: 'ceo', label: 'Decide CEO', color: '#f87171' },
+    { key: 'alone', label: 'Decide SINGUR', color: 'var(--ok)' },
+    { key: 'manager', label: 'Decide MANAGERUL', color: 'var(--warn)' },
+    { key: 'ceo', label: 'Decide CEO', color: 'var(--error)' },
   ];
 
   return (
@@ -3057,7 +3057,7 @@ export const ExerciseBlock: React.FC<ExerciseBlockProps> = ({ exerciseId }) => {
         }}>
           {typeLabels[template.type] || 'Interactiv'}
         </span>
-        <span style={{ fontSize: 12, color: syncState.status === 'error' ? '#f87171' : 'var(--fg-3)', display: 'flex', alignItems: 'center', gap: 4 }}>
+        <span style={{ fontSize: 12, color: syncState.status === 'error' ? 'var(--error)' : 'var(--fg-3)', display: 'flex', alignItems: 'center', gap: 4 }}>
           <ChevronRight size={11} /> {syncState.status === 'error'
             ? `Salvat local. Sincronizarea cloud va fi reîncercată${syncState.message ? ` (${syncState.message})` : ''}`
             : syncState.status === 'ok'

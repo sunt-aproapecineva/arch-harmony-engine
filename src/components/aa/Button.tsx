@@ -45,7 +45,7 @@ export const Button: React.FC<ButtonProps> = ({
     },
     danger: {
       background: 'rgba(248,113,113,0.12)',
-      color: '#f87171',
+      color: 'var(--error)',
       border: '1px solid rgba(248,113,113,0.2)',
       fontWeight: 500,
     },

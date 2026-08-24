@@ -151,7 +151,7 @@ export const AdminUsers: React.FC = () => {
       <AnimatePresence>
         {addSuccess && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.25)', borderRadius: 10, marginBottom: 16, fontSize: 13, color: '#4ade80' }}>
+            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.25)', borderRadius: 10, marginBottom: 16, fontSize: 13, color: 'var(--ok)' }}>
             <CheckCircle2 size={15} /> {addSuccess}
           </motion.div>
         )}
@@ -161,7 +161,7 @@ export const AdminUsers: React.FC = () => {
         {[
           { label: 'Total utilizatori', value: users.length, color: 'var(--fg)' },
           { label: 'Studenți', value: totalStudents, color: 'var(--accent)' },
-          { label: 'Administratori', value: totalAdmins, color: '#a78bfa' },
+          { label: 'Administratori', value: totalAdmins, color: 'var(--info)' },
           { label: 'Whitelistați', value: whitelist.length, color: 'var(--gold)' },
         ].map(({ label, value, color }) => (
           <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '18px 20px' }}>
@@ -189,7 +189,7 @@ export const AdminUsers: React.FC = () => {
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} style={{ overflow: 'hidden' }}>
               <div style={{ borderTop: '1px solid var(--border)', marginTop: 16, paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {addError && (
-                  <div style={{ padding: '8px 12px', background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: 8, fontSize: 12, color: '#f87171' }}>{addError}</div>
+                  <div style={{ padding: '8px 12px', background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: 8, fontSize: 12, color: 'var(--error)' }}>{addError}</div>
                 )}
                 <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                   <input type="email" value={newEmail} onChange={e => { setNewEmail(e.target.value); if (addError) setAddError(''); }}
@@ -236,11 +236,11 @@ export const AdminUsers: React.FC = () => {
                   ); })()}
 
                   <button onClick={() => handleCopyLink(entry.email)} title="Copiază link de înregistrare"
-                    style={{ padding: '3px 10px', borderRadius: 6, fontSize: 11, cursor: 'pointer', border: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, background: copiedLink === entry.email ? 'rgba(74,222,128,0.15)' : 'rgba(196,240,228,0.08)', color: copiedLink === entry.email ? '#4ade80' : 'var(--accent)' }}>
+                    style={{ padding: '3px 10px', borderRadius: 6, fontSize: 11, cursor: 'pointer', border: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, background: copiedLink === entry.email ? 'rgba(74,222,128,0.15)' : 'rgba(196,240,228,0.08)', color: copiedLink === entry.email ? 'var(--ok)' : 'var(--accent)' }}>
                     <Link2 size={11} />{copiedLink === entry.email ? 'Copiat!' : 'Link'}
                   </button>
                   <button onClick={() => handleRemoveWhitelist(entry.email)}
-                    style={{ padding: '3px 10px', borderRadius: 6, fontSize: 11, cursor: 'pointer', border: 'none', fontWeight: 600, background: confirmRemove === entry.email ? '#f87171' : 'rgba(248,113,113,0.08)', color: confirmRemove === entry.email ? '#fff' : '#f87171' }}>
+                    style={{ padding: '3px 10px', borderRadius: 6, fontSize: 11, cursor: 'pointer', border: 'none', fontWeight: 600, background: confirmRemove === entry.email ? 'var(--error)' : 'rgba(248,113,113,0.08)', color: confirmRemove === entry.email ? '#fff' : 'var(--error)' }}>
                     {confirmRemove === entry.email ? 'Confirmă' : 'Elimină'}
                   </button>
                 </div>
@@ -297,9 +297,9 @@ export const AdminUsers: React.FC = () => {
                     {user.full_name?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: user.is_admin ? '#a78bfa' : 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: user.is_admin ? 'var(--info)' : 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6 }}>
                       {user.full_name || user.email}
-                      {user.is_admin && <Shield size={11} style={{ color: '#a78bfa', flexShrink: 0 }} />}
+                      {user.is_admin && <Shield size={11} style={{ color: 'var(--info)', flexShrink: 0 }} />}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--fg-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</div>
                   </div>
@@ -319,13 +319,13 @@ export const AdminUsers: React.FC = () => {
                   <div style={{ fontSize: 11, color: 'var(--fg-3)' }}>{user.last_activity ? timeAgo(user.last_activity) : '—'}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <div style={{ flex: 1, height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
-                      <div style={{ width: `${pct}%`, height: '100%', background: pct === 100 ? '#4ade80' : 'var(--accent)', borderRadius: 2 }} />
+                      <div style={{ width: `${pct}%`, height: '100%', background: pct === 100 ? 'var(--ok)' : 'var(--accent)', borderRadius: 2 }} />
                     </div>
                     <span style={{ fontSize: 11, color: 'var(--fg-3)', flexShrink: 0, minWidth: 28, textAlign: 'right' }}>{pct}%</span>
                   </div>
                   <div>
                     {user.quiz_done ? (
-                      <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.25)', color: '#4ade80' }}>✓ Completat</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.25)', color: 'var(--ok)' }}>✓ Completat</span>
                     ) : (
                       <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: 'var(--gold-dim)', border: '1px solid rgba(201,169,110,0.2)', color: 'var(--gold)' }}>⏳ În așteptare</span>
                     )}
@@ -338,7 +338,7 @@ export const AdminUsers: React.FC = () => {
                     {!isMainAdmin && (
                       <button onClick={e => { e.stopPropagation(); handleToggleAdmin(user); }}
                         title={user.is_admin ? 'Retrage admin' : 'Promovează la admin'}
-                        style={{ padding: '4px 8px', background: user.is_admin ? 'rgba(248,113,113,0.08)' : 'rgba(167,139,250,0.1)', border: `1px solid ${user.is_admin ? 'rgba(248,113,113,0.2)' : 'rgba(167,139,250,0.25)'}`, borderRadius: 7, cursor: 'pointer', fontSize: 11, color: user.is_admin ? '#f87171' : '#a78bfa', display: 'flex', alignItems: 'center' }}>
+                        style={{ padding: '4px 8px', background: user.is_admin ? 'rgba(248,113,113,0.08)' : 'rgba(167,139,250,0.1)', border: `1px solid ${user.is_admin ? 'rgba(248,113,113,0.2)' : 'rgba(167,139,250,0.25)'}`, borderRadius: 7, cursor: 'pointer', fontSize: 11, color: user.is_admin ? 'var(--error)' : 'var(--info)', display: 'flex', alignItems: 'center' }}>
                         {user.is_admin ? <ShieldOff size={11} /> : <Shield size={11} />}
                       </button>
                     )}
@@ -366,7 +366,7 @@ export const AdminUsers: React.FC = () => {
                                 <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{mod.etapa}</div>
                                 <div style={{ fontSize: 12, color: 'var(--fg)', fontWeight: 500, marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{mod.title}</div>
                                 <div style={{ height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden', marginBottom: 4 }}>
-                                  <div style={{ width: `${modPct}%`, height: '100%', background: modPct === 100 ? '#4ade80' : 'var(--accent)', borderRadius: 2 }} />
+                                  <div style={{ width: `${modPct}%`, height: '100%', background: modPct === 100 ? 'var(--ok)' : 'var(--accent)', borderRadius: 2 }} />
                                 </div>
                                 <div style={{ fontSize: 11, color: 'var(--fg-3)' }}>{done}/{total} lecții · {modPct}%</div>
                               </div>

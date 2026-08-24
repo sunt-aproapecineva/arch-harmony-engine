@@ -25,10 +25,10 @@ const cardStyle: React.CSSProperties = {
 };
 
 function scoreColor(v: number): string {
-  if (v >= 75) return '#4ade80';
+  if (v >= 75) return 'var(--ok)';
   if (v >= 50) return 'var(--accent)';
-  if (v >= 25) return '#fbbf24';
-  return '#f87171';
+  if (v >= 25) return 'var(--warn)';
+  return 'var(--error)';
 }
 
 function ScoreBar({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
@@ -332,7 +332,7 @@ export const StudentBriefingPanel: React.FC<Props> = ({ studentId, studentName }
             </div>
             {stuck && (
               <div style={{ marginTop: 16, padding: '10px 14px', background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.25)', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <AlertCircle size={14} style={{ color: '#fb923c', flexShrink: 0 }} />
+                <AlertCircle size={14} style={{ color: 'var(--warn-strong)', flexShrink: 0 }} />
                 <span style={{ fontSize: 12, color: '#fdba74' }}>Posibil blocat la: <strong>{stuck.label}</strong></span>
               </div>
             )}

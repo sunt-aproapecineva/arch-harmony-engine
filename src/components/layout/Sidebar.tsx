@@ -174,7 +174,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                     {locked ? (
                       <Lock size={10} style={{ color: 'var(--fg-3)' }} />
                     ) : done ? (
-                      <CheckCircle2 size={11} style={{ color: '#4ade80' }} />
+                      <CheckCircle2 size={11} style={{ color: 'var(--ok)' }} />
                     ) : (
                       <span className="font-aboreto" style={{ fontSize: 9, color: isActive ? 'var(--accent)' : 'var(--fg-3)', lineHeight: 1 }}>
                         {idx}
@@ -187,7 +187,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                     </div>
                     {!locked && progress > 0 && (
                       <div style={{ height: 2, background: 'var(--border)', borderRadius: 1, marginTop: 3 }}>
-                        <div style={{ height: '100%', width: `${progress}%`, background: done ? '#4ade80' : 'var(--accent)', borderRadius: 1, transition: 'width 0.6s ease' }} />
+                        <div style={{ height: '100%', width: `${progress}%`, background: done ? 'var(--ok)' : 'var(--accent)', borderRadius: 1, transition: 'width 0.6s ease' }} />
                       </div>
                     )}
                   </div>
@@ -224,7 +224,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
             <button
               onClick={async () => { await logout(); navigate('/login'); }}
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--fg-3)', padding: 4, borderRadius: 6, display: 'flex', alignItems: 'center', transition: 'color 0.15s', flexShrink: 0 }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#f87171')}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--error)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-3)')}
             >
               <LogOut size={14} />

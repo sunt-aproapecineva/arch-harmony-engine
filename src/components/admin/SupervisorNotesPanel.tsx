@@ -118,7 +118,7 @@ export const SupervisorNotesPanel: React.FC<Props> = ({ studentId }) => {
                 </span>
                 <button
                   onClick={() => handleDelete(n.id)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: confirmDel === n.id ? '#f87171' : 'var(--fg-3)', display: 'flex', alignItems: 'center', gap: 4, fontSize: 11 }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: confirmDel === n.id ? 'var(--error)' : 'var(--fg-3)', display: 'flex', alignItems: 'center', gap: 4, fontSize: 11 }}
                   title="Șterge notița"
                 >
                   <Trash2 size={12} /> {confirmDel === n.id ? 'Confirmă' : ''}

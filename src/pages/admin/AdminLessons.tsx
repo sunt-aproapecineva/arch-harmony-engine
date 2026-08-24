@@ -79,11 +79,11 @@ const SortableLesson: React.FC<{
         </div>
       ) : null}
       <button onClick={() => onTogglePublish(lesson)} style={iconBtn} title={lesson.is_published ? 'Despublică' : 'Publică'}>
-        {lesson.is_published ? <Eye size={13} style={{ color: '#4ade80' }} /> : <EyeOff size={13} style={{ color: 'var(--fg-3)' }} />}
+        {lesson.is_published ? <Eye size={13} style={{ color: 'var(--ok)' }} /> : <EyeOff size={13} style={{ color: 'var(--fg-3)' }} />}
       </button>
       <button onClick={() => setEditing(true)} style={iconBtn} title="Editează"><Pencil size={13} /></button>
       <button onClick={() => { if (confirm(`Șterge "${lesson.title}"?`)) onDelete(lesson.id); }} style={iconBtn} title="Șterge">
-        <Trash2 size={13} style={{ color: '#f87171' }} />
+        <Trash2 size={13} style={{ color: 'var(--error)' }} />
       </button>
     </div>
   );
@@ -158,7 +158,7 @@ const SortableModule: React.FC<{
           <div style={{ display: 'flex', gap: 4 }}>
             <button onClick={() => setEditing(true)} style={iconBtn} title="Editează modul"><Pencil size={13} /></button>
             <button onClick={() => { if (confirm(`Șterge modulul "${mod.title}" și toate lecțiile?`)) onDeleteModule(mod.id); }} style={iconBtn} title="Șterge modul">
-              <Trash2 size={13} style={{ color: '#f87171' }} />
+              <Trash2 size={13} style={{ color: 'var(--error)' }} />
             </button>
           </div>
         )}
