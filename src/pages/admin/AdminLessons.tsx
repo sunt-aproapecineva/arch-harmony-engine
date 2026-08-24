@@ -195,17 +195,25 @@ export const AdminLessons: React.FC = () => {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [schemaMissing, setSchemaMissing] = useState(false);
 
   const load = useCallback(async () => {
     const [m, l] = await Promise.all([
+      // Plasa veche arăta modulele TUTUROR cursurilor când coloana lipsea — adminul
+      // credea că editează Start și scria de fapt în Business. Fallback-ul se aplică
+      // acum doar pentru cursul implicit; pentru celelalte preferăm o listă goală și
+      // un mesaj explicit.
       supabase.from('modules').select('*').eq('course_id', courseId).order('order_index')
-        .then(r => (r.error?.code === '42703'
-          ? supabase.from('modules').select('*').order('order_index')
+        .then((r: any) => (r.error?.code === '42703'
+          ? (courseId === 'business'
+              ? supabase.from('modules').select('*').order('order_index')
+              : { data: [], error: null, schemaMissing: true })
           : r)),
       supabase.from('lessons').select('*').order('order_index'),
     ]);
     setModules((m.data as Module[]) || []);
     setLessons((l.data as Lesson[]) || []);
+    setSchemaMissing(!!(m as any).schemaMissing);
     setLoading(false);
   }, [courseId]);
 
@@ -298,6 +306,16 @@ export const AdminLessons: React.FC = () => {
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px' }}>
+      {schemaMissing && (
+        <div style={{
+          marginBottom: 16, padding: '12px 14px', borderRadius: 10,
+          background: 'var(--warn-dim)', border: '1px solid var(--border)',
+          color: 'var(--warn)', fontSize: 12.5, lineHeight: 1.6,
+        }}>
+          Migrația multicurs nu e aplicată, deci modulele nu pot fi filtrate pe program.
+          Ca să nu editezi din greșeală conținutul altui curs, lista rămâne goală până la migrație.
+        </div>
+      )}
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 24, gap: 16, flexWrap: 'wrap' }}>
         <div>
           <h1 className="font-aboreto" style={{ fontSize: 22, color: 'var(--fg)', marginBottom: 4 }}>Lecții & Module</h1>

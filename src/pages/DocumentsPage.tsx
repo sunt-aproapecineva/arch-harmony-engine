@@ -447,8 +447,7 @@ export const DocumentsPage: React.FC = () => {
             background: 'var(--bg-3)', border: '1px solid var(--border)',
           }}>
             <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>
-              🔒 Date stocate local — securizat
-            </span>
+              🔒 Salvate în contul tău, sincronizate între dispozitive</span>
           </div>
         </div>
       </motion.div>

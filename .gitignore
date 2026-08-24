@@ -30,3 +30,16 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Lovable build environment leftovers
+.workspace/
+.git.lovable-bak
+.git.lovable-bak/
+
+# Suprascrieri locale de mediu.
+# `.env` RĂMÂNE urmărit intenționat: conține doar cheia publicabilă Supabase și URL-ul
+# proiectului, aceleași valori care ajung oricum în bundle-ul client, iar Lovable are
+# nevoie de ele la build. Orice cheie de serviciu sau secret real se pune AICI, într-un
+# fișier local, niciodată în `.env`.
+.env.local
+.env.*.local

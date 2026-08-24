@@ -43,11 +43,13 @@ export const AdminDashboard: React.FC = () => {
   const [notifMessage, setNotifMessage] = useState('');
   const [notifType, setNotifType] = useState<'info' | 'success' | 'warning'>('info');
   const [notifPublished, setNotifPublished] = useState(false);
-  const [currentNotif, setCurrentNotif] = useState<{ message: string; type: string } | null>(null);
+  const [currentNotif, setCurrentNotif] = useState<{ message: string; type: string; flowId: string | null } | null>(null);
 
   // Announcements live in the database so every student sees them.
   useEffect(() => {
-    getActiveAnnouncement().then(a => setCurrentNotif(a ? { message: a.message, type: a.type } : null));
+    // Reținem și ținta anunțului afișat: ștergerea trebuie să lovească exact anunțul
+    // pe care îl vede adminul, nu fluxul selectat acum în bara laterală.
+    getActiveAnnouncement().then(a => setCurrentNotif(a ? { message: a.message, type: a.type, flowId: a.flow_id ?? null } : null));
   }, []);
 
   const [newEmail, setNewEmail] = useState('');
@@ -105,13 +107,15 @@ export const AdminDashboard: React.FC = () => {
     if (!notifMessage.trim()) return;
     // Ținta e fluxul selectat în bara laterală. „Toate fluxurile" publică global.
     const created = await publishAnnouncement(notifMessage.trim(), notifType, user?.id ?? null, 7, flowId);
-    setCurrentNotif(created ? { message: created.message, type: created.type } : { message: notifMessage.trim(), type: notifType });
+    setCurrentNotif(created
+      ? { message: created.message, type: created.type, flowId: created.flow_id ?? null }
+      : { message: notifMessage.trim(), type: notifType, flowId });
     setNotifPublished(true);
     setTimeout(() => setNotifPublished(false), 2000);
   };
 
   const handleDeleteNotif = async () => {
-    await clearAnnouncements(flowId);
+    await clearAnnouncements(currentNotif ? currentNotif.flowId : flowId);
     sessionStorage.removeItem('aa_notification_dismissed');
     setCurrentNotif(null);
     setNotifMessage('');

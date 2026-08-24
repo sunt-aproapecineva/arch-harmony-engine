@@ -272,7 +272,7 @@ const Field: React.FC<{ label: string; value: string; onChange: (v: string) => v
       <input
         type={type} value={value} placeholder={placeholder}
         onChange={e => onChange(e.target.value)}
-        style={{ width: '100%', padding: '6px 9px', borderRadius: 7, background: 'var(--bg-3)', border: '1px solid var(--border)', color: 'var(--fg)', fontSize: 12, outline: 'none' }}
+        style={{ width: '100%', padding: '6px 9px', borderRadius: 7, background: 'var(--bg-3)', border: '1px solid var(--border)', color: 'var(--fg)', fontSize: 12 }}
       />
     </label>
   );
@@ -283,7 +283,7 @@ const SelectField: React.FC<{ label: string; value: string; options: [string, st
       <span style={{ display: 'block', fontSize: 10, color: 'var(--fg-3)', marginBottom: 4 }}>{label}</span>
       <select
         value={value} onChange={e => onChange(e.target.value)}
-        style={{ width: '100%', padding: '6px 9px', borderRadius: 7, background: 'var(--bg-3)', border: '1px solid var(--border)', color: 'var(--fg)', fontSize: 12, outline: 'none', cursor: 'pointer' }}
+        style={{ width: '100%', padding: '6px 9px', borderRadius: 7, background: 'var(--bg-3)', border: '1px solid var(--border)', color: 'var(--fg)', fontSize: 12, cursor: 'pointer' }}
       >
         {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
       </select>

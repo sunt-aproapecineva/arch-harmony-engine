@@ -105,7 +105,7 @@ export const AdminUsers: React.FC = () => {
       setTimeout(() => setConfirmRemove(null), 3000);
       return;
     }
-    await supabase.from('whitelist').delete().eq('email', email);
+    await supabase.from('whitelist').delete().eq('course_id', courseId).eq('email', email);
     setConfirmRemove(null);
     reload();
   };
@@ -272,7 +272,7 @@ export const AdminUsers: React.FC = () => {
                       value={entry.tariff}
                       onChange={e => handleChangeWhitelistTariff(entry.email, e.target.value as Tariff)}
                       title="Schimbă tariful"
-                      style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 99, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, cursor: 'pointer', appearance: 'none', outline: 'none' }}>
+                      style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 99, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, cursor: 'pointer', appearance: 'none' }}>
                       {TARIFF_OPTIONS.map(opt => (
                         <option key={opt.value} value={opt.value} style={{ background: '#0D0907', color: 'var(--fg)' }}>{opt.label}</option>
                       ))}
@@ -355,7 +355,7 @@ export const AdminUsers: React.FC = () => {
                       onChange={e => handleChangeTariff(user, e.target.value as Tariff)}
                       disabled={!user.enrolled}
                       title={user.enrolled ? `Tariful la ${course?.shortTitle || 'curs'}` : 'Elevul nu are acces la acest program'}
-                      style={{ fontSize: 10, fontWeight: 700, padding: '4px 8px', borderRadius: 99, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, cursor: user.enrolled ? 'pointer' : 'not-allowed', opacity: user.enrolled ? 1 : 0.4, appearance: 'none', outline: 'none' }}>
+                      style={{ fontSize: 10, fontWeight: 700, padding: '4px 8px', borderRadius: 99, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, cursor: user.enrolled ? 'pointer' : 'not-allowed', opacity: user.enrolled ? 1 : 0.4, appearance: 'none' }}>
                       {TARIFF_OPTIONS.map(opt => (
                         <option key={opt.value} value={opt.value} style={{ background: '#0D0907', color: 'var(--fg)' }}>
                           {opt.label}
@@ -374,7 +374,7 @@ export const AdminUsers: React.FC = () => {
                           fontSize: 10, padding: '3px 6px', borderRadius: 99, maxWidth: 92,
                           background: user.flow_id ? 'var(--bg-3)' : 'var(--warn-dim)',
                           color: user.flow_id ? 'var(--fg-2)' : 'var(--warn)',
-                          border: '1px solid var(--border)', cursor: 'pointer', outline: 'none',
+                          border: '1px solid var(--border)', cursor: 'pointer',
                         }}
                       >
                         <option value="">fără flux</option>

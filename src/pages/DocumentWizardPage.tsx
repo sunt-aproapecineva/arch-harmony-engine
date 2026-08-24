@@ -115,7 +115,6 @@ export function DocumentWizardPage() {
     color: 'var(--fg)',
     fontSize: 13,
     fontFamily: 'Arimo, Arial, sans-serif',
-    outline: 'none',
     boxSizing: 'border-box',
   };
 

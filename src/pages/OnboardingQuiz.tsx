@@ -563,7 +563,7 @@ export const OnboardingQuiz: React.FC = () => {
                           style={{
                             width: '100%', padding: '14px 16px', borderRadius: 12, resize: 'vertical',
                             background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)',
-                            color: '#fff', fontSize: 14, lineHeight: 1.6, fontFamily: 'inherit', outline: 'none',
+                            color: '#fff', fontSize: 14, lineHeight: 1.6, fontFamily: 'inherit',
                           }}
                         />
                         <div style={{ marginTop: 8, fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>

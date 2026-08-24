@@ -332,12 +332,24 @@ body {
   border-radius: 16px;
 }
 
-/* Input defaults */
+/* Input defaults.
+   `outline: none` fără înlocuitor lăsa platforma fără NICIUN indicator de focus:
+   navigarea cu tastatura devenea oarbă, iar cine nu poate folosi mausul rămânea blocat.
+   Ascundem inelul implicit doar la click (`:focus`), nu și la tastatură
+   (`:focus-visible`), unde punem un inel propriu, în tokenii de brand. */
 input, textarea, select, button {
   font-family: inherit;
   font-size: inherit;
-  outline: none;
 }
+
+:where(input, textarea, select, button, a, [tabindex]):focus { outline: none; }
+
+:where(input, textarea, select, button, a, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
 
 
 a { text-decoration: none; color: inherit; }
@@ -348,6 +360,22 @@ input::placeholder, textarea::placeholder { color: var(--fg-3); }
   background: #FFFFFF;
   border-color: var(--border);
   color: var(--fg);
+}
+
+/* ============================================
+   MIȘCARE REDUSĂ
+   ============================================
+   Platforma folosește framer-motion peste tot. Cine a cerut din sistem mai puțină
+   mișcare (vestibular, migrene, preferință) primea oricum toate tranzițiile.
+   Regula de mai jos le neutralizează global, inclusiv pe cele din framer-motion,
+   fără să ascundă conținutul: elementele rămân vizibile, doar nu se mai deplasează. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ============================================

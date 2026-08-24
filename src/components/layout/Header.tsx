@@ -5,7 +5,7 @@ import { Sun, Moon, Menu, PanelLeftClose, PanelLeftOpen, ChevronDown, LogOut, Sh
 import { useTheme } from '../../context/ThemeContext';
 import { useAuthContext } from '../../context/AuthContext';
 import { useCourse } from '../../context/CourseContext';
-import { courseDashboardPath } from '../../lib/navigation';
+import { courseDashboardPath, courseModulePath } from '../../lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SearchModal } from '../aa/SearchModal';
 import { TariffBadge } from '../aa/TariffBadge';
@@ -16,7 +16,11 @@ interface HeaderProps { onMenuToggle?: () => void; sidebarOpen?: boolean; }
 export const Header: React.FC<HeaderProps> = ({ onMenuToggle, sidebarOpen }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout, isAdmin } = useAuthContext();
-  const { course, tariff: courseTariff } = useCourse();
+  const { course, modules, tariff: courseTariff } = useCourse();
+  // Era hardcodat '/module/mod-0': un id care nu există (modulele se numesc 'm-0'),
+  // iar redirectul de compatibilitate îl ducea în Business — deci un elev de la START
+  // era aruncat afară din cursul lui.
+  const programPath = modules.length ? courseModulePath(course, modules[0].id) : courseDashboardPath(course);
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -52,9 +56,10 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, sidebarOpen }) => 
   return (
     <>
     <header style={{
-      height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '0 20px', background: 'var(--header-bg)', backdropFilter: 'blur(20px)',
-      borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, zIndex: 30, flexShrink: 0,
+      minHeight: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      gap: 8, padding: '0 clamp(12px, 3vw, 20px)', background: 'var(--header-bg)',
+      backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--border)',
+      position: 'sticky', top: 0, zIndex: 30, flexShrink: 0,
     }}>
       {/* Sidebar toggle — always visible */}
       <button
@@ -62,8 +67,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, sidebarOpen }) => 
         style={{
           background: 'none', border: '1px solid var(--border)', borderRadius: 7,
           cursor: 'pointer', color: 'var(--fg-2)', display: 'flex', alignItems: 'center',
-          padding: '5px 7px', marginRight: 8, transition: 'all 0.15s',
+          padding: '7px 9px', marginRight: 8, flexShrink: 0, transition: 'all 0.15s',
         }}
+        aria-label={sidebarOpen ? 'Ascunde meniul' : 'Arată meniul'}
         onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-hi)'; e.currentTarget.style.color = 'var(--fg)'; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--fg-2)'; }}
         title={sidebarOpen ? 'Ascunde meniu' : 'Arată meniu'}
@@ -72,9 +78,11 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, sidebarOpen }) => 
       </button>
 
       {/* Nav links */}
-      <nav style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+      {/* Navigarea din mijloc dispare pe mobil: aceleași destinații există în bara de
+          jos, iar aici depășeau lățimea și împingeau meniul de cont în afara ecranului. */}
+      <nav className="aa-hide-sm" style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 }}>
         <NavLink to={courseDashboardPath(course)} style={({ isActive }) => navStyle(isActive)}>Dashboard</NavLink>
-        <NavLink to="/module/mod-0" style={({ isActive }) => navStyle(isActive)}>Programă</NavLink>
+        <NavLink to={programPath} style={({ isActive }) => navStyle(isActive)}>Programă</NavLink>
         {isAdmin && (
           <NavLink to="/admin" style={({ isActive }) => navStyle(isActive, true)}>
             <ShieldCheck size={13} />Admin
@@ -83,7 +91,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, sidebarOpen }) => 
       </nav>
 
       {/* Right side */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', flexShrink: 0 }}>
         {/* Search button */}
         <button
           onClick={() => setSearchOpen(true)}

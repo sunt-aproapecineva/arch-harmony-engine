@@ -355,7 +355,10 @@ export const AdminStudentProfile: React.FC = () => {
       const [{ data: profile }, { data: progressRows }, { data: quiz }, { data: notesRows }, { data: exRows }] = await Promise.all([
         supabase.from('profiles').select('id,email,full_name,tariff,avatar_url,created_at').eq('id', userId).maybeSingle(),
         supabase.from('progress').select('user_id,lesson_id,completed_at').eq('user_id', userId),
-        supabase.from('quiz_responses').select('answers,completed_at').eq('user_id', userId).maybeSingle(),
+        supabase.from('quiz_responses').select('answers,completed_at,course_id').eq('user_id', userId).eq('course_id', courseId).maybeSingle()
+        .then(r => (r.error?.code === '42703'
+          ? supabase.from('quiz_responses').select('answers,completed_at').eq('user_id', userId).maybeSingle()
+          : r)),
         supabase.from('lesson_notes').select('lesson_id,content').eq('user_id', userId),
         supabase.from('exercise_responses').select('exercise_id,response').eq('user_id', userId),
       ]);

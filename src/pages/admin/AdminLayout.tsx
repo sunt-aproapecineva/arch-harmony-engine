@@ -107,7 +107,7 @@ export const AdminLayout: React.FC = () => {
               style={{
                 width: '100%', minHeight: 34, padding: '6px 8px', borderRadius: 7, fontSize: 11.5,
                 background: 'var(--bg-3)', color: flowId ? 'var(--fg)' : 'var(--fg-3)',
-                border: '1px solid var(--border)', cursor: 'pointer', outline: 'none',
+                border: '1px solid var(--border)', cursor: 'pointer',
               }}
             >
               <option value="">Toate fluxurile</option>

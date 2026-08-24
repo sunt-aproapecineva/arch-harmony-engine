@@ -288,7 +288,7 @@ export const StudentBriefingPanel: React.FC<Props> = ({ studentId, studentName }
     } finally { setGenerating(false); }
   };
 
-  useEffect(() => { load(); }, [studentId]);
+  useEffect(() => { load(); }, [studentId, courseId]);
 
   if (loading) {
     return <div style={{ padding: 32, textAlign: 'center', color: 'var(--fg-3)', fontSize: 13 }}>Se încarcă briefingul…</div>;

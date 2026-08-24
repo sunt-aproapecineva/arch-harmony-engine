@@ -383,10 +383,13 @@ export const getAttentionQueue = createServerFn({ method: 'POST' })
     const admin = await ensureAdmin(context);
     const courseId = data.courseId;
 
-    const [profilesRes, rolesRes, progressRes, exRes, notesRes, activityRes, quizRes, modulesRes, lessonsRes] =
+    const [profilesRes, rolesRes, enrollRes, progressRes, exRes, notesRes, activityRes, quizRes, modulesRes, lessonsRes] =
       await Promise.all([
         admin.from('profiles').select('id,email,full_name,tariff,created_at'),
         admin.from('user_roles').select('user_id,role'),
+        // Coada de atenție e a UNUI curs: fără filtrul de înscriere, în ea intrau și
+        // elevi care n-au acces la programul privit, cu progres 0% și „inactiv de N zile".
+        admin.from('enrollments').select('user_id').eq('course_id', courseId),
         admin.from('progress').select('user_id,lesson_id,completed_at').limit(10000),
         admin.from('exercise_responses').select('user_id,exercise_id,response').limit(10000),
         admin.from('lesson_notes').select('user_id,content').limit(10000),
@@ -403,7 +406,12 @@ export const getAttentionQueue = createServerFn({ method: 'POST' })
       ]);
 
     const adminIds = new Set((rolesRes.data || []).filter((r: any) => r.role === 'admin').map((r: any) => r.user_id));
-    const profiles = (profilesRes.data || []).filter((p: any) => !adminIds.has(p.id));
+    // Lipsa tabelului `enrollments` (migrație neaplicată) = comportamentul vechi:
+    // toți elevii sunt considerați ai cursului privit.
+    const enrolled = enrollRes?.data ? new Set(enrollRes.data.map((e: any) => e.user_id)) : null;
+    const profiles = (profilesRes.data || [])
+      .filter((p: any) => !adminIds.has(p.id))
+      .filter((p: any) => (enrolled ? enrolled.has(p.id) : true));
 
     const modules = (modulesRes.data || []) as any[];
     const allLessons = (lessonsRes.data || []) as any[];

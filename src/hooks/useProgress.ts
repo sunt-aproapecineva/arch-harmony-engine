@@ -245,6 +245,8 @@ export function useProgress(explicitCourseId?: string) {
         .flatMap((m) => m.lessons)
         .filter(isTrackableLesson);
       const total = trackableLessons.length;
+      // Un curs fără nimic de parcurs e 0%, nu 100%. Fără garda asta, START (lecții
+      // nefilmate) apărea „complet" pe ecranul de selecție.
       if (total === 0) return 0;
       const lessonsDone = trackableLessons.filter((l) => isCompleted(l.id)).length;
       return Math.round((lessonsDone / total) * 100);

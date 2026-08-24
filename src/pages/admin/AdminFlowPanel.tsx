@@ -49,7 +49,12 @@ export const AdminFlowPanel: React.FC = () => {
       const [profilesRes, rolesRes, quizRes, progressRes, enrollRes, activityRes] = await Promise.all([
         supabase.from('profiles').select('id,email,full_name'),
         supabase.from('user_roles').select('user_id,role'),
-        supabase.from('quiz_responses').select('user_id,answers,profile,completed_at,course_id'),
+        // Fără plasa de 42703, lipsa coloanei făcea interogarea să eșueze în tăcere
+        // și toată cohorta apărea „fără diagnostic".
+        supabase.from('quiz_responses').select('user_id,answers,profile,completed_at,course_id')
+          .then(r => (r.error?.code === '42703'
+            ? supabase.from('quiz_responses').select('user_id,answers,profile,completed_at')
+            : r)),
         supabase.from('progress').select('user_id,lesson_id,completed_at').limit(10000),
         supabase.from('enrollments').select('user_id,course_id,flow_id'),
         supabase.from('activity_log').select('user_id,created_at').order('created_at', { ascending: false }).limit(3000),

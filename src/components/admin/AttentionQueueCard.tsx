@@ -31,7 +31,7 @@ export const AttentionQueueCard: React.FC = () => {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [courseId]);
 
   return (
     <div style={cardStyle}>

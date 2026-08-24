@@ -204,7 +204,7 @@ export const AdminGroups: React.FC = () => {
                       defaultValue=""
                       disabled={busy}
                       onChange={e => { handleAssign(g.id, e.target.value); e.currentTarget.value = ''; }}
-                      style={{ padding: '5px 9px', borderRadius: 8, fontSize: 11.5, background: 'var(--bg-3)', color: 'var(--fg-2)', border: '1px solid var(--border)', cursor: 'pointer', outline: 'none' }}
+                      style={{ padding: '5px 9px', borderRadius: 8, fontSize: 11.5, background: 'var(--bg-3)', color: 'var(--fg-2)', border: '1px solid var(--border)', cursor: 'pointer' }}
                     >
                       <option value="">+ alocă la flux…</option>
                       {flows
@@ -249,7 +249,7 @@ export const AdminGroups: React.FC = () => {
                         <Search size={12} style={{ position: 'absolute', left: 9, top: 9, color: 'var(--fg-3)' }} />
                         <input
                           value={search} onChange={e => setSearch(e.target.value)} placeholder="caută după nume sau email"
-                          style={{ width: '100%', padding: '6px 9px 6px 26px', borderRadius: 7, background: 'var(--bg-3)', border: '1px solid var(--border)', color: 'var(--fg)', fontSize: 12, outline: 'none' }}
+                          style={{ width: '100%', padding: '6px 9px 6px 26px', borderRadius: 7, background: 'var(--bg-3)', border: '1px solid var(--border)', color: 'var(--fg)', fontSize: 12 }}
                         />
                       </div>
                       <div style={{ display: 'grid', gap: 3, maxHeight: 200, overflowY: 'auto', marginBottom: 8 }}>
@@ -318,7 +318,7 @@ const Field: React.FC<{ label: string; value: string; onChange: (v: string) => v
       <span style={{ display: 'block', fontSize: 10, color: 'var(--fg-3)', marginBottom: 4 }}>{label}</span>
       <input
         value={value} placeholder={placeholder} onChange={e => onChange(e.target.value)}
-        style={{ width: '100%', padding: '6px 9px', borderRadius: 7, background: 'var(--bg-3)', border: '1px solid var(--border)', color: 'var(--fg)', fontSize: 12, outline: 'none' }}
+        style={{ width: '100%', padding: '6px 9px', borderRadius: 7, background: 'var(--bg-3)', border: '1px solid var(--border)', color: 'var(--fg)', fontSize: 12 }}
       />
     </label>
   );

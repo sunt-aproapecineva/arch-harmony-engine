@@ -143,7 +143,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ open, onClose }) => {
                 onKeyDown={handleKeyDown}
                 placeholder="Caută lecții, exerciții..."
                 style={{
-                  flex: 1, background: 'none', border: 'none', outline: 'none',
+                  flex: 1, background: 'none', border: 'none',
                   fontSize: 15, color: 'var(--fg)',
                 }}
               />

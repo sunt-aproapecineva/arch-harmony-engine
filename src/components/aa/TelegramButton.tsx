@@ -5,14 +5,13 @@ interface TelegramButtonProps {
   compact?: boolean;
 }
 
-/** Linkul implicit, pentru elevii care încă nu au flux asignat. */
-const FALLBACK_TELEGRAM = 'https://t.me/+f2YYXZlVWjVhMzcy';
-
 export const TelegramButton: React.FC<TelegramButtonProps> = ({ compact = false }) => {
-  // Fiecare flux are canalul lui: altfel elevii unui flux nou aterizează în grupul
-  // celui dinainte, peste conversații care nu-i privesc.
+  // Canalul vine EXCLUSIV din flux. Nu mai există link implicit: un elev fără flux
+  // asignat ajungea altfel în grupul primei promoții de Business, peste conversații
+  // care nu-l privesc — și linkul privat de invitație era în bundle-ul public.
   const { flow } = useCourse();
-  const href = flow?.telegram_url || FALLBACK_TELEGRAM;
+  const href = flow?.telegram_url;
+  if (!href) return null;
   return (
   <a
     href={href}
