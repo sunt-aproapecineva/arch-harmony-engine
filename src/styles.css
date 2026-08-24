@@ -457,6 +457,23 @@ input::placeholder, textarea::placeholder { color: var(--fg-3); }
   .aa-doc-actions > * { flex: 1; justify-content: center; min-height: 40px; }
 }
 
+/* Literele cuvântului rotativ intră din blur, una după alta — aceeași animație ca pe
+   pagina de prezentare, ca tranziția landing → platformă să nu se simtă ca o ruptură. */
+@keyframes aaWordIn {
+  from { opacity: 0; filter: blur(11px); transform: translateY(8px); }
+  to   { opacity: 1; filter: blur(0);    transform: none; }
+}
+.aa-wf-letter { animation: aaWordIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+@media (prefers-reduced-motion: reduce) { .aa-wf-letter { animation: none; } }
+
+/* Panoul-erou al paginilor de autentificare: apare doar de la 1024px în sus.
+   Sub asta, formularul primește tot ecranul — pe telefon un panou decorativ de
+   jumătate de lățime ar împinge câmpurile într-o coloană inutilizabilă. */
+.aa-auth-hero { display: none; }
+@media (min-width: 1024px) {
+  .aa-auth-hero { display: flex; flex-direction: column; }
+}
+
 /* Ascunde pe mobil ce nu încape (etichete lungi, coloane secundare). */
 @media (max-width: 640px) {
   .aa-hide-sm { display: none !important; }

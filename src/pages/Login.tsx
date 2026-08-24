@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Mail, Lock, HelpCircle } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
 import { OnboardingGuideModal } from '@/components/aa/OnboardingGuideModal';
+import { AuthHero } from '@/components/auth/AuthHero';
 
 interface InputFieldProps {
   label: string;
@@ -66,45 +67,26 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div style={{ minHeight: '100dvh', display: 'flex', background: 'var(--bg)' }}>
-      {/* Left panel — brand */}
-      <div
-        className="hidden md:flex"
-        style={{
-          width: '42%', background: 'var(--sidebar-bg)', borderRight: '1px solid var(--border)',
-          flexDirection: 'column', justifyContent: 'space-between', padding: '48px 40px',
-        }}
-      >
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 48 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #1A5C38, #0f3d22)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(26,92,56,0.35)' }}>
-              <span className="font-aboreto" style={{ fontSize: 12, color: '#C4F0E4' }}>AA</span>
-            </div>
-            <span className="font-aboreto" style={{ fontSize: 13, letterSpacing: '0.1em', color: 'var(--fg)' }}>ARHITECTURA AFACERII</span>
-          </div>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <h1 className="font-aboreto" style={{ fontSize: 'clamp(2rem,3.5vw,3.2rem)', color: 'var(--fg)', lineHeight: 1.05, letterSpacing: '-0.02em', marginBottom: 16 }}>
-              Construiește afacerea<br />care <span style={{ color: 'var(--accent)' }}>funcționează</span><br />fără tine.
-            </h1>
-            <p style={{ fontSize: 14, color: 'var(--fg-3)', lineHeight: 1.7, maxWidth: 300 }}>
-              Practicum de sistematizare · 8 săptămâni · 6 etape · Victor Morar
-            </p>
-          </motion.div>
-        </div>
-        {/* Decorative stats */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} style={{ display: 'flex', gap: 24 }}>
-          {[['6', 'Etape'], ['8', 'Săptămâni'], ['100%', 'Livrable reale']].map(([val, lbl]) => (
-            <div key={lbl}>
-              <div className="font-aboreto" style={{ fontSize: 22, color: 'var(--accent)', lineHeight: 1 }}>{val}</div>
-              <div style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 3 }}>{lbl}</div>
-            </div>
-          ))}
-        </motion.div>
-      </div>
+    <div className="aa-viewport-min" style={{
+      display: 'flex', gap: 'clamp(8px, 1vw, 16px)', background: 'var(--bg)',
+      padding: 'clamp(8px, 1vw, 16px)',
+    }}>
+      <AuthHero
+        film
+        eyebrow="Practicum de sistematizare"
+        title={null}
+        subtitle="În doar 2 luni alături de mine îți restructurezi afacerea din rădăcină — o sistematizăm astfel încât să fii antreprenor liber."
+        steps={[
+          { label: 'Intri în cont', state: 'active' },
+          { label: 'Îți dai diagnosticul', state: 'todo' },
+          { label: 'Începi practicumul', state: 'todo' },
+        ]}
+        footnote="Accesul e nominal. Dacă ai achitat și nu poți intra, scrie-i echipei."
+      />
 
       {/* Right panel — form */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} style={{ width: '100%', maxWidth: 380 }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(20px, 4vw, 48px)', overflowY: 'auto' }}>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, ease: 'easeOut' }} style={{ width: '100%', maxWidth: 440 }}>
           {/* Mobile logo */}
           <div className="md:hidden" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32 }}>
             <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #1A5C38, #0f3d22)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

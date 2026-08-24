@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Mail, Lock, User, CheckCircle2, Loader2, HelpCircle } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { AuthHero } from '@/components/auth/AuthHero';
 import { OnboardingGuideModal } from '@/components/aa/OnboardingGuideModal';
 
 interface InputFieldProps {
@@ -117,42 +118,22 @@ export const Register: React.FC = () => {
   };
 
   return (
-    <div style={{ minHeight: '100dvh', display: 'flex', background: 'var(--bg)' }}>
-      {/* Left panel */}
-      <div
-        className="hidden md:flex"
-        style={{
-          width: '42%', background: 'var(--sidebar-bg)', borderRight: '1px solid var(--border)',
-          flexDirection: 'column', justifyContent: 'space-between', padding: '48px 40px',
-        }}
-      >
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 48 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #1A5C38, #0f3d22)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(26,92,56,0.35)' }}>
-              <span className="font-aboreto" style={{ fontSize: 12, color: '#C4F0E4' }}>AA</span>
-            </div>
-            <span className="font-aboreto" style={{ fontSize: 13, letterSpacing: '0.1em', color: 'var(--fg)' }}>ARHITECTURA AFACERII</span>
-          </div>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <h1 className="font-aboreto" style={{ fontSize: 'clamp(2rem,3.5vw,3.2rem)', color: 'var(--fg)', lineHeight: 1.05, letterSpacing: '-0.02em', marginBottom: 16 }}>
-              Alătură-te<br />unui practicum<br /><span style={{ color: 'var(--accent)' }}>cu rezultate reale.</span>
-            </h1>
-            <p style={{ fontSize: 14, color: 'var(--fg-3)', lineHeight: 1.7, maxWidth: 300 }}>
-              Accesul este permis doar pe bază de invitație. Dacă ai primit link-ul, ești în locul potrivit.
-            </p>
-          </motion.div>
-        </div>
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {['Sistem dovedit în 7 afaceri reale', 'Livrabile concrete la fiecare etapă', 'Suport direct de la Victor Morar'].map(item => (
-              <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <CheckCircle2 size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-                <span style={{ fontSize: 13, color: 'var(--fg-3)' }}>{item}</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
+    <div className="aa-viewport-min" style={{
+      display: 'flex', gap: 'clamp(8px, 1vw, 16px)', background: 'var(--bg)',
+      padding: 'clamp(8px, 1vw, 16px)',
+    }}>
+      <AuthHero
+        film
+        eyebrow="Acces nominal"
+        title={null}
+        subtitle="Verificăm întâi că adresa ta e pe lista de acces, apoi îți alegi parola. Doi pași, un minut."
+        steps={[
+          { label: 'Verificarea accesului', state: step === 1 ? 'active' : 'done' },
+          { label: 'Crearea contului', state: step === 2 ? 'active' : 'todo' },
+          { label: 'Diagnosticul de intrare', state: 'todo' },
+        ]}
+        footnote="Dacă adresa nu e recunoscută, înseamnă că accesul n-a fost încă deschis — scrie-i echipei, nu încerca altă adresă."
+      />
 
       {/* Right panel — form */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
