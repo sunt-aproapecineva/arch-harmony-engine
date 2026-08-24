@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect, useCallback } from 'react';
+import { getActiveAnnouncement, publishAnnouncement, clearAnnouncements } from '../../lib/announcements';
 import { useNavigate } from '@/lib/router-compat';
 import { motion } from 'framer-motion';
 import {
@@ -38,9 +39,12 @@ export const AdminDashboard: React.FC = () => {
   const [notifMessage, setNotifMessage] = useState('');
   const [notifType, setNotifType] = useState<'info' | 'success' | 'warning'>('info');
   const [notifPublished, setNotifPublished] = useState(false);
-  const [currentNotif, setCurrentNotif] = useState<{ message: string; type: string } | null>(() => {
-    try { const raw = localStorage.getItem('aa_notification'); return raw ? JSON.parse(raw) : null; } catch { return null; }
-  });
+  const [currentNotif, setCurrentNotif] = useState<{ message: string; type: string } | null>(null);
+
+  // Announcements live in the database so every student sees them.
+  useEffect(() => {
+    getActiveAnnouncement().then(a => setCurrentNotif(a ? { message: a.message, type: a.type } : null));
+  }, []);
 
   const [newEmail, setNewEmail] = useState('');
   const [addedEmail, setAddedEmail] = useState(false);
@@ -93,17 +97,16 @@ export const AdminDashboard: React.FC = () => {
     return last ? timeAgo(last.timestamp) : '—';
   };
 
-  const handlePublishNotif = () => {
+  const handlePublishNotif = async () => {
     if (!notifMessage.trim()) return;
-    const data = { message: notifMessage.trim(), type: notifType, exp: Date.now() + 7 * 24 * 60 * 60 * 1000 };
-    localStorage.setItem('aa_notification', JSON.stringify(data));
-    setCurrentNotif(data);
+    const created = await publishAnnouncement(notifMessage.trim(), notifType, user?.id ?? null);
+    setCurrentNotif(created ? { message: created.message, type: created.type } : { message: notifMessage.trim(), type: notifType });
     setNotifPublished(true);
     setTimeout(() => setNotifPublished(false), 2000);
   };
 
-  const handleDeleteNotif = () => {
-    localStorage.removeItem('aa_notification');
+  const handleDeleteNotif = async () => {
+    await clearAnnouncements();
     sessionStorage.removeItem('aa_notification_dismissed');
     setCurrentNotif(null);
     setNotifMessage('');
