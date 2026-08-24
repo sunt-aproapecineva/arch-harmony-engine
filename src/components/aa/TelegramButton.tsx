@@ -1,12 +1,21 @@
 import React from 'react';
+import { useCourse } from '../../context/CourseContext';
 
 interface TelegramButtonProps {
   compact?: boolean;
 }
 
-export const TelegramButton: React.FC<TelegramButtonProps> = ({ compact = false }) => (
+/** Linkul implicit, pentru elevii care încă nu au flux asignat. */
+const FALLBACK_TELEGRAM = 'https://t.me/+f2YYXZlVWjVhMzcy';
+
+export const TelegramButton: React.FC<TelegramButtonProps> = ({ compact = false }) => {
+  // Fiecare flux are canalul lui: altfel elevii unui flux nou aterizează în grupul
+  // celui dinainte, peste conversații care nu-i privesc.
+  const { cohort } = useCourse();
+  const href = cohort?.telegram_url || FALLBACK_TELEGRAM;
+  return (
   <a
-    href="https://t.me/+f2YYXZlVWjVhMzcy"
+    href={href}
     target="_blank"
     rel="noopener noreferrer"
     style={{
@@ -31,4 +40,5 @@ export const TelegramButton: React.FC<TelegramButtonProps> = ({ compact = false 
     </svg>
     {compact ? 'Telegram' : 'Grup Telegram'}
   </a>
-);
+  );
+};

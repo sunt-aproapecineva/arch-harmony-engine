@@ -4,6 +4,18 @@ export interface Enrollment {
   course_id: string;
   tariff: Tariff;
   granted_at?: string;
+  /** Fluxul (cohorta) din care face parte elevul la acest curs. */
+  cohort_id?: string | null;
+  /** Fluxul hidratat, când a putut fi citit. Ancorează deblocările și canalul. */
+  cohort?: {
+    id: string;
+    course_id: string;
+    name: string;
+    slug: string;
+    starts_on: string;
+    telegram_url: string | null;
+    is_active: boolean;
+  } | null;
 }
 
 export interface User {
@@ -42,7 +54,18 @@ export interface Module {
   order_index: number;
   etapa: string;
   saptamana: string;
+  /**
+   * @deprecated Dată absolută, din perioada cu un singur flux. Rămâne doar ca
+   * plasă pentru elevii fără flux asignat. Sursa de adevăr e `unlockWeek`.
+   */
   unlockDate?: string;
+  /**
+   * Săptămâna de program în care se deschide modulul, numărată de la data de start
+   * a FLUXULUI. Modulul cu unlockWeek = 3 se deschide la start + 21 de zile —
+   * pentru fiecare flux la data lui. Fără asta, un flux nou primea tot practicumul
+   * deblocat din prima zi, pentru că datele absolute erau deja trecute.
+   */
+  unlockWeek?: number;
   /**
    * Modul-poartă: modulele următoare presupun că acesta a fost livrat.
    * La START, Modulul 2 (Validarea) e poartă — „dacă sari peste, construiești pe nisip".

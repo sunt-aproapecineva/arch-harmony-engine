@@ -9,6 +9,7 @@ import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
 import { useAuthContext } from '../context/AuthContext';
 import { useProgress } from '../hooks/useProgress';
 import { useCourse } from '../context/CourseContext';
+import { moduleUnlockDate } from '../lib/cohorts';
 import { courseLessonPath, courseModulePath, courseQuizPath } from '../lib/navigation';
 import { ModuleCard } from '../components/aa/ModuleCard';
 import { ProgressRing } from '../components/aa/ProgressRing';
@@ -79,7 +80,7 @@ export const Dashboard: React.FC = () => {
   const { getModuleProgress, getOverallProgress, isModuleLocked, getCompletedLessonsCount, getTotalLessonsCount } = useProgress();
   const navigate = useNavigate();
 
-  const { course, courseId, modules, liveEvents, tariff: courseTariff } = useCourse();
+  const { course, courseId, modules, liveEvents, tariff: courseTariff, cohort } = useCourse();
   const quizDone = hasCompletedOnboarding(user, courseId);
   const [quizModalOpen, setQuizModalOpen] = useState(false);
 
@@ -106,8 +107,9 @@ export const Dashboard: React.FC = () => {
   const nextEvent = upcomingEvents[0];
 
   const moduleUnlocks = modules
-    .filter(m => m.unlockDate)
-    .map(m => ({ date: m.unlockDate!, title: m.title, moduleId: m.id }));
+    .map(m => ({ mod: m, at: moduleUnlockDate(m, cohort) }))
+    .filter(x => !!x.at)
+    .map(x => ({ date: x.at!.toISOString().slice(0, 10), title: x.mod.title, moduleId: x.mod.id }));
 
   const fade = (delay: number) => ({
     initial: { opacity: 0, y: 20 },

@@ -5,6 +5,7 @@ import { supabase, isMockMode } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { useCourse } from '../context/CourseContext';
 import { getCourseModules } from '../lib/content';
+import { isModuleUnlocked } from '../lib/cohorts';
 
 const STORAGE_PROGRESS_KEY = 'aa_progress';
 
@@ -59,7 +60,7 @@ function saveMockProgress(progress: Progress[]) {
  */
 export function useProgress(explicitCourseId?: string) {
   const { user } = useAuthContext();
-  const { courseId: contextCourseId } = useCourse();
+  const { courseId: contextCourseId, cohort } = useCourse();
   const courseId = explicitCourseId || contextCourseId;
   const modules = getCourseModules(courseId);
   const [progress, setProgress] = useState<Progress[]>([]);
@@ -250,22 +251,21 @@ export function useProgress(explicitCourseId?: string) {
   );
 
 
-  // A module is locked only until its scheduled unlock date begins
-  // (start of day in Bucharest for the configured date).
+  /**
+   * Un modul e blocat până la data lui de deschidere, calculată față de data de start
+   * a FLUXULUI elevului (`starts_on + unlockWeek * 7`). Pentru elevii fără flux
+   * asignat se cade pe data absolută din cod — comportamentul de dinainte de fluxuri.
+   *
+   * Fără calculul relativ, orice flux nou primea tot practicumul deblocat din prima
+   * zi, pentru că datele scrise în cod erau deja trecute.
+   */
   const isModuleLocked = useCallback(
     (moduleIndex: number): boolean => {
       const mod = modules[moduleIndex];
       if (!mod) return true;
-
-      if (mod.unlockDate) {
-        // Unlock la începutul zilei în București.
-        const unlock = new Date(mod.unlockDate + 'T00:00:00+03:00');
-        if (new Date() < unlock) return true;
-      }
-
-      return false;
+      return !isModuleUnlocked(mod, cohort);
     },
-    [modules]
+    [modules, cohort]
   );
 
   /**

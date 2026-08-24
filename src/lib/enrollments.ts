@@ -41,7 +41,7 @@ export function clearCachedEnrollments(userId: string) {
  * Coduri Postgres pentru „tabelul/coloana nu există". Le tratăm separat pentru că
  * înseamnă un singur lucru: codul multicurs a ajuns în producție înaintea migrației.
  */
-const MISSING_SCHEMA_CODES = new Set(['42P01', '42703']);
+const MISSING_SCHEMA_CODES = new Set(['42P01', '42703', 'PGRST200']);
 
 /**
  * Citește înscrierile din DB. La eșec întoarce cache-ul local în loc de listă goală —
@@ -54,17 +54,34 @@ const MISSING_SCHEMA_CODES = new Set(['42P01', '42703']);
 export async function fetchEnrollments(userId: string): Promise<Enrollment[]> {
   if (!userId) return [];
   try {
-    const { data, error } = await supabase
+    // Fluxul vine odată cu înscrierea: ancorează deblocarea modulelor și canalul de
+    // Telegram. Dacă tabelul `cohorts` nu există încă, reîncercăm fără îmbinare —
+    // platforma rămâne funcțională, doar fără fluxuri.
+    let data: any[] | null = null;
+    const withCohort = await supabase
       .from('enrollments')
-      .select('course_id,tariff,granted_at')
+      .select('course_id,tariff,granted_at,cohort_id,cohorts(id,course_id,name,slug,starts_on,telegram_url,is_active)')
       .eq('user_id', userId);
-    if (error) throw error;
+    if (withCohort.error) {
+      if (!MISSING_SCHEMA_CODES.has(withCohort.error.code)) throw withCohort.error;
+      const plain = await supabase
+        .from('enrollments')
+        .select('course_id,tariff,granted_at')
+        .eq('user_id', userId);
+      if (plain.error) throw plain.error;
+      data = plain.data;
+    } else {
+      data = withCohort.data;
+    }
+
     const list: Enrollment[] = (data || [])
       .filter((row: any) => !!getCourse(row.course_id))
       .map((row: any) => ({
         course_id: row.course_id,
         tariff: (row.tariff as Tariff) || 'student',
         granted_at: row.granted_at,
+        cohort_id: row.cohort_id ?? null,
+        cohort: row.cohorts || null,
       }));
     cacheEnrollments(userId, list);
     return list;
@@ -100,4 +117,9 @@ export function isEnrolled(enrollments: Enrollment[] | null | undefined, courseI
 /** Tariful elevului la un curs anume. 'student' dacă nu e înscris. */
 export function tariffForCourse(enrollments: Enrollment[] | null | undefined, courseId: string): Tariff {
   return (enrollments || []).find(e => e.course_id === courseId)?.tariff || 'student';
+}
+
+/** Fluxul elevului la un curs anume. Null dacă nu e asignat niciunui flux. */
+export function cohortForCourse(enrollments: Enrollment[] | null | undefined, courseId: string) {
+  return (enrollments || []).find(e => e.course_id === courseId)?.cohort || null;
 }

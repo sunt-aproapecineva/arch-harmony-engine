@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from '@/lib/router-compat';
 import { useCourse } from '../../context/CourseContext';
+import { moduleUnlockDate } from '../../lib/cohorts';
 import { courseModulePath } from '../../lib/navigation';
 import { motion } from 'framer-motion';
 import { Lock, CheckCircle2, ChevronRight, BookOpen, Pencil } from 'lucide-react';
@@ -16,7 +17,8 @@ interface Props {
 
 export const ModuleCard: React.FC<Props> = ({ module: mod, progress, locked, active, index }) => {
   const navigate = useNavigate();
-  const { course } = useCourse();
+  const { course, cohort } = useCourse();
+  const unlockAt = moduleUnlockDate(mod, cohort);
   const done = progress === 100;
 
   const borderColor = done
@@ -138,8 +140,8 @@ export const ModuleCard: React.FC<Props> = ({ module: mod, progress, locked, act
               }}
             >
               <Lock size={11} />
-              {mod.unlockDate
-                ? `Se deblochează ${new Date(mod.unlockDate).toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' })}`
+              {unlockAt
+                ? `Se deblochează ${unlockAt.toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' })}`
                 : 'Indisponibil'}
             </div>
           ) : (

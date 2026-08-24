@@ -7,10 +7,11 @@
 //
 // Providerul de aici doar expune cursul rutei curente și conținutul lui, ca paginile
 // să nu-l recalculeze fiecare din parametri.
-import React, { createContext, useContext, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Course, getCourse, getCourseBySlug } from '@/lib/courses';
 import { getCourseModules, getCourseLiveEvents } from '@/lib/content';
-import { tariffForCourse } from '@/lib/enrollments';
+import { tariffForCourse, cohortForCourse } from '@/lib/enrollments';
+import { fetchCohortEvents, type Cohort, type CohortEvent } from '@/lib/cohorts';
 import { useAuthContext } from './AuthContext';
 import type { Module, LiveEvent, Tariff } from '@/lib/types';
 
@@ -21,6 +22,11 @@ interface CourseContextValue {
   liveEvents: LiveEvent[];
   /** Tariful elevului la ACEST curs (nu cel de pe profil). */
   tariff: Tariff;
+  /**
+   * Fluxul elevului la acest curs. Ancorează deblocarea modulelor și canalul de
+   * comunicare. Null pentru elevii neasignați — atunci se cade pe datele absolute vechi.
+   */
+  cohort: Cohort | null;
 }
 
 const CourseContext = createContext<CourseContextValue>({
@@ -29,6 +35,7 @@ const CourseContext = createContext<CourseContextValue>({
   modules: [],
   liveEvents: [],
   tariff: 'student',
+  cohort: null,
 });
 
 export const useCourse = () => useContext(CourseContext);
@@ -52,20 +59,40 @@ export const CourseProvider: React.FC<{ courseSlug?: string; courseId?: string; 
   children,
 }) => {
   const { user } = useAuthContext();
+  const [cohortEvents, setCohortEvents] = useState<CohortEvent[]>([]);
   const course = useMemo(
     () => (courseId ? getCourse(courseId) : getCourseBySlug(courseSlug)) || null,
     [courseSlug, courseId],
   );
+
+  const cohort = useMemo(
+    () => (course ? cohortForCourse(user?.enrollments, course.id) : null),
+    [course, user?.enrollments],
+  );
+
+  // Calendarul e al fluxului, nu al cursului: un flux nou n-are ce căuta în opt
+  // întâlniri deja trecute ale celui dinainte.
+  useEffect(() => {
+    let cancelled = false;
+    if (!cohort?.id) { setCohortEvents([]); return; }
+    fetchCohortEvents(cohort.id).then(evts => { if (!cancelled) setCohortEvents(evts); });
+    return () => { cancelled = true; };
+  }, [cohort?.id]);
 
   const value = useMemo<CourseContextValue>(
     () => ({
       course,
       courseId: course?.id || null,
       modules: course ? getCourseModules(course.id) : [],
-      liveEvents: course ? getCourseLiveEvents(course.id) : [],
+      // Evenimentele fluxului au prioritate; cele din cod rămân ca plasă pentru
+      // elevii fără flux asignat.
+      liveEvents: cohortEvents.length
+        ? (cohortEvents as unknown as LiveEvent[])
+        : (course ? getCourseLiveEvents(course.id) : []),
       tariff: course ? tariffForCourse(user?.enrollments, course.id) : 'student',
+      cohort,
     }),
-    [course, user?.enrollments],
+    [course, user?.enrollments, cohort, cohortEvents],
   );
 
   return <CourseContext.Provider value={value}>{children}</CourseContext.Provider>;

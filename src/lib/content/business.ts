@@ -14,6 +14,7 @@ export const BUSINESS_MODULES: Module[] = [
     etapa: 'Etapa 0',
     saptamana: 'Săptămâna 0',
     unlockDate: '2026-05-18',
+    unlockWeek: 0,
     deliverable:
       'Raport diagnostic de 1–2 pagini + Plan personalizat pe 8 săptămâni. Fără acest raport nu se intră în Etapa 1.',
     lessons: [
@@ -206,6 +207,7 @@ export const BUSINESS_MODULES: Module[] = [
     etapa: 'Etapa 1',
     saptamana: 'Săptămâna 1',
     unlockDate: '2026-05-25',
+    unlockWeek: 1,
     deliverable:
       'Manifestul Fundației — 1 pagină A4. Imprimat și pus pe perete în birou. Devine documentul-mamă al afacerii.',
     lessons: [
@@ -316,6 +318,7 @@ export const BUSINESS_MODULES: Module[] = [
     etapa: 'Etapa 2',
     saptamana: 'Săptămâna 2',
     unlockDate: '2026-06-01',
+    unlockWeek: 2,
     deliverable:
       'Pachetul Structurii: 2 organigrame + fișe de rol pentru 3 poziții pilot + matrice decizională.',
     lessons: [
@@ -457,6 +460,7 @@ export const BUSINESS_MODULES: Module[] = [
     etapa: 'Etapa 3',
     saptamana: 'Săptămânile 3–4',
     unlockDate: '2026-06-08',
+    unlockWeek: 3,
     deliverable:
       'Mapa de Operare: minimum 2 procese cheie documentate complet + 1 instrucțiune testată de altcineva.',
     lessons: [
@@ -626,6 +630,7 @@ export const BUSINESS_MODULES: Module[] = [
     etapa: 'Etapa 4',
     saptamana: 'Săptămâna 5',
     unlockDate: '2026-06-22',
+    unlockWeek: 5,
     deliverable:
       'Sistemul de Control: tablou de bord gata + format raport săptămânal + ritm fix + rezultatul testului de 2 zile.',
     lessons: [
@@ -787,6 +792,7 @@ export const BUSINESS_MODULES: Module[] = [
     etapa: 'Etapa 5',
     saptamana: 'Săptămânile 6–7',
     unlockDate: '2026-06-29',
+    unlockWeek: 6,
     deliverable:
       'Dovada Delegării Reale: 1 proces complet predat + acord de responsabilitate semnat de ambele părți + jurnalul primelor 2 săptămâni.',
     lessons: [
@@ -919,6 +925,7 @@ export const BUSINESS_MODULES: Module[] = [
     etapa: 'Etapa 6',
     saptamana: 'Săptămâna 8',
     unlockDate: '2026-07-06',
+    unlockWeek: 7,
     deliverable:
       'Dosarul Complet "Arhitectura Afacerii Mele" — toate livrabilele etapelor 0–6 compilate.',
     lessons: [

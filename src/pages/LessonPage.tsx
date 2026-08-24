@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useCourse } from '../context/CourseContext';
 import { courseDashboardPath, courseModulePath, courseLessonPath, courseQuizPath, courseDocumentsPath, courseMaterialsPath } from '../lib/navigation';
+import { moduleUnlockDate } from '../lib/cohorts';
 import { Lesson, Module } from '../lib/types';
 import { useProgress } from '../hooks/useProgress';
 import { Confetti } from '../components/aa/Confetti';
@@ -208,7 +209,7 @@ const CompleteButton: React.FC<{
 export const LessonPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { course, courseId, modules } = useCourse();
+  const { course, courseId, modules, cohort } = useCourse();
   const { markComplete, unmarkComplete, markExerciseComplete, unmarkExerciseComplete, isCompleted, isModuleLocked } = useProgress();
   const { user } = useAuthContext();
   const [completing, setCompleting] = useState(false);
@@ -286,8 +287,9 @@ export const LessonPage: React.FC = () => {
   // Module lock
   const moduleIdx = modules.findIndex(m => m.id === module!.id);
   if (isModuleLocked(moduleIdx)) {
-    const unlockDate = module.unlockDate
-      ? new Date(module.unlockDate).toLocaleDateString('ro-RO', { weekday: 'long', day: 'numeric', month: 'long' })
+    const unlockAt = moduleUnlockDate(module, cohort);
+    const unlockDate = unlockAt
+      ? unlockAt.toLocaleDateString('ro-RO', { weekday: 'long', day: 'numeric', month: 'long' })
       : null;
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400, padding: 24 }}>
