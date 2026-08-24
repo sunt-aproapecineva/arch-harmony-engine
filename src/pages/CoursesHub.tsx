@@ -9,7 +9,7 @@ import { useNavigate } from '@/lib/router-compat';
 import { useAuthContext } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useProgress } from '../hooks/useProgress';
-import { enrolledCourses } from '../lib/enrollments';
+import { enrolledCourses, expiredCourses, enrollmentForCourse } from '../lib/enrollments';
 import { activeCourses, COURSE_ACCENT } from '../lib/courses';
 import { getCourseModules } from '../lib/content';
 import { courseDashboardPath } from '../lib/navigation';
@@ -23,6 +23,9 @@ export const CoursesHub: React.FC = () => {
 
   // Adminul vede toate cursurile active, ca să poată verifica conținutul.
   const courses = isAdmin ? activeCourses() : enrolledCourses(user?.enrollments);
+  // Accesul expirat nu se ascunde: elevul trebuie să vadă că a avut, nu să creadă
+  // că i-a dispărut contul.
+  const expired = isAdmin ? [] : expiredCourses(user?.enrollments);
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
@@ -145,6 +148,36 @@ export const CoursesHub: React.FC = () => {
                   </motion.button>
                 );
               })}
+            </div>
+          )}
+          {expired.length > 0 && (
+            <div style={{ marginTop: 34 }}>
+              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 12 }}>
+                Acces încheiat
+              </div>
+              <div style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+                {expired.map(course => {
+                  const enr = enrollmentForCourse(user?.enrollments, course.id);
+                  return (
+                    <div key={course.id} style={{
+                      background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 14,
+                      padding: 18, opacity: 0.75,
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
+                        <Lock size={13} style={{ color: 'var(--fg-3)' }} />
+                        <span className="font-aboreto" style={{ fontSize: 14, color: 'var(--fg-2)' }}>{course.title}</span>
+                      </div>
+                      <p style={{ fontSize: 12.5, color: 'var(--fg-3)', lineHeight: 1.6, margin: 0 }}>
+                        Accesul s-a încheiat pe{' '}
+                        {enr?.access_until
+                          ? new Date(enr.access_until).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' })
+                          : 'o dată anterioară'}
+                        . Scrie-i echipei dacă vrei prelungire.
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

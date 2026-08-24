@@ -10,8 +10,8 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Course, getCourse, getCourseBySlug } from '@/lib/courses';
 import { getCourseModules, getCourseLiveEvents } from '@/lib/content';
-import { tariffForCourse, cohortForCourse } from '@/lib/enrollments';
-import { fetchCohortEvents, type Cohort, type CohortEvent } from '@/lib/cohorts';
+import { tariffForCourse, flowForCourse } from '@/lib/enrollments';
+import { fetchFlowEvents, type Flow, type FlowEvent } from '@/lib/flows';
 import { useAuthContext } from './AuthContext';
 import type { Module, LiveEvent, Tariff } from '@/lib/types';
 
@@ -26,7 +26,7 @@ interface CourseContextValue {
    * Fluxul elevului la acest curs. Ancorează deblocarea modulelor și canalul de
    * comunicare. Null pentru elevii neasignați — atunci se cade pe datele absolute vechi.
    */
-  cohort: Cohort | null;
+  flow: Flow | null;
 }
 
 const CourseContext = createContext<CourseContextValue>({
@@ -35,7 +35,7 @@ const CourseContext = createContext<CourseContextValue>({
   modules: [],
   liveEvents: [],
   tariff: 'student',
-  cohort: null,
+  flow: null,
 });
 
 export const useCourse = () => useContext(CourseContext);
@@ -59,14 +59,14 @@ export const CourseProvider: React.FC<{ courseSlug?: string; courseId?: string; 
   children,
 }) => {
   const { user } = useAuthContext();
-  const [cohortEvents, setCohortEvents] = useState<CohortEvent[]>([]);
+  const [flowEvents, setFlowEvents] = useState<FlowEvent[]>([]);
   const course = useMemo(
     () => (courseId ? getCourse(courseId) : getCourseBySlug(courseSlug)) || null,
     [courseSlug, courseId],
   );
 
-  const cohort = useMemo(
-    () => (course ? cohortForCourse(user?.enrollments, course.id) : null),
+  const flow = useMemo(
+    () => (course ? flowForCourse(user?.enrollments, course.id) : null),
     [course, user?.enrollments],
   );
 
@@ -74,10 +74,10 @@ export const CourseProvider: React.FC<{ courseSlug?: string; courseId?: string; 
   // întâlniri deja trecute ale celui dinainte.
   useEffect(() => {
     let cancelled = false;
-    if (!cohort?.id) { setCohortEvents([]); return; }
-    fetchCohortEvents(cohort.id).then(evts => { if (!cancelled) setCohortEvents(evts); });
+    if (!flow?.id) { setFlowEvents([]); return; }
+    fetchFlowEvents(flow.id).then(evts => { if (!cancelled) setFlowEvents(evts); });
     return () => { cancelled = true; };
-  }, [cohort?.id]);
+  }, [flow?.id]);
 
   const value = useMemo<CourseContextValue>(
     () => ({
@@ -86,13 +86,13 @@ export const CourseProvider: React.FC<{ courseSlug?: string; courseId?: string; 
       modules: course ? getCourseModules(course.id) : [],
       // Evenimentele fluxului au prioritate; cele din cod rămân ca plasă pentru
       // elevii fără flux asignat.
-      liveEvents: cohortEvents.length
-        ? (cohortEvents as unknown as LiveEvent[])
+      liveEvents: flowEvents.length
+        ? (flowEvents as unknown as LiveEvent[])
         : (course ? getCourseLiveEvents(course.id) : []),
       tariff: course ? tariffForCourse(user?.enrollments, course.id) : 'student',
-      cohort,
+      flow,
     }),
-    [course, user?.enrollments, cohort, cohortEvents],
+    [course, user?.enrollments, flow, flowEvents],
   );
 
   return <CourseContext.Provider value={value}>{children}</CourseContext.Provider>;

@@ -1,5 +1,5 @@
 // @ts-nocheck
-// Panoul de cohortă — ce vede mentorul înainte de apelul săptămânal de grup.
+// Panoul de flowă — ce vede mentorul înainte de apelul săptămânal de grup.
 //
 // Cockpitul existent răspunde la „cum stă elevul X". Înaintea unui apel de grup,
 // întrebarea e alta: „unde e toată lumea și cu cine trebuie să vorbesc azi".
@@ -33,7 +33,7 @@ function isTrackable(l: any) {
   return l?.type === 'exercise' || !!(l?.video_url && String(l.video_url).trim());
 }
 
-export const AdminCohort: React.FC = () => {
+export const AdminFlowPanel: React.FC = () => {
   const { course, courseId } = useAdminCourseScope();
   const navigate = useNavigate();
   const [rows, setRows] = useState<Row[]>([]);
@@ -134,7 +134,7 @@ export const AdminCohort: React.FC = () => {
       <div style={{ marginBottom: 22 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
           <Users size={16} style={{ color: 'var(--gold)' }} />
-          <h1 className="font-aboreto" style={{ fontSize: 18, color: 'var(--fg)' }}>Cohorta</h1>
+          <h1 className="font-aboreto" style={{ fontSize: 18, color: 'var(--fg)' }}>Flowa</h1>
           {course && (
             <span style={{ fontSize: 11, color: 'var(--fg-3)', padding: '2px 8px', borderRadius: 99, border: '1px solid var(--border)' }}>
               {course.shortTitle}
@@ -150,7 +150,7 @@ export const AdminCohort: React.FC = () => {
       {/* Sumar de pregătire a apelului */}
       <div style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', marginBottom: 20 }}>
         {[
-          { label: 'În cohortă', value: stats.total, tone: 'var(--fg)' },
+          { label: 'În flowă', value: stats.total, tone: 'var(--fg)' },
           { label: 'Fără diagnostic', value: stats.faraQuiz, tone: stats.faraQuiz ? 'var(--warn)' : 'var(--fg-3)' },
           { label: gateModule ? `Înainte de ${gateModule.etapa}` : 'Fără poartă', value: gateModule ? stats.inainteDePoarta : '—', tone: stats.inainteDePoarta ? 'var(--warn-strong)' : 'var(--fg-3)' },
           { label: 'Cu semnale de atenție', value: stats.cuSemnale, tone: stats.cuSemnale ? 'var(--error)' : 'var(--fg-3)' },
@@ -187,7 +187,7 @@ export const AdminCohort: React.FC = () => {
       </div>
 
       {loading ? (
-        <div style={{ padding: 40, textAlign: 'center', color: 'var(--fg-3)', fontSize: 13 }}>Se încarcă cohorta…</div>
+        <div style={{ padding: 40, textAlign: 'center', color: 'var(--fg-3)', fontSize: 13 }}>Se încarcă flowa…</div>
       ) : filtered.length === 0 ? (
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--fg-3)', fontSize: 13 }}>Nimeni în filtrul ăsta.</div>
       ) : (

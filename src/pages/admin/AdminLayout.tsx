@@ -2,7 +2,7 @@
 import React from 'react';
 import { NavLink, Outlet, Navigate, useNavigate } from '@/lib/router-compat';
 import {
-  LayoutDashboard, Users, UserCog, BookOpen, TrendingUp, ShieldCheck, LogOut, Activity,
+  LayoutDashboard, Users, UserCog, BookOpen, TrendingUp, ShieldCheck, LogOut, Activity, CalendarRange, ClipboardList,
 } from 'lucide-react';
 import { useAuthContext } from '../../context/AuthContext';
 import { Header } from '../../components/layout/Header';
@@ -12,7 +12,7 @@ import { activeCourses, COURSE_ACCENT } from '../../lib/courses';
 export const AdminLayout: React.FC = () => {
   const { isAdmin, logout } = useAuthContext();
   const navigate = useNavigate();
-  const { course, courseId, setCourseId } = useAdminCourseScope();
+  const { course, courseId, setCourseId, flows, flowId, setFlowId } = useAdminCourseScope();
   const courses = activeCourses();
 
   if (!isAdmin) {
@@ -21,7 +21,9 @@ export const AdminLayout: React.FC = () => {
 
   const navItems = [
     { to: '/admin', icon: <LayoutDashboard size={15} />, label: 'Prezentare generală', end: true },
-    { to: '/admin/cohorta', icon: <Users size={15} />, label: 'Cohorta' },
+    { to: '/admin/flowa', icon: <Users size={15} />, label: 'Flowa' },
+    { to: '/admin/fluxuri', icon: <CalendarRange size={15} />, label: 'Fluxuri' },
+    { to: '/admin/grupe', icon: <Users size={15} />, label: 'Grupe' },
     { to: '/admin/users', icon: <UserCog size={15} />, label: 'Utilizatori' },
     { to: '/admin/lessons', icon: <BookOpen size={15} />, label: 'Lecții' },
     { to: '/admin/progress', icon: <TrendingUp size={15} />, label: 'Progres' },
@@ -78,6 +80,32 @@ export const AdminLayout: React.FC = () => {
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {/* Fluxul privit. „Toate" e alegerea implicită — filtrarea contează la
+            panourile de lucru cu flowa, nu la administrarea de conținut. */}
+        {flows.length > 0 && (
+          <div style={{ padding: '10px 12px 0' }}>
+            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 6 }}>
+              Flux
+            </div>
+            <select
+              value={flowId || ''}
+              onChange={e => setFlowId(e.target.value || null)}
+              style={{
+                width: '100%', padding: '5px 8px', borderRadius: 7, fontSize: 11.5,
+                background: 'var(--bg-3)', color: flowId ? 'var(--fg)' : 'var(--fg-3)',
+                border: '1px solid var(--border)', cursor: 'pointer', outline: 'none',
+              }}
+            >
+              <option value="">Toate fluxurile</option>
+              {flows.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.name} · start {new Date(c.starts_on).toLocaleDateString('ro-RO', { day: 'numeric', month: 'short', year: '2-digit' })}
+                </option>
+              ))}
+            </select>
           </div>
         )}
 

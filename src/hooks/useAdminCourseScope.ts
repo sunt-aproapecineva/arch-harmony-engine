@@ -11,9 +11,10 @@
 //
 // Regula rămâne aceeași ca pentru elev: agregările (progres, scoruri, briefing) se
 // raportează la UN curs. Un scor combinat între două metodologii n-ar spune nimic.
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { activeCourses, getCourse } from '../lib/courses';
+import { fetchFlows, type Flow } from '../lib/flows';
 
 export function useAdminCourseScope() {
   const navigate = useNavigate();
@@ -21,13 +22,28 @@ export function useAdminCourseScope() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const fallback = activeCourses()[0];
-  const requested = new URLSearchParams(search).get('curs');
+  const params = new URLSearchParams(search);
+  const requested = params.get('curs');
   const course = getCourse(requested) || fallback;
+  const courseId = course?.id || fallback?.id || 'business';
 
-  const setCourseId = useCallback(
-    (nextId: string) => {
+  // Fluxul privit. Gol = toate fluxurile cursului, ceea ce e alegerea corectă
+  // pentru vederile de administrare; panourile de lucru cu flowa filtrează.
+  const [flows, setFlows] = useState<Flow[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    fetchFlows(courseId).then(list => { if (!cancelled) setFlows(list); });
+    return () => { cancelled = true; };
+  }, [courseId]);
+
+  const requestedFlow = params.get('flux');
+  const flow = flows.find(c => c.id === requestedFlow) || null;
+
+  const setParam = useCallback(
+    (key: string, value: string | null) => {
       const next = new URLSearchParams(search);
-      next.set('curs', nextId);
+      if (value) next.set(key, value);
+      else next.delete(key);
       const obj: Record<string, string> = {};
       next.forEach((v, k) => { obj[k] = v; });
       navigate({ to: pathname, search: obj, replace: true });
@@ -35,5 +51,17 @@ export function useAdminCourseScope() {
     [navigate, pathname, search],
   );
 
-  return { course, courseId: course?.id || fallback?.id || 'business', setCourseId };
+  // Schimbarea cursului resetează fluxul: fluxurile aparțin unui singur curs.
+  const setCourseId = useCallback((nextId: string) => {
+    const next = new URLSearchParams(search);
+    next.set('curs', nextId);
+    next.delete('flux');
+    const obj: Record<string, string> = {};
+    next.forEach((v, k) => { obj[k] = v; });
+    navigate({ to: pathname, search: obj, replace: true });
+  }, [navigate, pathname, search]);
+
+  const setFlowId = useCallback((nextId: string | null) => setParam('flux', nextId), [setParam]);
+
+  return { course, courseId, setCourseId, flows, flow, flowId: flow?.id || null, setFlowId };
 }

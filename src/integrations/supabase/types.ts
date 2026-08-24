@@ -49,6 +49,7 @@ export type Database = {
       }
       announcements: {
         Row: {
+          flow_id: string | null
           created_at: string
           created_by: string | null
           expires_at: string | null
@@ -58,6 +59,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          flow_id?: string | null
           created_at?: string
           created_by?: string | null
           expires_at?: string | null
@@ -67,6 +69,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          flow_id?: string | null
           created_at?: string
           created_by?: string | null
           expires_at?: string | null
@@ -115,6 +118,9 @@ export type Database = {
       }
       enrollments: {
         Row: {
+          source_group_id: string | null
+          access_until: string | null
+          flow_id: string | null
           course_id: string
           created_at: string
           granted_at: string
@@ -125,6 +131,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          source_group_id?: string | null
+          access_until?: string | null
+          flow_id?: string | null
           course_id: string
           created_at?: string
           granted_at?: string
@@ -135,6 +144,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          source_group_id?: string | null
+          access_until?: string | null
+          flow_id?: string | null
           course_id?: string
           created_at?: string
           granted_at?: string
@@ -143,6 +155,171 @@ export type Database = {
           tariff?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      flows: {
+        Row: {
+          access_weeks: number | null
+          course_id: string
+          created_at: string
+          ends_on: string | null
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          slug: string
+          starts_on: string
+          telegram_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_weeks?: number | null
+          course_id: string
+          created_at?: string
+          ends_on?: string | null
+          id: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          slug: string
+          starts_on: string
+          telegram_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_weeks?: number | null
+          course_id?: string
+          created_at?: string
+          ends_on?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          slug?: string
+          starts_on?: string
+          telegram_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      flow_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration: string | null
+          event_date: string
+          event_time: string | null
+          flow_id: string
+          id: string
+          title: string
+          type: string
+          updated_at: string
+          workshop_themes: Json | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          event_date: string
+          event_time?: string | null
+          flow_id: string
+          id?: string
+          title: string
+          type?: string
+          updated_at?: string
+          workshop_themes?: Json | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          event_date?: string
+          event_time?: string | null
+          flow_id?: string
+          id?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          workshop_themes?: Json | null
+        }
+        Relationships: []
+      }
+      groups: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      group_members: {
+        Row: {
+          added_at: string
+          added_by: string | null
+          group_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          added_by?: string | null
+          group_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          added_by?: string | null
+          group_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      group_flow_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          flow_id: string
+          group_id: string
+          id: string
+          tariff: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          flow_id: string
+          group_id: string
+          id?: string
+          tariff?: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          flow_id?: string
+          group_id?: string
+          id?: string
+          tariff?: string
         }
         Relationships: []
       }
@@ -698,6 +875,9 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      apply_group_to_flow: { Args: { _group_id: string; _flow_id: string }; Returns: number }
+      revoke_group_from_flow: { Args: { _group_id: string; _flow_id: string }; Returns: number }
+      max_tariff: { Args: { a: string; b: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -47,6 +47,8 @@ export interface AdminUserRow {
   is_admin: boolean;
   /** Elevul are acces la cursul privit acum de admin. */
   enrolled: boolean;
+  /** Fluxul din care face parte la acest curs. Null = neasignat. */
+  flow_id: string | null;
   quiz_done: boolean;
   last_activity?: string | null;
 }
@@ -89,7 +91,7 @@ export async function fetchAdminUsers(courseId: string): Promise<AdminUserRow[]>
     ),
     supabase.from('activity_log').select('user_id,created_at').order('created_at', { ascending: false }).limit(2000),
     withSchemaFallback(
-      () => supabase.from('enrollments').select('user_id,tariff').eq('course_id', courseId),
+      () => supabase.from('enrollments').select('user_id,tariff,flow_id').eq('course_id', courseId),
       // Fără tabelul de înscrieri, toată lumea e considerată înscrisă la cursul privit,
       // cu tariful de pe profil — exact comportamentul de dinainte de multicurs.
       async () => ({ data: null, error: null }),
@@ -98,8 +100,12 @@ export async function fetchAdminUsers(courseId: string): Promise<AdminUserRow[]>
   const adminIds = new Set((roles || []).filter((r: any) => r.role === 'admin').map((r: any) => r.user_id));
   const quizUserIds = new Set((quiz || []).map((q: any) => q.user_id));
   const enrolledTariff: Record<string, Tariff> = {};
+  const enrolledFlow: Record<string, string | null> = {};
   const enrollmentsKnown = Array.isArray(enrollments);
-  (enrollments || []).forEach((e: any) => { enrolledTariff[e.user_id] = (e.tariff as Tariff) || 'student'; });
+  (enrollments || []).forEach((e: any) => {
+    enrolledTariff[e.user_id] = (e.tariff as Tariff) || 'student';
+    enrolledFlow[e.user_id] = e.flow_id ?? null;
+  });
   const lastActivityBy: Record<string, string> = {};
   (activity || []).forEach((a: any) => {
     if (!lastActivityBy[a.user_id]) lastActivityBy[a.user_id] = a.created_at;
@@ -112,6 +118,7 @@ export async function fetchAdminUsers(courseId: string): Promise<AdminUserRow[]>
     created_at: p.created_at,
     is_admin: adminIds.has(p.id),
     enrolled: enrollmentsKnown ? p.id in enrolledTariff : true,
+    flow_id: enrolledFlow[p.id] ?? null,
     quiz_done: quizUserIds.has(p.id),
     last_activity: lastActivityBy[p.id] || null,
   }));

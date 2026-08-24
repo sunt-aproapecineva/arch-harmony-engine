@@ -23,6 +23,8 @@ import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminActivityRouteImport } from './routes/admin.activity'
 import { Route as AdminCohortaRouteImport } from './routes/admin.cohorta'
+import { Route as AdminFluxuriRouteImport } from './routes/admin.fluxuri'
+import { Route as AdminGrupeRouteImport } from './routes/admin.grupe'
 import { Route as AdminLessonsRouteImport } from './routes/admin.lessons'
 import { Route as AdminProgressRouteImport } from './routes/admin.progress'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -112,6 +114,16 @@ const AdminActivityRoute = AdminActivityRouteImport.update({
 const AdminCohortaRoute = AdminCohortaRouteImport.update({
   id: '/cohorta',
   path: '/cohorta',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFluxuriRoute = AdminFluxuriRouteImport.update({
+  id: '/fluxuri',
+  path: '/fluxuri',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGrupeRoute = AdminGrupeRouteImport.update({
+  id: '/grupe',
+  path: '/grupe',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLessonsRoute = AdminLessonsRouteImport.update({
@@ -239,6 +251,8 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/cohorta': typeof AdminCohortaRoute
+  '/admin/fluxuri': typeof AdminFluxuriRoute
+  '/admin/grupe': typeof AdminGrupeRoute
   '/admin/lessons': typeof AdminLessonsRoute
   '/admin/progress': typeof AdminProgressRoute
   '/admin/users': typeof AdminUsersRoute
@@ -274,6 +288,8 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/cohorta': typeof AdminCohortaRoute
+  '/admin/fluxuri': typeof AdminFluxuriRoute
+  '/admin/grupe': typeof AdminGrupeRoute
   '/admin/lessons': typeof AdminLessonsRoute
   '/admin/progress': typeof AdminProgressRoute
   '/admin/users': typeof AdminUsersRoute
@@ -311,6 +327,8 @@ export interface FileRoutesById {
   '/_app/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/cohorta': typeof AdminCohortaRoute
+  '/admin/fluxuri': typeof AdminFluxuriRoute
+  '/admin/grupe': typeof AdminGrupeRoute
   '/admin/lessons': typeof AdminLessonsRoute
   '/admin/progress': typeof AdminProgressRoute
   '/admin/users': typeof AdminUsersRoute
@@ -349,6 +367,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/admin/activity'
     | '/admin/cohorta'
+    | '/admin/fluxuri'
+    | '/admin/grupe'
     | '/admin/lessons'
     | '/admin/progress'
     | '/admin/users'
@@ -384,6 +404,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/admin/activity'
     | '/admin/cohorta'
+    | '/admin/fluxuri'
+    | '/admin/grupe'
     | '/admin/lessons'
     | '/admin/progress'
     | '/admin/users'
@@ -420,6 +442,8 @@ export interface FileRouteTypes {
     | '/_app/dashboard'
     | '/admin/activity'
     | '/admin/cohorta'
+    | '/admin/fluxuri'
+    | '/admin/grupe'
     | '/admin/lessons'
     | '/admin/progress'
     | '/admin/users'
@@ -557,6 +581,20 @@ declare module '@tanstack/react-router' {
       path: '/cohorta'
       fullPath: '/admin/cohorta'
       preLoaderRoute: typeof AdminCohortaRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/fluxuri': {
+      id: '/admin/fluxuri'
+      path: '/fluxuri'
+      fullPath: '/admin/fluxuri'
+      preLoaderRoute: typeof AdminFluxuriRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/grupe': {
+      id: '/admin/grupe'
+      path: '/grupe'
+      fullPath: '/admin/grupe'
+      preLoaderRoute: typeof AdminGrupeRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/lessons': {
@@ -762,6 +800,8 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 interface AdminRouteChildren {
   AdminActivityRoute: typeof AdminActivityRoute
   AdminCohortaRoute: typeof AdminCohortaRoute
+  AdminFluxuriRoute: typeof AdminFluxuriRoute
+  AdminGrupeRoute: typeof AdminGrupeRoute
   AdminLessonsRoute: typeof AdminLessonsRoute
   AdminProgressRoute: typeof AdminProgressRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -772,6 +812,8 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminActivityRoute: AdminActivityRoute,
   AdminCohortaRoute: AdminCohortaRoute,
+  AdminFluxuriRoute: AdminFluxuriRoute,
+  AdminGrupeRoute: AdminGrupeRoute,
   AdminLessonsRoute: AdminLessonsRoute,
   AdminProgressRoute: AdminProgressRoute,
   AdminUsersRoute: AdminUsersRoute,

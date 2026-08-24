@@ -11,8 +11,8 @@ const FALLBACK_TELEGRAM = 'https://t.me/+f2YYXZlVWjVhMzcy';
 export const TelegramButton: React.FC<TelegramButtonProps> = ({ compact = false }) => {
   // Fiecare flux are canalul lui: altfel elevii unui flux nou aterizează în grupul
   // celui dinainte, peste conversații care nu-i privesc.
-  const { cohort } = useCourse();
-  const href = cohort?.telegram_url || FALLBACK_TELEGRAM;
+  const { flow } = useCourse();
+  const href = flow?.telegram_url || FALLBACK_TELEGRAM;
   return (
   <a
     href={href}

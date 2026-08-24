@@ -5,7 +5,7 @@ import { supabase, isMockMode } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { useCourse } from '../context/CourseContext';
 import { getCourseModules } from '../lib/content';
-import { isModuleUnlocked } from '../lib/cohorts';
+import { isModuleUnlocked } from '../lib/flows';
 
 const STORAGE_PROGRESS_KEY = 'aa_progress';
 
@@ -60,7 +60,7 @@ function saveMockProgress(progress: Progress[]) {
  */
 export function useProgress(explicitCourseId?: string) {
   const { user } = useAuthContext();
-  const { courseId: contextCourseId, cohort } = useCourse();
+  const { courseId: contextCourseId, flow } = useCourse();
   const courseId = explicitCourseId || contextCourseId;
   const modules = getCourseModules(courseId);
   const [progress, setProgress] = useState<Progress[]>([]);
@@ -263,9 +263,9 @@ export function useProgress(explicitCourseId?: string) {
     (moduleIndex: number): boolean => {
       const mod = modules[moduleIndex];
       if (!mod) return true;
-      return !isModuleUnlocked(mod, cohort);
+      return !isModuleUnlocked(mod, flow);
     },
-    [modules, cohort]
+    [modules, flow]
   );
 
   /**

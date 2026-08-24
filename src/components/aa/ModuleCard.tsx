@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from '@/lib/router-compat';
 import { useCourse } from '../../context/CourseContext';
-import { moduleUnlockDate } from '../../lib/cohorts';
+import { moduleUnlockDate } from '../../lib/flows';
 import { courseModulePath } from '../../lib/navigation';
 import { motion } from 'framer-motion';
 import { Lock, CheckCircle2, ChevronRight, BookOpen, Pencil } from 'lucide-react';
@@ -17,8 +17,8 @@ interface Props {
 
 export const ModuleCard: React.FC<Props> = ({ module: mod, progress, locked, active, index }) => {
   const navigate = useNavigate();
-  const { course, cohort } = useCourse();
-  const unlockAt = moduleUnlockDate(mod, cohort);
+  const { course, flow } = useCourse();
+  const unlockAt = moduleUnlockDate(mod, flow);
   const done = progress === 100;
 
   const borderColor = done

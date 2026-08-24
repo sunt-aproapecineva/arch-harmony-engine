@@ -4,15 +4,17 @@ export interface Enrollment {
   course_id: string;
   tariff: Tariff;
   granted_at?: string;
-  /** Fluxul (cohorta) din care face parte elevul la acest curs. */
-  cohort_id?: string | null;
+  /** Fluxul (flowa) din care face parte elevul la acest curs. */
+  flow_id?: string | null;
   /** Fluxul hidratat, când a putut fi citit. Ancorează deblocările și canalul. */
-  cohort?: {
+  flow?: {
     id: string;
     course_id: string;
     name: string;
     slug: string;
     starts_on: string;
+    ends_on: string | null;
+    access_weeks: number | null;
     telegram_url: string | null;
     is_active: boolean;
   } | null;

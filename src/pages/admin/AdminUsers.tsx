@@ -25,7 +25,7 @@ const tariffColor = (t: Tariff) => {
 };
 
 export const AdminUsers: React.FC = () => {
-  const { course, courseId } = useAdminCourseScope();
+  const { course, courseId, flows } = useAdminCourseScope();
   const navigate = useNavigate();
   const [users, setUsers] = useState<AdminUserRow[]>([]);
   const [progress, setProgress] = useState<AdminProgressRow[]>([]);
@@ -128,6 +128,21 @@ export const AdminUsers: React.FC = () => {
     // pentru cursul curent — altfel am schimba tariful și la celelalte programe.
     await supabase.from('whitelist').update({ tariff })
       .eq('email', user.email.toLowerCase()).eq('course_id', courseId);
+    reload();
+  };
+
+  /**
+   * Mută elevul într-un flux. Fluxul îi schimbă datele de deblocare, calendarul și
+   * canalul de Telegram — deci e cea mai consecventă acțiune din pagina asta.
+   */
+  const handleChangeFlow = async (user: AdminUserRow, flowId: string) => {
+    const { error } = await supabase
+      .from('enrollments')
+      .upsert(
+        { user_id: user.id, course_id: courseId, tariff: user.tariff || 'student', flow_id: flowId || null },
+        { onConflict: 'user_id,course_id' },
+      );
+    if (error) { alert('Eroare la mutarea în flux: ' + error.message); return; }
     reload();
   };
 
@@ -346,6 +361,25 @@ export const AdminUsers: React.FC = () => {
                     </select>
                     {/* Accesul la programul privit acum. Fără asta, adminul n-ar avea de
                         unde deschide sau retrage un curs pentru un elev. */}
+                    {flows.length > 0 && user.enrolled && (
+                      <select
+                        value={user.flow_id || ''}
+                        onClick={e => e.stopPropagation()}
+                        onChange={e => handleChangeFlow(user, e.target.value)}
+                        title="Fluxul elevului"
+                        style={{
+                          fontSize: 10, padding: '3px 6px', borderRadius: 99, maxWidth: 92,
+                          background: user.flow_id ? 'var(--bg-3)' : 'var(--warn-dim)',
+                          color: user.flow_id ? 'var(--fg-2)' : 'var(--warn)',
+                          border: '1px solid var(--border)', cursor: 'pointer', outline: 'none',
+                        }}
+                      >
+                        <option value="">fără flux</option>
+                        {flows.map(c => (
+                          <option key={c.id} value={c.id} style={{ background: '#0D0907', color: 'var(--fg)' }}>{c.name}</option>
+                        ))}
+                      </select>
+                    )}
                     <button
                       onClick={e => { e.stopPropagation(); handleToggleEnrollment(user, !user.enrolled); }}
                       title={user.enrolled ? `Retrage accesul la ${course?.shortTitle || 'curs'}` : `Dă acces la ${course?.shortTitle || 'curs'}`}

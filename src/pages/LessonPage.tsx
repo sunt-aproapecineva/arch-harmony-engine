@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useCourse } from '../context/CourseContext';
 import { courseDashboardPath, courseModulePath, courseLessonPath, courseQuizPath, courseDocumentsPath, courseMaterialsPath } from '../lib/navigation';
-import { moduleUnlockDate } from '../lib/cohorts';
+import { moduleUnlockDate } from '../lib/flows';
 import { Lesson, Module } from '../lib/types';
 import { useProgress } from '../hooks/useProgress';
 import { Confetti } from '../components/aa/Confetti';
@@ -209,7 +209,7 @@ const CompleteButton: React.FC<{
 export const LessonPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { course, courseId, modules, cohort } = useCourse();
+  const { course, courseId, modules, flow } = useCourse();
   const { markComplete, unmarkComplete, markExerciseComplete, unmarkExerciseComplete, isCompleted, isModuleLocked } = useProgress();
   const { user } = useAuthContext();
   const [completing, setCompleting] = useState(false);
@@ -287,7 +287,7 @@ export const LessonPage: React.FC = () => {
   // Module lock
   const moduleIdx = modules.findIndex(m => m.id === module!.id);
   if (isModuleLocked(moduleIdx)) {
-    const unlockAt = moduleUnlockDate(module, cohort);
+    const unlockAt = moduleUnlockDate(module, flow);
     const unlockDate = unlockAt
       ? unlockAt.toLocaleDateString('ro-RO', { weekday: 'long', day: 'numeric', month: 'long' })
       : null;
