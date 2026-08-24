@@ -3,6 +3,7 @@ import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 import { computeScores, detectStuckModule, type StudentScores } from './studentScoring';
+import { staticExercisesByModuleOrder, allStaticExercises } from './staticExercises';
 
 async function ensureAdmin(ctx: any) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
@@ -13,7 +14,7 @@ async function ensureAdmin(ctx: any) {
 
 // ── Helpers to collect a student's full footprint ────────────────────────────
 async function gatherStudent(admin: any, studentId: string) {
-  const [profileRes, progressRes, quizRes, notesRes, exRes, activityRes, modulesRes, lessonsRes, exercisesRes] =
+  const [profileRes, progressRes, quizRes, notesRes, exRes, activityRes, modulesRes, lessonsRes] =
     await Promise.all([
       admin.from('profiles').select('id,email,full_name,tariff,created_at').eq('id', studentId).maybeSingle(),
       admin.from('progress').select('lesson_id,completed_at').eq('user_id', studentId),
@@ -23,7 +24,6 @@ async function gatherStudent(admin: any, studentId: string) {
       admin.from('activity_log').select('created_at,type,label').eq('user_id', studentId).order('created_at', { ascending: false }).limit(500),
       admin.from('modules').select('id,title,etapa,order_index').order('order_index'),
       admin.from('lessons').select('id,module_id,title,order_index,video_url').order('order_index'),
-      admin.from('exercises').select('id,module_id,title,order_index').order('order_index'),
     ]);
 
   if (profileRes.error) throw new Error(profileRes.error.message);
@@ -34,15 +34,16 @@ async function gatherStudent(admin: any, studentId: string) {
   const allLessons = (lessonsRes.data || []) as any[];
   // Only count lessons that actually have a video — placeholders/empty lessons are excluded
   const lessons = allLessons.filter((l: any) => !!(l.video_url && String(l.video_url).trim()));
-  const exercises = (exercisesRes.data || []) as any[];
+  // Exercise IDs come from code (data.ts), not from the DB `exercises` table:
+  // student answers are stored under the code IDs (e-0-1, ex-8-1-…).
+  const staticExByOrder = staticExercisesByModuleOrder();
+  const exercises = allStaticExercises();
   const lessonsByMod: Record<string, any[]> = {};
-  const exercisesByMod: Record<string, any[]> = {};
   lessons.forEach((l: any) => { (lessonsByMod[l.module_id] ||= []).push(l); });
-  exercises.forEach((e: any) => { (exercisesByMod[e.module_id] ||= []).push(e); });
   const mods = modules.map((m: any) => ({
     ...m,
     lessons: lessonsByMod[m.id] || [],
-    exercises: exercisesByMod[m.id] || [],
+    exercises: staticExByOrder[m.order_index ?? -1] || [],
   }));
 
   const progress = (progressRes.data || []) as any[];
@@ -353,7 +354,7 @@ export const getAttentionQueue = createServerFn({ method: 'POST' })
   .handler(async ({ context }) => {
     const admin = await ensureAdmin(context);
 
-    const [profilesRes, rolesRes, progressRes, exRes, notesRes, activityRes, quizRes, modulesRes, lessonsRes, exercisesRes] =
+    const [profilesRes, rolesRes, progressRes, exRes, notesRes, activityRes, quizRes, modulesRes, lessonsRes] =
       await Promise.all([
         admin.from('profiles').select('id,email,full_name,tariff,created_at'),
         admin.from('user_roles').select('user_id,role'),
@@ -364,7 +365,6 @@ export const getAttentionQueue = createServerFn({ method: 'POST' })
         admin.from('quiz_responses').select('user_id'),
         admin.from('modules').select('id,title,etapa,order_index').order('order_index'),
         admin.from('lessons').select('id,module_id,order_index,video_url').order('order_index'),
-        admin.from('exercises').select('id,module_id').order('order_index'),
       ]);
 
     const adminIds = new Set((rolesRes.data || []).filter((r: any) => r.role === 'admin').map((r: any) => r.user_id));
@@ -373,15 +373,14 @@ export const getAttentionQueue = createServerFn({ method: 'POST' })
     const modules = (modulesRes.data || []) as any[];
     const allLessons = (lessonsRes.data || []) as any[];
     const lessons = allLessons.filter((l: any) => !!(l.video_url && String(l.video_url).trim()));
-    const exercises = (exercisesRes.data || []) as any[];
+    const staticExByOrder = staticExercisesByModuleOrder();
+    const exercises = allStaticExercises();
     const lessonsByMod: Record<string, any[]> = {};
-    const exercisesByMod: Record<string, any[]> = {};
     lessons.forEach((l: any) => { (lessonsByMod[l.module_id] ||= []).push(l); });
-    exercises.forEach((e: any) => { (exercisesByMod[e.module_id] ||= []).push(e); });
     const mods = modules.map((m: any) => ({
       ...m,
       lessons: lessonsByMod[m.id] || [],
-      exercises: exercisesByMod[m.id] || [],
+      exercises: staticExByOrder[m.order_index ?? -1] || [],
     }));
     const totalLessons = lessons.length;
     const totalExercises = exercises.length;
