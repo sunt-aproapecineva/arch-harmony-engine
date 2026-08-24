@@ -117,7 +117,7 @@ export const Register: React.FC = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', background: 'var(--bg)' }}>
+    <div style={{ minHeight: '100dvh', display: 'flex', background: 'var(--bg)' }}>
       {/* Left panel */}
       <div
         className="hidden md:flex"

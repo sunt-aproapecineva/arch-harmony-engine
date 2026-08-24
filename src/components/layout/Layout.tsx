@@ -47,14 +47,15 @@ export const Layout: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'var(--bg)' }}>
+    <div className="aa-viewport" style={{ display: 'flex', overflow: 'hidden', background: 'var(--bg)' }}>
 
       {/* Desktop sidebar — collapsible */}
       {!mobile && (
         <motion.div
           animate={{ width: desktopOpen ? 240 : 0 }}
           transition={{ duration: 0.22, ease: 'easeInOut' }}
-          style={{ flexShrink: 0, height: '100vh', overflow: 'hidden', position: 'sticky', top: 0 }}
+          className="aa-viewport"
+          style={{ flexShrink: 0, overflow: 'hidden', position: 'sticky', top: 0 }}
         >
           <div style={{ width: 240, height: '100%' }}>
             <Sidebar />

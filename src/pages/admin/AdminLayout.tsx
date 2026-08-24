@@ -179,9 +179,9 @@ export const AdminLayout: React.FC = () => {
   );
 
   return (
-    <div style={{ display: 'flex', height: '100dvh', overflow: 'hidden', background: 'var(--bg)' }}>
+    <div className="aa-viewport" style={{ display: 'flex', overflow: 'hidden', background: 'var(--bg)' }}>
       {!isMobile && (
-        <div style={{ flexShrink: 0, height: '100dvh', position: 'sticky', top: 0 }}>
+        <div className="aa-viewport" style={{ flexShrink: 0, position: 'sticky', top: 0 }}>
           {sidebar}
         </div>
       )}

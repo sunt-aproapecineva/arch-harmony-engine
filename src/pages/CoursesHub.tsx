@@ -72,7 +72,7 @@ export const CoursesHub: React.FC = () => {
   const single = cards.length === 1;
 
   return (
-    <div style={{ minHeight: '100dvh', background: 'var(--bg)', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+    <div className="aa-viewport-min" style={{ background: 'var(--bg)', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
       {/* Fundal ambiental — aceleași glow-uri ca pe dashboard, pentru continuitate. */}
       <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
         <div className="dash-glow" style={{ width: 420, height: 420, top: -140, left: '8%', background: 'var(--accent-glow)' }} />

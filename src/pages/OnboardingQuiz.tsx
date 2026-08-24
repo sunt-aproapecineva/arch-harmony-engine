@@ -245,11 +245,11 @@ export const OnboardingQuiz: React.FC = () => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.18 }}
-        style={{ minHeight: '100vh' }}
+        style={{ minHeight: '100dvh' }}
       >
         {/* ── WELCOME SCREEN (first time only) ── */}
         {screen === 'welcome' && (
-          <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', overflow: 'hidden', position: 'relative' }}>
+          <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', overflow: 'hidden', position: 'relative' }}>
             <div style={{ position: 'absolute', width: 500, height: 500, borderRadius: '50%', background: 'rgba(196,240,228,0.05)', filter: 'blur(80px)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} />
             <motion.div
               initial={{ opacity: 0, scale: 0.92 }}
@@ -311,7 +311,7 @@ export const OnboardingQuiz: React.FC = () => {
 
         {/* ── QUIZ INTRO SCREEN ── */}
         {screen === 'intro' && (
-          <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', overflow: 'hidden', position: 'relative' }}>
+          <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', overflow: 'hidden', position: 'relative' }}>
             <div style={{ position: 'absolute', width: 400, height: 400, borderRadius: '50%', background: 'rgba(196,240,228,0.04)', filter: 'blur(60px)', top: '30%', right: '10%', pointerEvents: 'none' }} />
             <div style={{ position: 'absolute', width: 300, height: 300, borderRadius: '50%', background: 'rgba(201,169,110,0.04)', filter: 'blur(60px)', bottom: '20%', left: '5%', pointerEvents: 'none' }} />
             <motion.div
@@ -375,14 +375,14 @@ export const OnboardingQuiz: React.FC = () => {
 
         {/* ── RESULT SCREEN ── */}
         {done && (
-          <div style={{ minHeight: '100vh', background: '#0D0907', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <div style={{ minHeight: '100dvh', background: '#0D0907', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
             <ResultScreen answers={answers} />
           </div>
         )}
 
         {/* ── QUESTIONS SCREEN ── */}
         {screen === 'questions' && !done && (
-          <div style={{ minHeight: '100vh', background: '#0D0907', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 16px' }}>
+          <div style={{ minHeight: '100dvh', background: '#0D0907', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 16px' }}>
             {/* Progress bar */}
             <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 3, background: 'rgba(255,255,255,0.08)', zIndex: 10 }}>
               <motion.div

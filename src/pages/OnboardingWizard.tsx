@@ -313,7 +313,7 @@ export const OnboardingWizard: React.FC = () => {
 
   return (
     <div style={{
-      minHeight: '100vh', background: '#0D0907',
+      minHeight: '100dvh', background: '#0D0907',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: '32px 16px',
     }}>

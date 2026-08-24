@@ -12,7 +12,7 @@ function AppLayout() {
   const { ready: contentReady } = useLiveContent();
   if (loading || (user && !contentReady)) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', color: 'var(--fg-3)', fontSize: 13 }}>
+      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', color: 'var(--fg-3)', fontSize: 13 }}>
         Se încarcă platforma…
       </div>
     );

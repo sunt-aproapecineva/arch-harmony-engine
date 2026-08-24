@@ -63,7 +63,7 @@ export const LibraryArticlePage: React.FC = () => {
         zIndex: 60,
       }} />
 
-      <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+      <div style={{ background: 'var(--bg)', minHeight: '100dvh' }}>
         {/* Back link */}
         <div style={{ maxWidth: 760, margin: '0 auto', padding: '24px 24px 0' }}>
           <button onClick={() => navigate(courseLibraryPath(course))} style={{

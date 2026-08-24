@@ -111,6 +111,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  min-height: 100dvh;
   transition: background 0.3s, color 0.3s;
 }
 
@@ -383,6 +384,13 @@ input::placeholder, textarea::placeholder { color: var(--fg-3); }
   .aa-tap { min-height: 40px; }
 }
 
+/* Înălțimea reală a ferestrei.
+   `100vh` pe mobil include bara de adrese, deci partea de jos a paginii rămâne sub ea —
+   la noi însemna bara de navigare tăiată. `dvh` urmărește înălțimea vizibilă; prima
+   declarație rămâne ca rezervă pentru browserele care nu-l cunosc. */
+.aa-viewport { height: 100vh; height: 100dvh; }
+.aa-viewport-min { min-height: 100vh; min-height: 100dvh; }
+
 /* Ascunde pe mobil ce nu încape (etichete lungi, coloane secundare). */
 @media (max-width: 640px) {
   .aa-hide-sm { display: none !important; }
@@ -391,9 +399,15 @@ input::placeholder, textarea::placeholder { color: var(--fg-3); }
 /* ============================================
    MOBILE RESPONSIVE
    ============================================ */
-@media (max-width: 768px) {
-  /* Aplicate în Dashboard.tsx. Restul claselor de aici au fost șterse — erau definite
-     și nefolosite, deci nu adaptau nimic. */
+/* Grilele de pagină. Erau definite în DOUĂ locuri — aici la 768px și inline în
+   Dashboard.tsx la 640px — cu praguri diferite pentru aceleași clase. Sursa e acum
+   una singură. */
+@media (max-width: 900px) {
+  /* Coloana laterală de 340px din hero nu mai încape lângă conținut. */
+  .hero-grid { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 640px) {
   .module-grid { grid-template-columns: 1fr !important; }
   .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }

@@ -438,17 +438,6 @@ export const Dashboard: React.FC = () => {
 
       </div>
 
-      {/* ── RESPONSIVE STYLES ── */}
-      <style>{`
-        @media (max-width: 900px) {
-          .hero-grid { grid-template-columns: 1fr !important; }
-        }
-        @media (max-width: 640px) {
-          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-          .module-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
-
       <QuizRequiredModal open={quizModalOpen} onClose={() => setQuizModalOpen(false)} />
     </div>
   );

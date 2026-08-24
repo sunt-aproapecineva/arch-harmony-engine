@@ -66,7 +66,7 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', background: 'var(--bg)' }}>
+    <div style={{ minHeight: '100dvh', display: 'flex', background: 'var(--bg)' }}>
       {/* Left panel — brand */}
       <div
         className="hidden md:flex"
