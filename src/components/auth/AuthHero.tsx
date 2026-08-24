@@ -33,20 +33,22 @@ export interface HeroStep {
 
 interface AuthHeroProps {
   eyebrow?: string;
-  title: React.ReactNode;
-  subtitle: string;
-  steps: HeroStep[];
-  footnote?: string;
+  title?: React.ReactNode;
+  subtitle?: string;
+  steps?: HeroStep[];
+  footnote?: React.ReactNode;
   /** Rulează slideshow-ul de pe landing, cu titlul al cărui ultim cuvânt se rotește. */
   film?: boolean;
+  /** Eticheta butonului principal de pe mobil (coboară la formular). */
+  primaryCta?: string;
+  /** Al doilea buton de pe mobil — de obicei trimite la cealaltă pagină de acces. */
+  secondaryCta?: { label: string; href: string };
 }
 
-export const AuthHero: React.FC<AuthHeroProps> = ({ eyebrow, title, subtitle, steps, footnote, film = false }) => {
+export const AuthHero: React.FC<AuthHeroProps> = ({ eyebrow, title, subtitle, steps = [], footnote, film = false, primaryCta = 'Conectează-te', secondaryCta }) => {
   const reduce = useReducedMotion();
-  // Panoul e ascuns prin CSS sub 1024px, dar `display: none` NU oprește preîncărcarea
-  // videoclipurilor: pe telefon s-ar consuma trafic pentru ceva ce nu se vede.
   const wide = useMinWidth(1024);
-  const playing = film && wide && !reduce;
+  const playing = film && !reduce;
   const slide = useHeroSlideshow(playing);
 
   /** Intrare eșalonată, fiecare element cu întârzierea lui. */
@@ -61,6 +63,7 @@ export const AuthHero: React.FC<AuthHeroProps> = ({ eyebrow, title, subtitle, st
       className="aa-auth-hero"
       style={{
         position: 'relative', width: '52%', flexShrink: 0,
+        containerType: 'inline-size',
         // `display` e controlat de clasă (.aa-auth-hero), nu inline: altfel stilul
         // inline ar învinge media query-ul și panoul ar apărea și pe telefon.
         flexDirection: 'column', justifyContent: 'flex-end',
@@ -103,14 +106,14 @@ export const AuthHero: React.FC<AuthHeroProps> = ({ eyebrow, title, subtitle, st
         background: 'linear-gradient(105deg, var(--bg) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.25) 100%)',
       }} />
 
-      <Blueprint />
+      {!playing && <Blueprint />}
 
       <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         <div className="dash-glow" style={{ width: 460, height: 460, top: '-18%', left: '-12%', background: 'var(--accent-glow)' }} />
         <div className="dash-glow" style={{ width: 380, height: 380, bottom: '-14%', right: '-10%', background: 'var(--gold-dim)' }} />
       </div>
 
-      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 460, display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 620, display: 'flex', flexDirection: 'column', gap: 32 }}>
         <motion.div {...rise(0)} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
             width: 30, height: 30, borderRadius: 8, display: 'grid', placeItems: 'center',
@@ -130,13 +133,17 @@ export const AuthHero: React.FC<AuthHeroProps> = ({ eyebrow, title, subtitle, st
             </p>
           )}
           <h2 className="font-aboreto" style={{
-            fontSize: film ? 'clamp(1.5rem, 2.3vw, 2.15rem)' : 'clamp(1.7rem, 2.6vw, 2.4rem)',
-            color: 'var(--fg)', lineHeight: 1.14, letterSpacing: '-0.02em', margin: 0,
+            // Dimensiunea se leagă de LĂȚIMEA PANOULUI, nu de a ferestrei: panoul are
+            // 52%, deci `vw` îl umfla peste măsură și forța rupturi urâte.
+            fontSize: film ? 'clamp(1.5rem, 6.6cqw, 3.6rem)' : 'clamp(1.4rem, 5.4cqw, 2.9rem)',
+            color: 'var(--fg)', lineHeight: 1.1, letterSpacing: '-0.02em', margin: 0,
             textWrap: 'balance',
           }}>
-            {film && wide ? (
+            {film ? (
               <>
-                Hai să construim afaceri,<br />care îți oferă{' '}
+                {/* Fără <br /> fix: se bătea cu `text-wrap: balance` și ieșea un rând
+                    cu un singur cuvânt. Lăsăm browserul să distribuie egal. */}
+                Hai să construim afaceri, care îți oferă{' '}
                 <span key={slide.index} aria-label={slide.word} style={{ color: 'var(--gold)', display: 'inline-block', whiteSpace: 'nowrap' }}>
                   {slide.word.split('').map((ch, k) => (
                     <span key={k} className="aa-wf-letter" style={{ display: 'inline-block', animationDelay: `${k * 0.04}s` }}>{ch}</span>
@@ -145,16 +152,42 @@ export const AuthHero: React.FC<AuthHeroProps> = ({ eyebrow, title, subtitle, st
               </>
             ) : title}
           </h2>
-          <p style={{ fontSize: 14, color: 'var(--fg-3)', lineHeight: 1.7, marginTop: 14, maxWidth: 360 }}>
-            {subtitle}
-          </p>
+          {subtitle && (
+            <p style={{ fontSize: 14, color: 'var(--fg-3)', lineHeight: 1.7, marginTop: 14, maxWidth: 380 }}>
+              {subtitle}
+            </p>
+          )}
         </motion.div>
 
-        <motion.ol {...rise(2)} style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {steps.map((s, i) => (
-            <StepItem key={s.label} number={i + 1} label={s.label} state={s.state} />
-          ))}
-        </motion.ol>
+        {steps.length > 0 && (
+          <motion.ol {...rise(2)} style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {steps.map((s, i) => (
+              <StepItem key={s.label} number={i + 1} label={s.label} state={s.state} />
+            ))}
+          </motion.ol>
+        )}
+
+        {/* Doar pe mobil: eroul ocupă primul ecran, iar butoanele coboară la formular.
+            Pe desktop formularul e deja alături, deci n-au ce căuta. */}
+        <motion.div {...rise(2)} className="aa-auth-hero-cta" style={{ gap: 10, flexWrap: 'wrap' }}>
+          <a href="#aa-auth-form" style={{
+            flex: '1 1 150px', minHeight: 46, display: 'inline-flex', alignItems: 'center',
+            justifyContent: 'center', borderRadius: 12, fontSize: 14, fontWeight: 700,
+            background: 'var(--accent)', color: 'var(--bg)', textDecoration: 'none',
+          }}>
+            {primaryCta}
+          </a>
+          {secondaryCta && (
+            <a href={secondaryCta.href} style={{
+              flex: '1 1 150px', minHeight: 46, display: 'inline-flex', alignItems: 'center',
+              justifyContent: 'center', borderRadius: 12, fontSize: 14, fontWeight: 600,
+              background: 'transparent', color: 'var(--fg)',
+              border: '1px solid var(--border-hi)', textDecoration: 'none',
+            }}>
+              {secondaryCta.label}
+            </a>
+          )}
+        </motion.div>
 
         {footnote && (
           <motion.p {...rise(3)} style={{ fontSize: 12, color: 'var(--fg-3)', lineHeight: 1.65, margin: 0, maxWidth: 380 }}>

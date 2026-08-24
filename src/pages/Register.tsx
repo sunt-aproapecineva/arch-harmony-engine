@@ -5,6 +5,7 @@ import { ArrowRight, Mail, Lock, User, CheckCircle2, Loader2, HelpCircle } from 
 import { useAuthContext } from '../context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthHero } from '@/components/auth/AuthHero';
+import { SUPPORT_EMAIL } from '@/lib/courses';
 import { OnboardingGuideModal } from '@/components/aa/OnboardingGuideModal';
 
 interface InputFieldProps {
@@ -118,26 +119,26 @@ export const Register: React.FC = () => {
   };
 
   return (
-    <div className="aa-viewport-min" style={{
+    <div className="aa-viewport-min aa-auth-page" style={{
       display: 'flex', gap: 'clamp(8px, 1vw, 16px)', background: 'var(--bg)',
       padding: 'clamp(8px, 1vw, 16px)',
     }}>
       <AuthHero
         film
-        eyebrow="Acces nominal"
-        title={null}
-        subtitle="Verificăm întâi că adresa ta e pe lista de acces, apoi îți alegi parola. Doi pași, un minut."
-        steps={[
-          { label: 'Verificarea accesului', state: step === 1 ? 'active' : 'done' },
-          { label: 'Crearea contului', state: step === 2 ? 'active' : 'todo' },
-          { label: 'Diagnosticul de intrare', state: 'todo' },
-        ]}
-        footnote="Dacă adresa nu e recunoscută, înseamnă că accesul n-a fost încă deschis — scrie-i echipei, nu încerca altă adresă."
+        primaryCta="Creează cont"
+        secondaryCta={{ label: 'Am deja cont', href: '/login' }}
+        footnote={<>
+          Dacă adresa nu e recunoscută, accesul n-a fost încă deschis —{' '}
+          <a href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Acces la platformă')}`}
+             style={{ color: 'var(--accent)', textDecoration: 'underline', textUnderlineOffset: 3 }}>
+            scrie-ne
+          </a>, nu încerca altă adresă.
+        </>}
       />
 
       {/* Right panel — form */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-        <div style={{ width: '100%', maxWidth: 380 }}>
+      <div id="aa-auth-form" className="aa-auth-form" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(20px, 4vw, 48px)', overflowY: 'auto' }}>
+        <div style={{ width: '100%', maxWidth: 440 }}>
           {/* Mobile logo */}
           <div className="md:hidden" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32 }}>
             <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #1A5C38, #0f3d22)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

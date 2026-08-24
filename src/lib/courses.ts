@@ -11,6 +11,12 @@
 // document_responses.document_id). Orice curs nou trebuie să aibă prefix ne-gol, ca
 // id-urile să rămână unice global și cele patru tabele să nu aibă nevoie de migrație.
 
+/**
+ * Adresa la care scriu elevii când n-au acces.
+ * PROVIZORIE — de înlocuit cu cutia reală a echipei.
+ */
+export const SUPPORT_EMAIL = 'contact@arhitecturaafacerii.ro';
+
 export type CourseId = 'business' | 'start';
 
 /** Accente de brand, exprimate ca tokeni de design (vezi invariantul 6). */

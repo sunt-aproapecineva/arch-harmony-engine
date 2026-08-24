@@ -466,12 +466,28 @@ input::placeholder, textarea::placeholder { color: var(--fg-3); }
 .aa-wf-letter { animation: aaWordIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
 @media (prefers-reduced-motion: reduce) { .aa-wf-letter { animation: none; } }
 
-/* Panoul-erou al paginilor de autentificare: apare doar de la 1024px în sus.
-   Sub asta, formularul primește tot ecranul — pe telefon un panou decorativ de
-   jumătate de lățime ar împinge câmpurile într-o coloană inutilizabilă. */
-.aa-auth-hero { display: none; }
-@media (min-width: 1024px) {
-  .aa-auth-hero { display: flex; flex-direction: column; }
+/* Paginile de acces.
+   Desktop: două coloane — erou 52% pe stânga, formular pe dreapta.
+   Mobil: eroul ocupă primul ecran (video + titlu + butoane), formularul vine dedesubt,
+   la un scroll distanță. Butoanele din erou coboară la el prin ancoră. */
+.aa-auth-hero { display: flex; flex-direction: column; }
+.aa-auth-hero-cta { display: none; }
+
+@media (max-width: 1023px) {
+  .aa-auth-page { flex-direction: column; }
+  .aa-auth-hero {
+    width: 100% !important;
+    min-height: 74svh;
+    border-radius: 18px;
+    /* Pe desktop conținutul stă jos, sub imagine. Pe telefon, ancorat jos, lăsa un gol
+       mare deasupra — aici îl centrăm. */
+    justify-content: center;
+  }
+    .aa-auth-hero-cta { display: flex; }
+  /* Ancora nu lipește formularul de marginea de sus. */
+  #aa-auth-form { scroll-margin-top: 12px; }
+  /* Formularul începe sub prima priveliște, nu înghesuit lângă ea. */
+  .aa-auth-form { min-height: auto; }
 }
 
 /* Ascunde pe mobil ce nu încape (etichete lungi, coloane secundare). */

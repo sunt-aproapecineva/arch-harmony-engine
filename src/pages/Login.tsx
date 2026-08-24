@@ -5,6 +5,7 @@ import { ArrowRight, Mail, Lock, HelpCircle } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
 import { OnboardingGuideModal } from '@/components/aa/OnboardingGuideModal';
 import { AuthHero } from '@/components/auth/AuthHero';
+import { SUPPORT_EMAIL } from '@/lib/courses';
 
 interface InputFieldProps {
   label: string;
@@ -67,25 +68,25 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="aa-viewport-min" style={{
+    <div className="aa-viewport-min aa-auth-page" style={{
       display: 'flex', gap: 'clamp(8px, 1vw, 16px)', background: 'var(--bg)',
       padding: 'clamp(8px, 1vw, 16px)',
     }}>
       <AuthHero
         film
-        eyebrow="Practicum de sistematizare"
-        title={null}
-        subtitle="În doar 2 luni alături de mine îți restructurezi afacerea din rădăcină — o sistematizăm astfel încât să fii antreprenor liber."
-        steps={[
-          { label: 'Intri în cont', state: 'active' },
-          { label: 'Îți dai diagnosticul', state: 'todo' },
-          { label: 'Începi practicumul', state: 'todo' },
-        ]}
-        footnote="Accesul e nominal. Dacă ai achitat și nu poți intra, scrie-i echipei."
+        primaryCta="Conectează-te"
+        secondaryCta={{ label: 'Creează cont', href: '/register' }}
+        footnote={<>
+          Accesul e nominal. Dacă ai achitat și nu poți intra,{' '}
+          <a href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Nu pot intra în platformă')}`}
+             style={{ color: 'var(--accent)', textDecoration: 'underline', textUnderlineOffset: 3 }}>
+            scrie-ne
+          </a>.
+        </>}
       />
 
       {/* Right panel — form */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(20px, 4vw, 48px)', overflowY: 'auto' }}>
+      <div id="aa-auth-form" className="aa-auth-form" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(20px, 4vw, 48px)', overflowY: 'auto' }}>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, ease: 'easeOut' }} style={{ width: '100%', maxWidth: 440 }}>
           {/* Mobile logo */}
           <div className="md:hidden" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32 }}>
