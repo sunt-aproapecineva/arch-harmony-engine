@@ -89,6 +89,8 @@ export function getWhitelist(): WhitelistEntry[] {
   return _cachedWhitelist;
 }
 
+import { logActivity, logActivityOnce } from '../lib/activity';
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -198,6 +200,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (error) return { error: error.message === 'Invalid login credentials' ? 'Email sau parolă incorectă.' : error.message };
     if (rememberMe) startRememberWindow(data.session);
     else clearSessionBackup();
+    if (data?.user) {
+      // Identity fields are filled server-side by the activity_log trigger.
+      logActivityOnce('login', {
+        userId: data.user.id,
+        userEmail: data.user.email || '',
+        userName: '',
+        type: 'login',
+        label: 'S-a autentificat pe platformă',
+        data: {},
+      });
+    }
     return { error: null };
   };
 
@@ -231,6 +244,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
+    if (user) {
+      await logActivity({
+        userId: user.id,
+        userEmail: user.email,
+        userName: user.full_name,
+        type: 'logout',
+        label: `${user.full_name} s-a deconectat`,
+        data: {},
+      });
+    }
     await supabase.auth.signOut();
     setUser(null);
   };

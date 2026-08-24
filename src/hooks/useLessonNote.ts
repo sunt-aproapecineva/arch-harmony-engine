@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logActivityOnce } from '../lib/activity';
 
 /**
  * Cloud + local autosaved lesson note.
@@ -62,6 +63,14 @@ export function useLessonNote(userId: string | null | undefined, lessonId: strin
           { onConflict: 'user_id,lesson_id' }
         );
         setStatus(error ? 'error' : 'saved');
+        if (!error && next.trim()) {
+          logActivityOnce(`note_${lessonId}`, {
+            userId, userEmail: '', userName: '',
+            type: 'note_saved',
+            label: 'A scris notițe la o lecție',
+            data: { lessonId },
+          });
+        }
       } catch {
         setStatus('error');
       }

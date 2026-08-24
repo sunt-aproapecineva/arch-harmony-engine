@@ -136,6 +136,51 @@ export function useProgress() {
     [user, progress]
   );
 
+  const unmarkComplete = useCallback(
+    async (lessonId: string) => {
+      if (!user) return;
+      if (isMockMode) {
+        const updated = progress.filter((p) => p.lesson_id !== lessonId);
+        setProgress(updated);
+        saveMockProgress(updated.length ? updated : [{ user_id: user.id, lesson_id: '__none__', completed_at: new Date().toISOString() }]);
+        return;
+      }
+      await supabase!.from('progress').delete().eq('user_id', user.id).eq('lesson_id', lessonId);
+      setProgress((prev) => prev.filter((p) => p.lesson_id !== lessonId));
+    },
+    [user, progress]
+  );
+
+  // Exercise completions are their own durable record: the tick survives even
+  // if the student later edits the answer text.
+  const markExerciseComplete = useCallback(
+    async (exerciseId: string) => {
+      if (!user || !exerciseId || isMockMode) return;
+      if (exerciseDone.includes(exerciseId)) return;
+      setExerciseDone((prev) => [...prev, exerciseId]);
+      const { error } = await supabase!
+        .from('exercise_completions')
+        .insert({ user_id: user.id, exercise_id: exerciseId });
+      if (error && error.code !== '23505') {
+        setExerciseDone((prev) => prev.filter((e) => e !== exerciseId));
+      }
+    },
+    [user, exerciseDone]
+  );
+
+  const unmarkExerciseComplete = useCallback(
+    async (exerciseId: string) => {
+      if (!user || !exerciseId || isMockMode) return;
+      setExerciseDone((prev) => prev.filter((e) => e !== exerciseId));
+      await supabase!
+        .from('exercise_completions')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('exercise_id', exerciseId);
+    },
+    [user]
+  );
+
   const isCompleted = useCallback(
     (lessonId: string) => progress.some((p) => p.lesson_id === lessonId),
     [progress]
@@ -211,6 +256,9 @@ export function useProgress() {
     progress,
     loading,
     markComplete,
+    unmarkComplete,
+    markExerciseComplete,
+    unmarkExerciseComplete,
     isCompleted,
     isExerciseDone,
     isModuleFullyDone,
