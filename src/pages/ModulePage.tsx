@@ -47,7 +47,7 @@ export const ModulePage: React.FC = () => {
   ];
 
   return (
-    <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
+    <div style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(20px, 5vw, 32px) clamp(14px, 4vw, 24px)' }}>
       {/* Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--fg-3)', marginBottom: 24 }}>
         <Link to={courseDashboardPath(course)} style={{ color: 'var(--fg-3)', transition: 'color 0.15s' }}
@@ -258,7 +258,7 @@ export const ModulePage: React.FC = () => {
                         if (!quizDone) { setQuizModalOpen(true); return; }
                         navigate(courseLessonPath(course, lesson.id));
                       }}
-                      style={{ flex: 1, marginBottom: 0, padding: '11px 16px', background: 'var(--bg-card)', border: `1px solid ${borderColor}`, borderRadius: 12, cursor: locked ? 'not-allowed' : 'pointer', opacity: locked ? 0.5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, transition: 'border-color 0.15s, background 0.15s' }}
+                      style={{ flex: 1, minWidth: 0, marginBottom: 0, padding: '11px 16px', background: 'var(--bg-card)', border: `1px solid ${borderColor}`, borderRadius: 12, cursor: locked ? 'not-allowed' : 'pointer', opacity: locked ? 0.5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, transition: 'border-color 0.15s, background 0.15s' }}
                       onMouseEnter={e => { if (!locked) { (e.currentTarget as HTMLDivElement).style.borderColor = isExLesson ? 'rgba(201,169,110,0.35)' : 'rgba(196,240,228,0.3)'; (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-3)'; }}}
                       onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = borderColor; (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-card)'; }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -276,12 +276,12 @@ export const ModulePage: React.FC = () => {
                           <Clock size={11} />{lesson.duration_min}min
                         </div>
                         {isExLesson && (
-                          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--gold)', background: 'var(--gold-dim)', border: '1px solid rgba(201,169,110,0.2)', padding: '2px 6px', borderRadius: 4 }}>
+                          <div className="aa-hide-sm" style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--gold)', background: 'var(--gold-dim)', border: '1px solid var(--border-hi)', padding: '2px 6px', borderRadius: 4 }}>
                             Interactiv
                           </div>
                         )}
                         {lesson.pdf_url && !isExLesson && (
-                          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--accent)', background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)', padding: '2px 6px', borderRadius: 4 }}>PDF</div>
+                          <div className="aa-hide-sm" style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--accent)', background: 'var(--accent-dim)', border: '1px solid var(--border-hi)', padding: '2px 6px', borderRadius: 4 }}>PDF</div>
                         )}
                         {lessonDone
                           ? <CheckCircle2 size={15} style={{ color: 'var(--ok)' }} />

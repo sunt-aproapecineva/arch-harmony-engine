@@ -406,10 +406,24 @@ input::placeholder, textarea::placeholder { color: var(--fg-3); }
   .aa-stack-sm { grid-template-columns: 1fr !important; }
 }
 
-/* Ținte de atingere: sub 768px, orice control interactiv marcat capătă înălțime minimă
-   de 40px. Sub 40px, degetul ratează. */
+/* Ținte de atingere.
+   Sub 768px, orice control interactiv capătă o zonă de atingere de minimum 40px.
+   Linkurile de tip text (ex. „Ai uitat parola?", 20px înălțime) sunt cel mai des
+   ratate cu degetul, de aceea regula se aplică general, nu doar pe clasa .aa-tap. */
 @media (max-width: 768px) {
   .aa-tap { min-height: 40px; }
+  button, a[href], select, [role="button"] {
+    /* Zona de atingere crește fără să schimbe aspectul: padding-ul rămâne al
+       componentei, doar cutia devine suficient de înaltă. */
+    min-height: 40px;
+  }
+  /* Linkurile din fluxul de text nu trebuie să devină blocuri de 40px — acolo
+     mărim doar zona de atingere pe verticală. */
+  p a[href], span a[href], li a[href] {
+    min-height: 0;
+    display: inline-block;
+    padding-block: 8px;
+  }
 }
 
 /* Înălțimea reală a ferestrei.
@@ -427,6 +441,20 @@ input::placeholder, textarea::placeholder { color: var(--fg-3); }
   .aa-tbl { min-width: 520px; }
   /* Containerul direct al grilelor devine derulabil. */
   .aa-tbl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+/* Cardurile de documente.
+   Layoutul e o linie: [număr][titlu + descriere][butoane]. Pe 375px butoanele
+   (~200px, neîngustabile) lăsau titlului vreo 50px, deci apărea tăiat la „Ce…" iar
+   descrierea se scurgea într-o coloană de trei cuvinte pe rând.
+   Pe mobil: număr + titlu pe primul rând, butoanele dedesubt, pe toată lățimea. */
+@media (max-width: 640px) {
+  .aa-doc-body { flex-wrap: wrap; align-items: flex-start; gap: 12px; }
+  .aa-doc-title { min-width: calc(100% - 52px); }
+  /* Titlul se încadrează pe două rânduri în loc să fie retezat. */
+  .aa-doc-heading { white-space: normal !important; overflow: visible !important; line-height: 1.35; }
+  .aa-doc-actions { width: 100%; }
+  .aa-doc-actions > * { flex: 1; justify-content: center; min-height: 40px; }
 }
 
 /* Ascunde pe mobil ce nu încape (etichete lungi, coloane secundare). */

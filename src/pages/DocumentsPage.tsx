@@ -92,7 +92,7 @@ const TemplateCard: React.FC<{ doc: PlatformDocument; index: number }> = ({ doc,
       <div style={{ width: 4, flexShrink: 0, background: c.border }} />
 
       {/* Content */}
-      <div style={{ flex: 1, padding: '16px 18px', display: 'flex', gap: 16, alignItems: 'center', minWidth: 0 }}>
+      <div className="aa-doc-body" style={{ flex: 1, padding: '16px 18px', display: 'flex', gap: 16, alignItems: 'center', minWidth: 0 }}>
         {/* Doc number */}
         <div style={{
           width: 36, height: 36, flexShrink: 0, borderRadius: 8,
@@ -104,8 +104,8 @@ const TemplateCard: React.FC<{ doc: PlatformDocument; index: number }> = ({ doc,
         </div>
 
         {/* Title + meta */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)', marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <div className="aa-doc-title" style={{ flex: 1, minWidth: 0 }}>
+          <div className="aa-doc-heading" style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)', marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {doc.title}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
@@ -124,7 +124,7 @@ const TemplateCard: React.FC<{ doc: PlatformDocument; index: number }> = ({ doc,
         </div>
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center' }}>
+        <div className="aa-doc-actions" style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center' }}>
           <button
             onClick={() => {
               if (doc.downloadUrl) {
@@ -212,7 +212,7 @@ const SavedDocCard: React.FC<{
       <div style={{ width: 4, flexShrink: 0, background: c.border }} />
 
       {/* Content */}
-      <div style={{ flex: 1, padding: '14px 18px', display: 'flex', gap: 14, alignItems: 'center', minWidth: 0 }}>
+      <div className="aa-doc-body" style={{ flex: 1, padding: '14px 18px', display: 'flex', gap: 14, alignItems: 'center', minWidth: 0 }}>
         {/* Badge */}
         <div style={{
           width: 34, height: 34, flexShrink: 0, borderRadius: 7,
@@ -224,9 +224,9 @@ const SavedDocCard: React.FC<{
         </div>
 
         {/* Info */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="aa-doc-title" style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 2 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <span className="aa-doc-heading" style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {doc.shortTitle}
             </span>
             {isNew && (
@@ -246,7 +246,7 @@ const SavedDocCard: React.FC<{
         </div>
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+        <div className="aa-doc-actions" style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
           <button
             onClick={() => openPrintWindow(doc.html)}
             style={{
