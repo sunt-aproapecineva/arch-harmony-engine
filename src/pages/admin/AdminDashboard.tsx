@@ -13,6 +13,7 @@ import { TariffBadge } from '../../components/aa/TariffBadge';
 import { ProgressBar } from '../../components/aa/ProgressBar';
 import { getActivity, ActivityEvent, timeAgo, ActivityType } from '../../lib/activity';
 import { fetchAdminUsers, fetchAllProgress, AdminUserRow, AdminProgressRow } from '../../lib/adminData';
+import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
 import { AttentionQueueCard } from '../../components/admin/AttentionQueueCard';
 
 function ActivityIcon({ type }: { type: ActivityType }) {
@@ -29,6 +30,7 @@ function ActivityIcon({ type }: { type: ActivityType }) {
 }
 
 export const AdminDashboard: React.FC = () => {
+  const { course, courseId } = useAdminCourseScope();
   const navigate = useNavigate();
   const { user } = useAuthContext();
   const [users, setUsers] = useState<AdminUserRow[]>([]);
@@ -53,7 +55,7 @@ export const AdminDashboard: React.FC = () => {
 
   const loadData = useCallback(async () => {
     const [u, p, a, lessonsRes, wlRes] = await Promise.all([
-      fetchAdminUsers(),
+      fetchAdminUsers(courseId),
       fetchAllProgress(),
       getActivity(200),
       supabase.from('lessons').select('id', { count: 'exact', head: true }),
@@ -65,7 +67,7 @@ export const AdminDashboard: React.FC = () => {
     setTotalLessons(lessonsRes.count || 0);
     setQuizCount(u.filter(x => x.quiz_done).length);
     setWhitelistCount(wlRes.count || 0);
-  }, []);
+  }, [courseId]);
 
   useEffect(() => {
     loadData();

@@ -38,8 +38,18 @@ export function clearCachedEnrollments(userId: string) {
 }
 
 /**
+ * Coduri Postgres pentru „tabelul/coloana nu există". Le tratăm separat pentru că
+ * înseamnă un singur lucru: codul multicurs a ajuns în producție înaintea migrației.
+ */
+const MISSING_SCHEMA_CODES = new Set(['42P01', '42703']);
+
+/**
  * Citește înscrierile din DB. La eșec întoarce cache-ul local în loc de listă goală —
  * altfel o rețea proastă ar arăta „nu ai acces la niciun curs" unui elev plătitor.
+ *
+ * Dacă tabelul `enrollments` lipsește cu totul (migrație neaplicată), degradăm controlat
+ * la primul curs activ, în loc să blocăm toată școala afară. Nu e o breșă: RLS-ul din DB
+ * protejează datele oricum — fallback-ul deschide doar navigarea, nu conținutul altcuiva.
  */
 export async function fetchEnrollments(userId: string): Promise<Enrollment[]> {
   if (!userId) return [];
@@ -58,9 +68,22 @@ export async function fetchEnrollments(userId: string): Promise<Enrollment[]> {
       }));
     cacheEnrollments(userId, list);
     return list;
-  } catch (error) {
-    console.warn('[Enrollments] citire eșuată; folosesc cache-ul local', error);
-    return readCachedEnrollments(userId);
+  } catch (error: any) {
+    const cached = readCachedEnrollments(userId);
+    if (cached.length > 0) {
+      console.warn('[Enrollments] citire eșuată; folosesc cache-ul local', error);
+      return cached;
+    }
+    if (MISSING_SCHEMA_CODES.has(error?.code)) {
+      const fallback = activeCourses()[0];
+      console.warn(
+        '[Enrollments] tabelul `enrollments` lipsește — migrația multicurs nu e aplicată. ' +
+        'Degradez la cursul implicit.', error,
+      );
+      return fallback ? [{ course_id: fallback.id, tariff: 'student' }] : [];
+    }
+    console.warn('[Enrollments] citire eșuată și fără cache local', error);
+    return [];
   }
 }
 

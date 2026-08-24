@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, ArrowUpDown, Trophy } from 'lucide-react';
 import { useNavigate } from '@/lib/router-compat';
 import { fetchModulesWithLessons, fetchAdminUsers, fetchAllProgress, AdminModule, AdminUserRow, AdminProgressRow } from '../../lib/adminData';
+import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
 import type { Tariff } from '../../lib/types';
 
 type SortKey = 'name' | 'progress' | 'lastActive';
@@ -42,6 +43,7 @@ const CellPopover: React.FC<{ userName: string; moduleName: string; lessons: { t
 );
 
 export const AdminProgress: React.FC = () => {
+  const { course, courseId } = useAdminCourseScope();
   const navigate = useNavigate();
   const [modules, setModules] = useState<AdminModule[]>([]);
   const [users, setUsers] = useState<AdminUserRow[]>([]);
@@ -52,10 +54,10 @@ export const AdminProgress: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      const [m, u, p] = await Promise.all([fetchModulesWithLessons(), fetchAdminUsers(), fetchAllProgress()]);
+      const [m, u, p] = await Promise.all([fetchModulesWithLessons(courseId), fetchAdminUsers(courseId), fetchAllProgress()]);
       setModules(m); setUsers(u); setProgress(p);
     })();
-  }, []);
+  }, [courseId]);
 
   const totalLessons = modules.flatMap(m => m.lessons).length;
 

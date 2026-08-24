@@ -6,10 +6,14 @@ import {
 } from 'lucide-react';
 import { useAuthContext } from '../../context/AuthContext';
 import { Header } from '../../components/layout/Header';
+import { useAdminCourseScope } from '../../hooks/useAdminCourseScope';
+import { activeCourses, COURSE_ACCENT } from '../../lib/courses';
 
 export const AdminLayout: React.FC = () => {
   const { isAdmin, logout } = useAuthContext();
   const navigate = useNavigate();
+  const { course, courseId, setCourseId } = useAdminCourseScope();
+  const courses = activeCourses();
 
   if (!isAdmin) {
     return <Navigate to="/" replace />;
@@ -42,6 +46,39 @@ export const AdminLayout: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Cursul privit. Tot cockpitul (scoruri, coadă de atenție, briefing, editor de
+            conținut) se raportează la ramura selectată aici — un scor combinat între două
+            metodologii n-ar spune nimic supervizorului. */}
+        {courses.length > 1 && (
+          <div style={{ padding: '12px 12px 0' }}>
+            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 6 }}>
+              Program
+            </div>
+            <div style={{ display: 'flex', gap: 4 }}>
+              {courses.map(c => {
+                const active = c.id === courseId;
+                const accent = COURSE_ACCENT[c.accent];
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => setCourseId(c.id)}
+                    style={{
+                      flex: 1, padding: '5px 8px', borderRadius: 7, cursor: 'pointer',
+                      fontSize: 11, fontWeight: active ? 600 : 400,
+                      color: active ? accent.fg : 'var(--fg-3)',
+                      background: active ? accent.dim : 'transparent',
+                      border: `1px solid ${active ? 'var(--border-hi)' : 'var(--border)'}`,
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {c.shortTitle}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Nav */}
         <nav style={{ flex: 1, padding: '12px 8px', overflowY: 'auto' }}>

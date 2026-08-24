@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { TariffBadge } from '../../components/aa/TariffBadge';
 import { timeAgo } from '../../lib/activity';
 import { fetchModulesWithLessons, fetchAdminUsers, fetchAllProgress, setUserAdmin, AdminModule, AdminUserRow, AdminProgressRow } from '../../lib/adminData';
+import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
 import type { Tariff } from '../../lib/types';
 
 interface WLEntry { email: string; tariff: Tariff; added_at?: string; }
@@ -24,6 +25,7 @@ const tariffColor = (t: Tariff) => {
 };
 
 export const AdminUsers: React.FC = () => {
+  const { course, courseId } = useAdminCourseScope();
   const navigate = useNavigate();
   const [users, setUsers] = useState<AdminUserRow[]>([]);
   const [progress, setProgress] = useState<AdminProgressRow[]>([]);
@@ -44,9 +46,9 @@ export const AdminUsers: React.FC = () => {
   const reload = useCallback(async () => {
     setLoading(true);
     const [u, p, m, wl] = await Promise.all([
-      fetchAdminUsers(),
+      fetchAdminUsers(courseId),
       fetchAllProgress(),
-      fetchModulesWithLessons(),
+      fetchModulesWithLessons(courseId),
       supabase.from('whitelist').select('email,tariff,added_at').order('added_at', { ascending: false }),
     ]);
     setUsers(u);
@@ -54,7 +56,7 @@ export const AdminUsers: React.FC = () => {
     setModules(m);
     setWhitelist((wl.data || []) as WLEntry[]);
     setLoading(false);
-  }, []);
+  }, [courseId]);
 
   useEffect(() => { reload(); }, [reload]);
 

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor,
   useSensor, useSensors, DragEndEvent,
@@ -188,6 +189,8 @@ const SortableModule: React.FC<{
 
 // ─── Main Page ───────────────────────────────
 export const AdminLessons: React.FC = () => {
+  // Editorul de conținut lucrează pe o singură ramură odată (?curs=).
+  const { course, courseId } = useAdminCourseScope();
   const [modules, setModules] = useState<Module[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
@@ -195,13 +198,13 @@ export const AdminLessons: React.FC = () => {
 
   const load = useCallback(async () => {
     const [m, l] = await Promise.all([
-      supabase.from('modules').select('*').order('order_index'),
+      supabase.from('modules').select('*').eq('course_id', courseId).order('order_index'),
       supabase.from('lessons').select('*').order('order_index'),
     ]);
     setModules((m.data as Module[]) || []);
     setLessons((l.data as Lesson[]) || []);
     setLoading(false);
-  }, []);
+  }, [courseId]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -226,6 +229,7 @@ export const AdminLessons: React.FC = () => {
   const addModule = async () => {
     const nextIdx = modules.length + 1;
     const { data, error } = await supabase.from('modules').insert({
+      course_id: courseId,
       title: `Modul nou ${nextIdx}`,
       order_index: nextIdx,
       etapa: `Modulul ${nextIdx}`,

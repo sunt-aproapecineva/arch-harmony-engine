@@ -32,6 +32,8 @@ export interface AdminUserRow {
   tariff: Tariff;
   created_at: string;
   is_admin: boolean;
+  /** Elevul are acces la cursul privit acum de admin. */
+  enrolled: boolean;
   quiz_done: boolean;
   last_activity?: string | null;
 }
@@ -42,9 +44,10 @@ export interface AdminProgressRow {
   completed_at: string;
 }
 
-export async function fetchModulesWithLessons(): Promise<AdminModule[]> {
+/** Modulele unui curs, cu lecțiile lor. Editorul de conținut lucrează pe o ramură odată. */
+export async function fetchModulesWithLessons(courseId: string): Promise<AdminModule[]> {
   const [{ data: modules }, { data: lessons }] = await Promise.all([
-    supabase.from('modules').select('*').order('order_index'),
+    supabase.from('modules').select('*').eq('course_id', courseId).order('order_index'),
     supabase.from('lessons').select('*').order('order_index'),
   ]);
   const mods = (modules || []) as any[];
@@ -56,15 +59,22 @@ export async function fetchModulesWithLessons(): Promise<AdminModule[]> {
   return mods.map(m => ({ ...m, lessons: lessonsByMod[m.id] || [] }));
 }
 
-export async function fetchAdminUsers(): Promise<AdminUserRow[]> {
-  const [{ data: profiles }, { data: roles }, { data: quiz }, { data: activity }] = await Promise.all([
+/**
+ * Utilizatorii, cu starea lor la un curs anume: tariful de pe înscriere și quizul acelui
+ * curs. Tariful de pe profil rămâne doar ca fallback pentru conturile nemigrate.
+ */
+export async function fetchAdminUsers(courseId: string): Promise<AdminUserRow[]> {
+  const [{ data: profiles }, { data: roles }, { data: quiz }, { data: activity }, { data: enrollments }] = await Promise.all([
     supabase.from('profiles').select('id,email,full_name,tariff,created_at').order('created_at', { ascending: false }),
     supabase.from('user_roles').select('user_id,role'),
-    supabase.from('quiz_responses').select('user_id,completed_at'),
+    supabase.from('quiz_responses').select('user_id,completed_at').eq('course_id', courseId),
     supabase.from('activity_log').select('user_id,created_at').order('created_at', { ascending: false }).limit(2000),
+    supabase.from('enrollments').select('user_id,tariff').eq('course_id', courseId),
   ]);
   const adminIds = new Set((roles || []).filter((r: any) => r.role === 'admin').map((r: any) => r.user_id));
   const quizUserIds = new Set((quiz || []).map((q: any) => q.user_id));
+  const enrolledTariff: Record<string, Tariff> = {};
+  (enrollments || []).forEach((e: any) => { enrolledTariff[e.user_id] = (e.tariff as Tariff) || 'student'; });
   const lastActivityBy: Record<string, string> = {};
   (activity || []).forEach((a: any) => {
     if (!lastActivityBy[a.user_id]) lastActivityBy[a.user_id] = a.created_at;
@@ -73,9 +83,10 @@ export async function fetchAdminUsers(): Promise<AdminUserRow[]> {
     id: p.id,
     email: p.email,
     full_name: p.full_name || '',
-    tariff: (p.tariff as Tariff) || 'student',
+    tariff: enrolledTariff[p.id] || (p.tariff as Tariff) || 'student',
     created_at: p.created_at,
     is_admin: adminIds.has(p.id),
+    enrolled: p.id in enrolledTariff,
     quiz_done: quizUserIds.has(p.id),
     last_activity: lastActivityBy[p.id] || null,
   }));
