@@ -1,12 +1,24 @@
 export type Tariff = 'student' | 'designer' | 'arhitect';
 
+export interface Enrollment {
+  course_id: string;
+  tariff: Tariff;
+  granted_at?: string;
+}
+
 export interface User {
   id: string;
   email: string;
   full_name: string;
   role: 'student' | 'admin';
+  /** @deprecated Tariful real e per curs, în `enrollments`. Rămâne doar ca fallback de migrație. */
   tariff: Tariff;
+  /** @deprecated Quizul e per curs. Folosește `quiz_completed_courses` / hasCompletedOnboarding(user, courseId). */
   quiz_completed?: boolean;
+  /** Cursurile la care elevul are acces, cu tariful fiecăruia. */
+  enrollments?: Enrollment[];
+  /** Id-urile cursurilor la care elevul a terminat quizul de onboarding. */
+  quiz_completed_courses?: string[];
   created_at: string;
   country?: string;
   city?: string;
@@ -71,4 +83,17 @@ export interface Progress {
   user_id: string;
   lesson_id: string;
   completed_at: string;
+}
+
+export type EventType = 'zoom' | 'workshop';
+
+export interface LiveEvent {
+  id: string;
+  title: string;
+  type: EventType;
+  date: string;
+  time: string;
+  duration: string;
+  description: string;
+  workshopThemes?: string[];
 }

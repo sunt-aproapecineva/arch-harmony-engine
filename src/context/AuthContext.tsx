@@ -3,6 +3,8 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, WhitelistEntry, Tariff } from '../lib/types';
 import { saveSessionBackup, readSessionBackup, clearSessionBackup, startRememberWindow, isRememberMode, isRememberExpired } from '../lib/sessionPersistence';
+import { fetchEnrollments, readCachedEnrollments, clearCachedEnrollments } from '../lib/enrollments';
+import { quizDoneKey, legacyQuizDoneKey } from '../lib/access';
 
 interface AuthContextType {
   user: User | null;
@@ -25,7 +27,7 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuthContext = () => useContext(AuthContext);
 
 function readLocalQuizDone(userId: string): boolean {
-  try { return localStorage.getItem(`aa_quiz_done_${userId}`) === '1'; } catch { return false; }
+  try { return localStorage.getItem(legacyQuizDoneKey(userId)) === '1'; } catch { return false; }
 }
 
 function buildFallbackUser(authUser: any): User {
@@ -36,6 +38,9 @@ function buildFallbackUser(authUser: any): User {
     role: 'student',
     tariff: 'student',
     quiz_completed: readLocalQuizDone(authUser.id),
+    // Cache-ul local ține elevul în cursurile lui chiar dacă hidratarea a eșuat.
+    enrollments: readCachedEnrollments(authUser.id),
+    quiz_completed_courses: [],
     avatar_url: null,
     created_at: authUser.created_at,
   };
@@ -45,17 +50,25 @@ async function hydrateUser(authUser: any): Promise<User | null> {
   if (!authUser) return null;
 
   try {
-    const [{ data: profile }, { data: roles }, { data: quiz }] = await Promise.all([
+    const [{ data: profile }, { data: roles }, { data: quizRows }, enrollments] = await Promise.all([
       supabase.from('profiles').select('full_name,email,tariff,avatar_url').eq('id', authUser.id).maybeSingle(),
       supabase.from('user_roles').select('role').eq('user_id', authUser.id),
-      supabase.from('quiz_responses').select('answers,completed_at').eq('user_id', authUser.id).maybeSingle(),
+      supabase.from('quiz_responses').select('answers,completed_at,course_id').eq('user_id', authUser.id),
+      fetchEnrollments(authUser.id),
     ]);
     const isAdmin = (roles || []).some((r: any) => r.role === 'admin');
-    // Sync quiz state into localStorage for legacy gating
+
+    // Oglindește starea quizului în localStorage, per curs, pentru gating instant.
+    const quizCourses: string[] = [];
     try {
-      if (quiz?.completed_at) {
-        localStorage.setItem(`aa_quiz_done_${authUser.id}`, '1');
-        if (quiz.answers) localStorage.setItem(`aa_quiz_answers_${authUser.id}`, JSON.stringify(quiz.answers));
+      for (const row of quizRows || []) {
+        if (!row?.completed_at) continue;
+        const courseId = row.course_id || 'business';
+        quizCourses.push(courseId);
+        localStorage.setItem(quizDoneKey(authUser.id, courseId), '1');
+        if (row.answers) {
+          localStorage.setItem(`aa_quiz_answers_${authUser.id}_${courseId}`, JSON.stringify(row.answers));
+        }
       }
     } catch {}
     const localQuizDone = readLocalQuizDone(authUser.id);
@@ -65,7 +78,9 @@ async function hydrateUser(authUser: any): Promise<User | null> {
       full_name: profile?.full_name || authUser.user_metadata?.full_name || '',
       role: isAdmin ? 'admin' : 'student',
       tariff: (profile?.tariff as Tariff) || 'student',
-      quiz_completed: !!quiz?.completed_at || localQuizDone,
+      quiz_completed: quizCourses.includes('business') || localQuizDone,
+      enrollments,
+      quiz_completed_courses: quizCourses,
       avatar_url: profile?.avatar_url || null,
       created_at: authUser.created_at,
     };
@@ -254,6 +269,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         data: {},
       });
     }
+    // Cache-ul de înscrieri e per utilizator; îl curățăm ca următorul cont logat
+    // pe același dispozitiv să nu vadă o clipă cursurile celui dinainte.
+    if (user) clearCachedEnrollments(user.id);
     await supabase.auth.signOut();
     setUser(null);
   };
