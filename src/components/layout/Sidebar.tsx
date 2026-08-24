@@ -7,7 +7,8 @@ import { useAuthContext } from '../../context/AuthContext';
 import { useCourse } from '../../context/CourseContext';
 import { courseDocumentsPath, courseLibraryPath, courseMaterialsPath, courseModulePath } from '../../lib/navigation';
 import { COURSE_ACCENT } from '../../lib/courses';
-import { enrolledCourses } from '../../lib/enrollments';
+import { enrolledCourses, enrollmentForCourse } from '../../lib/enrollments';
+import { flowAccessUntil } from '../../lib/flows';
 import { TariffBadge } from '../aa/TariffBadge';
 import { TelegramButton } from '../aa/TelegramButton';
 import { Tariff } from '../../lib/types';
@@ -19,7 +20,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const { getModuleProgress, isModuleLocked } = useProgress();
   const { user, logout } = useAuthContext();
-  const { course, modules, tariff: courseTariff } = useCourse();
+  const { course, modules, tariff: courseTariff, flow } = useCourse();
   const navigate = useNavigate();
   const initial = (user?.full_name || user?.email || 'U').charAt(0).toUpperCase();
   // Tariful afișat e cel de la cursul curent, nu cel vechi de pe profil.
@@ -27,6 +28,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   // Comutatorul de curs apare doar dacă elevul chiar are unde comuta.
   const canSwitchCourse = (user?.role === 'admin') || enrolledCourses(user?.enrollments).length > 1;
   const accent = COURSE_ACCENT[course?.accent || 'accent'];
+  // Fluxul și fereastra de acces: elevul trebuie să știe în ce grupă de livrare e
+  // și până când are acces, nu să afle într-o dimineață că nu mai poate intra.
+  const enrollment = course ? enrollmentForCourse(user?.enrollments, course.id) : null;
+  const accessUntil = enrollment?.access_until
+    ? new Date(`${enrollment.access_until}T23:59:59+03:00`)
+    : flowAccessUntil(flow);
+  const daysLeft = accessUntil
+    ? Math.ceil((accessUntil.getTime() - Date.now()) / 86400000)
+    : null;
 
   return (
     <div style={{
@@ -65,7 +75,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
               title="Schimbă programul"
             >
               <span style={{ fontSize: 11, fontWeight: 600, color: accent.fg, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {course.shortTitle}
+                {course.shortTitle}{flow ? ` · ${flow.name.replace(/ · .*$/, '')}` : ''}
               </span>
               <ChevronsUpDown size={12} style={{ color: 'var(--fg-3)', flexShrink: 0 }} />
             </NavLink>
@@ -75,9 +85,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
               background: accent.dim, border: '1px solid var(--border)',
               fontSize: 11, fontWeight: 600, color: accent.fg,
             }}>
-              {course.shortTitle}
+              {course.shortTitle}{flow ? ` · ${flow.name.replace(/ · .*$/, '')}` : ''}
             </div>
           )
+        )}
+
+        {/* Avertisment de expirare, doar în ultimele două săptămâni. Mai devreme ar fi
+            zgomot; mai târziu, o surpriză neplăcută. */}
+        {daysLeft !== null && daysLeft <= 14 && (
+          <div style={{
+            marginTop: 8, padding: '5px 9px', borderRadius: 8, fontSize: 10.5, lineHeight: 1.45,
+            background: daysLeft <= 3 ? 'var(--error-dim)' : 'var(--warn-dim)',
+            color: daysLeft <= 3 ? 'var(--error)' : 'var(--warn)',
+            border: '1px solid var(--border)',
+          }}>
+            {daysLeft > 0
+              ? `Acces încă ${daysLeft} ${daysLeft === 1 ? 'zi' : 'zile'}`
+              : 'Accesul s-a încheiat'}
+          </div>
         )}
       </div>
 

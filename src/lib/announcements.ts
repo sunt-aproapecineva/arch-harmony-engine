@@ -69,9 +69,22 @@ export async function publishAnnouncement(
   return data || null;
 }
 
-export async function clearAnnouncements(): Promise<void> {
+/**
+ * Șterge anunțurile unei ținte. `flowId` null curăță doar anunțurile globale —
+ * publicarea către Fluxul 2 nu are voie să șteargă anunțul Fluxului 1.
+ * `'*'` curăță tot, pentru butonul de ștergere din admin.
+ */
+export async function clearAnnouncements(flowId: string | null | '*' = '*'): Promise<void> {
   try {
-    await supabase.from('announcements').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    let q = supabase.from('announcements').delete();
+    if (flowId === '*') q = q.neq('id', '00000000-0000-0000-0000-000000000000');
+    else if (flowId) q = q.eq('flow_id', flowId);
+    else q = q.is('flow_id', null);
+    const { error } = await q;
+    // Coloana nu există încă (migrație neaplicată) → cădem pe comportamentul vechi.
+    if (error?.code === '42703') {
+      await supabase.from('announcements').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    }
   } catch {
     /* best-effort */
   }

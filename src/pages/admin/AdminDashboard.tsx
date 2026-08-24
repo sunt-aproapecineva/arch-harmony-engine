@@ -30,7 +30,7 @@ function ActivityIcon({ type }: { type: ActivityType }) {
 }
 
 export const AdminDashboard: React.FC = () => {
-  const { course, courseId } = useAdminCourseScope();
+  const { course, courseId, flows, flowId } = useAdminCourseScope();
   const navigate = useNavigate();
   const { user } = useAuthContext();
   const [users, setUsers] = useState<AdminUserRow[]>([]);
@@ -103,14 +103,15 @@ export const AdminDashboard: React.FC = () => {
 
   const handlePublishNotif = async () => {
     if (!notifMessage.trim()) return;
-    const created = await publishAnnouncement(notifMessage.trim(), notifType, user?.id ?? null);
+    // Ținta e fluxul selectat în bara laterală. „Toate fluxurile" publică global.
+    const created = await publishAnnouncement(notifMessage.trim(), notifType, user?.id ?? null, 7, flowId);
     setCurrentNotif(created ? { message: created.message, type: created.type } : { message: notifMessage.trim(), type: notifType });
     setNotifPublished(true);
     setTimeout(() => setNotifPublished(false), 2000);
   };
 
   const handleDeleteNotif = async () => {
-    await clearAnnouncements();
+    await clearAnnouncements(flowId);
     sessionStorage.removeItem('aa_notification_dismissed');
     setCurrentNotif(null);
     setNotifMessage('');
@@ -274,6 +275,13 @@ export const AdminDashboard: React.FC = () => {
               {notifPublished ? <><Check size={13} /> Publicat</> : 'Publică'}
             </button>
           </div>
+          {/* Ținta anunțului. Fără linia asta, adminul n-are de unde ști că mesajul
+              pleacă doar către fluxul selectat în bara laterală. */}
+          <p style={{ fontSize: 11, color: flowId ? 'var(--accent)' : 'var(--warn)', margin: '8px 0 0', lineHeight: 1.5 }}>
+            {flowId
+              ? `Anunțul merge doar către ${flows.find(f => f.id === flowId)?.name || 'fluxul selectat'}.`
+              : 'Anunțul merge către TOȚI elevii, din toate fluxurile. Selectează un flux în bara laterală ca să-l țintești.'}
+          </p>
         </div>
       </motion.div>
     </div>

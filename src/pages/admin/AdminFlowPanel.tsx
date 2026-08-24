@@ -34,7 +34,7 @@ function isTrackable(l: any) {
 }
 
 export const AdminFlowPanel: React.FC = () => {
-  const { course, courseId } = useAdminCourseScope();
+  const { course, courseId, flow, flowId, flows } = useAdminCourseScope();
   const navigate = useNavigate();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,15 +51,20 @@ export const AdminFlowPanel: React.FC = () => {
         supabase.from('user_roles').select('user_id,role'),
         supabase.from('quiz_responses').select('user_id,answers,profile,completed_at,course_id'),
         supabase.from('progress').select('user_id,lesson_id,completed_at').limit(10000),
-        supabase.from('enrollments').select('user_id,course_id'),
+        supabase.from('enrollments').select('user_id,course_id,flow_id'),
         supabase.from('activity_log').select('user_id,created_at').order('created_at', { ascending: false }).limit(3000),
       ]);
 
       const adminIds = new Set((rolesRes.data || []).filter((r: any) => r.role === 'admin').map((r: any) => r.user_id));
       // Fără tabelul de înscrieri (migrație neaplicată) considerăm toți elevii ca fiind
       // în cursul privit — comportamentul de dinainte de multicurs.
+      // Apelul de grup e al UNUI flux: dacă e selectat unul, cohorta se restrânge la el.
       const enrolled = enrollRes.data
-        ? new Set(enrollRes.data.filter((e: any) => e.course_id === courseId).map((e: any) => e.user_id))
+        ? new Set(
+            enrollRes.data
+              .filter((e: any) => e.course_id === courseId && (!flowId || e.flow_id === flowId))
+              .map((e: any) => e.user_id),
+          )
         : null;
 
       const quizByUser: Record<string, any> = {};
@@ -113,7 +118,7 @@ export const AdminFlowPanel: React.FC = () => {
       setRows(built);
       setLoading(false);
     })();
-  }, [courseId, modules, gateModule]);
+  }, [courseId, flowId, modules, gateModule]);
 
   const filtered = rows.filter(r => {
     if (filter === 'semnale') return (r.profile?.riskFlags || []).length > 0;
@@ -140,10 +145,14 @@ export const AdminFlowPanel: React.FC = () => {
               {course.shortTitle}
             </span>
           )}
+          <span style={{ fontSize: 11, color: flow ? 'var(--accent)' : 'var(--warn)', padding: '2px 8px', borderRadius: 99, border: '1px solid var(--border)' }}>
+            {flow ? flow.name : 'toate fluxurile'}
+          </span>
         </div>
         <p style={{ fontSize: 12.5, color: 'var(--fg-3)', lineHeight: 1.6, maxWidth: 620 }}>
           Unde e fiecare înainte de apelul de grup. Semnalele vin din diagnosticul completat la
           intrare, progresul din lecțiile bifate — nimic nu cere raportare suplimentară de la elev.
+          {!flow && flows.length > 1 && ' Selectează un flux în bara laterală ca să vezi doar cohorta cu care ai apelul.'}
         </p>
       </div>
 
