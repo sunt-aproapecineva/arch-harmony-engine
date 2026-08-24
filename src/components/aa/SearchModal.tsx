@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, BookOpen, Dumbbell } from 'lucide-react';
-import { MODULES } from '../../lib/data';
+import { useCourse } from '../../context/CourseContext';
+import { useLiveContent } from '../../context/LiveContentContext';
+import { courseLessonPath, courseModulePath } from '../../lib/navigation';
 
 interface SearchResult {
   type: 'lesson' | 'exercise';
@@ -14,9 +16,12 @@ interface SearchResult {
   href: string;
 }
 
-function buildIndex(): SearchResult[] {
+// Indexul se construiește la deschidere, nu la încărcarea fișierului: overlay-ul de
+// conținut din DB mutează modulele după boot, iar un index construit prea devreme ar
+// căuta prin titlurile vechi. Se reconstruiește și când se schimbă cursul.
+function buildIndex(modules: any[], course: any): SearchResult[] {
   const results: SearchResult[] = [];
-  for (const mod of MODULES) {
+  for (const mod of modules) {
     for (const lesson of mod.lessons) {
       results.push({
         type: 'lesson',
@@ -25,7 +30,7 @@ function buildIndex(): SearchResult[] {
         moduleTitle: mod.title,
         title: lesson.title,
         description: lesson.description,
-        href: `/lesson/${lesson.id}`,
+        href: courseLessonPath(course, lesson.id),
       });
     }
     for (const ex of mod.exercises) {
@@ -36,14 +41,12 @@ function buildIndex(): SearchResult[] {
         moduleTitle: mod.title,
         title: ex.title,
         description: ex.description,
-        href: `/module/${mod.id}`,
+        href: courseModulePath(course, mod.id),
       });
     }
   }
   return results;
 }
-
-const INDEX = buildIndex();
 
 interface SearchModalProps {
   open: boolean;
@@ -52,12 +55,15 @@ interface SearchModalProps {
 
 export const SearchModal: React.FC<SearchModalProps> = ({ open, onClose }) => {
   const [query, setQuery] = useState('');
+  const { course, modules } = useCourse();
+  const { version } = useLiveContent();
   const navigate = useNavigate();
+  const index = useMemo(() => buildIndex(modules, course), [modules, course, version]);
   const inputRef = useRef<HTMLInputElement>(null);
   const [selected, setSelected] = useState(0);
 
   const results = query.trim().length > 0
-    ? INDEX.filter(item => {
+    ? index.filter(item => {
         const q = query.toLowerCase();
         return (
           item.title.toLowerCase().includes(q) ||

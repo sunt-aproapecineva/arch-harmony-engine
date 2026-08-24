@@ -112,7 +112,7 @@ export const Register: React.FC = () => {
       }
       setError(err);
     } else {
-      navigate('/dashboard');
+      navigate('/');
     }
   };
 

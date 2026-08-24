@@ -12,7 +12,7 @@ export const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
 
   if (!isAdmin) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/" replace />;
   }
 
   const navItems = [
@@ -72,7 +72,7 @@ export const AdminLayout: React.FC = () => {
         {/* Footer */}
         <div style={{ padding: '12px 8px', borderTop: '1px solid var(--border)' }}>
           <NavLink
-            to="/dashboard"
+            to="/"
             style={({ isActive }) => ({
               display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 8, marginBottom: 4,
               textDecoration: 'none', color: 'var(--fg-3)', fontSize: 12, transition: 'all 0.15s',

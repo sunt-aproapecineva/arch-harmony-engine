@@ -1,7 +1,8 @@
 // @ts-nocheck
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { MODULES } from '@/lib/data';
+import { COURSES } from '@/lib/courses';
+import { getCourseModules } from '@/lib/content';
 import { useAuthContext } from '@/context/AuthContext';
 import { CONTENT_SNAPSHOT } from '@/lib/contentSnapshot';
 
@@ -14,10 +15,13 @@ const CACHE_KEY = 'aa_content_overlay_v1';
 
 /**
  * Fetches admin edits from the DB (modules + lessons tables) and overlays them
- * onto the static MODULES structure in place. Matching is positional:
- *   - DB module ↔ static module by `order_index`
- *   - DB lesson ↔ static video lesson (type !== 'exercise') by position
- *     within the module (sorted by order_index)
+ * onto the static course content in place. Matching:
+ *   - DB module ↔ static module by (course_id, order_index)
+ *   - DB lesson ↔ static video lesson by normalized title, then positionally
+ *
+ * IMPORTANT (multicurs): potrivirea se face ÎNTÂI pe curs. Fără asta, modulul cu
+ * order_index 0 din Start ar suprascrie modulul 0 din Business — cursurile își
+ * numerotează modulele fiecare de la zero.
  *
  * Resilience: the fetched payload is cached in localStorage and applied
  * immediately at boot, so a failed / empty / slow network response can never
@@ -27,8 +31,11 @@ const CACHE_KEY = 'aa_content_overlay_v1';
 function overlayContent(dbMods: any[], dbLessons: any[]) {
     if (!dbMods || dbMods.length === 0) return false;
 
-    const dbModByIdx = new Map<number, any>();
-    dbMods.forEach((m: any) => dbModByIdx.set(m.order_index, m));
+    // Rândurile de dinainte de multicurs nu au course_id — sunt, prin definiție, Business.
+    const dbModsByCourse: Record<string, any[]> = {};
+    dbMods.forEach((m: any) => {
+      (dbModsByCourse[m.course_id || 'business'] ||= []).push(m);
+    });
     const dbLessonsByMod: Record<string, any[]> = {};
     (dbLessons || []).forEach((l: any) => {
       (dbLessonsByMod[l.module_id] ||= []).push(l);
@@ -37,7 +44,11 @@ function overlayContent(dbMods: any[], dbLessons: any[]) {
       arr.sort((a: any, b: any) => a.order_index - b.order_index)
     );
 
-    MODULES.forEach((staticMod: any) => {
+    COURSES.forEach((course) => {
+    const dbModByIdx = new Map<number, any>();
+    (dbModsByCourse[course.id] || []).forEach((m: any) => dbModByIdx.set(m.order_index, m));
+
+    getCourseModules(course.id).forEach((staticMod: any) => {
       const dbMod = dbModByIdx.get(staticMod.order_index);
       if (!dbMod) return;
       if (dbMod.title) staticMod.title = dbMod.title;
@@ -90,6 +101,7 @@ function overlayContent(dbMods: any[], dbLessons: any[]) {
         if (db.is_published != null) sl.is_published = db.is_published || !!sl.video_url;
       });
 
+    });
     });
     return true;
 }
@@ -151,7 +163,7 @@ export function LiveContentProvider({ children }: { children: React.ReactNode })
         const [modsRes, lessonsRes] = await Promise.all([
           supabase
             .from('modules')
-            .select('id,order_index,title,subtitle,description,etapa,saptamana')
+            .select('id,course_id,order_index,title,subtitle,description,etapa,saptamana')
             .order('order_index'),
           supabase
             .from('lessons')
@@ -250,7 +262,7 @@ export function LiveContentProvider({ children }: { children: React.ReactNode })
       }}
     >
       {/* key bump remounts the route tree once overrides land, so any
-          component that captured stale MODULES values re-reads them. */}
+          component that captured stale content values re-reads them. */}
       <div key={version} style={{ display: 'contents' }}>
         {children}
       </div>

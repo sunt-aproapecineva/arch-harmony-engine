@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play, Lock, Clock, FileText, ChevronDown, CheckCircle2, Award, ChevronRight, Star, Pencil,
 } from 'lucide-react';
-import { MODULES } from '../lib/data';
+import { useCourse } from '../context/CourseContext';
+import { courseDashboardPath, courseLessonPath } from '../lib/navigation';
 import { useProgress } from '../hooks/useProgress';
 import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
 import { useAuthContext } from '../context/AuthContext';
@@ -16,11 +17,12 @@ export const ModulePage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuthContext();
   const { getModuleProgress, isModuleLocked, isCompleted } = useProgress();
-  const quizDone = hasCompletedOnboarding(user);
+  const { course, courseId, modules } = useCourse();
+  const quizDone = hasCompletedOnboarding(user, courseId);
   const [quizModalOpen, setQuizModalOpen] = useState(false);
 
-  const module = MODULES.find(m => m.id === id);
-  const moduleIndex = MODULES.findIndex(m => m.id === id);
+  const module = modules.find(m => m.id === id);
+  const moduleIndex = modules.findIndex(m => m.id === id);
 
   if (!module) {
     return (
@@ -46,7 +48,7 @@ export const ModulePage: React.FC = () => {
     <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
       {/* Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--fg-3)', marginBottom: 24 }}>
-        <Link to="/dashboard" style={{ color: 'var(--fg-3)', transition: 'color 0.15s' }}
+        <Link to={courseDashboardPath(course)} style={{ color: 'var(--fg-3)', transition: 'color 0.15s' }}
           onMouseEnter={e => (e.currentTarget.style.color = 'var(--fg)')}
           onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-3)')}
         >
@@ -117,7 +119,7 @@ export const ModulePage: React.FC = () => {
         {!locked && module.lessons.length > 0 && (
           <div style={{ marginTop: 20 }}>
             <button
-              onClick={() => navigate(`/lesson/${module.lessons[0].id}`)}
+              onClick={() => navigate(courseLessonPath(course, module.lessons[0].id))}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 padding: '10px 22px', background: 'var(--accent)', color: '#0D0907',
@@ -223,7 +225,7 @@ export const ModulePage: React.FC = () => {
                     <div onClick={() => {
                         if (locked) return;
                         if (!quizDone) { setQuizModalOpen(true); return; }
-                        navigate(`/lesson/${lesson.id}`);
+                        navigate(courseLessonPath(course, lesson.id));
                       }}
                       style={{ flex: 1, marginBottom: 0, padding: '11px 16px', background: 'var(--bg-card)', border: `1px solid ${borderColor}`, borderRadius: 12, cursor: locked ? 'not-allowed' : 'pointer', opacity: locked ? 0.5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, transition: 'border-color 0.15s, background 0.15s' }}
                       onMouseEnter={e => { if (!locked) { (e.currentTarget as HTMLDivElement).style.borderColor = isExLesson ? 'rgba(201,169,110,0.35)' : 'rgba(196,240,228,0.3)'; (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-3)'; }}}

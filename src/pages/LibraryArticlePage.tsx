@@ -1,6 +1,8 @@
 // @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from '@/lib/router-compat';
+import { useCourse } from '../context/CourseContext';
+import { courseLibraryPath } from '../lib/navigation';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { ArrowLeft, Clock, BookOpen, Quote, AlertTriangle, CheckCircle2, XCircle, Target, Users, TrendingDown, Layers, ListChecks } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
@@ -14,6 +16,7 @@ const REGISTRY: Record<string, React.FC> = {
 };
 
 export const LibraryArticlePage: React.FC = () => {
+  const { course } = useCourse();
   const { slug } = useParams() as { slug: string };
   const navigate = useNavigate();
   const { user } = useAuthContext();
@@ -39,7 +42,7 @@ export const LibraryArticlePage: React.FC = () => {
     return (
       <div style={{ padding: '64px 24px', textAlign: 'center' }}>
         <h2 style={{ color: 'var(--fg)' }}>Material indisponibil</h2>
-        <button onClick={() => navigate('/library')} style={{
+        <button onClick={() => navigate(courseLibraryPath(course))} style={{
           marginTop: 16, padding: '8px 16px', borderRadius: 8,
           background: 'var(--bg-3)', border: '1px solid var(--border)', color: 'var(--fg-2)', cursor: 'pointer',
         }}>
@@ -61,7 +64,7 @@ export const LibraryArticlePage: React.FC = () => {
       <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
         {/* Back link */}
         <div style={{ maxWidth: 760, margin: '0 auto', padding: '24px 24px 0' }}>
-          <button onClick={() => navigate('/library')} style={{
+          <button onClick={() => navigate(courseLibraryPath(course))} style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             background: 'transparent', border: 'none', cursor: 'pointer',
             color: 'var(--fg-3)', fontSize: 12, padding: 0,

@@ -1,6 +1,8 @@
 // @ts-nocheck
 import React from 'react';
 import { useNavigate } from '@/lib/router-compat';
+import { useCourse } from '../context/CourseContext';
+import { courseLibraryArticlePath } from '../lib/navigation';
 import { motion } from 'framer-motion';
 import { BookOpen, Clock, Lock, ArrowRight, Sparkles, FileText, Film, Wrench, Briefcase } from 'lucide-react';
 import { LIBRARY_ITEMS, LIBRARY_ACCENT, LibraryItem } from '../lib/libraryData';
@@ -40,7 +42,7 @@ const Card: React.FC<{ item: LibraryItem; index: number }> = ({ item, index }) =
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
       whileHover={disabled ? {} : { y: -3 }}
-      onClick={() => !disabled && navigate(`/library/${item.slug}`)}
+      onClick={() => !disabled && navigate(courseLibraryArticlePath(course, item.slug))}
       style={{
         ...spanStyle(item.span),
         position: 'relative',

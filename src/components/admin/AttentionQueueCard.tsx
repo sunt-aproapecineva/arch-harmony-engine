@@ -4,6 +4,7 @@ import { useServerFn } from '@tanstack/react-start';
 import { useNavigate } from '@/lib/router-compat';
 import { AlertCircle, ChevronRight, RefreshCw } from 'lucide-react';
 import { getAttentionQueue } from '@/lib/studentInsights.functions';
+import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
 import { STATUS_COLOR, STATUS_LABEL } from '@/lib/studentScoring';
 
 const cardStyle: React.CSSProperties = {
@@ -19,11 +20,12 @@ export const AttentionQueueCard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const fn = useServerFn(getAttentionQueue);
+  const { courseId } = useAdminCourseScope();
 
   const load = async () => {
     setLoading(true); setError(null);
     try {
-      const r = await fn({ data: {} });
+      const r = await fn({ data: { courseId } });
       setRows(r || []);
     } catch (e: any) { setError(e?.message || 'Eroare.'); }
     finally { setLoading(false); }

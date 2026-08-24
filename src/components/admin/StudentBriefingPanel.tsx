@@ -10,6 +10,7 @@ import {
   getStudentInsightBundle,
 } from '@/lib/studentInsights.functions';
 import { STATUS_LABEL, STATUS_COLOR, type StudentScores } from '@/lib/studentScoring';
+import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
 
 interface Props {
   studentId: string;
@@ -253,12 +254,13 @@ export const StudentBriefingPanel: React.FC<Props> = ({ studentId, studentName }
   const [error, setError] = useState<string | null>(null);
 
   const fetchBundle = useServerFn(getStudentInsightBundle);
+  const { courseId } = useAdminCourseScope();
   const generateFn = useServerFn(generateStudentInsight);
 
   const load = async () => {
     setLoading(true); setError(null);
     try {
-      const res = await fetchBundle({ data: { studentId } });
+      const res = await fetchBundle({ data: { studentId, courseId } });
       setScores(res.scores);
       setStuck(res.stuckModule);
       if (res.cached) {
@@ -276,7 +278,7 @@ export const StudentBriefingPanel: React.FC<Props> = ({ studentId, studentName }
   const generate = async (force = false) => {
     setGenerating(true); setError(null);
     try {
-      const res = await generateFn({ data: { studentId, force } });
+      const res = await generateFn({ data: { studentId, courseId, force } });
       setSummary(res.summary);
       setGeneratedAt(res.generated_at);
       setModelUsed(res.model_used);

@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from '@/lib/router-compat';
+import { useCourse } from '../../context/CourseContext';
+import { courseModulePath } from '../../lib/navigation';
 import { motion } from 'framer-motion';
 import { Lock, CheckCircle2, ChevronRight, BookOpen, Pencil } from 'lucide-react';
 import { Module } from '../../lib/types';
@@ -14,6 +16,7 @@ interface Props {
 
 export const ModuleCard: React.FC<Props> = ({ module: mod, progress, locked, active, index }) => {
   const navigate = useNavigate();
+  const { course } = useCourse();
   const done = progress === 100;
 
   const borderColor = done
@@ -30,7 +33,7 @@ export const ModuleCard: React.FC<Props> = ({ module: mod, progress, locked, act
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.06 }}
       whileHover={!locked ? { y: -2 } : undefined}
-      onClick={() => !locked && navigate(`/module/${mod.id}`)}
+      onClick={() => !locked && navigate(courseModulePath(course, mod.id))}
       style={{
         background: 'var(--bg-card)',
         border: `1px solid ${borderColor}`,

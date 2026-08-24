@@ -1,4 +1,17 @@
+// @ts-nocheck
+// Compatibilitate cu ruta de dinainte de multicurs.
 import { createFileRoute } from "@tanstack/react-router";
-import { LibraryPage } from "@/pages/LibraryPage";
+import { Navigate } from "@/lib/router-compat";
+import { useAuth } from "@/hooks/useAuth";
+import { enrolledCourses } from "@/lib/enrollments";
+import { coursePath } from "@/lib/navigation";
 
-export const Route = createFileRoute("/_app/library/")({ component: LibraryPage });
+function Legacy() {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  const courses = enrolledCourses(user?.enrollments);
+  if (courses.length !== 1) return <Navigate to="/cursuri" replace />;
+  return <Navigate to={coursePath(courses[0], 'library')} replace />;
+}
+
+export const Route = createFileRoute("/_app/library/")({ component: Legacy });

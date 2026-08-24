@@ -9,7 +9,9 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { MockUser, Progress } from '../../lib/types';
-import { MODULES } from '../../lib/data';
+import { getCourseModules } from '../../lib/content';
+import { useAdminCourseScope } from '../../hooks/useAdminCourseScope';
+import { courseModulePath } from '../../lib/navigation';
 import { TariffBadge } from '../../components/aa/TariffBadge';
 import { ProgressBar } from '../../components/aa/ProgressBar';
 import { getActivityForUser, ActivityEvent, timeAgo, ActivityType } from '../../lib/activity';
@@ -289,6 +291,8 @@ function renderReadableAnswer(
 
 // ── Main component ────────────────────────────────────────────────────────────
 export const AdminStudentProfile: React.FC = () => {
+  const { courseId } = useAdminCourseScope();
+  const courseModules = getCourseModules(courseId);
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
 
@@ -314,7 +318,7 @@ export const AdminStudentProfile: React.FC = () => {
     setRecoveringDrafts(true);
     setRecoveryMessage(null);
     try {
-      const exerciseIds = MODULES.flatMap((m: any) => (m.exercises || []).map((ex: any) => ex.id));
+      const exerciseIds = courseModules.flatMap((m: any) => (m.exercises || []).map((ex: any) => ex.id));
       const responses: { exercise_id: string; response: any }[] = [];
       exerciseIds.forEach((exerciseId: string) => {
         const candidateKeys = [`aa_ex_${userId}_${exerciseId}`, `aa_ex_anon_${exerciseId}`, `aa_ex_${exerciseId}`];
@@ -405,7 +409,7 @@ export const AdminStudentProfile: React.FC = () => {
     );
   }
 
-  const allLessons = MODULES.flatMap(m => m.lessons).filter(isVideoLesson);
+  const allLessons = courseModules.flatMap(m => m.lessons).filter(isVideoLesson);
   const videoLessonIds = new Set(allLessons.map((l: any) => l.id));
   const totalLessons = allLessons.length;
   const completedCount = progress.filter((p: any) => videoLessonIds.has(p.lesson_id)).length;
@@ -702,7 +706,7 @@ export const AdminStudentProfile: React.FC = () => {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} style={cardStyle}>
         <div style={sectionLabel}>Progres per modul</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {MODULES.map(mod => {
+          {courseModules.map(mod => {
             const done = mod.lessons.filter(l => progress.some(p => p.lesson_id === l.id)).length;
             const total = mod.lessons.length;
             const pct = total > 0 ? Math.round((done / total) * 100) : 0;
@@ -712,7 +716,7 @@ export const AdminStudentProfile: React.FC = () => {
               <div key={mod.id}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                   <button
-                    onClick={() => navigate(`/module/${mod.id}`)}
+                    onClick={() => navigate(courseModulePath(courseId, mod.id))}
                     style={{
                       background: 'none', border: 'none', cursor: 'pointer',
                       fontSize: 13, color: 'var(--fg)', fontWeight: 500, padding: 0,
@@ -802,7 +806,7 @@ export const AdminStudentProfile: React.FC = () => {
       {/* ── Section 5: Notes per lesson ── */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} style={cardStyle}>
         <div style={sectionLabel}>Notițe</div>
-        {MODULES.map(mod => {
+        {courseModules.map(mod => {
           const notesInModule = mod.lessons.map(l => ({
             lesson: l,
             note: notesByLesson[l.id] || '',
@@ -852,7 +856,7 @@ export const AdminStudentProfile: React.FC = () => {
         <div style={sectionLabel}>Răspunsuri exerciții</div>
 
         {(() => {
-          const exerciseLessons = MODULES.flatMap(m => m.lessons.filter((l: any) => l.type === 'exercise' && l.exercise_id));
+          const exerciseLessons = courseModules.flatMap(m => m.lessons.filter((l: any) => l.type === 'exercise' && l.exercise_id));
           const totalEx = exerciseLessons.length;
           const completedLessons = exerciseLessons.filter((l: any) => progress.some(p => p.lesson_id === l.id));
           const completedEx = Object.keys(exercisesById).length;
@@ -882,7 +886,7 @@ export const AdminStudentProfile: React.FC = () => {
           );
         })()}
 
-        {MODULES.map(mod => {
+        {courseModules.map(mod => {
           const exWithAnswers = ((mod as any).exercises || []).map((ex: any) => ({
             ex,
             parsed: exercisesById[ex.id],

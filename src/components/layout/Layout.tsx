@@ -7,11 +7,15 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { NotificationBanner } from '../aa/NotificationBanner';
 import { LayoutDashboard, BookOpen, FolderOpen, ShieldCheck, Library } from 'lucide-react';
 import { useAuthContext } from '../../context/AuthContext';
+import { useCourse } from '../../context/CourseContext';
+import { courseDashboardPath, courseDocumentsPath, courseLibraryPath, courseModulePath } from '../../lib/navigation';
 
 const SIDEBAR_KEY = 'aa_sidebar_open';
 
 export const Layout: React.FC = () => {
   const { isAdmin, user } = useAuthContext();
+  const { course, modules, tariff: courseTariff } = useCourse();
+  const firstModulePath = modules.length ? courseModulePath(course, modules[0].id) : courseDashboardPath(course);
   const isMobile = () => window.innerWidth < 768;
 
   // Desktop: persisted open/closed. Mobile: always starts closed.
@@ -97,10 +101,12 @@ export const Layout: React.FC = () => {
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}>
             {[
-              { to: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Acasă' },
-              { to: '/module/mod-0', icon: <BookOpen size={20} />, label: 'Lecții' },
-              { to: '/documents', icon: <FolderOpen size={20} />, label: 'Documente' },
-              ...(user?.tariff === 'arhitect' ? [{ to: '/library', icon: <Library size={20} />, label: 'Bibliotecă' }] : []),
+              { to: courseDashboardPath(course), icon: <LayoutDashboard size={20} />, label: 'Acasă' },
+              // Primul modul al cursului. Înainte era hardcodat '/module/mod-0', un id
+              // care nu există (modulele se numesc 'm-0'), deci tabul ducea în gol.
+              { to: firstModulePath, icon: <BookOpen size={20} />, label: 'Lecții' },
+              { to: courseDocumentsPath(course), icon: <FolderOpen size={20} />, label: 'Documente' },
+              ...(courseTariff === 'arhitect' ? [{ to: courseLibraryPath(course), icon: <Library size={20} />, label: 'Bibliotecă' }] : []),
               ...(isAdmin ? [{ to: '/admin', icon: <ShieldCheck size={20} />, label: 'Admin' }] : []),
             ].map(({ to, icon, label }) => (
               <NavLink

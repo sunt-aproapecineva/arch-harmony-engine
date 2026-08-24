@@ -37,3 +37,11 @@ export function getCourseLiveEvents(courseId: CourseId | string | null | undefin
 export function allCourseModules(): Array<{ courseId: CourseId; modules: Module[] }> {
   return COURSES.map(c => ({ courseId: c.id, modules: MODULES_BY_COURSE[c.id] }));
 }
+
+/**
+ * Toate modulele tuturor cursurilor, aplatizate. DOAR pentru căutări după id
+ * (id-urile de lecție/exercițiu sunt unice global). Niciodată pentru procente.
+ */
+export function allModulesFlat(): Module[] {
+  return COURSES.flatMap(c => MODULES_BY_COURSE[c.id]);
+}

@@ -8,7 +8,8 @@ import {
 import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
 import { useAuthContext } from '../context/AuthContext';
 import { useProgress } from '../hooks/useProgress';
-import { MODULES, LIVE_EVENTS } from '../lib/data';
+import { useCourse } from '../context/CourseContext';
+import { courseLessonPath, courseModulePath, courseQuizPath } from '../lib/navigation';
 import { ModuleCard } from '../components/aa/ModuleCard';
 import { ProgressRing } from '../components/aa/ProgressRing';
 import { useCounter } from '../hooks/useCounter';
@@ -78,19 +79,20 @@ export const Dashboard: React.FC = () => {
   const { getModuleProgress, getOverallProgress, isModuleLocked, getCompletedLessonsCount, getTotalLessonsCount } = useProgress();
   const navigate = useNavigate();
 
-  const quizDone = hasCompletedOnboarding(user);
+  const { course, courseId, modules, liveEvents } = useCourse();
+  const quizDone = hasCompletedOnboarding(user, courseId);
   const [quizModalOpen, setQuizModalOpen] = useState(false);
 
   const overallPct = getOverallProgress();
   const completedLessons = getCompletedLessonsCount();
   const totalLessons = getTotalLessonsCount();
-  const completedModules = MODULES.filter(m => getModuleProgress(m.id) === 100).length;
+  const completedModules = modules.filter(m => getModuleProgress(m.id) === 100).length;
 
   const animatedLessons = useCounter(completedLessons, 1000, 150);
   const animatedPct = useCounter(overallPct, 1100, 200);
   const animatedModules = useCounter(completedModules, 900, 250);
 
-  const currentModule = MODULES.find((m, i) => !isModuleLocked(i) && getModuleProgress(m.id) < 100) || MODULES[0];
+  const currentModule = modules.find((m, i) => !isModuleLocked(i) && getModuleProgress(m.id) < 100) || modules[0];
   const currentLesson = currentModule.lessons[0];
   const currentProgress = getModuleProgress(currentModule.id);
 
@@ -99,11 +101,11 @@ export const Dashboard: React.FC = () => {
 
   const today = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
   const upcomingEvents = useMemo(() =>
-    LIVE_EVENTS.filter(ev => new Date(ev.date) >= today)
+    liveEvents.filter(ev => new Date(ev.date) >= today)
       .sort((a, b) => a.date.localeCompare(b.date)), [today]);
   const nextEvent = upcomingEvents[0];
 
-  const moduleUnlocks = MODULES
+  const moduleUnlocks = modules
     .filter(m => m.unlockDate)
     .map(m => ({ date: m.unlockDate!, title: m.title, moduleId: m.id }));
 
@@ -148,7 +150,7 @@ export const Dashboard: React.FC = () => {
                 <div style={{ fontSize: 12, color: 'var(--fg-3)' }}>Completează formularul de onboarding pentru a debloca toate modulele.</div>
               </div>
             </div>
-            <button onClick={() => navigate('/quiz')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'var(--gold)', color: '#0D0907', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>
+            <button onClick={() => navigate(courseQuizPath(course))} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'var(--gold)', color: '#0D0907', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>
               Completează acum <ArrowRight size={13} />
             </button>
           </motion.div>
@@ -215,7 +217,7 @@ export const Dashboard: React.FC = () => {
                 )}
 
                 <button
-                  onClick={() => currentLesson && navigate(`/lesson/${currentLesson.id}`)}
+                  onClick={() => currentLesson && navigate(courseLessonPath(course, currentLesson.id))}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 8,
                     padding: '11px 22px', background: 'var(--accent)', color: '#0D0907',
@@ -321,7 +323,7 @@ export const Dashboard: React.FC = () => {
         {/* ── STATS ROW ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }} className="stats-grid">
           <StatCard icon={<BookOpen size={16} />} value={`${animatedLessons}/${totalLessons}`} label="Lecții finalizate" delay={0.13} accent sub={completedLessons > 0 ? `+${completedLessons} completate` : undefined} />
-          <StatCard icon={<Layers size={16} />} value={`${animatedModules}/${MODULES.length}`} label="Module finalizate" delay={0.17} sub={completedModules > 0 ? 'Progres bun!' : 'Începe primul'} />
+          <StatCard icon={<Layers size={16} />} value={`${animatedModules}/${modules.length}`} label="Module finalizate" delay={0.17} sub={completedModules > 0 ? 'Progres bun!' : 'Începe primul'} />
           <StatCard icon={<TrendingUp size={16} />} value={`${animatedPct}%`} label="Progres global" delay={0.21} accent sub={overallPct >= 50 ? '🔥 Peste jumătate!' : undefined} />
           <StatCard icon={<CheckCircle2 size={16} />} value={currentModule.lessons.length + '/' + currentModule.lessons.length} label={`Lecții în ${currentModule.etapa}`} delay={0.25} sub="Modul curent" />
         </div>
@@ -336,7 +338,7 @@ export const Dashboard: React.FC = () => {
               <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>{overallPct}% total</span>
             </div>
             <div style={{ padding: '8px 0' }}>
-              {MODULES.map((mod, idx) => {
+              {modules.map((mod, idx) => {
                 const pct = getModuleProgress(mod.id);
                 const locked = isModuleLocked(idx);
                 const done = pct === 100;
@@ -344,7 +346,7 @@ export const Dashboard: React.FC = () => {
                 return (
                   <div
                     key={mod.id}
-                    onClick={() => !locked && navigate(`/module/${mod.id}`)}
+                    onClick={() => !locked && navigate(courseModulePath(course, mod.id))}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 14, padding: '10px 24px',
                       cursor: locked ? 'not-allowed' : 'pointer', opacity: locked ? 0.45 : 1,
@@ -406,7 +408,7 @@ export const Dashboard: React.FC = () => {
               Calendar program
             </h3>
           </div>
-          <Calendar events={LIVE_EVENTS} moduleUnlocks={moduleUnlocks} />
+          <Calendar events={liveEvents} moduleUnlocks={moduleUnlocks} />
         </motion.div>
 
         {/* ── MODULE GRID ── */}
@@ -415,10 +417,10 @@ export const Dashboard: React.FC = () => {
             <h3 className="font-aboreto" style={{ fontSize: 11, letterSpacing: '0.1em', color: 'var(--fg-3)', textTransform: 'uppercase' }}>
               Toate modulele
             </h3>
-            <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>{completedModules}/{MODULES.length} finalizate</span>
+            <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>{completedModules}/{modules.length} finalizate</span>
           </div>
           <div className="module-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
-            {MODULES.map((mod, idx) => (
+            {modules.map((mod, idx) => (
               <div key={mod.id} onClick={!quizDone ? (e) => { e.preventDefault(); e.stopPropagation(); setQuizModalOpen(true); } : undefined}>
                 <ModuleCard
                   module={mod}

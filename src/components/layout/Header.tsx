@@ -4,6 +4,8 @@ import { Link, NavLink, useNavigate } from '@/lib/router-compat';
 import { Sun, Moon, Menu, PanelLeftClose, PanelLeftOpen, ChevronDown, LogOut, ShieldCheck, Search } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuthContext } from '../../context/AuthContext';
+import { useCourse } from '../../context/CourseContext';
+import { courseDashboardPath } from '../../lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SearchModal } from '../aa/SearchModal';
 import { TariffBadge } from '../aa/TariffBadge';
@@ -14,12 +16,13 @@ interface HeaderProps { onMenuToggle?: () => void; sidebarOpen?: boolean; }
 export const Header: React.FC<HeaderProps> = ({ onMenuToggle, sidebarOpen }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout, isAdmin } = useAuthContext();
+  const { course, tariff: courseTariff } = useCourse();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const initial = (user?.full_name || user?.email || 'U').charAt(0).toUpperCase();
-  const tariff = (user?.tariff || 'student') as Tariff;
+  const tariff = (courseTariff || user?.tariff || 'student') as Tariff;
 
   useEffect(() => {
     const fn = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false); };
@@ -70,7 +73,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, sidebarOpen }) => 
 
       {/* Nav links */}
       <nav style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-        <NavLink to="/dashboard" style={({ isActive }) => navStyle(isActive)}>Dashboard</NavLink>
+        <NavLink to={courseDashboardPath(course)} style={({ isActive }) => navStyle(isActive)}>Dashboard</NavLink>
         <NavLink to="/module/mod-0" style={({ isActive }) => navStyle(isActive)}>Programă</NavLink>
         {isAdmin && (
           <NavLink to="/admin" style={({ isActive }) => navStyle(isActive, true)}>

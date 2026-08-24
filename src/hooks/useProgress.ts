@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { Progress } from '../lib/types';
 import { supabase, isMockMode } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { MODULES } from '../lib/data';
+import { useCourse } from '../context/CourseContext';
+import { getCourseModules } from '../lib/content';
 
 const STORAGE_PROGRESS_KEY = 'aa_progress';
 
@@ -46,8 +47,21 @@ function saveMockProgress(progress: Progress[]) {
   } catch {}
 }
 
-export function useProgress() {
+/**
+ * Progresul elevului, întotdeauna raportat la UN curs.
+ *
+ * Rândurile din `progress` sunt globale (id-urile de lecție sunt unice între cursuri),
+ * dar procentele NU au voie să fie: un elev cu Business terminat și Start abia început
+ * ar apărea la 50% și ar intra fals în coada de atenție. De aceea fiecare calcul
+ * pornește de la modulele cursului curent.
+ *
+ * @param explicitCourseId cursul de raportat; implicit cel din ruta curentă.
+ */
+export function useProgress(explicitCourseId?: string) {
   const { user } = useAuthContext();
+  const { courseId: contextCourseId } = useCourse();
+  const courseId = explicitCourseId || contextCourseId;
+  const modules = getCourseModules(courseId);
   const [progress, setProgress] = useState<Progress[]>([]);
   const [exerciseDone, setExerciseDone] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -195,9 +209,33 @@ export function useProgress() {
   // video lessons that actually have a video URL + exercise lesson pages.
   const getModuleProgress = useCallback(
     (moduleId: string) => {
-      const mod = MODULES.find((m) => m.id === moduleId);
+      const mod = modules.find((m) => m.id === moduleId);
       if (!mod) return 0;
       const trackableLessons = mod.lessons.filter(isTrackableLesson);
+      const total = trackableLessons.length;
+      if (total === 0) return 0;
+      const lessonsDone = trackableLessons.filter((l) => isCompleted(l.id)).length;
+      return Math.round((lessonsDone / total) * 100);
+    },
+    [isCompleted, modules]
+  );
+
+  const isModuleFullyDone = useCallback(
+    (moduleId: string) => {
+      const mod = modules.find((m) => m.id === moduleId);
+      if (!mod) return false;
+      const trackableLessons = mod.lessons.filter(isTrackableLesson);
+      return trackableLessons.length > 0 && trackableLessons.every((l) => isCompleted(l.id));
+    },
+    [isCompleted, modules]
+  );
+
+  /** Procentul într-un curs oarecare — folosit de ecranul de selecție a cursului. */
+  const getOverallProgressFor = useCallback(
+    (targetCourseId: string) => {
+      const trackableLessons = getCourseModules(targetCourseId)
+        .flatMap((m) => m.lessons)
+        .filter(isTrackableLesson);
       const total = trackableLessons.length;
       if (total === 0) return 0;
       const lessonsDone = trackableLessons.filter((l) => isCompleted(l.id)).length;
@@ -206,30 +244,17 @@ export function useProgress() {
     [isCompleted]
   );
 
-  const isModuleFullyDone = useCallback(
-    (moduleId: string) => {
-      const mod = MODULES.find((m) => m.id === moduleId);
-      if (!mod) return false;
-      const trackableLessons = mod.lessons.filter(isTrackableLesson);
-      return trackableLessons.length > 0 && trackableLessons.every((l) => isCompleted(l.id));
-    },
-    [isCompleted]
+  const getOverallProgress = useCallback(
+    () => (courseId ? getOverallProgressFor(courseId) : 0),
+    [courseId, getOverallProgressFor]
   );
-
-  const getOverallProgress = useCallback(() => {
-    const trackableLessons = MODULES.flatMap((m) => m.lessons).filter(isTrackableLesson);
-    const total = trackableLessons.length;
-    if (total === 0) return 0;
-    const lessonsDone = trackableLessons.filter((l) => isCompleted(l.id)).length;
-    return Math.round((lessonsDone / total) * 100);
-  }, [isCompleted]);
 
 
   // A module is locked only until its scheduled unlock date begins
   // (start of day in Bucharest for the configured date).
   const isModuleLocked = useCallback(
     (moduleIndex: number): boolean => {
-      const mod = MODULES[moduleIndex];
+      const mod = modules[moduleIndex];
       if (!mod) return true;
 
       if (mod.unlockDate) {
@@ -240,16 +265,16 @@ export function useProgress() {
 
       return false;
     },
-    []
+    [modules]
   );
 
   const getCompletedLessonsCount = useCallback(() => {
-    const videoLessonIds = new Set(MODULES.flatMap((m) => m.lessons).filter(hasVideo).map((l) => l.id));
+    const videoLessonIds = new Set(modules.flatMap((m) => m.lessons).filter(hasVideo).map((l) => l.id));
     return progress.filter((p) => videoLessonIds.has(p.lesson_id)).length;
-  }, [progress]);
+  }, [progress, modules]);
   const getTotalLessonsCount = useCallback(
-    () => MODULES.flatMap((m) => m.lessons).filter(hasVideo).length,
-    []
+    () => modules.flatMap((m) => m.lessons).filter(hasVideo).length,
+    [modules]
   );
 
   return {
@@ -264,6 +289,7 @@ export function useProgress() {
     isModuleFullyDone,
     getModuleProgress,
     getOverallProgress,
+    getOverallProgressFor,
     isModuleLocked,
     getCompletedLessonsCount,
     getTotalLessonsCount,

@@ -3,6 +3,7 @@ import { useNavigate } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Play, FileText, Award } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
+import { resolveLandingPath } from '../lib/navigation';
 
 // ─── Building Blocks Animation ────────────────────────────────────────────────
 const BuildingBlocks: React.FC = () => {
@@ -299,7 +300,9 @@ export const OnboardingWizard: React.FC = () => {
       localStorage.setItem(`aa_welcome_shown_${user.id}`, '1');
     }
     localStorage.setItem('aa_wizard_done', '1');
-    navigate('/quiz');
+    // Turul e la nivel de platformă, nu de curs: îl trimitem în aterizarea lui
+    // normală, care decide singură între cursul unic și ecranul de selecție.
+    navigate(resolveLandingPath(user));
   };
 
   const steps = [

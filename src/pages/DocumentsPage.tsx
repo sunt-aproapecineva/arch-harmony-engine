@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { readLocalDocs, writeLocalDocs, hydrateDocsFromCloud, pushDocsToCloud } from '../lib/documentSync';
 import { useNavigate, useSearchParams } from '@/lib/router-compat';
+import { useCourse } from '../context/CourseContext';
+import { courseDocumentFillPath } from '../lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, FileText, Printer, Pencil, Trash2, FolderOpen, ExternalLink, X } from 'lucide-react';
 import { PLATFORM_DOCUMENTS, PlatformDocument, openPrintWindow } from '../lib/documentData';
@@ -65,6 +67,7 @@ const DOC_PAGE_COUNTS: Record<string, number> = {
 // ─── Template Card ────────────────────────────────────────────────────────────
 
 const TemplateCard: React.FC<{ doc: PlatformDocument; index: number }> = ({ doc, index }) => {
+  const { course } = useCourse();
   const navigate = useNavigate();
   const c = BRAND_COLOR[doc.color];
   const pages = DOC_PAGE_COUNTS[doc.id];
@@ -152,7 +155,7 @@ const TemplateCard: React.FC<{ doc: PlatformDocument; index: number }> = ({ doc,
           </button>
 
           <button
-            onClick={() => navigate(`/documents/${doc.id}/fill`)}
+            onClick={() => navigate(courseDocumentFillPath(course, doc.id))}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
               padding: '7px 13px', fontSize: 11, fontWeight: 700, letterSpacing: '0.03em',
@@ -180,6 +183,7 @@ const SavedDocCard: React.FC<{
   onDelete: (id: string) => void;
 }> = ({ doc, isNew, onDelete }) => {
   const navigate = useNavigate();
+  const { course } = useCourse();
   const c = BRAND_COLOR[doc.color];
 
   const date = new Date(doc.generatedAt).toLocaleDateString('ro-RO', {
@@ -259,7 +263,7 @@ const SavedDocCard: React.FC<{
           </button>
 
           <button
-            onClick={() => navigate(`/documents/${doc.docId}/fill?edit=${doc.id}`)}
+            onClick={() => navigate(`${courseDocumentFillPath(course, doc.docId)}?edit=${doc.id}`)}
             title="Editează"
             style={{
               width: 32, height: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',

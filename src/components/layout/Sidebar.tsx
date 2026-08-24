@@ -1,10 +1,13 @@
 // @ts-nocheck
 import React from 'react';
 import { NavLink, useNavigate } from '@/lib/router-compat';
-import { Lock, CheckCircle2, LogOut, FolderOpen, Library, Archive } from 'lucide-react';
-import { MODULES } from '../../lib/data';
+import { Lock, CheckCircle2, LogOut, FolderOpen, Library, Archive, ChevronsUpDown } from 'lucide-react';
 import { useProgress } from '../../hooks/useProgress';
 import { useAuthContext } from '../../context/AuthContext';
+import { useCourse } from '../../context/CourseContext';
+import { courseDocumentsPath, courseLibraryPath, courseMaterialsPath, courseModulePath } from '../../lib/navigation';
+import { COURSE_ACCENT } from '../../lib/courses';
+import { enrolledCourses } from '../../lib/enrollments';
 import { TariffBadge } from '../aa/TariffBadge';
 import { TelegramButton } from '../aa/TelegramButton';
 import { Tariff } from '../../lib/types';
@@ -16,9 +19,14 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const { getModuleProgress, isModuleLocked } = useProgress();
   const { user, logout } = useAuthContext();
+  const { course, modules, tariff: courseTariff } = useCourse();
   const navigate = useNavigate();
   const initial = (user?.full_name || user?.email || 'U').charAt(0).toUpperCase();
-  const tariff = (user?.tariff || 'student') as Tariff;
+  // Tariful afișat e cel de la cursul curent, nu cel vechi de pe profil.
+  const tariff = (courseTariff || user?.tariff || 'student') as Tariff;
+  // Comutatorul de curs apare doar dacă elevul chiar are unde comuta.
+  const canSwitchCourse = (user?.role === 'admin') || enrolledCourses(user?.enrollments).length > 1;
+  const accent = COURSE_ACCENT[course?.accent || 'accent'];
 
   return (
     <div style={{
@@ -41,13 +49,43 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
             <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--fg-3)', lineHeight: 1.3 }}>AFACERII</div>
           </div>
         </div>
+
+        {/* Cursul curent + comutator. Fără asta, un elev cu două programe nu are
+            de unde ști în care se află. */}
+        {course && (
+          canSwitchCourse ? (
+            <NavLink
+              to="/cursuri"
+              onClick={onClose}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
+                marginTop: 12, padding: '6px 9px', borderRadius: 8, textDecoration: 'none',
+                background: accent.dim, border: '1px solid var(--border)',
+              }}
+              title="Schimbă programul"
+            >
+              <span style={{ fontSize: 11, fontWeight: 600, color: accent.fg, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {course.shortTitle}
+              </span>
+              <ChevronsUpDown size={12} style={{ color: 'var(--fg-3)', flexShrink: 0 }} />
+            </NavLink>
+          ) : (
+            <div style={{
+              marginTop: 12, padding: '6px 9px', borderRadius: 8,
+              background: accent.dim, border: '1px solid var(--border)',
+              fontSize: 11, fontWeight: 600, color: accent.fg,
+            }}>
+              {course.shortTitle}
+            </div>
+          )
+        )}
       </div>
 
       {/* Module nav */}
       <nav style={{ flex: 1, overflowY: 'auto', padding: '12px 8px' }}>
         {/* Documents link */}
         <NavLink
-          to="/documents"
+          to={courseDocumentsPath(course)}
           onClick={onClose}
           style={({ isActive }) => ({
             display: 'flex', alignItems: 'center', gap: 8,
@@ -76,7 +114,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         {/* Library — Arhitect only */}
         {tariff === 'arhitect' && (
           <NavLink
-            to="/library"
+            to={courseLibraryPath(course)}
             onClick={onClose}
             style={({ isActive }) => ({
               display: 'flex', alignItems: 'center', gap: 8,
@@ -113,7 +151,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
 
         {/* Materialele mele */}
         <NavLink
-          to="/materials"
+          to={courseMaterialsPath(course)}
           onClick={onClose}
           style={({ isActive }) => ({
             display: 'flex', alignItems: 'center', gap: 8,
@@ -143,14 +181,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-3)', padding: '4px 8px 8px' }}>
           Curriculum
         </div>
-        {MODULES.map((mod, idx) => {
+        {modules.map((mod, idx) => {
           const progress = getModuleProgress(mod.id);
           const locked = isModuleLocked(idx);
           const done = progress === 100;
           return (
             <NavLink
               key={mod.id}
-              to={`/module/${mod.id}`}
+              to={courseModulePath(course, mod.id)}
               onClick={onClose}
               style={({ isActive }) => ({
                 display: 'flex', alignItems: 'center', gap: 8,

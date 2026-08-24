@@ -1,11 +1,14 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from '@/lib/router-compat';
+import { useCourse } from '../../context/CourseContext';
+import { courseQuizPath } from '../../lib/navigation';
 import { ClipboardList, X, ArrowRight, Lock } from 'lucide-react';
 
 interface Props { open: boolean; onClose: () => void; }
 
 export const QuizRequiredModal: React.FC<Props> = ({ open, onClose }) => {
+  const { course } = useCourse();
   const navigate = useNavigate();
   return (
     <AnimatePresence>
@@ -72,7 +75,7 @@ export const QuizRequiredModal: React.FC<Props> = ({ open, onClose }) => {
                 Înapoi
               </button>
               <button
-                onClick={() => { onClose(); navigate('/quiz'); }}
+                onClick={() => { onClose(); navigate(courseQuizPath(course)); }}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 22px', background: 'var(--accent)', color: '#0D0907', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 700, boxShadow: '0 4px 20px rgba(196,240,228,0.25)', transition: 'filter 0.15s' }}
                 onMouseEnter={e => e.currentTarget.style.filter = 'brightness(1.08)'}
                 onMouseLeave={e => e.currentTarget.style.filter = ''}

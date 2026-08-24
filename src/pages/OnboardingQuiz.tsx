@@ -1,5 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from '@/lib/router-compat';
+import { useCourse } from '../context/CourseContext';
+import { courseDashboardPath } from '../lib/navigation';
+import { markOnboardingDoneLocally } from '../lib/access';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
@@ -154,6 +157,7 @@ type AnswerValue = string | string[] | number;
 
 // ─── Result Screen ────────────────────────────────────────────────────────────
 const ResultScreen: React.FC<{ answers: Record<string, AnswerValue> }> = ({ answers }) => {
+  const { course } = useCourse();
   const navigate = useNavigate();
   const domain = answers['q1'] as string || '—';
   const years = answers['q2'] as string || '—';
@@ -205,7 +209,7 @@ const ResultScreen: React.FC<{ answers: Record<string, AnswerValue> }> = ({ answ
       </div>
 
       <button
-        onClick={() => navigate('/dashboard')}
+        onClick={() => navigate(courseDashboardPath(course))}
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 10,
           padding: '14px 32px', background: '#C4F0E4', color: '#0D0907',
@@ -227,6 +231,7 @@ type QuizScreen = 'welcome' | 'intro' | 'questions' | 'result';
 
 export const OnboardingQuiz: React.FC = () => {
   const { user } = useAuthContext();
+  const { course, courseId } = useCourse();
 
   const getInitialScreen = (): QuizScreen => {
     if (!user) return 'intro';
@@ -293,28 +298,31 @@ export const OnboardingQuiz: React.FC = () => {
       Object.keys(otherValues).forEach(id => {
         if (otherValues[id]) finalAnswers[id] = otherValues[id];
       });
-      if (user) {
+      if (user && courseId) {
+        // Flagul local e per curs: quizul de Business nu deschide practicumul de Start.
+        markOnboardingDoneLocally(user.id, courseId);
         try {
-          localStorage.setItem(`aa_quiz_done_${user.id}`, '1');
-          localStorage.setItem(`aa_quiz_answers_${user.id}`, JSON.stringify(finalAnswers));
+          localStorage.setItem(`aa_quiz_answers_${user.id}_${courseId}`, JSON.stringify(finalAnswers));
         } catch {}
         try {
           const profile = generateProfile(finalAnswers as any);
           await supabase.from('quiz_responses').upsert({
             user_id: user.id,
+            course_id: courseId,
             answers: finalAnswers,
             profile: profile as any,
             completed_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-          }, { onConflict: 'user_id' });
+          }, { onConflict: 'user_id,course_id' });
         } catch (e) { /* best-effort */ }
         logActivity({
           userId: user.id,
           userEmail: user.email,
           userName: user.full_name,
           type: 'quiz_complete',
-          label: `${user.full_name} a finalizat quiz-ul de onboarding`,
+          label: `${user.full_name} a finalizat diagnosticul${course ? ` · ${course.shortTitle}` : ''}`,
           data: {
+            courseId,
             urgency: String(finalAnswers.q15 || ''),
             domain: String(finalAnswers.q1 || ''),
           },

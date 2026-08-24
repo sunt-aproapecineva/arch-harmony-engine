@@ -3,7 +3,7 @@
 // materialsExport.ts — AA-branded HTML/print exports for user materials
 // Uses the same visual shell as Documents (openPrintWindow + AA branding)
 // ─────────────────────────────────────────────────────────────────────────────
-import { MODULES } from './data';
+import { allModulesFlat } from './content';
 import { EXERCISE_TEMPLATES as EXERCISES } from './exerciseData';
 import { formatLessonNumber, getModuleNumber } from './lessonNumbering';
 import {
@@ -18,15 +18,18 @@ import {
 
 // ─── Lookups ─────────────────────────────────────────────────────────────────
 
+// Căutare după id, nu agregare: id-urile sunt unice între cursuri, deci e corect
+// să căutăm în tot conținutul — un material exportat își găsește lecția indiferent
+// de cursul din care vine.
 function findLesson(lessonId: string) {
-  for (const mod of MODULES) {
+  for (const mod of allModulesFlat()) {
     const l = mod.lessons.find((x: any) => x.id === lessonId);
     if (l) return { mod, lesson: l };
   }
   return null;
 }
 function findExercise(exId: string) {
-  for (const mod of MODULES) {
+  for (const mod of allModulesFlat()) {
     const l = mod.lessons.find((x: any) => x.exercise_id === exId);
     if (l) return { mod, lesson: l, exercise: EXERCISES.find((e: any) => e.id === exId || e.exerciseId === exId) };
   }

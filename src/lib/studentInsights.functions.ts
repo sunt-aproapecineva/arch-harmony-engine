@@ -13,16 +13,18 @@ async function ensureAdmin(ctx: any) {
 }
 
 // ── Helpers to collect a student's full footprint ────────────────────────────
-async function gatherStudent(admin: any, studentId: string) {
+// Briefingul e întotdeauna despre UN curs: un elev poate fi la zi cu Business și
+// abia început la Start, iar un scor combinat n-ar spune nimic supervizorului.
+async function gatherStudent(admin: any, studentId: string, courseId: string) {
   const [profileRes, progressRes, quizRes, notesRes, exRes, activityRes, modulesRes, lessonsRes] =
     await Promise.all([
       admin.from('profiles').select('id,email,full_name,tariff,created_at').eq('id', studentId).maybeSingle(),
       admin.from('progress').select('lesson_id,completed_at').eq('user_id', studentId),
-      admin.from('quiz_responses').select('answers,completed_at').eq('user_id', studentId).maybeSingle(),
+      admin.from('quiz_responses').select('answers,completed_at').eq('user_id', studentId).eq('course_id', courseId).maybeSingle(),
       admin.from('lesson_notes').select('lesson_id,content,updated_at').eq('user_id', studentId),
       admin.from('exercise_responses').select('exercise_id,response,updated_at').eq('user_id', studentId),
       admin.from('activity_log').select('created_at,type,label').eq('user_id', studentId).order('created_at', { ascending: false }).limit(500),
-      admin.from('modules').select('id,title,etapa,order_index').order('order_index'),
+      admin.from('modules').select('id,title,etapa,order_index').eq('course_id', courseId).order('order_index'),
       admin.from('lessons').select('id,module_id,title,order_index,video_url').order('order_index'),
     ]);
 
@@ -36,8 +38,8 @@ async function gatherStudent(admin: any, studentId: string) {
   const lessons = allLessons.filter((l: any) => !!(l.video_url && String(l.video_url).trim()));
   // Exercise IDs come from code (data.ts), not from the DB `exercises` table:
   // student answers are stored under the code IDs (e-0-1, ex-8-1-…).
-  const staticExByOrder = staticExercisesByModuleOrder();
-  const exercises = allStaticExercises();
+  const staticExByOrder = staticExercisesByModuleOrder(courseId);
+  const exercises = allStaticExercises(courseId);
   const lessonsByMod: Record<string, any[]> = {};
   lessons.forEach((l: any) => { (lessonsByMod[l.module_id] ||= []).push(l); });
   const mods = modules.map((m: any) => ({
@@ -79,14 +81,18 @@ async function gatherStudent(admin: any, studentId: string) {
 // ── getStudentInsightBundle ──────────────────────────────────────────────────
 export const getStudentInsightBundle = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ studentId: z.string().uuid() }).parse(input))
+  .inputValidator((input: unknown) => z.object({
+    studentId: z.string().uuid(),
+    courseId: z.string().default('business'),
+  }).parse(input))
   .handler(async ({ data, context }) => {
     const admin = await ensureAdmin(context);
-    const gathered = await gatherStudent(admin, data.studentId);
+    const gathered = await gatherStudent(admin, data.studentId, data.courseId);
     const { data: insight } = await admin
       .from('student_insights')
       .select('summary,scores,model_used,generated_at,updated_at')
       .eq('user_id', data.studentId)
+      .eq('course_id', data.courseId)
       .maybeSingle();
     return {
       scores: gathered.scores,
@@ -221,6 +227,7 @@ export const generateStudentInsight = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({
     studentId: z.string().uuid(),
+    courseId: z.string().default('business'),
     force: z.boolean().optional(),
   }).parse(input))
   .handler(async ({ data, context }) => {
@@ -232,6 +239,7 @@ export const generateStudentInsight = createServerFn({ method: 'POST' })
         .from('student_insights')
         .select('summary,scores,model_used,generated_at,updated_at')
         .eq('user_id', data.studentId)
+        .eq('course_id', data.courseId)
         .maybeSingle();
       if (cached && cached.summary && cached.generated_at) {
         const ageH = (Date.now() - new Date(cached.generated_at).getTime()) / 3600000;
@@ -239,7 +247,7 @@ export const generateStudentInsight = createServerFn({ method: 'POST' })
       }
     }
 
-    const gathered = await gatherStudent(admin, data.studentId);
+    const gathered = await gatherStudent(admin, data.studentId, data.courseId);
     const prompt = buildPrompt({
       profile: gathered.profile,
       mods: gathered.mods,
@@ -285,6 +293,7 @@ export const generateStudentInsight = createServerFn({ method: 'POST' })
 
     const upsertPayload = {
       user_id: data.studentId,
+      course_id: data.courseId,
       summary,
       scores: gathered.scores,
       model_used: model,
@@ -293,7 +302,7 @@ export const generateStudentInsight = createServerFn({ method: 'POST' })
     };
     const { error: upErr } = await admin
       .from('student_insights')
-      .upsert(upsertPayload, { onConflict: 'user_id' });
+      .upsert(upsertPayload, { onConflict: 'user_id,course_id' });
     if (upErr) throw new Error(upErr.message);
 
     return { ...upsertPayload, fromCache: false };
@@ -350,9 +359,12 @@ export const deleteSupervisorNote = createServerFn({ method: 'POST' })
 // ── Attention queue ──────────────────────────────────────────────────────────
 export const getAttentionQueue = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
-  .inputValidator(() => ({}))
-  .handler(async ({ context }) => {
+  .inputValidator((input: unknown) => z.object({
+    courseId: z.string().default('business'),
+  }).parse(input ?? {}))
+  .handler(async ({ data, context }) => {
     const admin = await ensureAdmin(context);
+    const courseId = data.courseId;
 
     const [profilesRes, rolesRes, progressRes, exRes, notesRes, activityRes, quizRes, modulesRes, lessonsRes] =
       await Promise.all([
@@ -362,8 +374,8 @@ export const getAttentionQueue = createServerFn({ method: 'POST' })
         admin.from('exercise_responses').select('user_id,exercise_id,response').limit(10000),
         admin.from('lesson_notes').select('user_id,content').limit(10000),
         admin.from('activity_log').select('user_id,created_at').order('created_at', { ascending: false }).limit(5000),
-        admin.from('quiz_responses').select('user_id'),
-        admin.from('modules').select('id,title,etapa,order_index').order('order_index'),
+        admin.from('quiz_responses').select('user_id').eq('course_id', courseId),
+        admin.from('modules').select('id,title,etapa,order_index').eq('course_id', courseId).order('order_index'),
         admin.from('lessons').select('id,module_id,order_index,video_url').order('order_index'),
       ]);
 
@@ -373,8 +385,8 @@ export const getAttentionQueue = createServerFn({ method: 'POST' })
     const modules = (modulesRes.data || []) as any[];
     const allLessons = (lessonsRes.data || []) as any[];
     const lessons = allLessons.filter((l: any) => !!(l.video_url && String(l.video_url).trim()));
-    const staticExByOrder = staticExercisesByModuleOrder();
-    const exercises = allStaticExercises();
+    const staticExByOrder = staticExercisesByModuleOrder(courseId);
+    const exercises = allStaticExercises(courseId);
     const lessonsByMod: Record<string, any[]> = {};
     lessons.forEach((l: any) => { (lessonsByMod[l.module_id] ||= []).push(l); });
     const mods = modules.map((m: any) => ({

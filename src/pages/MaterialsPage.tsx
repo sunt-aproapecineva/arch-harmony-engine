@@ -1,11 +1,13 @@
 // @ts-nocheck
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from '@/lib/router-compat';
+import { useCourse } from '../context/CourseContext';
+import { courseLessonPath, courseDocumentFillPath } from '../lib/navigation';
 import { motion } from 'framer-motion';
 import { FileText, StickyNote, Download, ChevronRight, FolderOpen, BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/context/AuthContext';
-import { MODULES } from '@/lib/data';
+import { allModulesFlat } from '@/lib/content';
 
 import { PLATFORM_DOCUMENTS as DOCUMENTS } from '@/lib/documentData';
 import { formatLessonNumber, getModuleNumber } from '@/lib/lessonNumbering';
@@ -16,15 +18,16 @@ type Tab = 'exercitii' | 'notite' | 'documente';
 interface ExRow { exercise_id: string; response: any; updated_at: string | null; }
 interface NoteRow { lesson_id: string; content: string; updated_at: string | null; }
 
+// Căutări după id, nu agregări: id-urile sunt unice între cursuri.
 function findLessonByExerciseId(exId: string) {
-  for (const mod of MODULES) {
+  for (const mod of allModulesFlat()) {
     const l = mod.lessons.find((x: any) => x.exercise_id === exId);
     if (l) return { mod, lesson: l };
   }
   return null;
 }
 function findLesson(lessonId: string) {
-  for (const mod of MODULES) {
+  for (const mod of allModulesFlat()) {
     const l = mod.lessons.find((x: any) => x.id === lessonId);
     if (l) return { mod, lesson: l };
   }
@@ -53,6 +56,7 @@ function TabButton({ active, onClick, icon: Icon, label, count }: any) {
 }
 
 export const MaterialsPage: React.FC = () => {
+  const { course, courseId, modules } = useCourse();
   const { user } = useAuthContext();
   const [tab, setTab] = useState<Tab>('exercitii');
   const [exercises, setExercises] = useState<ExRow[]>([]);
@@ -79,35 +83,42 @@ export const MaterialsPage: React.FC = () => {
     })();
   }, [user?.id]);
 
+  // Materialele se arată doar pentru cursul curent. Răspunsurile elevului sunt
+  // globale în DB (chei text unice), dar pagina asta e sub /c/<curs>/materials —
+  // un exercițiu de la Start n-are ce căuta în materialele de la Business.
+  const moduleIdsOfCourse = useMemo(() => new Set(modules.map((m: any) => m.id)), [modules]);
+
   // Group by module
   const exByModule = useMemo(() => {
     const map = new Map<string, { mod: any; items: ExRow[] }>();
     for (const r of exercises) {
       const found = findLessonByExerciseId(r.exercise_id);
-      if (!found) continue;
+      if (!found || !moduleIdsOfCourse.has(found.mod.id)) continue;
       const key = found.mod.id;
       if (!map.has(key)) map.set(key, { mod: found.mod, items: [] });
       map.get(key)!.items.push(r);
     }
     return [...map.values()].sort((a, b) => a.mod.order_index - b.mod.order_index);
-  }, [exercises]);
+  }, [exercises, moduleIdsOfCourse]);
 
   const notesByModule = useMemo(() => {
     const map = new Map<string, { mod: any; items: NoteRow[] }>();
     for (const r of notes) {
       const found = findLesson(r.lesson_id);
-      if (!found) continue;
+      if (!found || !moduleIdsOfCourse.has(found.mod.id)) continue;
       const key = found.mod.id;
       if (!map.has(key)) map.set(key, { mod: found.mod, items: [] });
       map.get(key)!.items.push(r);
     }
     return [...map.values()].sort((a, b) => a.mod.order_index - b.mod.order_index);
-  }, [notes]);
+  }, [notes, moduleIdsOfCourse]);
 
+  // Exportul în bloc respectă același filtru — altfel PDF-ul „materialele mele de la
+  // Business" ar conține și răspunsurile de la Start.
   const handleExportAll = () => {
     exportAllPDF({
-      exercises: exercises.map(e => ({ id: e.exercise_id, response: e.response })),
-      notes: notes.map(n => ({ lesson_id: n.lesson_id, content: n.content })),
+      exercises: exByModule.flatMap(g => g.items).map(e => ({ id: e.exercise_id, response: e.response })),
+      notes: notesByModule.flatMap(g => g.items).map(n => ({ lesson_id: n.lesson_id, content: n.content })),
     });
   };
 
@@ -166,7 +177,7 @@ export const MaterialsPage: React.FC = () => {
                     num={formatLessonNumber(found.mod, found.lesson)}
                     title={found.lesson.title}
                     subtitle={r.updated_at ? `Actualizat ${new Date(r.updated_at).toLocaleDateString('ro-RO')}` : ''}
-                    href={`/lesson/${found.lesson.id}`}
+                    href={courseLessonPath(course, found.lesson.id)}
                     onDownload={() => exportExercisePDF(r.exercise_id, r.response)}
                   />
                 );
@@ -194,7 +205,7 @@ export const MaterialsPage: React.FC = () => {
                     num={formatLessonNumber(found.mod, found.lesson)}
                     title={found.lesson.title}
                     subtitle={preview + (r.content.length > 100 ? '…' : '')}
-                    href={`/lesson/${found.lesson.id}`}
+                    href={courseLessonPath(course, found.lesson.id)}
                     onDownload={() => exportNotePDF(r.lesson_id, r.content)}
                   />
                 );
@@ -209,7 +220,7 @@ export const MaterialsPage: React.FC = () => {
         <div style={{ marginTop: 24 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
             {DOCUMENTS.map((d: any) => (
-              <Link key={d.id} to={`/documents/${d.id}/fill`}
+              <Link key={d.id} to={courseDocumentFillPath(course, d.id)}
                 style={{
                   display: 'block', padding: 16, borderRadius: 12,
                   background: 'var(--bg-card)', border: '1px solid var(--border)',

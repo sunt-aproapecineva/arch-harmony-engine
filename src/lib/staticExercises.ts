@@ -1,7 +1,9 @@
 // Single source of truth for exercise IDs used by student responses.
+// Întotdeauna per curs: id-urile sunt unice global, dar agregările (scoring, briefing,
+// cozi de atenție) trebuie raportate la conținutul unui singur curs.
 // The DB `exercises` table uses generated UUIDs, while `exercise_responses`
 // stores the code-level IDs (e-0-1, ex-8-1-…). Scoring must use these.
-import { MODULES } from './data';
+import { getCourseModules } from './content';
 
 export interface StaticExerciseRef {
   id: string;
@@ -9,9 +11,9 @@ export interface StaticExerciseRef {
   moduleOrder: number;
 }
 
-export function staticExercisesByModuleOrder(): Record<number, StaticExerciseRef[]> {
+export function staticExercisesByModuleOrder(courseId: string): Record<number, StaticExerciseRef[]> {
   const out: Record<number, StaticExerciseRef[]> = {};
-  for (const m of MODULES as any[]) {
+  for (const m of getCourseModules(courseId) as any[]) {
     const order = m.order_index ?? 0;
     const list: StaticExerciseRef[] = [];
     const seen = new Set<string>();
@@ -27,6 +29,6 @@ export function staticExercisesByModuleOrder(): Record<number, StaticExerciseRef
   return out;
 }
 
-export function allStaticExercises(): StaticExerciseRef[] {
-  return Object.values(staticExercisesByModuleOrder()).flat();
+export function allStaticExercises(courseId: string): StaticExerciseRef[] {
+  return Object.values(staticExercisesByModuleOrder(courseId)).flat();
 }

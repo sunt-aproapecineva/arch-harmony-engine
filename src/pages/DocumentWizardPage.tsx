@@ -1,6 +1,8 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from '@/lib/router-compat';
+import { useCourse } from '../context/CourseContext';
+import { courseDocumentsPath } from '../lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, FileText, ArrowLeft, Printer } from 'lucide-react';
 import { PLATFORM_DOCUMENTS, openPrintWindow } from '../lib/documentData';
@@ -8,6 +10,7 @@ import { useAuthContext } from '../context/AuthContext';
 import { readLocalDocs, saveDocEntry, hydrateDocsFromCloud } from '../lib/documentSync';
 
 export function DocumentWizardPage() {
+  const { course } = useCourse();
   const { docId } = useParams<{ docId: string }>();
   const navigate = useNavigate();
   const { user } = useAuthContext();
@@ -36,7 +39,7 @@ export function DocumentWizardPage() {
     return (
       <div style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px' }}>
         <Link
-          to="/documents"
+          to={courseDocumentsPath(course)}
           style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--fg-3)', fontSize: 13, textDecoration: 'none', marginBottom: 24 }}
         >
           <ArrowLeft size={14} />
@@ -119,7 +122,7 @@ export function DocumentWizardPage() {
       {/* Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 28, fontSize: 13, color: 'var(--fg-3)' }}>
         <Link
-          to="/documents"
+          to={courseDocumentsPath(course)}
           style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: 'var(--fg-3)', textDecoration: 'none' }}
         >
           <ArrowLeft size={14} />
@@ -268,7 +271,7 @@ export function DocumentWizardPage() {
           </button>
         ) : (
           <Link
-            to="/documents"
+            to={courseDocumentsPath(course)}
             style={{
               display: 'inline-flex',
               alignItems: 'center',

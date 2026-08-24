@@ -7,7 +7,8 @@ import {
   ExternalLink, ChevronDown, Lock, ClipboardList, ArrowRight,
   Pencil, Clock, BookOpen, Hand,
 } from 'lucide-react';
-import { MODULES } from '../lib/data';
+import { useCourse } from '../context/CourseContext';
+import { courseDashboardPath, courseModulePath, courseLessonPath, courseQuizPath, courseDocumentsPath, courseMaterialsPath } from '../lib/navigation';
 import { Lesson, Module } from '../lib/types';
 import { useProgress } from '../hooks/useProgress';
 import { Confetti } from '../components/aa/Confetti';
@@ -47,6 +48,7 @@ const LessonSidebar: React.FC<{
   isCompleted: (id: string) => boolean;
 }> = ({ module, currentId, isCompleted }) => {
   const navigate = useNavigate();
+  const { course } = useCourse();
   return (
     <div style={{
       background: 'var(--bg-card)', border: '1px solid var(--border)',
@@ -63,7 +65,7 @@ const LessonSidebar: React.FC<{
           return (
             <button
               key={l.id}
-              onClick={() => navigate(`/lesson/${l.id}`)}
+              onClick={() => navigate(courseLessonPath(course, l.id))}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', gap: 8,
                 padding: '7px 10px', borderRadius: 8, cursor: 'pointer', textAlign: 'left',
@@ -105,11 +107,12 @@ const NavButtons: React.FC<{
   module: Module;
 }> = ({ prev, next, nextModuleLesson, nextModuleTitle, module }) => {
   const navigate = useNavigate();
+  const { course } = useCourse();
   return (
     <div style={{ display: 'flex', alignItems: 'stretch', gap: 12, paddingTop: 20, borderTop: '1px solid var(--border)' }}>
       <div style={{ flex: 1 }}>
         {prev ? (
-          <button onClick={() => navigate(`/lesson/${prev.id}`)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, cursor: 'pointer', textAlign: 'left', transition: 'border-color 0.15s' }}
+          <button onClick={() => navigate(courseLessonPath(course, prev.id))} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, cursor: 'pointer', textAlign: 'left', transition: 'border-color 0.15s' }}
             onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--border-hi)')}
             onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}>
             <ChevronLeft size={16} style={{ color: 'var(--fg-3)', flexShrink: 0 }} />
@@ -119,7 +122,7 @@ const NavButtons: React.FC<{
             </span>
           </button>
         ) : (
-          <button onClick={() => navigate(`/module/${module.id}`)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, cursor: 'pointer', transition: 'border-color 0.15s' }}
+          <button onClick={() => navigate(courseModulePath(course, module.id))} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, cursor: 'pointer', transition: 'border-color 0.15s' }}
             onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--border-hi)')}
             onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}>
             <ChevronLeft size={16} style={{ color: 'var(--fg-3)' }} />
@@ -129,7 +132,7 @@ const NavButtons: React.FC<{
       </div>
       <div style={{ flex: 1 }}>
         {next ? (
-          <button onClick={() => navigate(`/lesson/${next.id}`)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, padding: '12px 14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, cursor: 'pointer', textAlign: 'right', transition: 'border-color 0.15s' }}
+          <button onClick={() => navigate(courseLessonPath(course, next.id))} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, padding: '12px 14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, cursor: 'pointer', textAlign: 'right', transition: 'border-color 0.15s' }}
             onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--border-hi)')}
             onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}>
             <span>
@@ -141,7 +144,7 @@ const NavButtons: React.FC<{
             <ChevronRight size={16} style={{ color: 'var(--fg-3)', flexShrink: 0 }} />
           </button>
         ) : nextModuleLesson ? (
-          <button onClick={() => navigate(`/lesson/${nextModuleLesson.id}`)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, padding: '12px 14px', background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)', borderRadius: 10, cursor: 'pointer', textAlign: 'right', transition: 'background 0.15s' }}
+          <button onClick={() => navigate(courseLessonPath(course, nextModuleLesson.id))} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, padding: '12px 14px', background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)', borderRadius: 10, cursor: 'pointer', textAlign: 'right', transition: 'background 0.15s' }}
             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(196,240,228,0.18)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'var(--accent-dim)')}>
             <span>
@@ -205,6 +208,7 @@ const CompleteButton: React.FC<{
 export const LessonPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { course, courseId, modules } = useCourse();
   const { markComplete, unmarkComplete, markExerciseComplete, unmarkExerciseComplete, isCompleted, isModuleLocked } = useProgress();
   const { user } = useAuthContext();
   const [completing, setCompleting] = useState(false);
@@ -224,7 +228,7 @@ export const LessonPage: React.FC = () => {
   // press "finalizat". Throttled to once/day per lesson & module.
   useEffect(() => {
     if (!user || !id) return;
-    const l = MODULES.flatMap(m => m.lessons).find(x => x.id === id);
+    const l = modules.flatMap(m => m.lessons).find(x => x.id === id);
     if (!l) return;
     logActivityOnce(`view_${id}`, {
       userId: user.id, userEmail: user.email, userName: user.full_name,
@@ -247,7 +251,7 @@ export const LessonPage: React.FC = () => {
   let module: Module | null = null;
   let lessonIndex = -1;
 
-  for (const mod of MODULES) {
+  for (const mod of modules) {
     const idx = mod.lessons.findIndex(l => l.id === id);
     if (idx !== -1) { lesson = mod.lessons[idx]; module = mod; lessonIndex = idx; break; }
   }
@@ -261,7 +265,7 @@ export const LessonPage: React.FC = () => {
   }
 
   // Quiz lock
-  const quizDone = hasCompletedOnboarding(user);
+  const quizDone = hasCompletedOnboarding(user, courseId);
   if (!quizDone) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400, padding: 24 }}>
@@ -271,7 +275,7 @@ export const LessonPage: React.FC = () => {
           </div>
           <h2 className="font-aboreto" style={{ fontSize: 20, color: 'var(--fg)', marginBottom: 10 }}>Completează formularul de acces</h2>
           <p style={{ fontSize: 14, color: 'var(--fg-3)', lineHeight: 1.65, marginBottom: 24 }}>Trebuie să completezi formularul de onboarding înainte de a accesa lecțiile.</p>
-          <button onClick={() => navigate('/quiz')} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '11px 24px', background: 'var(--accent)', color: '#0D0907', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14, fontWeight: 700 }}>
+          <button onClick={() => navigate(courseQuizPath(course))} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '11px 24px', background: 'var(--accent)', color: '#0D0907', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14, fontWeight: 700 }}>
             Completează acum <ArrowRight size={15} />
           </button>
         </motion.div>
@@ -280,7 +284,7 @@ export const LessonPage: React.FC = () => {
   }
 
   // Module lock
-  const moduleIdx = MODULES.findIndex(m => m.id === module!.id);
+  const moduleIdx = modules.findIndex(m => m.id === module!.id);
   if (isModuleLocked(moduleIdx)) {
     const unlockDate = module.unlockDate
       ? new Date(module.unlockDate).toLocaleDateString('ro-RO', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -295,7 +299,7 @@ export const LessonPage: React.FC = () => {
           <p style={{ fontSize: 14, color: 'var(--fg-3)', lineHeight: 1.65, marginBottom: 24 }}>
             {unlockDate ? <>Modulul <strong style={{ color: 'var(--fg-2)' }}>{module.title}</strong> se deblochează pe <strong style={{ color: 'var(--gold)' }}>{unlockDate}</strong>.</> : <>Modulul este încă indisponibil.</>}
           </p>
-          <button onClick={() => navigate('/dashboard')} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border)', color: 'var(--fg-2)', borderRadius: 10, cursor: 'pointer', fontSize: 13 }}>
+          <button onClick={() => navigate(courseDashboardPath(course))} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border)', color: 'var(--fg-2)', borderRadius: 10, cursor: 'pointer', fontSize: 13 }}>
             <ChevronLeft size={14} /> Înapoi la dashboard
           </button>
         </motion.div>
@@ -306,8 +310,8 @@ export const LessonPage: React.FC = () => {
   const done = isCompleted(lesson.id);
   const prevLesson = lessonIndex > 0 ? module.lessons[lessonIndex - 1] : null;
   const nextLesson = lessonIndex < module.lessons.length - 1 ? module.lessons[lessonIndex + 1] : null;
-  const moduleIndex = MODULES.findIndex(m => m.id === module!.id);
-  const nextModule = moduleIndex < MODULES.length - 1 ? MODULES[moduleIndex + 1] : null;
+  const moduleIndex = modules.findIndex(m => m.id === module!.id);
+  const nextModule = moduleIndex < modules.length - 1 ? modules[moduleIndex + 1] : null;
   const nextModuleLesson = nextModule?.lessons[0] || null;
 
   const trackableLessons = module.lessons.filter(isTrackableTimelineItem);
@@ -390,12 +394,12 @@ export const LessonPage: React.FC = () => {
         <div style={{ maxWidth: 1060, margin: '0 auto', padding: '40px 24px 60px' }}>
           {/* Breadcrumb */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--fg-3)', marginBottom: 16, flexWrap: 'wrap' }}>
-            <Link to="/dashboard" style={{ color: 'var(--fg-3)', transition: 'color 0.15s' }}
+            <Link to={courseDashboardPath(course)} style={{ color: 'var(--fg-3)', transition: 'color 0.15s' }}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--fg)')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-3)')}>
               Dashboard
             </Link>
             <ChevronRight size={12} />
-            <Link to={`/module/${module.id}`} style={{ color: 'var(--fg-3)', transition: 'color 0.15s' }}
+            <Link to={courseModulePath(course, module.id)} style={{ color: 'var(--fg-3)', transition: 'color 0.15s' }}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--fg)')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-3)')}>
               {module.title}
             </Link>
@@ -486,12 +490,12 @@ export const LessonPage: React.FC = () => {
     <div style={{ maxWidth: 820, margin: '0 auto', padding: '32px 24px' }}>
       {/* Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--fg-3)', marginBottom: 12, flexWrap: 'wrap' }}>
-        <Link to="/dashboard" style={{ color: 'var(--fg-3)', transition: 'color 0.15s' }}
+        <Link to={courseDashboardPath(course)} style={{ color: 'var(--fg-3)', transition: 'color 0.15s' }}
           onMouseEnter={e => (e.currentTarget.style.color = 'var(--fg)')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-3)')}>
           Dashboard
         </Link>
         <ChevronRight size={12} />
-        <Link to={`/module/${module.id}`} style={{ color: 'var(--fg-3)', transition: 'color 0.15s' }}
+        <Link to={courseModulePath(course, module.id)} style={{ color: 'var(--fg-3)', transition: 'color 0.15s' }}
           onMouseEnter={e => (e.currentTarget.style.color = 'var(--fg)')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-3)')}>
           {module.title}
         </Link>
@@ -647,7 +651,7 @@ export const LessonPage: React.FC = () => {
                 ))}
               </div>
               <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)', fontSize: 11, color: 'var(--fg-3)' }}>
-                Poți completa aceste documente direct pe platformă din pagina <a href="/documents" style={{ color: '#C9A96E', textDecoration: 'underline' }}>Documente</a>.
+                Poți completa aceste documente direct pe platformă din pagina <a href={courseDocumentsPath(course)} style={{ color: '#C9A96E', textDecoration: 'underline' }}>Documente</a>.
               </div>
             </motion.div>
           )}
@@ -697,7 +701,7 @@ export const LessonPage: React.FC = () => {
                       ) : (
                         <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>{note ? `${note.length} caractere · autosave activ` : 'Se salvează automat pe măsură ce scrii'}</span>
                       )}
-                      <a href="/materials" style={{ fontSize: 11, color: 'var(--accent)', textDecoration: 'none' }}>
+                      <a href={courseMaterialsPath(course)} style={{ fontSize: 11, color: 'var(--accent)', textDecoration: 'none' }}>
                         Toate notițele →
                       </a>
                     </div>

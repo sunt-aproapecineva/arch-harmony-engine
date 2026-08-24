@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, X, ExternalLink, Download } from 'lucide-react';
-import { LiveEvent } from '../../lib/data';
+import { LiveEvent } from '../../lib/types';
 
 interface ModuleUnlock {
   date: string;
