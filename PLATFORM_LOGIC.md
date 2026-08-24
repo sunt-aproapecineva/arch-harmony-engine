@@ -29,6 +29,10 @@ Supabase (Lovable Cloud) pentru auth + date, CSS custom cu tokens (fără Tailwi
 | 15 | Admin / Supervisor cockpit | date agregate | `student_insights`, `supervisor_notes` | `lib/studentInsights.functions.ts`, `lib/studentScoring.ts`, `pages/admin/*` |
 | 16 | Reset parolă (OTP) | email | Supabase Auth OTP | `pages/ForgotPassword.tsx`, `pages/ResetPassword.tsx` |
 | 17 | Rutare & gating | URL | `_app` / `admin` guards | `src/routes/*` |
+| 18 | Infrastructură email | evenimente auth/app | coadă pgmq + pg_cron | `src/routes/lovable/email/queue/process.ts` |
+| 19 | Onboarding wizard & anunțuri | prima vizită / update-uri | flag local + config static | `pages/OnboardingWizard.tsx`, `components/aa/NotificationBanner.tsx` |
+| 20 | Recuperare răspunsuri (admin) | export local al elevului | `exercise_responses` | `lib/adminRecovery.functions.ts` |
+| 21 | Căutare globală | Cmd/Ctrl+K | conținut în memorie | `components/aa/SearchModal.tsx` |
 
 ---
 
@@ -201,6 +205,40 @@ compatibilitate. Nu se face niciodată reset doar pe baza prezenței în whiteli
 - `src/lib/router-compat.tsx` oferă `Navigate`/helpers în stil react-router peste TanStack Router
   (moștenire din migrare) — **nu** se instalează `react-router-dom`.
 
+## 18. Infrastructura de email
+
+Emailurile (auth + tranzacționale) intră într-o coadă **pgmq** din DB; un job **pg_cron**
+apelează endpointul public `src/routes/lovable/email/queue/process.ts`, care le trimite prin
+`@lovable.dev/email-js` de pe domeniul verificat `notificari.live.morarvictor.com`.
+Jobul cron și secretul din vault sunt configurate **în afara migrațiilor** (nu se regăsesc în
+`supabase/migrations`), deci un reset de DB nu le recreează automat.
+
+## 19. Onboarding wizard & anunțuri
+
+`/welcome` (`OnboardingWizard.tsx`) rulează o singură dată per utilizator, marcat de flagul
+local `aa_wizard_done`; nu e un gate de rută, ci un tur ghidat. `NotificationBanner` +
+`OnboardingGuideModal` afișează anunțuri/carduri de update definite static în cod
+(fără tabel în DB), deci un anunț nou = un deploy.
+
+## 20. Recuperarea răspunsurilor (admin)
+
+`adminRecovery.functions.ts` permite adminului să importe în `exercise_responses` un export
+din `localStorage`-ul elevului (cazuri în care sincronizarea cloud a eșuat pe dispozitivul lui).
+Este server function protejată, cu verificare de rol admin.
+
+## 21. Căutare globală
+
+`SearchModal` (Cmd/Ctrl+K) caută în modulele, lecțiile, documentele și articolele deja
+încărcate în memorie (nu face query în DB) — de aceea rezultatele respectă exact
+straturile de conținut din §4.
+
+## Notă importantă despre ID-urile exercițiilor
+
+Tabelul DB `exercises` are UUID-uri generate, dar răspunsurile elevilor se salvează pe
+**ID-urile din cod** (`e-0-1`, `ex-8-1-…`). Orice agregare (scoring, briefing, cozi de atenție)
+trebuie să numere exercițiile din `src/lib/staticExercises.ts` (derivat din `data.ts`),
+**nu** din tabelul `exercises`; altfel raportează 0 exerciții completate.
+
 ---
 
 ## Invariante de respectat la orice modificare
@@ -213,3 +251,4 @@ compatibilitate. Nu se face niciodată reset doar pe baza prezenței în whiteli
 5. Orice tabel nou în `public`: `CREATE TABLE` → `GRANT` → `ENABLE RLS` → policies.
 6. Fără culori hardcodate în componente — doar tokenii de design.
 7. Documentele și exporturile folosesc același template brandat; niciun stil nou ad-hoc.
+8. Exercițiile se numără din cod (`staticExercises.ts`), niciodată din tabelul `exercises`.
