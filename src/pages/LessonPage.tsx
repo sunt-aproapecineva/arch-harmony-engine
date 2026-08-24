@@ -12,7 +12,7 @@ import { Lesson, Module } from '../lib/types';
 import { useProgress } from '../hooks/useProgress';
 import { Confetti } from '../components/aa/Confetti';
 import { useAuthContext } from '../context/AuthContext';
-import { logActivity } from '../lib/activity';
+import { logActivity, logActivityOnce } from '../lib/activity';
 import { ExerciseBlock } from '../components/exercises/ExerciseBlock';
 import { flushExerciseResponse, getStoredExerciseResponse } from '../lib/exerciseSync';
 import { hasCompletedOnboarding } from '../lib/access';
@@ -164,8 +164,9 @@ const CompleteButton: React.FC<{
   showConfetti: boolean;
   onComplete: () => void;
   onConfettiDone: () => void;
+  onUndo?: () => void;
   isExercise?: boolean;
-}> = ({ done, justCompleted, completing, showConfetti, onComplete, onConfettiDone, isExercise }) => (
+}> = ({ done, justCompleted, completing, showConfetti, onComplete, onConfettiDone, onUndo, isExercise }) => (
   <div style={{ position: 'relative' }}>
     {showConfetti && <Confetti onDone={onConfettiDone} />}
     <AnimatePresence mode="wait">
@@ -173,7 +174,16 @@ const CompleteButton: React.FC<{
         <motion.div key="done" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
           style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.25)', borderRadius: 12, color: 'var(--ok)', fontSize: 14, fontWeight: 600 }}>
           <CheckCircle2 size={18} />
-          {isExercise ? 'Exercițiu finalizat' : 'Lecție finalizată'}
+          <span style={{ flex: 1 }}>{isExercise ? 'Exercițiu finalizat' : 'Lecție finalizată'}</span>
+          {onUndo && (
+            <button
+              onClick={onUndo}
+              disabled={completing}
+              style={{ background: 'none', border: 'none', color: 'var(--fg-3)', fontSize: 12, cursor: completing ? 'not-allowed' : 'pointer', textDecoration: 'underline', padding: 0 }}
+            >
+              Anulează finalizarea
+            </button>
+          )}
         </motion.div>
       ) : (
         <motion.button key="btn" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -195,7 +205,7 @@ const CompleteButton: React.FC<{
 export const LessonPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { markComplete, isCompleted, isModuleLocked } = useProgress();
+  const { markComplete, unmarkComplete, markExerciseComplete, unmarkExerciseComplete, isCompleted, isModuleLocked } = useProgress();
   const { user } = useAuthContext();
   const [completing, setCompleting] = useState(false);
   const [justCompletedLessonId, setJustCompletedLessonId] = useState<string | null>(null);
@@ -209,6 +219,26 @@ export const LessonPage: React.FC = () => {
     setShowConfetti(false);
     setCompleteError(null);
   }, [id]);
+
+  // Activity signal: a student who reads lessons is active even if they never
+  // press "finalizat". Throttled to once/day per lesson & module.
+  useEffect(() => {
+    if (!user || !id) return;
+    const l = MODULES.flatMap(m => m.lessons).find(x => x.id === id);
+    if (!l) return;
+    logActivityOnce(`view_${id}`, {
+      userId: user.id, userEmail: user.email, userName: user.full_name,
+      type: 'lesson_view',
+      label: `${user.full_name} a deschis "${l.title}"`,
+      data: { lessonId: l.id, lessonTitle: l.title, moduleId: l.module_id },
+    });
+    logActivityOnce(`module_${l.module_id}`, {
+      userId: user.id, userEmail: user.email, userName: user.full_name,
+      type: 'module_view',
+      label: `${user.full_name} lucrează la un modul`,
+      data: { moduleId: l.module_id },
+    });
+  }, [user, id]);
 
   const { note, setNote, status: noteStatus } = useLessonNote(user?.id, id);
   const [notesOpen, setNotesOpen] = useState(false);
@@ -300,14 +330,42 @@ export const LessonPage: React.FC = () => {
         await flushExerciseResponse(lesson!.exercise_id, exerciseDraft);
       }
       await markComplete(lesson!.id);
+      if (lesson!.type === 'exercise' && lesson!.exercise_id) {
+        await markExerciseComplete(lesson!.exercise_id);
+      }
       setJustCompletedLessonId(lesson!.id);
       setShowConfetti(true);
       if (user && lesson) {
-        logActivity({ userId: user.id, userEmail: user.email, userName: user.full_name, type: 'lesson_complete', label: `${user.full_name} a finalizat "${lesson.title}"`, data: { lessonId: lesson.id, lessonTitle: lesson.title, moduleId: lesson.module_id } });
+        logActivity({
+          userId: user.id, userEmail: user.email, userName: user.full_name,
+          type: lesson.type === 'exercise' ? 'exercise_complete' : 'lesson_complete',
+          label: lesson.type === 'exercise'
+            ? `${user.full_name} a finalizat exercițiul "${lesson.title}"`
+            : `${user.full_name} a finalizat "${lesson.title}"`,
+          data: { lessonId: lesson.id, lessonTitle: lesson.title, moduleId: lesson.module_id, exerciseId: lesson.exercise_id || '' },
+        });
       }
     } catch (err: any) {
       setJustCompletedLessonId(null);
       setCompleteError(err?.message || 'Eroare la salvare. Încearcă din nou.');
+    } finally {
+      setCompleting(false);
+    }
+  };
+
+  const handleUndoComplete = async () => {
+    if (completing) return;
+    setCompleteError(null);
+    setCompleting(true);
+    try {
+      await unmarkComplete(lesson!.id);
+      if (lesson!.type === 'exercise' && lesson!.exercise_id) {
+        await unmarkExerciseComplete(lesson!.exercise_id);
+      }
+      setJustCompletedLessonId(null);
+      setShowConfetti(false);
+    } catch (err: any) {
+      setCompleteError(err?.message || 'Nu am putut anula finalizarea.');
     } finally {
       setCompleting(false);
     }
@@ -402,7 +460,7 @@ export const LessonPage: React.FC = () => {
                 <div ref={completeRef} style={{ marginBottom: 24 }}>
                   <CompleteButton
                     done={done} justCompleted={justCompleted} completing={completing}
-                    showConfetti={scopedShowConfetti} onComplete={handleComplete}
+                    showConfetti={scopedShowConfetti} onComplete={handleComplete} onUndo={handleUndoComplete}
                     onConfettiDone={() => setShowConfetti(false)} isExercise
                   />
                   {completeError && (
@@ -597,7 +655,7 @@ export const LessonPage: React.FC = () => {
 
           {/* Complete button */}
           <motion.div ref={completeRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} style={{ marginBottom: 24 }}>
-            <CompleteButton done={done} justCompleted={justCompleted} completing={completing} showConfetti={scopedShowConfetti} onComplete={handleComplete} onConfettiDone={() => setShowConfetti(false)} />
+            <CompleteButton done={done} justCompleted={justCompleted} completing={completing} showConfetti={scopedShowConfetti} onComplete={handleComplete} onUndo={handleUndoComplete} onConfettiDone={() => setShowConfetti(false)} />
             {completeError && (
               <p style={{ marginTop: 10, fontSize: 13, color: 'var(--error)' }}>{completeError}</p>
             )}
