@@ -28,7 +28,7 @@ export function useAdminCourseScope() {
   const courseId = course?.id || fallback?.id || 'business';
 
   // Fluxul privit. Gol = toate fluxurile cursului, ceea ce e alegerea corectă
-  // pentru vederile de administrare; panourile de lucru cu flowa filtrează.
+  // pentru vederile de administrare; panourile de lucru cu cohorta filtrează.
   const [flows, setFlows] = useState<Flow[]>([]);
   useEffect(() => {
     let cancelled = false;

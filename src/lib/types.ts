@@ -4,7 +4,7 @@ export interface Enrollment {
   course_id: string;
   tariff: Tariff;
   granted_at?: string;
-  /** Fluxul (flowa) din care face parte elevul la acest curs. */
+  /** Fluxul din care face parte elevul la acest curs. */
   flow_id?: string | null;
   /** Fluxul hidratat, când a putut fi citit. Ancorează deblocările și canalul. */
   flow?: {
