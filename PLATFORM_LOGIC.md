@@ -19,7 +19,7 @@ Supabase (Lovable Cloud) pentru auth + date, CSS custom cu tokens (fără Tailwi
 | 5 | Numerotare lecții X.Y | structura modulului | calcul la runtime | `lib/lessonNumbering.ts` |
 | 6 | Progres lecții | click „am terminat" | `progress` | `hooks/useProgress.ts` |
 | 7 | Exerciții interactive | input elev | local-first + `exercise_responses` | `components/exercises/ExerciseBlock.tsx`, `lib/exerciseSync.ts`, `lib/exerciseData.ts` |
-| 8 | Finalizare exercițiu | buton | `exercise_completions` | `hooks/useExerciseCompletions.ts` |
+| 8 | Finalizare exercițiu | buton | `progress` + `exercise_completions` | `hooks/useProgress.ts`, `pages/LessonPage.tsx` |
 | 9 | Notițe la lecție | textarea | `lesson_notes` (autosave) | `hooks/useLessonNote.ts` |
 | 10 | Documente printabile | wizard | definiții statice + răspunsuri | `lib/documentData.ts`, `pages/DocumentWizardPage.tsx` |
 | 11 | Materialele mele (export) | buton descărcare | agregare răspunsuri | `lib/materialsExport.ts`, `pages/MaterialsPage.tsx` |
@@ -30,7 +30,7 @@ Supabase (Lovable Cloud) pentru auth + date, CSS custom cu tokens (fără Tailwi
 | 16 | Reset parolă (OTP) | email | Supabase Auth OTP | `pages/ForgotPassword.tsx`, `pages/ResetPassword.tsx` |
 | 17 | Rutare & gating | URL | `_app` / `admin` guards | `src/routes/*` |
 | 18 | Infrastructură email | evenimente auth/app | coadă pgmq + pg_cron | `src/routes/lovable/email/queue/process.ts` |
-| 19 | Onboarding wizard & anunțuri | prima vizită / update-uri | flag local + config static | `pages/OnboardingWizard.tsx`, `components/aa/NotificationBanner.tsx` |
+| 19 | Onboarding wizard & anunțuri | prima vizită / anunț admin | flag local + tabelul `announcements` | `pages/OnboardingWizard.tsx`, `components/aa/NotificationBanner.tsx`, `lib/announcements.ts` |
 | 20 | Recuperare răspunsuri (admin) | export local al elevului | `exercise_responses` | `lib/adminRecovery.functions.ts` |
 | 21 | Căutare globală | Cmd/Ctrl+K | conținut în memorie | `components/aa/SearchModal.tsx` |
 
@@ -111,7 +111,9 @@ Lecțiile-placeholder fără video nu consumă numere și nu intră în procente
 
 ## 6. Progres lecții
 
-`useProgress` scrie în `progress` (insert-only; „necompletat" = ștergere de rând; nu există UPDATE).
+`useProgress` scrie în `progress` (insert + delete, fără UPDATE). Anularea e expusă în UI:
+pe pagina lecției, cardul „Lecție finalizată / Exercițiu finalizat" are acțiunea
+**„Anulează finalizarea"** (`unmarkComplete`, plus `unmarkExerciseComplete` pentru exerciții).
 RLS: elevul vede/scrie doar rândurile proprii, adminul poate citi tot.
 Procentele de completare exclud lecțiile fără video.
 
@@ -134,8 +136,13 @@ Ciclul de salvare:
 
 ## 8. Finalizarea exercițiilor
 
-`exercise_completions` = tabel separat, insert/delete (fără update), independent de conținutul
-răspunsului. Astfel „am completat" rămâne bifat chiar dacă elevul continuă să editeze textul.
+Butonul „Marchează exercițiul ca finalizat" din `LessonPage` scrie **două** rânduri:
+1. `progress` pe id-ul paginii-exercițiu (sursa procentelor de progres);
+2. `exercise_completions` pe `exercise_id` (bifa independentă de conținutul răspunsului).
+
+Ambele se scriu prin `useProgress` (`markComplete` + `markExerciseComplete`), iar
+`isExerciseDone` citește `exercise_completions`. Anularea șterge din ambele.
+Hook-ul `useExerciseCompletions.ts` a fost eliminat — era cod mort, nu îl reintroduce.
 
 ## 9. Notițe
 
@@ -147,6 +154,10 @@ răspunsului. Astfel „am completat" rămâne bifat chiar dacă elevul continu�
 `documentData.ts` conține definițiile (Doc 01…13): secțiuni, câmpuri, și un generator HTML
 brandat (header negru, monogramă, accente aurii) transformat în PDF prin print.
 Fluxul: `/documents` (listă) → `/documents/$docId/fill` (wizard) → previzualizare → print/PDF.
+Documentele completate sunt **local-first cu cloud** (ca exercițiile): `lib/documentSync.ts`
+ține lista în `localStorage` (`aa_my_docs_<userId>`) și o sincronizează în
+`document_responses` (`document_id = '__my_docs__'`), cu reconciliere pe timestamp la montare.
+Astfel nu se mai pierd la schimbarea browserului/dispozitivului.
 Două moduri: șablon gol printabil sau completat pe platformă și printat deja completat.
 Paginarea e controlată manual (page-breaks explicite) pentru că secțiuni lungi
 se tăiau la finalul paginii.
@@ -171,8 +182,24 @@ Un flag local `aa_quiz_done_<userId>` oglindește starea pentru gating instant
 
 ## 14. Activity log
 
-`lib/activity.ts` scrie evenimente tipizate (`login`, `lesson_complete`, `exercise_complete`,
-`note_saved`, `quiz_complete`…) în `activity_log`. Identitatea (email/nume) e completată
+`lib/activity.ts` scrie evenimente tipizate în `activity_log`. Toate tipurile declarate sunt
+efectiv scrise:
+
+| Tip | Unde se scrie |
+|---|---|
+| `login` / `logout` | `AuthContext.login` / `AuthContext.logout` |
+| `lesson_view`, `module_view` | `LessonPage` la deschiderea lecției |
+| `lesson_complete`, `exercise_complete` | `LessonPage.handleComplete` |
+| `note_saved` | `useLessonNote` după salvarea în cloud |
+| `quiz_complete` | `OnboardingQuiz` |
+
+Semnalele de frecvență mare (`login`, `lesson_view`, `module_view`, `note_saved`) trec prin
+`logActivityOnce(key, event)` — maximum o scriere pe zi per cheie, ca `activity_log` să
+rămână un semnal curat de „ultima activitate" fără să umple tabelul.
+**Important:** „Activi azi", `last_activity` și `studentScoring.daysSinceLastActive` (deci
+statusul din Attention Queue și briefingul AI) se bazează pe acest tabel — orice acțiune nouă
+care înseamnă „elevul lucrează" trebuie să logheze un eveniment, altfel elevii activi apar
+fals ca inactivi. Identitatea (email/nume) e completată
 server-side de triggerul `activity_log_set_identity` — clientul nu o poate falsifica.
 Insert-only; elevul își vede doar propriile evenimente, adminul le vede pe toate.
 
@@ -216,9 +243,12 @@ Jobul cron și secretul din vault sunt configurate **în afara migrațiilor** (n
 ## 19. Onboarding wizard & anunțuri
 
 `/welcome` (`OnboardingWizard.tsx`) rulează o singură dată per utilizator, marcat de flagul
-local `aa_wizard_done`; nu e un gate de rută, ci un tur ghidat. `NotificationBanner` +
-`OnboardingGuideModal` afișează anunțuri/carduri de update definite static în cod
-(fără tabel în DB), deci un anunț nou = un deploy.
+local `aa_wizard_done`; nu e un gate de rută, ci un tur ghidat.
+
+Anunțurile sunt **server-side**: adminul publică din `AdminDashboard` în tabelul
+`announcements` (mesaj, tip, `expires_at`), iar `NotificationBanner` citește anunțul activ
+prin `lib/announcements.ts` și îl arată tuturor elevilor. Închiderea bannerului e per sesiune
+(`sessionStorage`, cheie = id-ul anunțului). Un anunț nou nu mai cere deploy.
 
 ## 20. Recuperarea răspunsurilor (admin)
 
