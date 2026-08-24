@@ -16,7 +16,7 @@ import { AttentionQueueCard } from '../../components/admin/AttentionQueueCard';
 function ActivityIcon({ type }: { type: ActivityType }) {
   const size = 13;
   switch (type) {
-    case 'login': return <LogIn size={size} style={{ color: '#86efac' }} />;
+    case 'login': return <LogIn size={size} style={{ color: 'var(--ok-soft)' }} />;
     case 'lesson_complete': return <CheckCircle size={size} style={{ color: 'var(--accent)' }} />;
     case 'note_saved': return <FileText size={size} style={{ color: '#93c5fd' }} />;
     case 'quiz_complete': return <Award size={size} style={{ color: 'var(--warn)' }} />;
@@ -78,7 +78,7 @@ export const AdminDashboard: React.FC = () => {
     { icon: <Users size={18} />, label: 'Studenți înregistrați', value: String(users.length), accent: 'var(--accent)' },
     { icon: <BookOpen size={18} />, label: 'Lecții completate total', value: String(totalCompletions), accent: 'var(--gold)' },
     { icon: <Award size={18} />, label: 'Quiz-uri finalizate', value: `${quizCount} (${quizPct}%)`, accent: 'var(--warn)' },
-    { icon: <Activity size={18} />, label: 'Activi azi', value: String(activeToday), accent: '#86efac' },
+    { icon: <Activity size={18} />, label: 'Activi azi', value: String(activeToday), accent: 'var(--ok-soft)' },
   ];
 
   const recentActivity = activity.slice(0, 30);

@@ -45,7 +45,7 @@ const MATURITY_COLOR: Record<QuizProfile['maturityLevel'], string> = {
   startup: '#93c5fd',
   manual: '#fca5a5',
   illusion: '#fdba74',
-  systemic: '#86efac',
+  systemic: 'var(--ok-soft)',
 };
 
 // ── Quiz question data (mirrors OnboardingQuiz) ───────────────────────────────
@@ -71,7 +71,7 @@ const QUIZ_QUESTIONS: { id: string; block: string; question: string }[] = [
 function ActivityIcon({ type }: { type: ActivityType }) {
   const size = 15;
   switch (type) {
-    case 'login': return <LogIn size={size} style={{ color: '#86efac' }} />;
+    case 'login': return <LogIn size={size} style={{ color: 'var(--ok-soft)' }} />;
     case 'lesson_complete': return <CheckCircle size={size} style={{ color: 'var(--accent)' }} />;
     case 'note_saved': return <FileText size={size} style={{ color: '#93c5fd' }} />;
     case 'quiz_complete': return <Award size={size} style={{ color: 'var(--warn)' }} />;
@@ -584,7 +584,7 @@ export const AdminStudentProfile: React.FC = () => {
                 {quizProfile.maturityLabel}
               </span>
               <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>
-                Urgență: <strong style={{ color: quizProfile.urgencyScore >= 8 ? 'var(--error)' : quizProfile.urgencyScore >= 5 ? 'var(--warn-strong)' : '#86efac' }}>
+                Urgență: <strong style={{ color: quizProfile.urgencyScore >= 8 ? 'var(--error)' : quizProfile.urgencyScore >= 5 ? 'var(--warn-strong)' : 'var(--ok-soft)' }}>
                   {quizProfile.urgencyScore}/10
                 </strong>
               </span>
@@ -596,7 +596,7 @@ export const AdminStudentProfile: React.FC = () => {
                 <div style={{
                   height: '100%',
                   width: `${quizProfile.urgencyScore * 10}%`,
-                  background: quizProfile.urgencyScore >= 8 ? 'var(--error)' : quizProfile.urgencyScore >= 5 ? 'var(--warn-strong)' : '#86efac',
+                  background: quizProfile.urgencyScore >= 8 ? 'var(--error)' : quizProfile.urgencyScore >= 5 ? 'var(--warn-strong)' : 'var(--ok-soft)',
                   borderRadius: 3,
                   transition: 'width 0.8s ease',
                 }} />

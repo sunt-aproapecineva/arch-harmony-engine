@@ -1018,7 +1018,7 @@ const DIAG_DIMENSIONS = [
   ]},
 ];
 
-const SCORE_COLORS: Record<number, string> = { 1: 'var(--error)', 2: 'var(--warn-strong)', 3: 'var(--gold)', 4: '#86efac', 5: 'var(--ok)' };
+const SCORE_COLORS: Record<number, string> = { 1: 'var(--error)', 2: 'var(--warn-strong)', 3: 'var(--gold)', 4: 'var(--ok-soft)', 5: 'var(--ok)' };
 
 const DiagnosticGridExercise: React.FC<{ storageKey: string }> = ({ storageKey }) => {
   const [answers, setAnswers] = useState<Record<string, number>>(() => {

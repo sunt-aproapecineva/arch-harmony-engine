@@ -181,7 +181,7 @@ export const STATUS_COLOR: Record<StudentScores['status'], string> = {
   slow: 'var(--warn)',
   stuck: 'var(--warn-strong)',
   inactive: 'var(--error)',
-  done: '#86efac',
+  done: 'var(--ok-soft)',
   new: 'var(--fg-3)',
 };
 
