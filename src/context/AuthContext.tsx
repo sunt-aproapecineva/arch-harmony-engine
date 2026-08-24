@@ -46,6 +46,27 @@ function buildFallbackUser(authUser: any): User {
   };
 }
 
+/**
+ * Quizurile elevului, tolerant la lipsa coloanei `course_id`.
+ *
+ * Codul multicurs poate ajunge în producție cu câteva minute înaintea migrației. Fără
+ * plasa asta, interogarea ar eșua, `quiz_completed` ar deveni fals pentru toată lumea și
+ * fiecare elev s-ar trezi blocat în spatele diagnosticului pe care deja l-a dat.
+ */
+async function fetchQuizRows(userId: string) {
+  const res = await supabase
+    .from('quiz_responses')
+    .select('answers,completed_at,course_id')
+    .eq('user_id', userId);
+  if (!res.error) return res;
+  if (res.error.code !== '42703') return res;
+  console.warn('[Auth] quiz_responses.course_id lipsește — migrația multicurs nu e aplicată');
+  return await supabase
+    .from('quiz_responses')
+    .select('answers,completed_at')
+    .eq('user_id', userId);
+}
+
 async function hydrateUser(authUser: any): Promise<User | null> {
   if (!authUser) return null;
 
@@ -53,7 +74,7 @@ async function hydrateUser(authUser: any): Promise<User | null> {
     const [{ data: profile }, { data: roles }, { data: quizRows }, enrollments] = await Promise.all([
       supabase.from('profiles').select('full_name,email,tariff,avatar_url').eq('id', authUser.id).maybeSingle(),
       supabase.from('user_roles').select('role').eq('user_id', authUser.id),
-      supabase.from('quiz_responses').select('answers,completed_at,course_id').eq('user_id', authUser.id),
+      fetchQuizRows(authUser.id),
       fetchEnrollments(authUser.id),
     ]);
     const isAdmin = (roles || []).some((r: any) => r.role === 'admin');

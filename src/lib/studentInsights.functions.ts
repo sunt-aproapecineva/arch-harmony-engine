@@ -5,6 +5,17 @@ import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 import { computeScores, detectStuckModule, type StudentScores } from './studentScoring';
 import { staticExercisesByModuleOrder, allStaticExercises } from './staticExercises';
 
+/**
+ * Plasă pentru perioada dintre deploy și rularea migrației multicurs: dacă `course_id`
+ * nu există încă, cădem pe interogarea veche în loc să întoarcem un briefing gol.
+ */
+const SCHEMA_MISSING = new Set(['42703', '42P01']);
+async function withSchemaFallback(scoped: () => any, legacy: () => any) {
+  const res = await scoped();
+  if (!res?.error || !SCHEMA_MISSING.has(res.error.code)) return res;
+  return await legacy();
+}
+
 async function ensureAdmin(ctx: any) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
   const { data, error } = await supabaseAdmin.rpc('has_role', { _user_id: ctx.userId, _role: 'admin' });
@@ -20,11 +31,17 @@ async function gatherStudent(admin: any, studentId: string, courseId: string) {
     await Promise.all([
       admin.from('profiles').select('id,email,full_name,tariff,created_at').eq('id', studentId).maybeSingle(),
       admin.from('progress').select('lesson_id,completed_at').eq('user_id', studentId),
-      admin.from('quiz_responses').select('answers,completed_at').eq('user_id', studentId).eq('course_id', courseId).maybeSingle(),
+      withSchemaFallback(
+        () => admin.from('quiz_responses').select('answers,completed_at').eq('user_id', studentId).eq('course_id', courseId).maybeSingle(),
+        () => admin.from('quiz_responses').select('answers,completed_at').eq('user_id', studentId).maybeSingle(),
+      ),
       admin.from('lesson_notes').select('lesson_id,content,updated_at').eq('user_id', studentId),
       admin.from('exercise_responses').select('exercise_id,response,updated_at').eq('user_id', studentId),
       admin.from('activity_log').select('created_at,type,label').eq('user_id', studentId).order('created_at', { ascending: false }).limit(500),
-      admin.from('modules').select('id,title,etapa,order_index').eq('course_id', courseId).order('order_index'),
+      withSchemaFallback(
+        () => admin.from('modules').select('id,title,etapa,order_index').eq('course_id', courseId).order('order_index'),
+        () => admin.from('modules').select('id,title,etapa,order_index').order('order_index'),
+      ),
       admin.from('lessons').select('id,module_id,title,order_index,video_url').order('order_index'),
     ]);
 
@@ -374,8 +391,14 @@ export const getAttentionQueue = createServerFn({ method: 'POST' })
         admin.from('exercise_responses').select('user_id,exercise_id,response').limit(10000),
         admin.from('lesson_notes').select('user_id,content').limit(10000),
         admin.from('activity_log').select('user_id,created_at').order('created_at', { ascending: false }).limit(5000),
-        admin.from('quiz_responses').select('user_id').eq('course_id', courseId),
-        admin.from('modules').select('id,title,etapa,order_index').eq('course_id', courseId).order('order_index'),
+        withSchemaFallback(
+          () => admin.from('quiz_responses').select('user_id').eq('course_id', courseId),
+          () => admin.from('quiz_responses').select('user_id'),
+        ),
+        withSchemaFallback(
+        () => admin.from('modules').select('id,title,etapa,order_index').eq('course_id', courseId).order('order_index'),
+        () => admin.from('modules').select('id,title,etapa,order_index').order('order_index'),
+      ),
         admin.from('lessons').select('id,module_id,order_index,video_url').order('order_index'),
       ]);
 

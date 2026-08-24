@@ -49,7 +49,10 @@ export const AdminUsers: React.FC = () => {
       fetchAdminUsers(courseId),
       fetchAllProgress(),
       fetchModulesWithLessons(courseId),
-      supabase.from('whitelist').select('email,tariff,added_at').eq('course_id', courseId).order('added_at', { ascending: false }),
+      supabase.from('whitelist').select('email,tariff,added_at').eq('course_id', courseId).order('added_at', { ascending: false })
+        .then(r => (r.error?.code === '42703'
+          ? supabase.from('whitelist').select('email,tariff,added_at').order('added_at', { ascending: false })
+          : r)),
     ]);
     setUsers(u);
     setProgress(p);

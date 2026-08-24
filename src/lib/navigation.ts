@@ -3,7 +3,7 @@
 // Toate rutele de studiu trăiesc sub /c/<slug>/. Le construim într-un singur loc ca
 // să nu apară șiruri lipite manual prin componente — altfel un curs nou înseamnă
 // vânătoare de '/dashboard' prin tot codul.
-import { Course, CourseId, getCourse, courseIdFromContentId } from './courses';
+import { Course, CourseId, getCourse, courseIdFromContentId, activeCourses } from './courses';
 import { enrolledCourses } from './enrollments';
 import type { User } from './types';
 
@@ -41,10 +41,14 @@ export function legacyContentPath(kind: 'lesson' | 'module', contentId: string):
  * Unde aterizează elevul după login.
  * Un singur curs → direct în el; mai multe → ecranul de selecție; niciunul → tot
  * ecranul de selecție, care explică situația în loc să arate o pagină goală.
+ *
+ * Adminul e tratat ca având acces la toate cursurile active — la fel ca poarta de curs
+ * și ca ecranul de selecție. Altfel ar fi trimis direct într-un singur curs și n-ar
+ * mai ajunge niciodată la ecranul general fără să scrie URL-ul de mână.
  */
 export function resolveLandingPath(user: User | null | undefined): string {
   if (!user) return '/login';
-  const courses = enrolledCourses(user.enrollments);
+  const courses = user.role === 'admin' ? activeCourses() : enrolledCourses(user.enrollments);
   if (courses.length === 1) return courseDashboardPath(courses[0]);
   return '/cursuri';
 }

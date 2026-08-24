@@ -198,7 +198,10 @@ export const AdminLessons: React.FC = () => {
 
   const load = useCallback(async () => {
     const [m, l] = await Promise.all([
-      supabase.from('modules').select('*').eq('course_id', courseId).order('order_index'),
+      supabase.from('modules').select('*').eq('course_id', courseId).order('order_index')
+        .then(r => (r.error?.code === '42703'
+          ? supabase.from('modules').select('*').order('order_index')
+          : r)),
       supabase.from('lessons').select('*').order('order_index'),
     ]);
     setModules((m.data as Module[]) || []);

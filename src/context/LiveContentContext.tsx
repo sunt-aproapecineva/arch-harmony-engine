@@ -14,6 +14,24 @@ export const useLiveContent = () => useContext(LiveCtx);
 const CACHE_KEY = 'aa_content_overlay_v1';
 
 /**
+ * Modulele din DB, tolerant la lipsa coloanei `course_id` (migrație multicurs
+ * neaplicată încă). Fără plasa asta, editările făcute de admin în DB ar dispărea din
+ * platformă până la migrație, iar elevii ar vedea doar conținutul static.
+ */
+async function fetchModules() {
+  const res = await supabase
+    .from('modules')
+    .select('id,course_id,order_index,title,subtitle,description,etapa,saptamana')
+    .order('order_index');
+  if (!res.error || res.error.code !== '42703') return res;
+  console.warn('[LiveContent] modules.course_id lipsește — tratez tot conținutul ca Business');
+  return await supabase
+    .from('modules')
+    .select('id,order_index,title,subtitle,description,etapa,saptamana')
+    .order('order_index');
+}
+
+/**
  * Fetches admin edits from the DB (modules + lessons tables) and overlays them
  * onto the static course content in place. Matching:
  *   - DB module ↔ static module by (course_id, order_index)
@@ -161,10 +179,7 @@ export function LiveContentProvider({ children }: { children: React.ReactNode })
     const attempt = async (tryIndex: number) => {
       try {
         const [modsRes, lessonsRes] = await Promise.all([
-          supabase
-            .from('modules')
-            .select('id,course_id,order_index,title,subtitle,description,etapa,saptamana')
-            .order('order_index'),
+          fetchModules(),
           supabase
             .from('lessons')
             .select('id,module_id,order_index,title,description,video_url,pdf_url,duration_min,is_published')
