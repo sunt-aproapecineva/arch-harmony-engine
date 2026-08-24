@@ -32,6 +32,10 @@ function spanStyle(span: LibraryItem['span']): React.CSSProperties {
 
 const Card: React.FC<{ item: LibraryItem; index: number }> = ({ item, index }) => {
   const navigate = useNavigate();
+  // `course` era folosit în onClick fără să existe în acest scop — click pe un articol
+  // arunca ReferenceError, iar cardul părea pur și simplu mort. React nu prinde
+  // excepțiile din handleri, deci nu apărea niciun ecran de eroare.
+  const { course } = useCourse();
   const c = LIBRARY_ACCENT[item.accent];
   const isFeature = item.span === 'feature';
   const disabled = !item.available;

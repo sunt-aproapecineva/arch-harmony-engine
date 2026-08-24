@@ -8,6 +8,7 @@ import { TariffBadge } from '../../components/aa/TariffBadge';
 import { timeAgo } from '../../lib/activity';
 import { fetchModulesWithLessons, fetchAdminUsers, fetchAllProgress, setUserAdmin, AdminModule, AdminUserRow, AdminProgressRow } from '../../lib/adminData';
 import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
+import { courseLessonIndex, modulePct, overallPct, doneCount, doneByUser } from '@/lib/adminProgress';
 import type { Tariff } from '../../lib/types';
 
 interface WLEntry { email: string; tariff: Tariff; added_at?: string; }
@@ -63,12 +64,13 @@ export const AdminUsers: React.FC = () => {
 
   useEffect(() => { reload(); }, [reload]);
 
-  const totalLessons = modules.flatMap(m => m.lessons).length;
-  const getUserProgress = (userId: string) => {
-    const done = progress.filter(p => p.user_id === userId).length;
-    return totalLessons > 0 ? Math.round((done / totalLessons) * 100) : 0;
-  };
-  const getUserLessonCount = (userId: string) => progress.filter(p => p.user_id === userId).length;
+  // Ca și în AdminProgress: numărăm din cod, nu din tabelul `modules` (id-uri UUID
+  // care nu se potrivesc cu progress.lesson_id) și doar lecțiile cursului privit.
+  const index = React.useMemo(() => courseLessonIndex(courseId), [courseId]);
+  const doneMap = React.useMemo(() => doneByUser(progress), [progress]);
+  const totalLessons = index.total;
+  const getUserProgress = (userId: string) => overallPct(index, doneMap[userId] || new Set());
+  const getUserLessonCount = (userId: string) => doneCount(index, doneMap[userId] || new Set());
 
   const handleAddWhitelist = async () => {
     setAddError('');
@@ -435,10 +437,11 @@ export const AdminUsers: React.FC = () => {
                           Progres per modul · {lessonCount}/{totalLessons} lecții totale
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 8 }}>
-                          {modules.map(mod => {
-                            const done = mod.lessons.filter(l => progress.some(p => p.user_id === user.id && p.lesson_id === l.id)).length;
-                            const total = mod.lessons.length;
-                            const modPct = total > 0 ? Math.round((done / total) * 100) : 0;
+                          {index.modules.map(mod => {
+                            const userDone = doneMap[user.id] || new Set<string>();
+                            const done = mod.lessonIds.filter(id => userDone.has(id)).length;
+                            const total = mod.lessonIds.length;
+                            const modPct = modulePct(index, mod.id, userDone);
                             return (
                               <div key={mod.id} style={{ background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px' }}>
                                 <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{mod.etapa}</div>

@@ -28,6 +28,9 @@ export const ModuleCard: React.FC<Props> = ({ module: mod, progress, locked, act
     : 'var(--border)';
 
   const statusColor = done ? 'var(--ok)' : active ? 'var(--accent)' : 'var(--gold)';
+  // `${statusColor}18` producea `var(--ok)18`, care e CSS invalid: badge-ul rămânea
+  // fără fundal și fără bordură. Tokenii au deja variante translucide — le folosim.
+  const statusDim = done ? 'var(--ok-dim)' : active ? 'var(--accent-dim)' : 'var(--gold-dim)';
 
   return (
     <motion.div
@@ -73,8 +76,8 @@ export const ModuleCard: React.FC<Props> = ({ module: mod, progress, locked, act
             <span style={{
               fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase',
               color: statusColor,
-              background: `${statusColor}18`,
-              border: `1px solid ${statusColor}30`,
+              background: statusDim,
+              border: `1px solid var(--border-hi)`,
               padding: '2px 8px', borderRadius: 99,
             }}>
               {mod.etapa}

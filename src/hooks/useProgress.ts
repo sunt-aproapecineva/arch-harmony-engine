@@ -81,13 +81,20 @@ export function useProgress(explicitCourseId?: string) {
       return;
     }
 
-    const [{ data: progressData }, { data: exData }] = await Promise.all([
+    const [progressRes, exRes] = await Promise.all([
       supabase!.from('progress').select('*').eq('user_id', user.id),
       supabase!.from('exercise_completions').select('exercise_id').eq('user_id', user.id),
     ]);
 
-    setProgress(progressData || []);
-    setExerciseDone((exData || []).map((r: any) => r.exercise_id));
+    // La eroare NU golim starea. `data` e null când interogarea eșuează, iar
+    // `|| []` ștergea vizual toate bifele elevului la o simplă pierdere de rețea —
+    // arăta ca și cum și-ar fi pierdut tot progresul.
+    if (!progressRes.error && progressRes.data) setProgress(progressRes.data);
+    else if (progressRes.error) console.warn('[Progress] citire eșuată; păstrez starea', progressRes.error);
+
+    if (!exRes.error && exRes.data) setExerciseDone(exRes.data.map((r: any) => r.exercise_id));
+    else if (exRes.error) console.warn('[Progress] exerciții: citire eșuată; păstrez starea', exRes.error);
+
     setLoading(false);
   }, [user]);
 

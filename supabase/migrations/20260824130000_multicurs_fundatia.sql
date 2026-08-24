@@ -179,16 +179,22 @@ BEGIN
     v_whitelisted := true;
     v_tariff := 'arhitect';
   ELSE
-    SELECT true, COALESCE(tariff, 'student')
-      INTO v_whitelisted, v_tariff
+    -- ATENȚIE: `SELECT ... INTO` fără rânduri pune NULL în TOATE variabilele țintă,
+    -- suprascriind `v_whitelisted := false`. Vechiul `IF NOT v_whitelisted` devenea
+    -- `IF NOT NULL` → NULL → ramura nu se executa, deci verificarea de whitelist era
+    -- cod mort și orice email se putea înregistra. Folosim FOUND, care e explicit.
+    SELECT COALESCE(tariff, 'student')
+      INTO v_tariff
       FROM public.whitelist
       WHERE lower(email) = v_email
       ORDER BY added_at
       LIMIT 1;
+    v_whitelisted := FOUND;
     IF NOT v_whitelisted THEN
       RAISE EXCEPTION 'Email % nu este în lista de acces. Contactează administratorul.', v_email
         USING ERRCODE = 'check_violation';
     END IF;
+    v_tariff := COALESCE(v_tariff, 'student');
   END IF;
 
   INSERT INTO public.profiles (id, email, full_name, tariff)

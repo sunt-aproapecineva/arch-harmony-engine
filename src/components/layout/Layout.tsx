@@ -20,9 +20,13 @@ export const Layout: React.FC = () => {
 
   // Desktop: persisted open/closed. Mobile: always starts closed.
   const [desktopOpen, setDesktopOpen] = useState(() => {
-    if (typeof window !== 'undefined' && !isMobile()) {
-      return localStorage.getItem(SIDEBAR_KEY) !== 'false';
-    }
+    // Citire protejată: în Safari privat accesul la localStorage aruncă, iar o
+    // excepție în inițializatorul de state oprește montarea întregului layout.
+    try {
+      if (typeof window !== 'undefined' && !isMobile()) {
+        return localStorage.getItem(SIDEBAR_KEY) !== 'false';
+      }
+    } catch { /* revenim la implicit */ }
     return true;
   });
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -40,7 +44,7 @@ export const Layout: React.FC = () => {
     } else {
       setDesktopOpen(v => {
         const next = !v;
-        localStorage.setItem(SIDEBAR_KEY, String(next));
+        try { localStorage.setItem(SIDEBAR_KEY, String(next)); } catch { /* nu se reține */ }
         return next;
       });
     }

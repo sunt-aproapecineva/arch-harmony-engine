@@ -42,13 +42,20 @@ CREATE TABLE public.flows (
   UNIQUE (course_id, slug)
 );
 
-GRANT SELECT ON public.flows TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.flows TO authenticated;
 GRANT ALL ON public.flows TO service_role;
 ALTER TABLE public.flows ENABLE ROW LEVEL SECURITY;
 
--- Elevul trebuie să-și citească fluxul: data de start, canalul, până când are acces.
-CREATE POLICY "authenticated read flows"
-  ON public.flows FOR SELECT TO authenticated USING (true);
+-- Elevul își citește DOAR fluxul lui. `USING (true)` ar expune linkul privat de
+-- Telegram al tuturor fluxurilor oricărui cont autentificat — inclusiv al grupelor
+-- din care nu face parte.
+CREATE POLICY "read own flow"
+  ON public.flows FOR SELECT TO authenticated
+  USING (
+    public.has_role(auth.uid(), 'admin'::app_role)
+    OR EXISTS (SELECT 1 FROM public.enrollments e
+                WHERE e.user_id = auth.uid() AND e.flow_id = flows.id)
+  );
 CREATE POLICY "admins manage flows"
   ON public.flows FOR ALL TO authenticated
   USING (public.has_role(auth.uid(), 'admin'::app_role))
@@ -79,7 +86,7 @@ CREATE TABLE public.flow_events (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
-GRANT SELECT ON public.flow_events TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.flow_events TO authenticated;
 GRANT ALL ON public.flow_events TO service_role;
 ALTER TABLE public.flow_events ENABLE ROW LEVEL SECURITY;
 
@@ -109,7 +116,7 @@ CREATE TABLE public.groups (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
-GRANT SELECT ON public.groups TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.groups TO authenticated;
 GRANT ALL ON public.groups TO service_role;
 ALTER TABLE public.groups ENABLE ROW LEVEL SECURITY;
 
@@ -240,7 +247,10 @@ BEGIN
   ON CONFLICT (user_id, course_id) DO UPDATE
      SET flow_id         = EXCLUDED.flow_id,
          access_until    = EXCLUDED.access_until,
-         source_group_id = EXCLUDED.source_group_id,
+         -- Proveniența NU se rescrie. Dacă înscrierea exista deja (dată manual sau
+         -- prin altă grupă), rămâne a ei: altfel o alocare de grupă „adopta" accesele
+         -- manuale, iar retragerea grupei le ștergea pe toate odată cu ale ei.
+         source_group_id = enrollments.source_group_id,
          -- Tariful dat manual mai sus nu se coboară de o realocare de grupă.
          tariff          = public.max_tariff(enrollments.tariff, EXCLUDED.tariff);
 
@@ -299,3 +309,87 @@ CREATE POLICY "read announcements for own flow"
     OR EXISTS (SELECT 1 FROM public.enrollments e
                 WHERE e.user_id = auth.uid() AND e.flow_id = announcements.flow_id)
   );
+
+-- ============ ÎNSCRIEREA NOUĂ PRIMEȘTE UN FLUX ============
+/**
+ * Fără flux, `isModuleLocked` cade pe datele absolute din cod — care sunt deja trecute
+ * — și elevul nou primește TOT practicumul deblocat din prima zi. Redefinim
+ * handle_new_user ca să lege înscrierea de cel mai recent flux activ al cursului.
+ *
+ * Dacă un curs n-are niciun flux, flow_id rămâne NULL și adminul îl vede marcat
+ * „fără flux" în lista de utilizatori — o stare vizibilă, nu una tăcută.
+ */
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
+DECLARE
+  v_email text := lower(new.email);
+  v_tariff text := 'student';
+  v_whitelisted boolean := false;
+BEGIN
+  IF v_email = 'babaradumi@gmail.com' THEN
+    v_whitelisted := true;
+    v_tariff := 'arhitect';
+  ELSE
+    SELECT COALESCE(tariff, 'student')
+      INTO v_tariff
+      FROM public.whitelist
+      WHERE lower(email) = v_email
+      ORDER BY added_at
+      LIMIT 1;
+    v_whitelisted := FOUND;
+    IF NOT v_whitelisted THEN
+      RAISE EXCEPTION 'Email % nu este în lista de acces. Contactează administratorul.', v_email
+        USING ERRCODE = 'check_violation';
+    END IF;
+    v_tariff := COALESCE(v_tariff, 'student');
+  END IF;
+
+  INSERT INTO public.profiles (id, email, full_name, tariff)
+  VALUES (new.id, v_email, COALESCE(new.raw_user_meta_data->>'full_name', v_email), v_tariff)
+  ON CONFLICT (id) DO UPDATE SET tariff = EXCLUDED.tariff, full_name = EXCLUDED.full_name;
+
+  INSERT INTO public.user_roles (user_id, role)
+  VALUES (new.id, 'student')
+  ON CONFLICT (user_id, role) DO NOTHING;
+
+  IF v_email = 'babaradumi@gmail.com' THEN
+    INSERT INTO public.enrollments (user_id, course_id, tariff, flow_id, access_until)
+    SELECT new.id, c.id, 'arhitect', f.id,
+           COALESCE(f.ends_on, CASE WHEN f.access_weeks IS NOT NULL
+                                    THEN f.starts_on + (f.access_weeks * 7) END)
+      FROM public.courses c
+      LEFT JOIN LATERAL (
+        SELECT * FROM public.flows fl
+         WHERE fl.course_id = c.id AND fl.is_active
+         ORDER BY fl.starts_on DESC LIMIT 1
+      ) f ON true
+    ON CONFLICT (user_id, course_id) DO NOTHING;
+  ELSE
+    INSERT INTO public.enrollments (user_id, course_id, tariff, flow_id, access_until)
+    SELECT new.id, w.course_id, COALESCE(w.tariff, 'student'), f.id,
+           COALESCE(f.ends_on, CASE WHEN f.access_weeks IS NOT NULL
+                                    THEN f.starts_on + (f.access_weeks * 7) END)
+      FROM public.whitelist w
+      LEFT JOIN LATERAL (
+        SELECT * FROM public.flows fl
+         WHERE fl.course_id = w.course_id AND fl.is_active
+         ORDER BY fl.starts_on DESC LIMIT 1
+      ) f ON true
+     WHERE lower(w.email) = v_email
+    ON CONFLICT (user_id, course_id) DO NOTHING;
+  END IF;
+
+  RETURN new;
+END;
+$function$;
+
+-- Elevii deja migrați la Flux 1 primesc și fereastra de acces a fluxului.
+UPDATE public.enrollments e
+   SET access_until = COALESCE(f.ends_on, CASE WHEN f.access_weeks IS NOT NULL
+                                               THEN f.starts_on + (f.access_weeks * 7) END)
+  FROM public.flows f
+ WHERE e.flow_id = f.id AND e.access_until IS NULL;

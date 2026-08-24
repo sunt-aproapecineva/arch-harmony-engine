@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from '@/lib/router-compat';
+import { useNavigate, Link } from '@/lib/router-compat';
 import {
   ArrowRight, BookOpen, CheckCircle2, Layers, Video,
   Wrench, Lock, Clock, Zap, TrendingUp, Send, ClipboardList
@@ -75,6 +75,18 @@ const StatCard: React.FC<{
 );
 
 /* ── main component ─────────────────────────────────── */
+/**
+ * Data calendaristică locală, ca yyyy-mm-dd.
+ * `toISOString()` convertește în UTC: o deblocare la 00:00+03:00 devine ziua
+ * precedentă la 21:00Z, deci calendarul o marca cu o zi mai devreme.
+ */
+function toLocalISODate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 export const Dashboard: React.FC = () => {
   const { user } = useAuthContext();
   const { getModuleProgress, getOverallProgress, isModuleLocked, getCompletedLessonsCount, getTotalLessonsCount } = useProgress();
@@ -93,9 +105,11 @@ export const Dashboard: React.FC = () => {
   const animatedPct = useCounter(overallPct, 1100, 200);
   const animatedModules = useCounter(completedModules, 900, 250);
 
-  const currentModule = modules.find((m, i) => !isModuleLocked(i) && getModuleProgress(m.id) < 100) || modules[0];
-  const currentLesson = currentModule.lessons[0];
-  const currentProgress = getModuleProgress(currentModule.id);
+  // Un curs fără module e o stare reală (START înainte de filmare): `modules[0]` ar fi
+  // undefined și `.lessons[0]` arunca, lăsând dashboard-ul alb.
+  const currentModule = modules.find((m, i) => !isModuleLocked(i) && getModuleProgress(m.id) < 100) || modules[0] || null;
+  const currentLesson = currentModule?.lessons?.[0] || null;
+  const currentProgress = currentModule ? getModuleProgress(currentModule.id) : 0;
 
   const firstName = user?.full_name?.split(' ')[0] || 'Antreprenor';
   const tariff = (courseTariff || 'student') as Tariff;
@@ -103,19 +117,38 @@ export const Dashboard: React.FC = () => {
   const today = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
   const upcomingEvents = useMemo(() =>
     liveEvents.filter(ev => new Date(ev.date) >= today)
-      .sort((a, b) => a.date.localeCompare(b.date)), [today]);
+      .sort((a, b) => a.date.localeCompare(b.date)), [liveEvents, today]);
   const nextEvent = upcomingEvents[0];
 
   const moduleUnlocks = modules
     .map(m => ({ mod: m, at: moduleUnlockDate(m, flow) }))
     .filter(x => !!x.at)
-    .map(x => ({ date: x.at!.toISOString().slice(0, 10), title: x.mod.title, moduleId: x.mod.id }));
+    .map(x => ({ date: toLocalISODate(x.at!), title: x.mod.title, moduleId: x.mod.id }));
 
   const fade = (delay: number) => ({
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
     transition: { duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
   });
+
+  // Program fără module: stare reală cât timp lecțiile se filmează. Fără ecranul ăsta,
+  // tot ce urmează citește din `currentModule` și pagina rămâne albă.
+  if (!currentModule) {
+    return (
+      <div style={{ maxWidth: 620, margin: '0 auto', padding: 'clamp(48px, 12vh, 96px) 24px', textAlign: 'center' }}>
+        <h1 className="font-aboreto" style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2rem)', color: 'var(--fg)', marginBottom: 14, lineHeight: 1.2 }}>
+          {course?.title || 'Programul'} se pregătește
+        </h1>
+        <p style={{ fontSize: 14, color: 'var(--fg-3)', lineHeight: 1.75, marginBottom: 26 }}>
+          Structura e stabilită, lecțiile se filmează. Primești acces imediat ce sunt gata —
+          nu trebuie să faci nimic până atunci.
+        </p>
+        <Link to="/cursuri" className="btn-ghost" style={{ display: 'inline-flex' }}>
+          Vezi celelalte programe
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100%', background: 'var(--bg)', position: 'relative', overflowX: 'hidden' }}>

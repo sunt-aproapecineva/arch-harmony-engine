@@ -33,7 +33,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     } else {
       root.classList.remove('light');
     }
-    localStorage.setItem('aa_theme', theme);
+    // Safari în mod privat aruncă la scriere. Fără try, întreg efectul crapă și
+    // aplicația rămâne albă — pentru o preferință de temă.
+    try { localStorage.setItem('aa_theme', theme); } catch { /* preferința nu se reține */ }
   }, [theme]);
 
   const toggleTheme = () => {
