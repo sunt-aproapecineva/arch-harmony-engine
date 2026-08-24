@@ -1,13 +1,14 @@
 // @ts-nocheck
-// Poarta de curs: validează slug-ul și înscrierea, apoi pune cursul în context.
-// Tot ce e sub /c/<slug>/ trece pe aici, deci e singurul loc unde se verifică
-// „elevul chiar are acces la produsul ăsta".
+// Poarta de curs: validează slug-ul și înscrierea.
+//
+// Contextul de curs NU se montează aici, ci în `_app.tsx`, deasupra lui `Layout` —
+// altfel bara laterală și header-ul, care sunt randate de Layout, ar rămâne în afara
+// lui. Aici rămâne doar verificarea accesului.
 import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
 import { Navigate } from "@/lib/router-compat";
 import { useAuth } from "@/hooks/useAuth";
 import { getCourseBySlug } from "@/lib/courses";
 import { hasCourseAccess } from "@/lib/access";
-import { CourseProvider } from "@/context/CourseContext";
 
 function CourseGate() {
   const { user, loading } = useAuth();
@@ -26,11 +27,7 @@ function CourseGate() {
     return <Navigate to="/cursuri" replace />;
   }
 
-  return (
-    <CourseProvider courseId={course.id}>
-      <Outlet />
-    </CourseProvider>
-  );
+  return <Outlet />;
 }
 
 export const Route = createFileRoute("/_app/c/$courseSlug")({ component: CourseGate });

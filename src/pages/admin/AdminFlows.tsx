@@ -178,7 +178,7 @@ export const AdminFlows: React.FC = () => {
 
                 {/* Fereastra de acces. Data explicită bate durata: dacă e completată,
                     `access_weeks` devine doar o notă informativă. */}
-                <div className="aa-stack-sm" style={{ display: 'grid', gridTemplateColumns: '150px 150px 1fr', gap: 10, alignItems: 'end', marginTop: 10 }}>
+                <div className="aa-stack-sm" style={{ display: 'grid', gridTemplateColumns: '150px 150px minmax(0,1fr)', gap: 10, alignItems: 'end', marginTop: 10 }}>
                   <Field label="Acces până la (manual)" type="date" value={c.ends_on || ''} onChange={v => setFlows(p => p.map(x => x.id === c.id ? { ...x, ends_on: v || null } : x))} />
                   <Field label="…sau durată (săptămâni)" type="number" value={c.access_weeks ?? ''} onChange={v => setFlows(p => p.map(x => x.id === c.id ? { ...x, access_weeks: v === '' ? null : Number(v) } : x))} />
                   <p style={{ fontSize: 11, color: 'var(--fg-3)', lineHeight: 1.5, margin: 0 }}>

@@ -419,6 +419,16 @@ input::placeholder, textarea::placeholder { color: var(--fg-3); }
 .aa-viewport { height: 100vh; height: 100dvh; }
 .aa-viewport-min { min-height: 100vh; min-height: 100dvh; }
 
+/* Tabelele de lucru din exerciții.
+   Sub 640px, coloanele fixe (procent, rol, buton de ștergere) lasă câmpului de text
+   sub 70px — nu se poate scrie în el. Preferăm derularea orizontală: rândul își
+   păstrează lățimea utilizabilă, iar elevul îl aduce cu degetul. */
+@media (max-width: 640px) {
+  .aa-tbl { min-width: 520px; }
+  /* Containerul direct al grilelor devine derulabil. */
+  .aa-tbl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
 /* Ascunde pe mobil ce nu încape (etichete lungi, coloane secundare). */
 @media (max-width: 640px) {
   .aa-hide-sm { display: none !important; }

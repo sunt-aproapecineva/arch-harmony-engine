@@ -162,7 +162,7 @@ export const AdminFlowPanel: React.FC = () => {
       </div>
 
       {/* Sumar de pregătire a apelului */}
-      <div style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', marginBottom: 20 }}>
+      <div style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(auto-fit, minmax(160px, minmax(0,1fr)))', marginBottom: 20 }}>
         {[
           { label: 'În flowă', value: stats.total, tone: 'var(--fg)' },
           { label: 'Fără diagnostic', value: stats.faraQuiz, tone: stats.faraQuiz ? 'var(--warn)' : 'var(--fg-3)' },

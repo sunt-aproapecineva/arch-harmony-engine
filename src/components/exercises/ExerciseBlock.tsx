@@ -664,7 +664,7 @@ const ActivityAuditExercise: React.FC<{ storageKey: string }> = ({ storageKey })
   const roleColors = { S: 'var(--accent)', D: 'var(--gold)', P: 'var(--info)' };
 
   return (
-    <div>
+    <div className="aa-tbl-scroll">
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
         {(['S', 'D', 'P'] as const).map(r => (
           <div key={r} style={{ padding: '10px 8px', background: 'var(--bg-3)', border: `1px solid ${roleColors[r]}25`, borderRadius: 10, textAlign: 'center' }}>
@@ -678,7 +678,7 @@ const ActivityAuditExercise: React.FC<{ storageKey: string }> = ({ storageKey })
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 72px 120px 32px', gap: 8, marginBottom: 6, padding: '0 2px' }}>
+      <div className="aa-tbl" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 72px 120px 32px', gap: 8, marginBottom: 6, padding: '0 2px' }}>
         {['Activitatea', '% Timp', 'Rol  S / D / P', ''].map((h, i) => (
           <div key={i} style={{ fontSize: 10, fontWeight: 700, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{h}</div>
         ))}
@@ -686,7 +686,7 @@ const ActivityAuditExercise: React.FC<{ storageKey: string }> = ({ storageKey })
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
         {rows.map((row, idx) => (
-          <div key={row.id} style={{ display: 'grid', gridTemplateColumns: '1fr 72px 120px 32px', gap: 8, alignItems: 'center' }}>
+          <div key={row.id} className="aa-tbl" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 72px 120px 32px', gap: 8, alignItems: 'center' }}>
             <input value={row.activity} onChange={e => updateRow(row.id, 'activity', e.target.value)}
               placeholder={`Activitate ${idx + 1}...`}
               style={{ padding: '7px 10px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', width: '100%' }} />
@@ -781,12 +781,12 @@ const BottleneckMapExercise: React.FC<{ storageKey: string }> = ({ storageKey })
   const filledRows = rows.filter(r => r.situation.trim() || r.wasNecessary);
 
   return (
-    <div>
+    <div className="aa-tbl-scroll">
       <div style={{ background: 'rgba(248,113,113,0.06)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 12, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.6 }}>
         💡 O sticlă cu gât îngust — oricât de mult lichid ai înăuntru, iese doar cât permite gâtul. La fel afacerea ta: crește doar cât îți permiți tu să gestionezi.
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 1fr 72px 32px', gap: 8, marginBottom: 6, padding: '0 2px' }}>
+      <div className="aa-tbl" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 90px minmax(0,1fr) 72px 32px', gap: 8, marginBottom: 6, padding: '0 2px' }}>
         {['Decizia / Situația', 'Chiar tu?', 'Motivul (dacă Nu)', 'Timp (min)', ''].map((h, i) => (
           <div key={i} style={{ fontSize: 10, fontWeight: 700, color: 'var(--fg-3)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{h}</div>
         ))}
@@ -794,7 +794,7 @@ const BottleneckMapExercise: React.FC<{ storageKey: string }> = ({ storageKey })
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 12 }}>
         {rows.map((row, idx) => (
-          <div key={row.id} style={{ display: 'grid', gridTemplateColumns: '1fr 90px 1fr 72px 32px', gap: 8, alignItems: 'center' }}>
+          <div key={row.id} className="aa-tbl" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 90px minmax(0,1fr) 72px 32px', gap: 8, alignItems: 'center' }}>
             <input value={row.situation} onChange={e => updateRow(row.id, 'situation', e.target.value)}
               placeholder={`Situația ${idx + 1}...`}
               style={{ padding: '7px 10px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', width: '100%' }} />
@@ -891,7 +891,7 @@ const AbsenceTestExercise: React.FC<{ storageKey: string }> = ({ storageKey }) =
   const count = (g: string) => rows.filter(r => r.gravity === g).length;
 
   return (
-    <div>
+    <div className="aa-tbl-scroll">
       <div style={{ background: 'rgba(196,240,228,0.05)', border: '1px solid rgba(196,240,228,0.15)', borderRadius: 12, padding: '14px 18px', marginBottom: 20, fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.6, fontStyle: 'italic', textAlign: 'center' }}>
         "Dacă aș pleca mâine 2 zile și nu aș răspunde la niciun mesaj — ce s-ar întâmpla?"
       </div>
@@ -901,7 +901,7 @@ const AbsenceTestExercise: React.FC<{ storageKey: string }> = ({ storageKey }) =
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
         {rows.map((row, idx) => (
-          <div key={row.id} style={{ display: 'grid', gridTemplateColumns: '1fr 130px 1fr 32px', gap: 8, alignItems: 'start' }}>
+          <div key={row.id} className="aa-tbl" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 130px minmax(0,1fr) 32px', gap: 8, alignItems: 'start' }}>
             <textarea value={row.scenario} onChange={e => updateRow(row.id, 'scenario', e.target.value)}
               placeholder={`Scenariul ${idx + 1}...`} rows={2}
               style={{ padding: '7px 10px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', resize: 'none', lineHeight: 1.5, width: '100%' }} />
@@ -2669,7 +2669,7 @@ const MiroOrgExercise: React.FC<{ template: ExerciseTemplate; storageKey: string
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {template.colorLegend?.map((c, i) => (
             <div key={i} style={{
-              display: 'grid', gridTemplateColumns: '14px 1fr 2fr', gap: 10, alignItems: 'center',
+              display: 'grid', gridTemplateColumns: '14px minmax(0,1fr) 2fr', gap: 10, alignItems: 'center',
               padding: '8px 10px', background: 'var(--bg-3)', borderRadius: 8, border: '1px solid var(--border)',
             }}>
               <div style={{ width: 14, height: 14, borderRadius: 4, background: c.color, border: c.name === 'Gri punctat' ? '1.5px dashed var(--fg-3)' : 'none' }} />

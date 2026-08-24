@@ -97,11 +97,15 @@ async function hydrateUser(authUser: any): Promise<User | null> {
   if (!authUser) return null;
 
   try {
-    const [{ data: profile }, { data: roles }, { data: quizRows }, enrollments] = await Promise.all([
-      supabase.from('profiles').select('full_name,email,tariff,avatar_url').eq('id', authUser.id).maybeSingle(),
+    // Profilul se citește ÎNAINTE de înscrieri: dacă tabelul `enrollments` lipsește
+    // încă, rezerva trebuie să folosească tariful real de pe profil, nu 'student'.
+    const { data: profile } = await supabase
+      .from('profiles').select('full_name,email,tariff,avatar_url').eq('id', authUser.id).maybeSingle();
+
+    const [{ data: roles }, { data: quizRows }, enrollments] = await Promise.all([
       supabase.from('user_roles').select('role').eq('user_id', authUser.id),
       fetchQuizRows(authUser.id),
-      fetchEnrollments(authUser.id),
+      fetchEnrollments(authUser.id, (profile?.tariff as Tariff) || 'student'),
     ]);
     const isAdmin = (roles || []).some((r: any) => r.role === 'admin');
 

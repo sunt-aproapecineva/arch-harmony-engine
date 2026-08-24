@@ -51,7 +51,7 @@ const MISSING_SCHEMA_CODES = new Set(['42P01', '42703', 'PGRST200']);
  * la primul curs activ, în loc să blocăm toată școala afară. Nu e o breșă: RLS-ul din DB
  * protejează datele oricum — fallback-ul deschide doar navigarea, nu conținutul altcuiva.
  */
-export async function fetchEnrollments(userId: string): Promise<Enrollment[]> {
+export async function fetchEnrollments(userId: string, fallbackTariff: Tariff = 'student'): Promise<Enrollment[]> {
   if (!userId) return [];
   try {
     // Fluxul vine odată cu înscrierea: ancorează deblocarea modulelor și canalul de
@@ -99,7 +99,9 @@ export async function fetchEnrollments(userId: string): Promise<Enrollment[]> {
         '[Enrollments] tabelul `enrollments` lipsește — migrația multicurs nu e aplicată. ' +
         'Degradez la cursul implicit.', error,
       );
-      return fallback ? [{ course_id: fallback.id, tariff: 'student' }] : [];
+      // Tariful vine din profil, nu hardcodat: altfel un elev cu tarif Arhitect
+      // pierdea biblioteca exact în fereastra dintre deploy și migrație.
+      return fallback ? [{ course_id: fallback.id, tariff: fallbackTariff }] : [];
     }
     console.warn('[Enrollments] citire eșuată și fără cache local', error);
     return [];
