@@ -6,7 +6,9 @@ import { useNavigate } from '@/lib/router-compat';
 import { fetchModulesWithLessons, fetchAdminUsers, fetchAllProgress, AdminModule, AdminUserRow, AdminProgressRow } from '../../lib/adminData';
 import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
 import { courseLessonIndex, modulePct, overallPct, doneCount, doneByUser } from '@/lib/adminProgress';
-import { courseTiers, getTier, defaultTier } from '@/lib/courses';
+import { courseTiers, getTier, defaultTier, parseTariffFilter } from '@/lib/courses';
+import { AdminScopeBar } from '../../components/admin/AdminScopeBar';
+import { matchesScope, userQuizDone, userFlowId, userTariff } from '../../lib/adminData';
 import type { Tariff } from '../../lib/types';
 
 type SortKey = 'name' | 'progress' | 'lastActive';
@@ -50,7 +52,10 @@ const CellPopover: React.FC<{ userName: string; moduleName: string; lessons: { t
 );
 
 export const AdminProgress: React.FC = () => {
-  const { course, courseId, flows } = useAdminCourseScope();
+  // Matricea are o coloană per modul, deci se raportează la UN program: două
+  // metodologii n-au aceleași module și un procent combinat n-ar însemna nimic.
+  // De aceea bara de filtrare de aici cere un program (`requireCourse`).
+  const { course, courseId, flows, flowId, tariffId } = useAdminCourseScope();
   const navigate = useNavigate();
   const [users, setUsers] = useState<AdminUserRow[]>([]);
   const [progress, setProgress] = useState<AdminProgressRow[]>([]);
@@ -60,19 +65,17 @@ export const AdminProgress: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      const [u, p] = await Promise.all([fetchAdminUsers(courseId), fetchAllProgress()]);
+      const [u, p] = await Promise.all([fetchAdminUsers(), fetchAllProgress()]);
       setUsers(u); setProgress(p);
     })();
   }, [courseId]);
 
   // Filtrul putea rămâne pe o treaptă a programului anterior (ex. „Arhitect" după
   // comutarea pe START), caz în care tabelul apărea gol fără explicație.
-  useEffect(() => {
-    const generic = ['all','low','mid','high','done','inactiv','nedemarat','fara-quiz','fara-flux'];
-    if (!generic.includes(filterKey) && !courseTiers(courseId).some(t => t.id === filterKey)) {
-      setFilterKey('all');
-    }
-  }, [courseId, filterKey]);
+  // Treapta și fluxul stau acum în AdminScopeBar (comune tuturor paginilor de admin),
+  // iar chipurile de aici au rămas strict despre STAREA elevului: cât a parcurs, de
+  // când n-a mai intrat, dacă are diagnostic. Înainte cele două axe erau amestecate
+  // în același rând de butoane și se anulau reciproc.
 
   // Structura vine din COD, nu din tabelul `modules`: rândurile de acolo au id-uri UUID
   // care nu se potrivesc niciodată cu progress.lesson_id (id-uri din cod), deci matricea
@@ -93,10 +96,15 @@ export const AdminProgress: React.FC = () => {
     return userProg.sort((a, b) => new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime())[0].completed_at;
   };
 
-  const avgProgress = users.length > 0 ? Math.round(users.reduce((s, u) => s + getUserOverallPct(u.id), 0) / users.length) : 0;
+  // Elevii din domeniu: înscriși la programul privit, în fluxul și pe treapta cerute.
+  // Fără asta, matricea de progres a programului START ar lista și oamenii care n-au
+  // acces la el, fiecare cu 0% — un tabel plin de rânduri false.
+  const scopedUsers = users.filter(u => matchesScope(u, { courseId, flowId, tariffId }));
+
+  const avgProgress = scopedUsers.length > 0 ? Math.round(scopedUsers.reduce((s, u) => s + getUserOverallPct(u.id), 0) / scopedUsers.length) : 0;
   const totalCompletions = progress.length;
 
-  const filteredUsers = users.filter(u => {
+  const filteredUsers = scopedUsers.filter(u => {
     if (filterKey === 'all') return true;
     const pct = getUserOverallPct(u.id);
     if (filterKey === 'low') return pct > 0 && pct < 30;
@@ -109,10 +117,9 @@ export const AdminProgress: React.FC = () => {
       if (!last) return true;
       return (Date.now() - new Date(last).getTime()) / 86400000 >= 14;
     }
-    if (filterKey === 'fara-quiz') return !u.quiz_done;
-    if (filterKey === 'fara-flux') return !u.flow_id;
-    // Restul sunt id-uri de treaptă ale programului privit.
-    return u.tariff === filterKey;
+    if (filterKey === 'fara-quiz') return !userQuizDone(u, courseId);
+    if (filterKey === 'fara-flux') return !userFlowId(u, courseId);
+    return true;
   });
 
   const sortedUsers = [...filteredUsers].sort((a, b) => {
@@ -143,8 +150,8 @@ export const AdminProgress: React.FC = () => {
   })();
 
   const moduleAvgs = modules.map(mod => {
-    if (users.length === 0) return 0;
-    return Math.round(users.reduce((s, u) => s + getUserModulePct(u.id, mod.id), 0) / users.length);
+    if (scopedUsers.length === 0) return 0;
+    return Math.round(scopedUsers.reduce((s, u) => s + getUserModulePct(u.id, mod.id), 0) / scopedUsers.length);
   });
 
   const exportCSV = () => {
@@ -152,7 +159,7 @@ export const AdminProgress: React.FC = () => {
     const rows = users.map(user => {
       const moduleProgress = modules.map(m => getUserModulePct(user.id, m.id) + '%');
       const completedCount = progress.filter(p => p.user_id === user.id).length;
-      return [user.email, user.full_name, user.is_admin ? 'admin' : 'student', user.tariff, user.created_at, ...moduleProgress, String(completedCount), getUserOverallPct(user.id) + '%'];
+      return [user.email, user.full_name, user.is_admin ? 'admin' : 'student', userTariff(user, courseId) || '—', user.created_at, ...moduleProgress, String(completedCount), getUserOverallPct(user.id) + '%'];
     });
     const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -169,18 +176,23 @@ export const AdminProgress: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 28 }}>
         <div>
           <h1 className="font-aboreto" style={{ fontSize: 22, color: 'var(--fg)', marginBottom: 4 }}>Progres Studenți</h1>
-          <p style={{ fontSize: 13, color: 'var(--fg-3)' }}>Vizualizare globală a progresului per modul</p>
+          <p style={{ fontSize: 13, color: 'var(--fg-3)' }}>Progresul per modul, în programul și fluxul alese</p>
         </div>
         <button onClick={exportCSV} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '9px 20px', background: 'var(--gold-dim)', border: '1px solid rgba(201,169,110,0.3)', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 700, color: 'var(--gold)' }}>
           <Download size={15} /> Export CSV
         </button>
       </div>
 
-      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 24 }}>
+      <AdminScopeBar
+        requireCourse
+        summary={`${scopedUsers.length} elevi în domeniu · ${course?.title || ''}${flowId ? ` · ${flows.find(f => f.id === flowId)?.name || ''}` : ' · toate fluxurile'}${tariffId ? ` · treapta ${getTier(courseId, (parseTariffFilter(tariffId) || {}).tierId)?.label || tariffId}` : ''}`}
+      />
+
+      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 12, marginBottom: 24 }}>
         {[
           { label: 'Progres mediu', value: `${avgProgress}%`, color: 'var(--accent)' },
           { label: 'Total completări', value: totalCompletions, color: 'var(--ok)' },
-          { label: 'Studenți activi', value: users.filter(u => getUserOverallPct(u.id) > 0).length, color: 'var(--info)' },
+          { label: 'Studenți activi', value: scopedUsers.filter(u => getUserOverallPct(u.id) > 0).length, color: 'var(--info)' },
         ].map(({ label, value, color }) => (
           <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '18px 20px' }}>
             <div style={{ fontSize: 28, fontWeight: 700, color, lineHeight: 1, marginBottom: 6 }}>{value}</div>
@@ -195,7 +207,7 @@ export const AdminProgress: React.FC = () => {
             <Trophy size={13} style={{ color: 'var(--gold)' }} /> Clasament
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {[...users].sort((a, b) => getUserOverallPct(b.id) - getUserOverallPct(a.id)).slice(0, 5).map((user, idx) => {
+            {[...scopedUsers].sort((a, b) => getUserOverallPct(b.id) - getUserOverallPct(a.id)).slice(0, 5).map((user, idx) => {
               const pct = getUserOverallPct(user.id);
               return (
                 <div key={user.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -219,8 +231,6 @@ export const AdminProgress: React.FC = () => {
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {([
             { k: 'all', l: 'Toți' },
-            // Treptele programului privit — Business și START au trepte diferite.
-            ...courseTiers(courseId).map(t => ({ k: t.id, l: t.label })),
             { k: 'nedemarat', l: 'N-au început' },
             { k: 'low', l: '< 30%' },
             { k: 'mid', l: '30–80%' },
@@ -246,7 +256,7 @@ export const AdminProgress: React.FC = () => {
         </div>
       </div>
 
-      {users.length === 0 ? (
+      {scopedUsers.length === 0 ? (
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '48px 24px', textAlign: 'center', color: 'var(--fg-3)', fontSize: 14 }}>
           Niciun student înregistrat.
         </div>

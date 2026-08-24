@@ -145,7 +145,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, sidebarOpen }) => 
                 <div style={{ padding: '12px 14px 10px', borderBottom: '1px solid var(--border)' }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)' }}>{user?.full_name || 'User'}</div>
                   <div style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 2, marginBottom: 8 }}>{user?.email}</div>
-                  <TariffBadge tariff={tariff} compact />
+                  <TariffBadge tariff={tariff} courseId={course?.id} compact />
                 </div>
                 <div style={{ padding: 6 }}>
                   {isAdmin && (

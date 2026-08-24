@@ -13,6 +13,7 @@ import { AlertTriangle, Users, ArrowRight, Clock, ShieldCheck } from 'lucide-rea
 import { useNavigate } from '@/lib/router-compat';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdminCourseScope } from '../../hooks/useAdminCourseScope';
+import { AdminScopeBar } from '../../components/admin/AdminScopeBar';
 import { getCourseModules } from '../../lib/content';
 
 interface Row {
@@ -157,9 +158,13 @@ export const AdminFlowPanel: React.FC = () => {
         <p style={{ fontSize: 12.5, color: 'var(--fg-3)', lineHeight: 1.6, maxWidth: 620 }}>
           Unde e fiecare înainte de apelul de grup. Semnalele vin din diagnosticul completat la
           intrare, progresul din lecțiile bifate — nimic nu cere raportare suplimentară de la elev.
-          {!flow && flows.length > 1 && ' Selectează un flux în bara laterală ca să vezi doar cohorta cu care ai apelul.'}
+          {!flow && flows.length > 1 && ' Alege fluxul de mai jos ca să vezi doar cohorta cu care ai apelul.'}
         </p>
       </div>
+
+      {/* Modulul-poartă și lecțiile diferă de la un program la altul, deci lista se
+          raportează la un program ales. */}
+      <AdminScopeBar requireCourse showTariff={false} />
 
       {/* Sumar de pregătire a apelului */}
       <div style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', marginBottom: 20 }}>

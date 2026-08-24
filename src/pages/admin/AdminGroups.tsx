@@ -14,7 +14,7 @@ import {
   fetchGroups, fetchGroupMembers, createGroup, renameGroup, deleteGroup,
   addMembers, removeMember, assignGroupToFlow, revokeGroupFromFlow,
 } from '../../lib/groups';
-import { COURSES } from '../../lib/courses';
+import { COURSES, getCourse, courseTiers, defaultTier } from '../../lib/courses';
 
 export const AdminGroups: React.FC = () => {
   const { user } = useAuthContext();
@@ -91,10 +91,13 @@ export const AdminGroups: React.FC = () => {
     load();
   };
 
-  const handleAssign = async (groupId: string, flowId: string) => {
+  // Alocarea cere DOUĂ decizii: în ce flux intră grupa și pe ce treaptă. Înainte se
+  // alegea doar fluxul, iar treapta cădea tăcut pe 'student' — corect la Business,
+  // inexistent la START.
+  const handleAssign = async (groupId: string, flowId: string, tariff: string) => {
     if (!flowId) return;
     setBusy(true);
-    const { count, error: err } = await assignGroupToFlow(groupId, flowId);
+    const { count, error: err } = await assignGroupToFlow(groupId, flowId, tariff);
     setBusy(false);
     if (err) { alert(err.message); return; }
     alert(`Grupa a fost alocată. ${count} înscrieri actualizate.`);
@@ -194,23 +197,21 @@ export const AdminGroups: React.FC = () => {
                         background: 'var(--accent-dim)', color: 'var(--accent)', border: '1px solid var(--border)',
                       }}>
                         <Link2 size={11} /> {flowLabel(a.flow_id)}
+                        <span style={{ color: 'var(--fg-3)' }}>
+                          · {getTierLabel(flows.find(f => f.id === a.flow_id)?.course_id, a.tariff)}
+                        </span>
                         <button onClick={() => handleRevoke(g.id, a.flow_id)} title="Retrage din flux"
                           style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--error)', padding: 0, display: 'inline-flex' }}>
                           <Unlink size={11} />
                         </button>
                       </span>
                     ))}
-                    <select
-                      defaultValue=""
-                      disabled={busy}
-                      onChange={e => { handleAssign(g.id, e.target.value); e.currentTarget.value = ''; }}
-                      style={{ padding: '5px 9px', borderRadius: 8, fontSize: 11.5, background: 'var(--bg-3)', color: 'var(--fg-2)', border: '1px solid var(--border)', cursor: 'pointer' }}
-                    >
-                      <option value="">+ alocă la flux…</option>
-                      {flows
-                        .filter(f => !(g.assignments || []).some((a: any) => a.flow_id === f.id))
-                        .map(f => <option key={f.id} value={f.id}>{flowLabel(f.id)}</option>)}
-                    </select>
+                    <AssignControl
+                      busy={busy}
+                      options={flows.filter(f => !(g.assignments || []).some((a: any) => a.flow_id === f.id))}
+                      label={flowLabel}
+                      onAssign={(flowId, tariff) => handleAssign(g.id, flowId, tariff)}
+                    />
                   </div>
                   {(g.assignments || []).length === 0 && (
                     <p style={{ fontSize: 11.5, color: 'var(--fg-3)', margin: '8px 0 0' }}>
@@ -322,3 +323,58 @@ const Field: React.FC<{ label: string; value: string; onChange: (v: string) => v
       />
     </label>
   );
+
+
+/**
+ * Alocarea unei grupe la un flux: flux + treaptă, în această ordine.
+ * Fluxul decide programul, programul decide ce trepte sunt posibile — de aceea al
+ * doilea select se reconstruiește la fiecare schimbare a primului.
+ */
+const AssignControl: React.FC<{
+  busy: boolean;
+  options: any[];
+  label: (id: string) => string;
+  onAssign: (flowId: string, tariff: string) => void;
+}> = ({ busy, options, label, onAssign }) => {
+  const [flowId, setFlowId] = React.useState('');
+  const flow = options.find(f => f.id === flowId);
+  const tiers = courseTiers(flow?.course_id);
+  const [tariff, setTariff] = React.useState('');
+
+  React.useEffect(() => {
+    setTariff(defaultTier(flow?.course_id)?.id || '');
+  }, [flow?.course_id]);
+
+  if (!options.length) return null;
+
+  const ctl: React.CSSProperties = {
+    padding: '5px 9px', borderRadius: 8, fontSize: 11.5, background: 'var(--bg-3)',
+    color: 'var(--fg-2)', border: '1px solid var(--border)', cursor: 'pointer', minHeight: 30,
+  };
+
+  return (
+    <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+      <select value={flowId} disabled={busy} onChange={e => setFlowId(e.target.value)} style={ctl} aria-label="Fluxul în care intră grupa">
+        <option value="">+ alocă la flux…</option>
+        {options.map(f => <option key={f.id} value={f.id}>{label(f.id)}</option>)}
+      </select>
+      {flow && (
+        <>
+          <select value={tariff} disabled={busy} onChange={e => setTariff(e.target.value)} style={ctl} aria-label="Treapta cu care intră membrii">
+            {tiers.map(t => <option key={t.id} value={t.id}>{t.label}{t.price ? ` · ${t.price}` : ''}</option>)}
+          </select>
+          <button
+            disabled={busy || !tariff}
+            onClick={() => { onAssign(flowId, tariff); setFlowId(''); }}
+            style={{ ...ctl, fontWeight: 700, color: 'var(--accent)', background: 'var(--accent-dim)', border: '1px solid var(--border-hi)' }}
+          >
+            Alocă
+          </button>
+        </>
+      )}
+    </span>
+  );
+};
+
+const getTierLabel = (courseId: string | undefined, tierId: string) =>
+  courseTiers(courseId).find(t => t.id === tierId)?.label || tierId;

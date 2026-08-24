@@ -12,7 +12,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { TariffBadge } from '../../components/aa/TariffBadge';
 import { ProgressBar } from '../../components/aa/ProgressBar';
 import { getActivity, ActivityEvent, timeAgo, ActivityType } from '../../lib/activity';
-import { fetchAdminUsers, fetchAllProgress, AdminUserRow, AdminProgressRow } from '../../lib/adminData';
+import {
+  fetchAdminUsers, fetchAllProgress, AdminUserRow, AdminProgressRow,
+  matchesScope, userQuizDone, userTariff,
+} from '../../lib/adminData';
+import { AdminScopeBar } from '../../components/admin/AdminScopeBar';
+import { activeCourses, defaultTier, getCourse } from '../../lib/courses';
+import { courseLessonIndex, overallPct, doneByUser } from '../../lib/adminProgress';
 import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
 import { AttentionQueueCard } from '../../components/admin/AttentionQueueCard';
 
@@ -37,7 +43,6 @@ export const AdminDashboard: React.FC = () => {
   const [progress, setProgress] = useState<AdminProgressRow[]>([]);
   const [activity, setActivity] = useState<ActivityEvent[]>([]);
   const [totalLessons, setTotalLessons] = useState(0);
-  const [quizCount, setQuizCount] = useState(0);
   const [whitelistCount, setWhitelistCount] = useState(0);
 
   const [notifMessage, setNotifMessage] = useState('');
@@ -48,7 +53,7 @@ export const AdminDashboard: React.FC = () => {
   // Announcements live in the database so every student sees them.
   useEffect(() => {
     // Reținem și ținta anunțului afișat: ștergerea trebuie să lovească exact anunțul
-    // pe care îl vede adminul, nu fluxul selectat acum în bara laterală.
+    // pe care îl vede adminul, nu fluxul selectat acum în filtru.
     getActiveAnnouncement().then(a => setCurrentNotif(a ? { message: a.message, type: a.type, flowId: a.flow_id ?? null } : null));
   }, []);
 
@@ -57,7 +62,7 @@ export const AdminDashboard: React.FC = () => {
 
   const loadData = useCallback(async () => {
     const [u, p, a, lessonsRes, wlRes] = await Promise.all([
-      fetchAdminUsers(courseId),
+      fetchAdminUsers(),
       fetchAllProgress(),
       getActivity(200),
       supabase.from('lessons').select('id', { count: 'exact', head: true }),
@@ -67,7 +72,7 @@ export const AdminDashboard: React.FC = () => {
     setProgress(p);
     setActivity(a);
     setTotalLessons(lessonsRes.count || 0);
-    setQuizCount(u.filter(x => x.quiz_done).length);
+
     setWhitelistCount(wlRes.count || 0);
   }, [courseId]);
 
@@ -82,10 +87,17 @@ export const AdminDashboard: React.FC = () => {
     activity.filter(e => new Date(e.timestamp).toDateString() === todayStr).map(e => e.userId)
   ).size;
   const totalCompletions = progress.length;
-  const quizPct = users.length > 0 ? Math.round((quizCount / users.length) * 100) : 0;
+  // Elevii din domeniul privit. Fără asta, „Studenți înregistrați" număra toate
+  // conturile platformei, inclusiv pe cei fără acces la programul de pe ecran.
+  const scopedUsers = React.useMemo(
+    () => users.filter(u => matchesScope(u, { courseId, flowId })),
+    [users, courseId, flowId],
+  );
+  const quizCount = scopedUsers.filter(u => userQuizDone(u, courseId)).length;
+  const quizPct = scopedUsers.length > 0 ? Math.round((quizCount / scopedUsers.length) * 100) : 0;
 
   const stats = [
-    { icon: <Users size={18} />, label: 'Studenți înregistrați', value: String(users.length), accent: 'var(--accent)' },
+    { icon: <Users size={18} />, label: 'Studenți în domeniu', value: String(scopedUsers.length), accent: 'var(--accent)' },
     { icon: <BookOpen size={18} />, label: 'Lecții completate total', value: String(totalCompletions), accent: 'var(--gold)' },
     { icon: <Award size={18} />, label: 'Quiz-uri finalizate', value: `${quizCount} (${quizPct}%)`, accent: 'var(--warn)' },
     { icon: <Activity size={18} />, label: 'Activi azi', value: String(activeToday), accent: 'var(--ok-soft)' },
@@ -93,10 +105,16 @@ export const AdminDashboard: React.FC = () => {
 
   const recentActivity = activity.slice(0, 30);
 
-  const getUserPct = (userId: string) => {
-    const done = progress.filter(p => p.user_id === userId).length;
-    return totalLessons > 0 ? Math.round((done / totalLessons) * 100) : 0;
-  };
+  // Procentul se numără pe id-urile din COD ale programului. Înainte se împărțeau
+  // toate rândurile de progres ale omului (din toate cursurile) la numărul de rânduri
+  // din tabelul `lessons` — două mărimi care nu se raportează una la alta și care
+  // puteau da peste 100%.
+  const doneMap = React.useMemo(() => doneByUser(progress), [progress]);
+  const pctIndex = React.useMemo(
+    () => courseLessonIndex(courseId || activeCourses()[0]?.id || 'business'),
+    [courseId],
+  );
+  const getUserPct = (userId: string) => overallPct(pctIndex, doneMap[userId] || new Set());
 
   const lastActive = (userId: string) => {
     const last = activity.find(e => e.userId === userId);
@@ -105,7 +123,7 @@ export const AdminDashboard: React.FC = () => {
 
   const handlePublishNotif = async () => {
     if (!notifMessage.trim()) return;
-    // Ținta e fluxul selectat în bara laterală. „Toate fluxurile" publică global.
+    // Ținta e fluxul selectat în filtrul de sus. „Toate fluxurile" publică global.
     const created = await publishAnnouncement(notifMessage.trim(), notifType, user?.id ?? null, 7, flowId);
     setCurrentNotif(created
       ? { message: created.message, type: created.type, flowId: created.flow_id ?? null }
@@ -124,7 +142,11 @@ export const AdminDashboard: React.FC = () => {
   const handleAddWhitelist = async () => {
     const email = newEmail.trim().toLowerCase();
     if (!email) return;
-    const { error } = await supabase.from('whitelist').insert({ email, tariff: 'student' });
+    // Adăugarea rapidă scria mereu `tariff: 'student'` fără `course_id` — adică o
+    // preautorizare la Business, oricât de clar te-ai fi uitat la START.
+    const target = courseId || activeCourses()[0]?.id || 'business';
+    const { error } = await supabase.from('whitelist')
+      .insert({ email, tariff: defaultTier(target)?.id || 'student', course_id: target });
     if (error) return;
     setNewEmail('');
     setAddedEmail(true);
@@ -143,6 +165,8 @@ export const AdminDashboard: React.FC = () => {
         <p style={{ fontSize: 13, color: 'var(--fg-3)' }}>Statusul platformei în timp real · actualizare automată la 30s</p>
       </motion.div>
 
+      <AdminScopeBar showTariff={false} summary={`${scopedUsers.length} elevi · ${courseId ? getCourse(courseId)?.title : 'toate programele'}`} />
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4" style={{ marginBottom: 28 }}>
         {stats.map((stat, i) => (
           <motion.div key={stat.label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} style={cardStyle}>
@@ -153,8 +177,12 @@ export const AdminDashboard: React.FC = () => {
         ))}
       </div>
 
-      <div style={{ marginBottom: 20 }}>
-        <AttentionQueueCard />
+      {/* Câte o coadă per program din domeniu: modulele diferă, deci și „unde s-a
+          blocat omul" e o întrebare per program. */}
+      <div style={{ display: 'grid', gap: 16, marginBottom: 20, gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
+        {(courseId ? [courseId] : activeCourses().map(c => c.id)).map(cid => (
+          <AttentionQueueCard key={cid} courseId={cid} />
+        ))}
       </div>
 
       <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', marginBottom: 20 }}>
@@ -162,13 +190,13 @@ export const AdminDashboard: React.FC = () => {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           style={{ ...cardStyle, flex: '1 1 280px', minWidth: 280, maxWidth: 380 }}>
           <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--fg-3)', textTransform: 'uppercase', marginBottom: 16 }}>
-            Studenți ({users.length})
+            Studenți ({scopedUsers.length})
           </div>
-          {users.length === 0 ? (
-            <p style={{ fontSize: 13, color: 'var(--fg-3)', textAlign: 'center', padding: '20px 0' }}>Niciun student.</p>
+          {scopedUsers.length === 0 ? (
+            <p style={{ fontSize: 13, color: 'var(--fg-3)', textAlign: 'center', padding: '20px 0' }}>Niciun student în domeniul ales.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2, maxHeight: 480, overflowY: 'auto' }}>
-              {users.map(u => {
+              {scopedUsers.map(u => {
                 const pct = getUserPct(u.id);
                 return (
                   <div key={u.id}
@@ -185,7 +213,7 @@ export const AdminDashboard: React.FC = () => {
                         <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140 }}>
                           {u.full_name || u.email}
                         </p>
-                        <TariffBadge tariff={u.tariff} compact />
+                        <TariffBadge tariff={userTariff(u, courseId) || u.legacyTariff} courseId={courseId || u.enrollments[0]?.course_id} compact />
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                         <ProgressBar value={pct} height={3} className="flex-1" />
@@ -280,11 +308,11 @@ export const AdminDashboard: React.FC = () => {
             </button>
           </div>
           {/* Ținta anunțului. Fără linia asta, adminul n-are de unde ști că mesajul
-              pleacă doar către fluxul selectat în bara laterală. */}
+              pleacă doar către fluxul selectat în filtrul de sus. */}
           <p style={{ fontSize: 11, color: flowId ? 'var(--accent)' : 'var(--warn)', margin: '8px 0 0', lineHeight: 1.5 }}>
             {flowId
               ? `Anunțul merge doar către ${flows.find(f => f.id === flowId)?.name || 'fluxul selectat'}.`
-              : 'Anunțul merge către TOȚI elevii, din toate fluxurile. Selectează un flux în bara laterală ca să-l țintești.'}
+              : 'Anunțul merge către TOȚI elevii, din toate fluxurile. Alege un flux în filtrul de sus ca să-l țintești.'}
           </p>
         </div>
       </motion.div>

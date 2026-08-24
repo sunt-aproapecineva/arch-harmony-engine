@@ -13,6 +13,8 @@ import { STATUS_LABEL, STATUS_COLOR, type StudentScores } from '@/lib/studentSco
 import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
 
 interface Props {
+  /** Programul pentru care se face briefingul. Vine din înscrierile elevului. */
+  courseId?: string | null;
   studentId: string;
   studentName: string;
 }
@@ -243,7 +245,7 @@ export function BriefingMarkdown({ text }: { text: string }) {
 }
 
 
-export const StudentBriefingPanel: React.FC<Props> = ({ studentId, studentName }) => {
+export const StudentBriefingPanel: React.FC<Props> = ({ studentId, studentName , courseId: propCourseId }) => {
   const [scores, setScores] = useState<StudentScores | null>(null);
   const [stuck, setStuck] = useState<{ id: string; label: string } | null>(null);
   const [summary, setSummary] = useState<string | null>(null);
@@ -254,7 +256,10 @@ export const StudentBriefingPanel: React.FC<Props> = ({ studentId, studentName }
   const [error, setError] = useState<string | null>(null);
 
   const fetchBundle = useServerFn(getStudentInsightBundle);
-  const { courseId } = useAdminCourseScope();
+  // Briefingul e al unui program (scoruri pe modulele lui), deci programul vine de la
+  // pagină — care îl ia din înscrierile elevului, nu dintr-un filtru global.
+  const { courseId: scopeCourse } = useAdminCourseScope();
+  const courseId = propCourseId || scopeCourse || 'business';
   const generateFn = useServerFn(generateStudentInsight);
 
   const load = async () => {

@@ -544,3 +544,16 @@ input::placeholder, textarea::placeholder { color: var(--fg-3); }
   body { font-size: 13px; }
   .calendar-grid { font-size: 11px; }
 }
+
+/* ── Lecție: conținut + cuprinsul modulului ────────────────────────────────
+   Direcția stă aici, nu inline: un `flexDirection` inline câștigă mereu în
+   fața claselor utilitare, așa că bara laterală cădea sub navigare. */
+.aa-lesson-layout { flex-direction: column; gap: 0; }
+.aa-lesson-aside { display: none; }
+@media (min-width: 1024px) {
+  .aa-lesson-layout { flex-direction: row; gap: 24px; align-items: flex-start; }
+  .aa-lesson-aside { display: block; width: 248px; flex-shrink: 0; }
+}
+/* Fără coloană laterală lecția respiră la 820px; cu ea, are nevoie de loc. */
+.aa-lesson-page { max-width: 820px; }
+@media (min-width: 1024px) { .aa-lesson-page { max-width: 1112px; } }

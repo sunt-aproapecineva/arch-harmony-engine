@@ -5,6 +5,7 @@ import { useNavigate } from '@/lib/router-compat';
 import { AlertCircle, ChevronRight, RefreshCw } from 'lucide-react';
 import { getAttentionQueue } from '@/lib/studentInsights.functions';
 import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
+import { activeCourses, getCourse } from '@/lib/courses';
 import { STATUS_COLOR, STATUS_LABEL } from '@/lib/studentScoring';
 
 const cardStyle: React.CSSProperties = {
@@ -14,13 +15,17 @@ const cardStyle: React.CSSProperties = {
   padding: 20,
 };
 
-export const AttentionQueueCard: React.FC = () => {
+export const AttentionQueueCard: React.FC<{ courseId?: string | null }> = ({ courseId: propCourseId }) => {
   const navigate = useNavigate();
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const fn = useServerFn(getAttentionQueue);
-  const { courseId } = useAdminCourseScope();
+  // Coada e a UNUI program (module și lecții diferite), deci programul vine ca
+  // proprietate, de la pagină. Când adminul se uită la „toate", dashboardul afișează
+  // câte o coadă per program — mai cinstit decât o coadă tăcut incompletă.
+  const { courseId: scopeCourse } = useAdminCourseScope();
+  const courseId = propCourseId || scopeCourse || activeCourses()[0]?.id || 'business';
 
   const load = async () => {
     setLoading(true); setError(null);
@@ -37,7 +42,7 @@ export const AttentionQueueCard: React.FC = () => {
     <div style={cardStyle}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--fg-3)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <AlertCircle size={12} style={{ color: 'var(--warn-strong)' }} /> Necesită atenție
+          <AlertCircle size={12} style={{ color: 'var(--warn-strong)' }} /> Necesită atenție · {getCourse(courseId)?.shortTitle}
         </div>
         <button onClick={load} disabled={loading}
           style={{ background: 'none', border: 'none', cursor: loading ? 'wait' : 'pointer', color: 'var(--fg-3)', display: 'flex', alignItems: 'center', gap: 4, fontSize: 11 }}>

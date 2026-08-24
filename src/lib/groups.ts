@@ -14,6 +14,7 @@
 // Alocarea scrie înscrieri reale, cu `source_group_id` care reține proveniența.
 // Retragerea grupei șterge doar ce a adus ea; accesele date manual rămân neatinse.
 import { supabase } from '@/integrations/supabase/client';
+import { defaultTier } from './courses';
 
 export interface Group {
   id: string;
@@ -108,7 +109,14 @@ export async function removeMember(groupId: string, userId: string) {
  * Alocă grupa unui flux: fiecare membru primește înscrierea la cursul fluxului, cu
  * orarul și fereastra lui de acces. Idempotentă — re-rularea prinde doar membrii noi.
  */
-export async function assignGroupToFlow(groupId: string, flowId: string, tariff = 'student') {
+export async function assignGroupToFlow(groupId: string, flowId: string, tariff?: string) {
+  // Treapta aparține PROGRAMULUI fluxului. Implicitul era 'student' — o treaptă
+  // Business scrisă și în înscrierile de la START, unde nici nu există: elevul
+  // apărea apoi sub un tarif inexistent și nu trecea de niciun filtru.
+  if (!tariff) {
+    const { data } = await supabase.from('flows').select('course_id').eq('id', flowId).maybeSingle();
+    tariff = defaultTier(data?.course_id)?.id || 'student';
+  }
   const up = await supabase
     .from('group_flow_assignments')
     .upsert({ group_id: groupId, flow_id: flowId, tariff }, { onConflict: 'group_id,flow_id' });

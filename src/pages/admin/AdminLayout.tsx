@@ -15,8 +15,6 @@ import {
 import { useAuthContext } from '../../context/AuthContext';
 import { Header } from '../../components/layout/Header';
 import { useIsMobile } from '../../hooks/use-mobile';
-import { useAdminCourseScope } from '../../hooks/useAdminCourseScope';
-import { activeCourses, COURSE_ACCENT } from '../../lib/courses';
 
 const SIDEBAR_WIDTH = 232;
 
@@ -25,8 +23,6 @@ export const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { course, courseId, setCourseId, flows, flowId, setFlowId } = useAdminCourseScope();
-  const courses = activeCourses();
 
   if (!isAdmin) {
     return <Navigate to="/" replace />;
@@ -66,60 +62,11 @@ export const AdminLayout: React.FC = () => {
         </div>
       </div>
 
-      {/* Domeniul privit: program + flux. Tot cockpitul se raportează la ele. */}
-      <div style={{ padding: '12px 12px 0', flexShrink: 0 }}>
-        {courses.length > 1 && (
-          <>
-            <span style={labelStyle}>Program</span>
-            <div style={{ display: 'flex', gap: 4, marginBottom: 10 }}>
-              {courses.map(c => {
-                const active = c.id === courseId;
-                const accent = COURSE_ACCENT[c.accent];
-                return (
-                  <button
-                    key={c.id}
-                    onClick={() => setCourseId(c.id)}
-                    aria-pressed={active}
-                    style={{
-                      flex: 1, minHeight: 32, padding: '5px 8px', borderRadius: 7, cursor: 'pointer',
-                      fontSize: 11.5, fontWeight: active ? 600 : 400,
-                      color: active ? accent.fg : 'var(--fg-3)',
-                      background: active ? accent.dim : 'transparent',
-                      border: `1px solid ${active ? 'var(--border-hi)' : 'var(--border)'}`,
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    {c.shortTitle}
-                  </button>
-                );
-              })}
-            </div>
-          </>
-        )}
-
-        {flows.length > 0 && (
-          <>
-            <span style={labelStyle}>Flux</span>
-            <select
-              value={flowId || ''}
-              onChange={e => setFlowId(e.target.value || null)}
-              aria-label="Fluxul privit"
-              style={{
-                width: '100%', minHeight: 34, padding: '6px 8px', borderRadius: 7, fontSize: 11.5,
-                background: 'var(--bg-3)', color: flowId ? 'var(--fg)' : 'var(--fg-3)',
-                border: '1px solid var(--border)', cursor: 'pointer',
-              }}
-            >
-              <option value="">Toate fluxurile</option>
-              {flows.map(f => (
-                <option key={f.id} value={f.id}>
-                  {f.name} · start {new Date(f.starts_on).toLocaleDateString('ro-RO', { day: 'numeric', month: 'short', year: '2-digit' })}
-                </option>
-              ))}
-            </select>
-          </>
-        )}
-      </div>
+      {/* Domeniul privit NU mai stă aici.
+          Era un comutator Business/Start peste tot panoul, adică un MOD în care intrai:
+          lista de acces, adăugarea unui elev și filtrele arătau doar jumătate din
+          realitate, iar chipurile de treaptă rămâneau ale unui singur program.
+          Adminul vede tot; decupajul se face în pagină, cu AdminScopeBar. */}
 
       {/* Nav */}
       <nav style={{ flex: 1, padding: '14px 8px', overflowY: 'auto' }}>

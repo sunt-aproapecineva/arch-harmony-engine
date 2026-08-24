@@ -293,7 +293,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
               <LogOut size={14} />
             </button>
           </div>
-          <TariffBadge tariff={tariff} compact />
+          <TariffBadge tariff={tariff} courseId={course?.id} compact />
         </div>
       </div>
     </div>

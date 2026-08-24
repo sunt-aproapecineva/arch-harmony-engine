@@ -43,6 +43,13 @@ function getYouTubeId(url: string): string | null {
 }
 
 // ─── Sidebar lesson list ──────────────────────────────────────────────────────
+/**
+ * Cuprinsul modulului, lângă lecție.
+ *
+ * Înainte: 220px lățime, titluri retezate la elipsă („1. Când Angajezi: Semnal…"),
+ * un „ex" criptic lipit în dreapta și niciun indiciu de progres. Elementul își rata
+ * scopul — să știi unde ești și cât a mai rămas.
+ */
 const LessonSidebar: React.FC<{
   module: Module;
   currentId: string;
@@ -50,56 +57,101 @@ const LessonSidebar: React.FC<{
 }> = ({ module, currentId, isCompleted }) => {
   const navigate = useNavigate();
   const { course } = useCourse();
+
+  const items = module.lessons || [];
+  const trackable = items.filter((l: any) => l.type === 'exercise' || !!(l.video_url && String(l.video_url).trim()));
+  const done = trackable.filter((l: any) => isCompleted(l.id)).length;
+  const pct = trackable.length ? Math.round((done / trackable.length) * 100) : 0;
+
   return (
-    <div style={{
-      background: 'var(--bg-card)', border: '1px solid var(--border)',
-      borderRadius: 14, padding: 16, position: 'sticky', top: 72,
-    }}>
-      <div className="font-aboreto" style={{ fontSize: 9, letterSpacing: '0.12em', color: 'var(--fg-3)', textTransform: 'uppercase', marginBottom: 12 }}>
-        {module.etapa} · {module.title}
+    <nav
+      aria-label={`Lecțiile din ${module.title}`}
+      style={{
+        background: 'var(--bg-card)', border: '1px solid var(--border)',
+        borderRadius: 16, position: 'sticky', top: 72, overflow: 'hidden',
+      }}
+    >
+      {/* Antet: unde ești și cât ai făcut din modul. */}
+      <div style={{ padding: '14px 16px 12px', borderBottom: '1px solid var(--border)' }}>
+        <div className="font-aboreto" style={{ fontSize: 9.5, letterSpacing: '0.14em', color: 'var(--gold)', textTransform: 'uppercase' }}>
+          {module.etapa}
+        </div>
+        <div style={{ fontSize: 12.5, color: 'var(--fg)', fontWeight: 600, lineHeight: 1.35, margin: '5px 0 10px' }}>
+          {module.title}
+        </div>
+        <div className="progress-bar" style={{ marginBottom: 6 }}>
+          <div style={{ height: '100%', width: `${pct}%`, background: 'var(--accent)', borderRadius: 2, transition: 'width 0.6s ease' }} />
+        </div>
+        <div style={{ fontSize: 10.5, color: 'var(--fg-3)' }}>
+          {done} din {trackable.length} parcurse
+        </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {module.lessons.map(l => {
+
+      <ol style={{ listStyle: 'none', margin: 0, padding: 6, display: 'flex', flexDirection: 'column', gap: 1 }}>
+        {items.map((l: any, i: number) => {
           const isActive = l.id === currentId;
           const isDone = isCompleted(l.id);
           const isExercise = l.type === 'exercise';
+          const accent = isExercise ? 'var(--gold)' : 'var(--accent)';
           return (
-            <button
-              key={l.id}
-              onClick={() => navigate(courseLessonPath(course, l.id))}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-                padding: '7px 10px', borderRadius: 8, cursor: 'pointer', textAlign: 'left',
-                background: isActive ? (isExercise ? 'rgba(201,169,110,0.1)' : 'var(--accent-dim)') : 'transparent',
-                border: isActive ? `1px solid ${isExercise ? 'rgba(201,169,110,0.25)' : 'rgba(196,240,228,0.2)'}` : '1px solid transparent',
-                transition: 'background 0.15s',
-              }}
-              onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-3)'; }}
-              onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
-            >
-              <div style={{ flexShrink: 0 }}>
-                {isDone
-                  ? <CheckCircle2 size={13} style={{ color: 'var(--ok)' }} />
-                  : isExercise
-                  ? <div style={{ width: 13, height: 13, borderRadius: 3, border: `1.5px solid ${isActive ? 'var(--gold)' : 'var(--border)'}` }} />
-                  : <div style={{ width: 13, height: 13, borderRadius: '50%', border: `1.5px solid ${isActive ? 'var(--accent)' : 'var(--border)'}` }} />
-                }
-              </div>
-              <span style={{ fontSize: 11, color: isActive ? 'var(--fg)' : 'var(--fg-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-                {l.order_index}. {l.title}
-              </span>
-              {isExercise && !isDone && (
-                <span style={{ fontSize: 9, color: 'var(--gold)', fontWeight: 700, flexShrink: 0 }}>ex</span>
-              )}
-            </button>
+            <li key={l.id}>
+              <button
+                onClick={() => navigate(courseLessonPath(course, l.id))}
+                aria-current={isActive ? 'true' : undefined}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'flex-start', gap: 10,
+                  padding: '9px 10px', borderRadius: 10, cursor: 'pointer', textAlign: 'left',
+                  background: isActive ? (isExercise ? 'var(--gold-dim)' : 'var(--accent-dim)') : 'transparent',
+                  border: `1px solid ${isActive ? 'var(--border-hi)' : 'transparent'}`,
+                  transition: 'background 0.15s, border-color 0.15s',
+                }}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--bg-3)'; }}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
+              >
+                <span style={{ flexShrink: 0, marginTop: 1, display: 'grid', placeItems: 'center', width: 16, height: 16 }}>
+                  {isDone
+                    ? <CheckCircle2 size={14} style={{ color: 'var(--ok)' }} />
+                    : <span style={{
+                        width: 13, height: 13,
+                        borderRadius: isExercise ? 4 : '50%',
+                        border: `1.5px solid ${isActive ? accent : 'var(--border-hi)'}`,
+                      }} />}
+                </span>
+
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  {/* Titlul se încadrează pe două rânduri în loc să fie retezat: un
+                      cuprins din care nu poți citi titlurile nu e un cuprins. */}
+                  <span style={{
+                    display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden', fontSize: 12, lineHeight: 1.4,
+                    color: isActive ? 'var(--fg)' : isDone ? 'var(--fg-3)' : 'var(--fg-2)',
+                    fontWeight: isActive ? 600 : 400,
+                  }}>
+                    <span style={{ color: 'var(--fg-3)', fontVariantNumeric: 'tabular-nums' }}>{i + 1}.</span>{' '}
+                    {l.title}
+                  </span>
+
+                  {/* „ex" era criptic. Spunem ce e, cu cuvinte. */}
+                  {isExercise && (
+                    <span style={{
+                      display: 'inline-block', marginTop: 4, fontSize: 9,
+                      fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+                      color: 'var(--gold)', background: 'var(--gold-dim)',
+                      border: '1px solid var(--border)', padding: '2px 7px', borderRadius: 99,
+                    }}>
+                      Exercițiu
+                    </span>
+                  )}
+                </span>
+              </button>
+            </li>
           );
         })}
-      </div>
-    </div>
+      </ol>
+    </nav>
   );
 };
 
-// ─── Navigation buttons ───────────────────────────────────────────────────────
 const NavButtons: React.FC<{
   prev: Lesson | null;
   next: Lesson | null;
@@ -478,7 +530,7 @@ export const LessonPage: React.FC = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="hidden lg:block" style={{ width: 220, flexShrink: 0 }}>
+            <div className="aa-lesson-aside">
               <LessonSidebar module={module} currentId={lesson.id} isCompleted={isCompleted} />
             </div>
           </div>
@@ -489,7 +541,7 @@ export const LessonPage: React.FC = () => {
 
   // ── VIDEO LESSON PAGE ──────────────────────────────────────────────────────
   return (
-    <div style={{ maxWidth: 820, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="aa-lesson-page" style={{ margin: '0 auto', padding: '32px 24px' }}>
       {/* Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--fg-3)', marginBottom: 12, flexWrap: 'wrap' }}>
         <Link to={courseDashboardPath(course)} style={{ color: 'var(--fg-3)', transition: 'color 0.15s' }}
@@ -517,7 +569,10 @@ export const LessonPage: React.FC = () => {
         </div>
       </motion.div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }} className="lg:flex-row lg:gap-6">
+      {/* `flexDirection: 'column'` inline BĂTEA clasa `lg:flex-row`: stilul inline
+          câștigă mereu în fața claselor, deci pe desktop cuprinsul cădea dedesubt,
+          sub butoanele de navigare. Direcția stă acum în CSS. */}
+      <div className="aa-lesson-layout" style={{ display: 'flex' }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           {/* Video / Welcome card */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
@@ -717,7 +772,7 @@ export const LessonPage: React.FC = () => {
         </div>
 
         {/* Sidebar */}
-        <div className="hidden lg:block" style={{ width: 220, flexShrink: 0 }}>
+        <div className="aa-lesson-aside">
           <LessonSidebar module={module} currentId={lesson.id} isCompleted={isCompleted} />
         </div>
       </div>

@@ -199,3 +199,71 @@ export const TIER_ACCENT: Record<CourseTier['accent'], { fg: string; bg: string 
   accent: { fg: 'var(--accent)', bg: 'var(--accent-dim)' },
   gold: { fg: 'var(--gold)', bg: 'var(--gold-dim)' },
 };
+
+// ─── Vederea adminului: toate programele deodată ──────────────────────────────
+//
+// Elevul vede un singur program odată — al lui. Adminul nu: el vede tot și poate tot,
+// iar programul e o coloană și un filtru, nu un mod global în care intri.
+// Funcțiile de aici există ca listele de admin să nu mai hardcodeze un program.
+
+/** O treaptă împreună cu programul din care face parte. */
+export interface ScopedTier extends CourseTier {
+  courseId: CourseId;
+  courseShortTitle: string;
+}
+
+/** Toate treptele, din toate programele active, grupate pe program. */
+export function allTiers(): ScopedTier[] {
+  return activeCourses().flatMap(c =>
+    c.tiers.map(t => ({ ...t, courseId: c.id, courseShortTitle: c.shortTitle })),
+  );
+}
+
+/**
+ * Treptele care au sens pentru un domeniu de filtrare.
+ * `null` = toate programele, deci reuniunea treptelor.
+ */
+export function tiersInScope(courseId: string | null | undefined): ScopedTier[] {
+  if (!courseId) return allTiers();
+  const c = getCourse(courseId);
+  return c ? c.tiers.map(t => ({ ...t, courseId: c.id, courseShortTitle: c.shortTitle })) : [];
+}
+
+/**
+ * Numele unei trepte fără să știi programul.
+ * Necesar în listele neîngrădite: rândurile vin din programe diferite, iar un
+ * `tariff` de 'singur' nu înseamnă nimic căutat în treptele Business.
+ */
+export function tierLabelAnywhere(tierId: string | null | undefined): string {
+  if (!tierId) return '—';
+  const hit = allTiers().find(t => t.id === tierId);
+  return hit?.label || tierId.charAt(0).toUpperCase() + tierId.slice(1);
+}
+
+/** Programul căruia îi aparține o treaptă. Ambiguitățile se rezolvă în ordinea cursurilor. */
+export function courseIdFromTier(tierId: string | null | undefined): CourseId | undefined {
+  return allTiers().find(t => t.id === tierId)?.courseId;
+}
+
+/**
+ * Valoarea filtrului de treaptă: „program:treaptă".
+ *
+ * Nu doar „treaptă". Astăzi id-urile nu se ciocnesc (student/designer/arhitect vs
+ * singur/pro/ultra), dar e un noroc, nu o garanție: primul program care refolosește
+ * un id ar amesteca tăcut elevii a două metodologii într-un singur filtru. Perechea
+ * o face imposibilă din construcție.
+ */
+export function tariffFilterValue(courseId: string, tierId: string): string {
+  return `${courseId}:${tierId}`;
+}
+
+export function parseTariffFilter(value: string | null | undefined): { courseId: string; tierId: string } | null {
+  if (!value) return null;
+  const i = value.indexOf(':');
+  // Forma veche, fără program (linkuri salvate): o acceptăm și căutăm treapta oriunde.
+  if (i < 0) {
+    const cid = courseIdFromTier(value);
+    return cid ? { courseId: cid, tierId: value } : null;
+  }
+  return { courseId: value.slice(0, i), tierId: value.slice(i + 1) };
+}

@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { getActivity, timeAgo, ActivityEvent, ActivityType } from '../../lib/activity';
 import { Search, RefreshCw, LogIn, CheckCircle2, FileText, Award, UserPlus, BookOpen } from 'lucide-react';
+import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
+import { AdminScopeBar } from '../../components/admin/AdminScopeBar';
+import { fetchAdminUsers, matchesScope } from '../../lib/adminData';
 
 const TYPE_CONFIG: Record<ActivityType, { icon: React.ReactNode; color: string; bg: string; label: string }> = {
   login: { icon: <LogIn size={13} />, color: 'var(--ok)', bg: 'rgba(74,222,128,0.1)', label: 'Login' },
@@ -26,6 +29,12 @@ const FILTERS: { value: string; label: string }[] = [
 ];
 
 export const AdminActivity: React.FC = () => {
+  // Jurnalul de activitate n-are `course_id` pe rând (un login nu aparține unui
+  // program), dar OMUL aparține. Filtrăm după înscrierile lui, ca aceleași trei axe
+  // să funcționeze și aici — altfel „Activitate" era singura pagină în care nu puteai
+  // separa fluxul 1 de fluxul 2.
+  const { courseId, flowId, tariffId } = useAdminCourseScope();
+  const [scopedIds, setScopedIds] = useState<Set<string> | null>(null);
   const [events, setEvents] = useState<ActivityEvent[]>([]);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
@@ -43,7 +52,19 @@ export const AdminActivity: React.FC = () => {
 
   useEffect(() => { load(); const t = setInterval(load, 30000); return () => clearInterval(t); }, []);
 
+  useEffect(() => {
+    // Fără niciun filtru nu are rost să încărcăm utilizatorii: tot jurnalul e valid.
+    if (!courseId && !flowId && !tariffId) { setScopedIds(null); return; }
+    let cancelled = false;
+    fetchAdminUsers().then(us => {
+      if (cancelled) return;
+      setScopedIds(new Set(us.filter(u => matchesScope(u, { courseId, flowId, tariffId })).map(u => u.id)));
+    });
+    return () => { cancelled = true; };
+  }, [courseId, flowId, tariffId]);
+
   const filtered = events.filter(ev => {
+    if (scopedIds && !scopedIds.has(ev.userId)) return false;
     if (filter !== 'all' && ev.type !== filter) return false;
     if (search && !ev.userName.toLowerCase().includes(search.toLowerCase()) && !ev.userEmail.toLowerCase().includes(search.toLowerCase())) return false;
     if (dateFilter === 'today') {
@@ -69,14 +90,18 @@ export const AdminActivity: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
         <div>
           <h1 className="font-aboreto" style={{ fontSize: 22, color: 'var(--fg)', letterSpacing: '-0.01em', marginBottom: 4 }}>Activitate</h1>
-          <p style={{ fontSize: 13, color: 'var(--fg-3)' }}>{events.length} evenimente înregistrate</p>
+          <p style={{ fontSize: 13, color: 'var(--fg-3)' }}>
+            {scopedIds ? `${filtered.length} din ${events.length} evenimente în filtru` : `${events.length} evenimente înregistrate`}
+          </p>
         </div>
         <button onClick={load} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--fg-2)' }}>
           <RefreshCw size={13} className={loading ? 'animate-spin' : ''} /> Actualizează
         </button>
       </div>
 
-      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+      <AdminScopeBar />
+
+      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 12, marginBottom: 24 }}>
         {[
           { label: 'Evenimente azi', value: eventsToday.length, color: 'var(--accent)' },
           { label: 'Utilizatori unici azi', value: uniqueUsersToday, color: 'var(--info)' },

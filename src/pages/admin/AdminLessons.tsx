@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
+import { AdminScopeBar } from '@/components/admin/AdminScopeBar';
 import { planCourseStructure, publishCourseStructure } from '@/lib/contentSync';
 import { COURSE_ACCENT } from '@/lib/courses';
 import {
@@ -330,6 +331,11 @@ export const AdminLessons: React.FC = () => {
           Ca să nu editezi din greșeală conținutul altui curs, lista rămâne goală până la migrație.
         </div>
       )}
+      {/* Editorul scrie în module și lecții, care aparțin UNUI program: aici alegerea
+          e obligatorie. Fluxul nu filtrează conținutul (același material în toate
+          fluxurile), deci nu are ce căuta în bară — ce diferă e calendarul. */}
+      <AdminScopeBar requireCourse showFlow={false} showTariff={false} />
+
       <ScopeNote course={course} flows={flows} plan={plan} publishing={publishing} onPublish={async () => {
         if (!confirm(`Publici în bază structura din cod pentru ${course?.title}? Se adaugă doar ce lipsește, nu se șterge nimic.`)) return;
         setPublishing(true);

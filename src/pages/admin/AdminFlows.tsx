@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { CalendarRange, Plus, Trash2, Save, Users, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdminCourseScope } from '../../hooks/useAdminCourseScope';
+import { AdminScopeBar } from '../../components/admin/AdminScopeBar';
 import { getCourseModules } from '../../lib/content';
 import { moduleUnlockDate, flowAccessUntil } from '../../lib/flows';
 
@@ -139,6 +140,11 @@ export const AdminFlows: React.FC = () => {
           pentru fiecare flux la data lui. Conținutul rămâne comun — deschiderea unui flux nou nu duplică nimic.
         </p>
       </div>
+
+      {/* Un flux se creează ÎNTR-un program (îi scrie `course_id`), deci alegerea e
+          obligatorie. Fluxul și treapta n-au ce filtra aici: pagina chiar despre
+          fluxuri este. */}
+      <AdminScopeBar requireCourse showFlow={false} showTariff={false} />
 
       {error && (
         <div style={{ padding: '12px 14px', borderRadius: 10, background: 'var(--error-dim)', border: '1px solid var(--border)', color: 'var(--error)', fontSize: 12.5, marginBottom: 16 }}>

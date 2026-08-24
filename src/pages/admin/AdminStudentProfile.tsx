@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { MockUser, Progress } from '../../lib/types';
 import { getCourseModules } from '../../lib/content';
 import { useAdminCourseScope } from '../../hooks/useAdminCourseScope';
+import { activeCourses, getCourse, COURSE_ACCENT } from '../../lib/courses';
 import { courseModulePath } from '../../lib/navigation';
 import { TariffBadge } from '../../components/aa/TariffBadge';
 import { ProgressBar } from '../../components/aa/ProgressBar';
@@ -291,7 +292,19 @@ function renderReadableAnswer(
 
 // ── Main component ────────────────────────────────────────────────────────────
 export const AdminStudentProfile: React.FC = () => {
-  const { courseId } = useAdminCourseScope();
+  // Programul privit în profil vine din ÎNSCRIERILE elevului, nu dintr-un comutator
+  // global: un elev de la START deschis dintr-o listă filtrată pe „toate" ar fi fost
+  // altfel citit prin modulele Business — cu 0% peste tot și un quiz care nu e al lui.
+  const { courseId: scopeCourse } = useAdminCourseScope();
+  const [enrollments, setEnrollments] = useState<{ course_id: string; tariff: string; flow_id: string | null }[]>([]);
+  const [pickedCourse, setPickedCourse] = useState<string | null>(null);
+  const courseId =
+    pickedCourse
+    || (enrollments.some(e => e.course_id === scopeCourse) ? scopeCourse : null)
+    || enrollments[0]?.course_id
+    || scopeCourse
+    || activeCourses()[0]?.id
+    || 'business';
   const courseModules = getCourseModules(courseId);
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
@@ -362,6 +375,10 @@ export const AdminStudentProfile: React.FC = () => {
         supabase.from('lesson_notes').select('lesson_id,content').eq('user_id', userId),
         supabase.from('exercise_responses').select('exercise_id,response').eq('user_id', userId),
       ]);
+      // Înscrierile lui: decid ce programe se pot deschide în profil.
+      const enrRes = await supabase.from('enrollments')
+        .select('course_id,tariff,flow_id').eq('user_id', userId);
+      setEnrollments((enrRes.data || []) as any);
       if (profile) {
         setUser({
           id: profile.id,
@@ -511,7 +528,25 @@ export const AdminStudentProfile: React.FC = () => {
               <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--fg)', margin: 0 }}>
                 {user.full_name}
               </h1>
-              <TariffBadge tariff={user.tariff} compact />
+              <TariffBadge tariff={(enrollments.find(e => e.course_id === courseId)?.tariff as any) || user.tariff} courseId={courseId} compact />
+              {enrollments.length > 1 && (
+                <span style={{ display: 'inline-flex', gap: 4, marginLeft: 2 }}>
+                  {enrollments.map(e => {
+                    const c = getCourse(e.course_id);
+                    const active = e.course_id === courseId;
+                    const a = c ? COURSE_ACCENT[c.accent] : { fg: 'var(--fg-3)', dim: 'var(--bg-3)' };
+                    return (
+                      <button key={e.course_id} onClick={() => setPickedCourse(e.course_id)} aria-pressed={active}
+                        title={`Vezi profilul la ${c?.title || e.course_id}`}
+                        style={{ fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 99, cursor: 'pointer',
+                          background: active ? a.dim : 'transparent', color: active ? a.fg : 'var(--fg-3)',
+                          border: `1px solid ${active ? 'var(--border-hi)' : 'var(--border)'}` }}>
+                        {c?.shortTitle || e.course_id}
+                      </button>
+                    );
+                  })}
+                </span>
+              )}
               {loggedInToday && (
                 <span style={{ fontSize: 10, background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)', color: 'var(--ok)', padding: '2px 8px', borderRadius: 99, fontWeight: 600 }}>
                   Activ azi
@@ -563,7 +598,7 @@ export const AdminStudentProfile: React.FC = () => {
       </div>
 
       {tab === 'briefing' && (
-        <StudentBriefingPanel studentId={userId!} studentName={user.full_name || user.email} />
+        <StudentBriefingPanel studentId={userId!} studentName={user.full_name || user.email} courseId={courseId} />
       )}
 
       {tab === 'notes' && (

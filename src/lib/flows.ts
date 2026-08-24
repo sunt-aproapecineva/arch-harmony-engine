@@ -63,14 +63,19 @@ export function cacheFlow(userId: string, flow: Flow | null) {
   } catch { /* noop */ }
 }
 
-/** Fluxurile unui curs, cele mai noi primele. Pentru administrare. */
-export async function fetchFlows(courseId: string): Promise<Flow[]> {
+/**
+ * Fluxurile, cele mai noi primele. Pentru administrare.
+ *
+ * `courseId` null înseamnă TOATE programele — vederea implicită a adminului, care
+ * nu lucrează „în interiorul" unui program, ci filtrează peste ele.
+ */
+export async function fetchFlows(courseId?: string | null): Promise<Flow[]> {
   try {
-    const { data, error } = await supabase
+    let q = supabase
       .from('flows')
-      .select('id,course_id,name,slug,starts_on,ends_on,access_weeks,telegram_url,is_active')
-      .eq('course_id', courseId)
-      .order('starts_on', { ascending: false });
+      .select('id,course_id,name,slug,starts_on,ends_on,access_weeks,telegram_url,is_active');
+    if (courseId) q = q.eq('course_id', courseId);
+    const { data, error } = await q.order('starts_on', { ascending: false });
     if (error) throw error;
     return (data || []) as Flow[];
   } catch (error) {

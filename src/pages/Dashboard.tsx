@@ -178,7 +178,7 @@ export const Dashboard: React.FC = () => {
             <h1 className="font-aboreto" style={{ fontSize: 'clamp(1.9rem, 4vw, 2.9rem)', color: 'var(--fg)', letterSpacing: '-0.025em', lineHeight: 1.05 }}>
               Bun venit, {firstName}.
             </h1>
-            <TariffBadge tariff={tariff} />
+            <TariffBadge tariff={tariff} courseId={course?.id} />
           </div>
           <p style={{ fontSize: 14, color: 'var(--fg-3)', lineHeight: 1.5 }}>
             <span style={{ color: 'var(--accent)', fontWeight: 500 }}>{currentModule.etapa}</span>
