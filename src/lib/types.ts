@@ -43,6 +43,11 @@ export interface Module {
   etapa: string;
   saptamana: string;
   unlockDate?: string;
+  /**
+   * Modul-poartă: modulele următoare presupun că acesta a fost livrat.
+   * La START, Modulul 2 (Validarea) e poartă — „dacă sari peste, construiești pe nisip".
+   */
+  isGate?: boolean;
   lessons: Lesson[];
   exercises: Exercise[];
   deliverable: string;

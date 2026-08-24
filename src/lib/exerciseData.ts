@@ -1,3 +1,5 @@
+import { START_EXERCISE_TEMPLATES } from './exerciseData.start';
+
 export interface QuizQuestionItem {
   id: string;
   text: string;
@@ -66,7 +68,7 @@ export interface ExerciseTemplate {
   functionOptions?: { value: string; label: string; sampleProduct: string }[];
 }
 
-export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
+const BUSINESS_EXERCISE_TEMPLATES: ExerciseTemplate[] = [
   // e-0-1: Auditul Activităților → activity-audit
   {
     exerciseId: 'e-0-1',
@@ -1416,3 +1418,10 @@ export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
 export function getExerciseTemplate(exerciseId: string): ExerciseTemplate | undefined {
   return EXERCISE_TEMPLATES.find((t) => t.exerciseId === exerciseId);
 }
+
+// Registrul complet, pe cursuri. Id-urile sunt unice global (vezi REGULA ID-URILOR),
+// deci o singură listă e suficientă pentru căutarea după id.
+export const EXERCISE_TEMPLATES: ExerciseTemplate[] = [
+  ...BUSINESS_EXERCISE_TEMPLATES,
+  ...START_EXERCISE_TEMPLATES,
+];

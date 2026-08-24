@@ -7,135 +7,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
 import { logActivity } from '../lib/activity';
-import { generateProfile } from '../lib/quizProfile';
+import { getQuizDefinition } from '../lib/quiz';
+import type { QuizQuestion } from '../lib/quiz';
 import { supabase } from '@/integrations/supabase/client';
 
 // ─── Question Data ─────────────────────────────────────────────────────────────
-
-interface QuizQuestion {
-  id: string;
-  block: string;
-  blockNum: number;
-  question: string;
-  type: 'select' | 'radio' | 'multi' | 'slider';
-  options?: string[];
-  allowOther?: boolean;
-  maxSelect?: number;
-  minSelect?: number;
-  min?: number;
-  max?: number;
-  labels?: Record<number, string>;
-}
-
-const QUIZ_QUESTIONS: QuizQuestion[] = [
-  {
-    id: 'q1', block: 'Contextul Afacerii', blockNum: 1,
-    question: 'În ce domeniu activezi?',
-    type: 'select',
-    options: ['Retail / Comerț', 'HoReCa', 'Producție', 'Servicii B2B', 'Servicii B2C', 'E-commerce', 'Construcții / Imobiliare', 'Sănătate / Frumusețe', 'Educație', 'Altul'],
-    allowOther: true,
-  },
-  {
-    id: 'q2', block: 'Contextul Afacerii', blockNum: 1,
-    question: 'De câți ani conduci această afacere?',
-    type: 'radio',
-    options: ['Sub 1 an', '1–3 ani', '3–7 ani', 'Peste 7 ani'],
-  },
-  {
-    id: 'q3', block: 'Contextul Afacerii', blockNum: 1,
-    question: 'Afacerea ta are asociați sau parteneri?',
-    type: 'radio',
-    options: ['Nu, conduc singur', 'Da, cu partener egal (50/50)', 'Da, cu parteneri, dar eu conduc', 'Da, am investitor pasiv'],
-  },
-  {
-    id: 'q4', block: 'Scala Financiară', blockNum: 2,
-    question: 'Care este cifra de afaceri lunară aproximativă a firmei tale?',
-    type: 'radio',
-    options: ['Sub 20.000 lei', '20.000–50.000 lei', '50.000–150.000 lei', '150.000–500.000 lei', 'Peste 500.000 lei'],
-  },
-  {
-    id: 'q5', block: 'Scala Financiară', blockNum: 2,
-    question: 'Cheltuielile lunare totale ale firmei sunt aproximativ:',
-    type: 'radio',
-    options: ['Sub 15.000 lei', '15.000–40.000 lei', '40.000–120.000 lei', '120.000–400.000 lei', 'Peste 400.000 lei'],
-  },
-  {
-    id: 'q6', block: 'Scala Financiară', blockNum: 2,
-    question: 'Estimezi că știi câți bani rămân net în firmă în fiecare lună?',
-    type: 'radio',
-    options: ['Da, știu exact', 'Aproximativ, ±20%', 'Nu prea știu', 'Nu știu deloc'],
-  },
-  {
-    id: 'q7', block: 'Structura și Oamenii', blockNum: 3,
-    question: 'Câți angajați sau colaboratori activi are firma ta?',
-    type: 'radio',
-    options: ['Lucrez singur', '1–3', '4–10', '11–30', 'Peste 30'],
-  },
-  {
-    id: 'q8', block: 'Structura și Oamenii', blockNum: 3,
-    question: 'Câți dintre angajații tăi vin la tine zilnic cu întrebări sau probleme de rezolvat?',
-    type: 'radio',
-    options: ['Nimeni', '1–2', '3–5', 'Aproape toți'],
-  },
-  {
-    id: 'q9', block: 'Structura și Oamenii', blockNum: 3,
-    question: 'Ai o organigramă clară, cu roluri și responsabilități scrise?',
-    type: 'radio',
-    options: ['Da, funcțională și actualizată', 'Da, există dar e depășită', 'Parțial, câteva roluri sunt clare', 'Nu există'],
-  },
-  {
-    id: 'q10', block: 'Timp și Operațional', blockNum: 4,
-    question: 'Câte ore pe zi lucrezi efectiv ÎN afacere (execuți, rezolvi, ești prezent operațional)?',
-    type: 'radio',
-    options: ['Sub 4 ore', '4–6 ore', '6–10 ore', 'Peste 10 ore'],
-  },
-  {
-    id: 'q11', block: 'Timp și Operațional', blockNum: 4,
-    question: 'Ai reușit să pleci în vacanță (minimum 5 zile fără telefon de business) în ultimele 12 luni?',
-    type: 'radio',
-    options: ['Da, fără probleme', 'Da, dar am răspuns la telefon zilnic', 'Nu am plecat deloc', 'Nu mi-am permis din cauza businessului'],
-  },
-  {
-    id: 'q12', block: 'Timp și Operațional', blockNum: 4,
-    question: 'Există procese scrise pe care angajații le urmează fără să te întrebe pe tine?',
-    type: 'radio',
-    options: ['Da, pentru majoritatea activităților', 'Da, pentru câteva zone', 'Câteva notițe informale', 'Nu există nimic scris'],
-  },
-  {
-    id: 'q13', block: 'Blocajul și Obiectivul', blockNum: 5,
-    question: 'Care este cel mai mare blocaj al afacerii tale în acest moment? (max. 5 opțiuni)',
-    type: 'multi', maxSelect: 5,
-    options: [
-      'Nu am timp pentru strategie, stau în operațional',
-      'Echipa nu răspunde de rezultate',
-      'Nu știu exact cum stă firma financiar',
-      'Nu am procese clare, totul depinde de mine',
-      'Nu am structură organizațională clară',
-      'Nu știu cui și cum să deleg',
-      'Conflicte sau lipsă de claritate cu asociatul/partenerii',
-    ],
-    allowOther: true,
-  },
-  {
-    id: 'q14', block: 'Blocajul și Obiectivul', blockNum: 5,
-    question: 'Ce vrei să obții concret în urma acestui practicum?',
-    type: 'multi', minSelect: 2, maxSelect: 5,
-    options: [
-      'Să ies din operațional și să am timp liber real',
-      'Să am o echipă care funcționează fără mine zilnic',
-      'Să construiesc procese clare și să pot scala',
-      'Să am control real pe cifre și performanță',
-      'Să pot delega o zonă întreagă fără să mai intervin',
-      'Să construiesc fundația corectă pentru o creștere sustenabilă',
-    ],
-  },
-  {
-    id: 'q15', block: 'Blocajul și Obiectivul', blockNum: 5,
-    question: 'Pe o scală de la 1 la 10, cât de urgent este pentru tine să rezolvi această problemă?',
-    type: 'slider', min: 1, max: 10,
-    labels: { 1: 'Pot amâna, nu arde', 10: 'Dacă nu rezolv în 90 de zile, businessul meu suferă' },
-  },
-];
 
 const BLOCK_COLORS: Record<number, string> = {
   1: 'rgba(196,240,228,0.18)',
@@ -157,16 +33,16 @@ type AnswerValue = string | string[] | number;
 
 // ─── Result Screen ────────────────────────────────────────────────────────────
 const ResultScreen: React.FC<{ answers: Record<string, AnswerValue> }> = ({ answers }) => {
-  const { course } = useCourse();
+  const { course, courseId } = useCourse();
   const navigate = useNavigate();
-  const domain = answers['q1'] as string || '—';
-  const years = answers['q2'] as string || '—';
-  const team = answers['q7'] as string || '—';
-  const blockers = Array.isArray(answers['q13']) ? (answers['q13'] as string[]).join(', ') : String(answers['q13'] || '—');
-  const objective = Array.isArray(answers['q14'])
-    ? (answers['q14'] as string[]).join(', ')
-    : String(answers['q14'] || '—');
-  const urgency = answers['q15'] as number || 0;
+  // Sumarul e definit de curs — Business rezumă o firmă existentă, START rezumă
+  // un punct de plecare. Aceleași id-uri hardcodate n-ar avea sens în ambele.
+  const quizDef = getQuizDefinition(courseId);
+  const summary = (quizDef?.summaryFields || []).map(f => {
+    const raw = answers[f.questionId];
+    const value = Array.isArray(raw) ? raw.join(', ') : String(raw ?? '').trim();
+    return [f.label, value || '—'] as [string, string];
+  });
 
   return (
     <motion.div
@@ -193,14 +69,7 @@ const ResultScreen: React.FC<{ answers: Record<string, AnswerValue> }> = ({ answ
         <div className="font-aboreto" style={{ fontSize: 9, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', marginBottom: 16 }}>
           Sumarul profilului tău
         </div>
-        {[
-          ['Domeniu', domain],
-          ['Experiență', years],
-          ['Echipă', team],
-          ['Principal blocaj', blockers],
-          ['Obiectiv', objective],
-          ['Urgență', `${urgency}/10`],
-        ].map(([label, value]) => (
+        {summary.map(([label, value]) => (
           <div key={label} style={{ display: 'flex', gap: 12, marginBottom: 10, fontSize: 13, lineHeight: 1.5 }}>
             <span style={{ color: 'rgba(255,255,255,0.4)', minWidth: 120, flexShrink: 0 }}>{label}</span>
             <span style={{ color: '#fff', fontWeight: 500 }}>{value}</span>
@@ -254,14 +123,19 @@ export const OnboardingQuiz: React.FC = () => {
     setScreen('intro');
   };
 
-  const q = QUIZ_QUESTIONS[currentIdx];
-  const total = QUIZ_QUESTIONS.length;
+  // Diagnosticul e al cursului, nu al platformei: START are alte întrebări,
+  // alte blocuri și alt calcul de profil decât Business.
+  const quizDef = getQuizDefinition(courseId);
+  const questions = quizDef?.questions || [];
+  const q = questions[currentIdx];
+  const total = questions.length;
   const pct = ((currentIdx + 1) / total) * 100;
 
   const currentAnswer = answers[q?.id];
   const canContinue = (() => {
     if (!q) return false;
     if (q.type === 'slider') return currentAnswer !== undefined;
+    if (q.type === 'text') return String(currentAnswer || '').trim().length >= 10;
     if (q.type === 'multi') {
       const sel = Array.isArray(currentAnswer) ? currentAnswer.length : 0;
       const min = q.minSelect ?? 1;
@@ -305,7 +179,7 @@ export const OnboardingQuiz: React.FC = () => {
           localStorage.setItem(`aa_quiz_answers_${user.id}_${courseId}`, JSON.stringify(finalAnswers));
         } catch {}
         try {
-          const profile = generateProfile(finalAnswers as any);
+          const profile = quizDef ? quizDef.generateProfile(finalAnswers as any) : {};
           await supabase.from('quiz_responses').upsert({
             user_id: user.id,
             course_id: courseId,
@@ -439,7 +313,7 @@ export const OnboardingQuiz: React.FC = () => {
                 transition={{ delay: 0.18 }}
                 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', color: '#fff', lineHeight: 1.05, letterSpacing: '-0.02em', marginBottom: 20 }}
               >
-                Quiz de Onboarding
+                {quizDef?.introTitle || 'Quiz de Onboarding'}
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 12 }}
@@ -447,7 +321,7 @@ export const OnboardingQuiz: React.FC = () => {
                 transition={{ delay: 0.26 }}
                 style={{ fontSize: 16, color: 'var(--fg-2)', lineHeight: 1.65, maxWidth: 440, margin: '0 auto 36px' }}
               >
-                Răspunde la 15 întrebări despre afacerea ta pentru a-ți personaliza parcursul de studiu.
+                {quizDef?.introSubtitle || 'Răspunde la câteva întrebări pentru a-ți personaliza parcursul de studiu.'}
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
@@ -455,7 +329,7 @@ export const OnboardingQuiz: React.FC = () => {
                 transition={{ delay: 0.34 }}
                 style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 44, flexWrap: 'wrap' }}
               >
-                {[['15', 'Întrebări'], ['5 min', 'Durată'], ['1×', 'O singură dată']].map(([v, l]) => (
+                {[[String(total), 'Întrebări'], [`${Math.max(4, Math.round(total / 3))} min`, 'Durată'], ['1×', 'O singură dată']].map(([v, l]) => (
                   <div key={l} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 20px', minWidth: 90, textAlign: 'center' }}>
                     <div className="font-aboreto" style={{ fontSize: 20, color: 'var(--accent)', lineHeight: 1, marginBottom: 4 }}>{v}</div>
                     <div style={{ fontSize: 11, color: 'var(--fg-3)' }}>{l}</div>
@@ -658,6 +532,29 @@ export const OnboardingQuiz: React.FC = () => {
                     )}
 
                     {/* Slider */}
+                    {/* Răspuns liber. Nu se scorează — e materialul cu care mentorul
+                        intră în primul apel fără să mai sape prin platformă. */}
+                    {q.type === 'text' && (
+                      <div>
+                        <textarea
+                          value={String(currentAnswer || '')}
+                          onChange={e => handleRadioOrSelect(q.id, e.target.value)}
+                          rows={5}
+                          placeholder="Scrie cu cuvintele tale. Nu căuta formularea perfectă."
+                          style={{
+                            width: '100%', padding: '14px 16px', borderRadius: 12, resize: 'vertical',
+                            background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)',
+                            color: '#fff', fontSize: 14, lineHeight: 1.6, fontFamily: 'inherit', outline: 'none',
+                          }}
+                        />
+                        <div style={{ marginTop: 8, fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                          {String(currentAnswer || '').trim().length < 10
+                            ? 'Scrie măcar o propoziție întreagă.'
+                            : `${String(currentAnswer).trim().length} caractere`}
+                        </div>
+                      </div>
+                    )}
+
                     {q.type === 'slider' && q.min !== undefined && q.max !== undefined && (
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
