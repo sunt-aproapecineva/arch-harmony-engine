@@ -122,6 +122,43 @@ care are acces.
 Dacă îl muți sub `Layout`, bara laterală a elevului se golește complet — `Layout`
 citește contextul înainte să existe. S-a întâmplat o dată; nu era evident din cod.
 
+### Aterizarea după login — `resolveLandingPath()`
+
+Ordinea deciziei, în `src/lib/navigation.ts`:
+
+```
+fără cont                              → /login
+admin                                  → /cursuri (vede tot, nu e elevul niciunui program)
+un program, fără diagnostic            → /c/<slug>/quiz
+un program, cu diagnostic              → /c/<slug>/dashboard
+zero sau mai multe programe            → /cursuri
+```
+
+**Logica pasului 3, care e miezul:** un elev ajunge pe platformă doar pentru că adminul
+l-a înscris, iar înscrierea spune deja **la ce program**. Deci în clipa în care își face
+contul, platforma știe care diagnostic i se cuvine și îl duce direct acolo. Nu are ce
+alege și n-are rost să treacă printr-un dashboard pe care oricum nu-l poate folosi
+înainte de quiz.
+
+Înainte ateriza pe dashboard, unde un banner îl anunța că are de dat un diagnostic, iar
+fiecare click pe un modul îi deschidea un modal care îl trimitea tot la quiz — doi pași
+în plus pentru o singură intenție.
+
+**Adminul NU e trimis în quiz.** El nu e elevul programului, iar un diagnostic dat de el
+ar polua datele mentorului.
+
+### Accesul e binar, nu gradat
+
+Ecranul `/cursuri` arată **doar** programele la care elevul are acces. Dacă n-are acces,
+programul pur și simplu nu apare — nu apare stins, nu apare cu lacăt.
+
+Înainte, un program fără lecții filmate era arătat estompat, cu lacăt și fără buton
+(*„Structura e gata — lecțiile se filmează"*). Asta transforma o stare de **producție
+internă** într-un refuz către elev, deși omul plătise și avea acces. Numărul de lecții
+filmate e acum doar o cifră pe card, nu o poartă.
+
+Adminul vede ambele programe, ca să poată verifica conținutul.
+
 ---
 
 ## 4. Tarifele: trepte per program, nu globale
@@ -268,16 +305,18 @@ rescrii ca sincronizare bidirecțională, editările făcute din admin se pierd.
 
 ## 10. Verificare după deploy
 
-1. Un elev cu acces la un singur program → `/cursuri` îi arată **un** card, iar
-   dashboardul e al programului lui.
-2. Un elev fără flux → modulele **nu** se deschid toate. Dacă se deschid, migrația
+1. Un elev nou, abia înscris de admin → după crearea contului aterizează **direct în
+   quizul programului său**, nu pe dashboard. După quiz, intră în practicum.
+2. Ecranul `/cursuri` are în antet **numele elevului**, nu „Alege programul". Niciun
+   card nu are lacăt sau text despre filmare.
+3. Un elev fără flux → modulele **nu** se deschid toate. Dacă se deschid, migrația
    fluxurilor nu s-a aplicat.
-3. Admin → *Utilizatori* → filtrul **Program: Start** + **Treaptă: Singur** returnează
+4. Admin → *Utilizatori* → filtrul **Program: Start** + **Treaptă: Singur** returnează
    oameni, nu listă goală. Ăsta era simptomul principal.
-4. Admin → *Progres* → matricea are procente, nu 0% peste tot.
-5. Admin → *Grupe* → alocarea unei grupe la un flux START oferă treptele
+5. Admin → *Progres* → matricea are procente, nu 0% peste tot.
+6. Admin → *Grupe* → alocarea unei grupe la un flux START oferă treptele
    Singur/PRO/Ultra, nu Student/Designer/Arhitect.
-6. O lecție video pe desktop (≥1024px) → cuprinsul modulului stă **în dreapta**, nu sub
+7. O lecție video pe desktop (≥1024px) → cuprinsul modulului stă **în dreapta**, nu sub
    butoanele de navigare.
 
 ---

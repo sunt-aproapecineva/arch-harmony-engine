@@ -3,8 +3,9 @@
 // Toate rutele de studiu trăiesc sub /c/<slug>/. Le construim într-un singur loc ca
 // să nu apară șiruri lipite manual prin componente — altfel un curs nou înseamnă
 // vânătoare de '/dashboard' prin tot codul.
-import { Course, CourseId, getCourse, courseIdFromContentId, activeCourses } from './courses';
+import { Course, CourseId, getCourse, courseIdFromContentId } from './courses';
 import { enrolledCourses } from './enrollments';
+import { hasCompletedOnboarding } from './access';
 import type { User } from './types';
 
 function slugOf(course: Course | CourseId | string | null | undefined): string | null {
@@ -38,17 +39,33 @@ export function legacyContentPath(kind: 'lesson' | 'module', contentId: string):
 }
 
 /**
- * Unde aterizează elevul după login.
- * Un singur curs → direct în el; mai multe → ecranul de selecție; niciunul → tot
- * ecranul de selecție, care explică situația în loc să arate o pagină goală.
+ * Unde aterizează elevul după login sau imediat după ce și-a creat contul.
  *
- * Adminul e tratat ca având acces la toate cursurile active — la fel ca poarta de curs
- * și ca ecranul de selecție. Altfel ar fi trimis direct într-un singur curs și n-ar
- * mai ajunge niciodată la ecranul general fără să scrie URL-ul de mână.
+ * Ordinea deciziei — de sus în jos:
+ *   1. fără cont            → /login
+ *   2. admin                → /cursuri (vede toate programele, nu e elevul niciunuia)
+ *   3. un singur program, fără diagnostic → quizul ACELUI program
+ *   4. un singur program, cu diagnostic   → direct în el
+ *   5. zero sau mai multe   → /cursuri
+ *
+ * Pasul 3 e miezul: elevul ajunge pe platformă doar pentru că adminul l-a înscris,
+ * iar înscrierea spune deja LA CE program. Deci în clipa în care își face contul,
+ * platforma știe care diagnostic i se cuvine și îl duce acolo — nu are ce alege și
+ * n-are rost să treacă printr-un dashboard pe care oricum nu-l poate folosi până nu
+ * completează quizul. Înainte ateriza pe dashboard, unde un banner îl anunța că are
+ * de dat un diagnostic, iar modulele îi deschideau un modal la fiecare click.
+ *
+ * Adminul NU e trimis în quiz: el nu e elevul programului, iar un diagnostic dat de
+ * el ar polua datele mentorului.
  */
 export function resolveLandingPath(user: User | null | undefined): string {
   if (!user) return '/login';
-  const courses = user.role === 'admin' ? activeCourses() : enrolledCourses(user.enrollments);
-  if (courses.length === 1) return courseDashboardPath(courses[0]);
-  return '/cursuri';
+  if (user.role === 'admin') return '/cursuri';
+
+  const courses = enrolledCourses(user.enrollments);
+  if (courses.length !== 1) return '/cursuri';
+
+  const only = courses[0];
+  if (only.hasQuiz && !hasCompletedOnboarding(user, only.id)) return courseQuizPath(only);
+  return courseDashboardPath(only);
 }

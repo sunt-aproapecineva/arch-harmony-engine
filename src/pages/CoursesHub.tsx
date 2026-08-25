@@ -15,7 +15,7 @@ import { useProgress } from '../hooks/useProgress';
 import { enrolledCourses, expiredCourses, enrollmentForCourse } from '../lib/enrollments';
 import { activeCourses, COURSE_ACCENT } from '../lib/courses';
 import { getCourseModules } from '../lib/content';
-import { courseDashboardPath } from '../lib/navigation';
+import { courseDashboardPath, courseQuizPath } from '../lib/navigation';
 import { hasCompletedOnboarding } from '../lib/access';
 
 /** Lecție care contează la progres: are video sau e pagină de exercițiu. */
@@ -41,17 +41,21 @@ export const CoursesHub: React.FC = () => {
   // Accesul expirat nu se ascunde: elevul trebuie să vadă că a avut, nu să creadă
   // că i-a dispărut contul.
   const expired = isAdmin ? [] : expiredCourses(user?.enrollments);
-  const firstName = usableFirstName(user?.full_name);
+  // Numele întreg dacă îl avem, prenumele ca variantă scurtă. Un singur caracter nu
+  // e un nume — în lipsa lui, antetul cade elegant pe „Programul tău".
+  const displayName = (user?.full_name || '').trim().length >= 2
+    ? (user!.full_name as string).trim()
+    : usableFirstName(user?.full_name);
 
   const cards = useMemo(() => courses.map(course => {
     const modules = getCourseModules(course.id);
     const trackable = modules.flatMap((m: any) => (m.lessons || []).filter(isTrackable));
-    // „În pregătire" nu înseamnă „fără module", ci „fără nimic de urmărit încă":
-    // START are structura celor 10 module, dar nicio lecție filmată. Un card care
-    // promite 10 lecții și deschide un curs gol e o minciună mică, dar e o minciună.
+    // Câte lecții filmate există. E o CIFRĂ pe card, nu o poartă: dacă elevul are
+    // acces la program, intră. Înainte, un program fără lecții filmate era arătat
+    // stins, cu lacăt și fără buton („structura e gata — lecțiile se filmează") —
+    // ceea ce transforma o stare de producție internă într-un refuz către elev.
     const videoLessons = modules.flatMap((m: any) =>
       (m.lessons || []).filter((l: any) => !!(l.video_url && String(l.video_url).trim())));
-    const empty = modules.length === 0 || videoLessons.length === 0;
     const modulesDone = modules.filter((m: any) => {
       const items = (m.lessons || []).filter(isTrackable);
       return items.length > 0 && items.every((l: any) => isCompleted(l.id));
@@ -59,11 +63,10 @@ export const CoursesHub: React.FC = () => {
     return {
       course,
       modules,
-      empty,
       lessonsTotal: videoLessons.length,
       deliverables: trackable.filter((l: any) => l.type === 'exercise').length,
       modulesDone,
-      pct: loading || empty ? 0 : getOverallProgressFor(course.id),
+      pct: loading ? 0 : getOverallProgressFor(course.id),
       quizDone: hasCompletedOnboarding(user, course.id),
       flow: enrollmentForCourse(user?.enrollments, course.id)?.flow || null,
     };
@@ -121,23 +124,28 @@ export const CoursesHub: React.FC = () => {
             transition={{ duration: 0.4 }}
             style={{ marginBottom: 'clamp(24px, 4vh, 40px)' }}
           >
+            {/* Antetul se adresează OMULUI, nu unei alegeri.
+                „Alege programul" presupunea că elevul cântărește între două produse —
+                dar cele două practicumuri sunt metodologii diferite, nimeni nu le
+                cumpără pe amândouă, iar cel care intră aici a fost deja înscris de
+                admin la unul anume. Singurul care vede două carduri e adminul. */}
             <p style={{
               fontSize: 11.5, color: 'var(--fg-3)', letterSpacing: '0.14em',
               textTransform: 'uppercase', marginBottom: 12,
             }}>
-              {firstName ? `Bine ai revenit, ${firstName}` : 'Bine ai revenit'}
+              {isAdmin ? 'Vedere de administrator' : 'Bine ai revenit'}
             </p>
             <h1 className="font-aboreto" style={{
               fontSize: 'clamp(1.75rem, 5vw, 2.75rem)', color: 'var(--fg)',
               lineHeight: 1.08, letterSpacing: '-0.02em', margin: 0,
             }}>
-              {courses.length > 1 ? 'Alege programul' : 'Programul tău'}
+              {displayName || 'Programul tău'}
             </h1>
-            {courses.length > 1 && (
-              <p style={{ fontSize: 13.5, color: 'var(--fg-3)', lineHeight: 1.65, marginTop: 12, maxWidth: 480 }}>
-                Poți trece dintr-un program în altul oricând, din bara laterală.
-              </p>
-            )}
+            <p style={{ fontSize: 13.5, color: 'var(--fg-3)', lineHeight: 1.65, marginTop: 12, maxWidth: 480 }}>
+              {isAdmin
+                ? 'Ai acces la toate programele active, ca să poți verifica conținutul fiecăruia.'
+                : 'Accesează practicumul de mai jos pentru a continua studiile.'}
+            </p>
           </motion.header>
 
           {cards.length === 0 ? (
@@ -148,7 +156,12 @@ export const CoursesHub: React.FC = () => {
               gridTemplateColumns: single ? '1fr' : 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))',
             }}>
               {cards.map((c, index) => (
-                <CourseCard key={c.course.id} data={c} index={index} reduceMotion={reduceMotion} onOpen={() => navigate(courseDashboardPath(c.course))} />
+                <CourseCard key={c.course.id} data={c} index={index} reduceMotion={reduceMotion} onOpen={() => navigate(
+                  // Butonul scrie „Începe cu diagnosticul" — atunci acolo să și ducă.
+                  // Înainte deschidea dashboardul, unde elevul primea un modal care îl
+                  // trimitea tot la quiz: două clicuri pentru o singură intenție.
+                  !c.quizDone && c.course.hasQuiz ? courseQuizPath(c.course) : courseDashboardPath(c.course),
+                )} />
               ))}
             </div>
           )}
@@ -193,7 +206,7 @@ export const CoursesHub: React.FC = () => {
 
 const CourseCard: React.FC<{ data: any; index: number; reduceMotion: boolean; onOpen: () => void }> =
   ({ data, index, reduceMotion, onOpen }) => {
-    const { course, empty, pct, modulesDone, modules, lessonsTotal, deliverables, quizDone, flow } = data;
+    const { course, pct, modulesDone, modules, lessonsTotal, deliverables, quizDone, flow } = data;
     const accent = COURSE_ACCENT[course.accent];
     const started = pct > 0;
 
@@ -205,11 +218,11 @@ const CourseCard: React.FC<{ data: any; index: number; reduceMotion: boolean; on
         style={{
           position: 'relative', display: 'flex', flexDirection: 'column',
           background: 'var(--bg-card)', border: '1px solid var(--border)',
-          borderRadius: 18, overflow: 'hidden', opacity: empty ? 0.7 : 1,
+          borderRadius: 18, overflow: 'hidden',
         }}
       >
         {/* Muchia de accent: distinge programele fără să adauge culoare pe fundal. */}
-        <div aria-hidden style={{ height: 3, background: empty ? 'var(--border)' : accent.fg, opacity: empty ? 1 : 0.85 }} />
+        <div aria-hidden style={{ height: 3, background: accent.fg, opacity: 0.85 }} />
 
         <div style={{ padding: 'clamp(18px, 3.5vw, 26px)', display: 'flex', flexDirection: 'column', flex: 1 }}>
           <div className="font-aboreto" aria-hidden style={{
@@ -249,56 +262,45 @@ const CourseCard: React.FC<{ data: any; index: number; reduceMotion: boolean; on
             </p>
 
             <div style={{ marginTop: 'auto' }}>
-              {empty ? (
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 10 }}>
-                    <Meta value={String(modules.length)} label="module" />
-                    <Meta value={String(deliverables)} label="livrabile" />
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: 'var(--fg-3)' }}>
-                    <Lock size={13} style={{ flexShrink: 0 }} /> Structura e gata — lecțiile se filmează
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {/* Reperele programului: cifre concrete, nu doar un procent. */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 12 }}>
-                    <Meta value={`${modulesDone}/${modules.length}`} label="module" done={modulesDone === modules.length && modules.length > 0} />
-                    <Meta value={String(lessonsTotal)} label="lecții" />
-                    {quizDone && (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11.5, color: 'var(--ok)' }}>
-                        <CheckCircle2 size={12} /> diagnostic dat
-                      </span>
-                    )}
-                  </div>
+              {/* Reperele programului: cifre concrete, nu doar un procent.
+                  „lecții" apare doar dacă există lecții filmate — la un program tânăr
+                  livrabilele sunt reperul real, iar un „0 lecții" n-ar spune nimic util. */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 12 }}>
+                <Meta value={`${modulesDone}/${modules.length}`} label="module" done={modulesDone === modules.length && modules.length > 0} />
+                {lessonsTotal > 0 && <Meta value={String(lessonsTotal)} label="lecții" />}
+                {deliverables > 0 && <Meta value={String(deliverables)} label="livrabile" />}
+                {quizDone && (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11.5, color: 'var(--ok)' }}>
+                    <CheckCircle2 size={12} /> diagnostic dat
+                  </span>
+                )}
+              </div>
 
-                  <div className="progress-bar" style={{ marginBottom: 12 }}>
-                    <div style={{
-                      height: '100%', width: `${pct}%`, borderRadius: 2,
-                      background: accent.fg, transition: 'width 0.8s cubic-bezier(0.4,0,0.2,1)',
-                    }} />
-                  </div>
+              <div className="progress-bar" style={{ marginBottom: 12 }}>
+                <div style={{
+                  height: '100%', width: `${pct}%`, borderRadius: 2,
+                  background: accent.fg, transition: 'width 0.8s cubic-bezier(0.4,0,0.2,1)',
+                }} />
+              </div>
 
-                  <button
-                    onClick={onOpen}
-                    aria-label={`Deschide ${course.title}${started ? `, ${pct}% parcurs` : ''}`}
-                    style={{
-                      width: '100%', minHeight: 44, display: 'flex', alignItems: 'center',
-                      justifyContent: 'space-between', gap: 10, padding: '0 14px',
-                      borderRadius: 10, cursor: 'pointer', font: 'inherit',
-                      background: accent.dim, color: accent.fg, border: '1px solid var(--border-hi)',
-                      transition: 'filter 0.15s',
-                    }}
-                    onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.25)')}
-                    onMouseLeave={e => (e.currentTarget.style.filter = 'none')}
-                  >
-                    <span style={{ fontSize: 13, fontWeight: 600 }}>
-                      {!quizDone ? 'Începe cu diagnosticul' : started ? `Continuă · ${pct}%` : 'Intră în program'}
-                    </span>
-                    <ArrowRight size={15} style={{ flexShrink: 0 }} />
-                  </button>
-                </>
-              )}
+              <button
+                onClick={onOpen}
+                aria-label={`Deschide ${course.title}${started ? `, ${pct}% parcurs` : ''}`}
+                style={{
+                  width: '100%', minHeight: 44, display: 'flex', alignItems: 'center',
+                  justifyContent: 'space-between', gap: 10, padding: '0 14px',
+                  borderRadius: 10, cursor: 'pointer', font: 'inherit',
+                  background: accent.dim, color: accent.fg, border: '1px solid var(--border-hi)',
+                  transition: 'filter 0.15s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.25)')}
+                onMouseLeave={e => (e.currentTarget.style.filter = 'none')}
+              >
+                <span style={{ fontSize: 13, fontWeight: 600 }}>
+                  {!quizDone ? 'Începe cu diagnosticul' : started ? `Continuă · ${pct}%` : 'Intră în program'}
+                </span>
+                <ArrowRight size={15} style={{ flexShrink: 0 }} />
+              </button>
             </div>
           </div>
         </div>
