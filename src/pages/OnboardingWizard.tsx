@@ -108,7 +108,10 @@ const Step1: React.FC<{ onNext: () => void }> = ({ onNext }) => (
       transition={{ delay: 0.8 }}
       style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, marginBottom: 28 }}
     >
-      În 8 săptămâni construim împreună fundația unui business care funcționează
+      {/* Turul e la nivel de PLATFORMĂ — îl poate vedea și un elev de la START, care
+          n-are opt săptămâni și nici o firmă existentă. Durata programului se vede în
+          cursul lui, unde e cea reală. */}
+      Construim împreună fundația unui business care funcționează
       fără să depindă de tine zilnic.
     </motion.p>
 

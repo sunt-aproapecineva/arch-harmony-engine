@@ -281,19 +281,11 @@ export const OnboardingQuiz: React.FC = () => {
                   Suntem bucuroși să te avem alături. Urmează câțiva pași simpli pentru a-ți personaliza experiența de studiu.
                 </p>
               </motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35 }}
-                style={{ display: 'flex', justifyContent: 'center', gap: 32, marginBottom: 44 }}
-              >
-                {[['6', 'Etape'], ['8', 'Săptămâni'], ['100%', 'Livrable reale']].map(([v, l]) => (
-                  <div key={l} style={{ textAlign: 'center' }}>
-                    <div className="font-aboreto" style={{ fontSize: 26, color: 'var(--accent)', lineHeight: 1 }}>{v}</div>
-                    <div style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 4 }}>{l}</div>
-                  </div>
-                ))}
-              </motion.div>
+              {/* Aici stăteau trei cifre scrise de mână — „6 Etape · 8 Săptămâni ·
+                  100% Livrable reale". Erau ale cursului Business și se afișau
+                  neschimbate și la START, care are 10 etape. Scoase: pagina asta e
+                  un salut înainte de diagnostic, nu o fișă de produs, iar cifrele
+                  reale ale programului le vede oricum pe dashboard. */}
               <motion.button
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
