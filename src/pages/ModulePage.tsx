@@ -181,6 +181,8 @@ export const ModulePage: React.FC = () => {
         <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--fg-3)', textTransform: 'uppercase', marginBottom: 20 }}>
           Conținut modul
         </div>
+        {/* Titlurile lecțiilor se blurează ușor până la completarea quiz-ului de acces. */}
+        <div style={{ filter: !quizDone ? 'blur(1px)' : undefined, userSelect: !quizDone ? 'none' : undefined, transition: 'filter 0.2s' }}>
 
         <div style={{ position: 'relative' }}>
           {/* Vertical line */}
