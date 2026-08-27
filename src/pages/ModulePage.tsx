@@ -97,6 +97,10 @@ export const ModulePage: React.FC = () => {
         style={{
           background: 'var(--bg-card)', border: `1px solid ${done ? 'rgba(74,222,128,0.3)' : 'var(--border)'}`,
           borderRadius: 16, padding: 24, marginBottom: 32,
+          // Blur ușor cât quiz-ul de onboarding nu e completat — conținutul rămâne privat.
+          filter: !quizDone ? 'blur(1px)' : undefined,
+          userSelect: !quizDone ? 'none' : undefined,
+          transition: 'filter 0.2s',
         }}
       >
         {/* Badges */}
