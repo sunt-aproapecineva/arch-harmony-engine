@@ -305,6 +305,7 @@ export const ModulePage: React.FC = () => {
             })}
           </div>
         </div>
+        </div>
       </motion.div>
 
       <QuizRequiredModal open={quizModalOpen} onClose={() => setQuizModalOpen(false)} />
