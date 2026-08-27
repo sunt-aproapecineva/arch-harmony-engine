@@ -20,6 +20,14 @@ export const QuizRequiredModal: React.FC<Props> = ({ open, onClose }) => {
             onClick={onClose}
             style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 100, backdropFilter: 'blur(4px)' }}
           />
+          {/* Wrapper de centrare — flex pe tot ecranul, funcționează pe orice dispozitiv.
+              Centrarea NU se face cu translate în style: framer-motion rescrie `transform`
+              la animație și ar anula translate(-50%,-50%), decăsând modalul. */}
+          <div style={{
+            position: 'fixed', inset: 0, zIndex: 101,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 16, pointerEvents: 'none',
+          }}>
           {/* Modal card */}
           <motion.div
             initial={{ opacity: 0, scale: 0.88, y: 24 }}
@@ -27,9 +35,10 @@ export const QuizRequiredModal: React.FC<Props> = ({ open, onClose }) => {
             exit={{ opacity: 0, scale: 0.92, y: 12 }}
             transition={{ type: 'spring', damping: 24, stiffness: 300 }}
             style={{
-              position: 'fixed', top: '50%', left: '50%',
-              transform: 'translate(-50%, -50%)',
-              zIndex: 101, width: '90%', maxWidth: 440,
+              pointerEvents: 'auto',
+              width: '100%', maxWidth: 440,
+              maxHeight: 'calc(100dvh - 32px)',
+              overflowY: 'auto',
               background: 'var(--bg-3)', borderRadius: 24,
               border: '1px solid var(--border-hi)',
               boxShadow: '0 32px 80px rgba(0,0,0,0.6)',
@@ -84,6 +93,7 @@ export const QuizRequiredModal: React.FC<Props> = ({ open, onClose }) => {
               </button>
             </div>
           </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>

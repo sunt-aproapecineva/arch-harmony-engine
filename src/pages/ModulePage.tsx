@@ -97,6 +97,10 @@ export const ModulePage: React.FC = () => {
         style={{
           background: 'var(--bg-card)', border: `1px solid ${done ? 'rgba(74,222,128,0.3)' : 'var(--border)'}`,
           borderRadius: 16, padding: 24, marginBottom: 32,
+          // Blur ușor cât quiz-ul de onboarding nu e completat — conținutul rămâne privat.
+          filter: !quizDone ? 'blur(1px)' : undefined,
+          userSelect: !quizDone ? 'none' : undefined,
+          transition: 'filter 0.2s',
         }}
       >
         {/* Badges */}
@@ -150,7 +154,7 @@ export const ModulePage: React.FC = () => {
         {!locked && module.lessons.length > 0 && (
           <div style={{ marginTop: 20 }}>
             <button
-              onClick={() => navigate(courseLessonPath(course, module.lessons[0].id))}
+              onClick={() => { if (!quizDone) { setQuizModalOpen(true); return; } navigate(courseLessonPath(course, module.lessons[0].id)); }}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 padding: '10px 22px', background: 'var(--accent)', color: '#0D0907',
@@ -177,6 +181,8 @@ export const ModulePage: React.FC = () => {
         <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--fg-3)', textTransform: 'uppercase', marginBottom: 20 }}>
           Conținut modul
         </div>
+        {/* Titlurile lecțiilor se blurează ușor până la completarea quiz-ului de acces. */}
+        <div style={{ filter: !quizDone ? 'blur(1px)' : undefined, userSelect: !quizDone ? 'none' : undefined, transition: 'filter 0.2s' }}>
 
         <div style={{ position: 'relative' }}>
           {/* Vertical line */}
@@ -298,6 +304,7 @@ export const ModulePage: React.FC = () => {
               return null;
             })}
           </div>
+        </div>
         </div>
       </motion.div>
 
