@@ -494,7 +494,7 @@ export const Dashboard: React.FC = () => {
                 <ModuleCard
                   module={mod}
                   progress={getModuleProgress(mod.id)}
-                  locked={isModuleLocked(idx)}
+                  locked={!quizDone || isModuleLocked(idx)}
                   active={mod.id === currentModule.id}
                   index={idx}
                 />
