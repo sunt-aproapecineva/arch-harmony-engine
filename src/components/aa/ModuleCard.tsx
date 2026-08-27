@@ -101,34 +101,37 @@ export const ModuleCard: React.FC<Props> = ({ module: mod, progress, locked, act
           </div>
         </div>
 
-        {/* Title */}
-        <h3 className="font-aboreto" style={{ fontSize: 17, color: 'var(--fg)', letterSpacing: '-0.01em', marginBottom: 4, lineHeight: 1.2 }}>
-          {mod.title}
-        </h3>
-        <p style={{ fontSize: 12, color: 'var(--fg-3)', marginBottom: 14 }}>{mod.subtitle}</p>
+        {/* Blur ușor pe conținutul modulelor încă blocate — temele viitoare se pot schimba. */}
+        <div style={{ filter: locked ? 'blur(0.9px)' : undefined, transition: 'filter 0.2s' }}>
+          {/* Title */}
+          <h3 className="font-aboreto" style={{ fontSize: 17, color: 'var(--fg)', letterSpacing: '-0.01em', marginBottom: 4, lineHeight: 1.2 }}>
+            {mod.title}
+          </h3>
+          <p style={{ fontSize: 12, color: 'var(--fg-3)', marginBottom: 14 }}>{mod.subtitle}</p>
 
-        {/* Meta */}
-        <div style={{ display: 'flex', gap: 14, marginBottom: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--fg-3)' }}>
-            <BookOpen size={12} />{mod.lessons.length} lecții
+          {/* Meta */}
+          <div style={{ display: 'flex', gap: 14, marginBottom: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--fg-3)' }}>
+              <BookOpen size={12} />{mod.lessons.length} lecții
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--fg-3)' }}>
+              <Pencil size={12} />{mod.exercises.length} exerciții
+            </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--fg-3)' }}>
-            <Pencil size={12} />{mod.exercises.length} exerciții
-          </div>
-        </div>
 
-        {/* Progress bar */}
-        <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden', marginBottom: 10 }}>
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.8, delay: index * 0.06 + 0.2, ease: 'easeOut' }}
-            style={{
-              height: '100%',
-              background: done ? 'var(--ok)' : active ? 'var(--accent)' : 'var(--fg-3)',
-              borderRadius: 2,
-            }}
-          />
+          {/* Progress bar */}
+          <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden', marginBottom: 10 }}>
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.8, delay: index * 0.06 + 0.2, ease: 'easeOut' }}
+              style={{
+                height: '100%',
+                background: done ? 'var(--ok)' : active ? 'var(--accent)' : 'var(--fg-3)',
+                borderRadius: 2,
+              }}
+            />
+          </div>
         </div>
 
         {/* CTA button row */}
