@@ -37,7 +37,7 @@ export const QuizRequiredModal: React.FC<Props> = ({ open, onClose }) => {
             style={{
               pointerEvents: 'auto',
               width: '100%', maxWidth: 440,
-              maxHeight: 'calc(100vh - 32px)', maxHeight: 'calc(100dvh - 32px)',
+              maxHeight: 'calc(100dvh - 32px)',
               overflowY: 'auto',
               background: 'var(--bg-3)', borderRadius: 24,
               border: '1px solid var(--border-hi)',
