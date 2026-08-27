@@ -93,6 +93,7 @@ export const QuizRequiredModal: React.FC<Props> = ({ open, onClose }) => {
               </button>
             </div>
           </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>
