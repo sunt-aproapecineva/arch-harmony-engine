@@ -154,7 +154,7 @@ export const ModulePage: React.FC = () => {
         {!locked && module.lessons.length > 0 && (
           <div style={{ marginTop: 20 }}>
             <button
-              onClick={() => navigate(courseLessonPath(course, module.lessons[0].id))}
+              onClick={() => { if (!quizDone) { setQuizModalOpen(true); return; } navigate(courseLessonPath(course, module.lessons[0].id)); }}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 padding: '10px 22px', background: 'var(--accent)', color: '#0D0907',
