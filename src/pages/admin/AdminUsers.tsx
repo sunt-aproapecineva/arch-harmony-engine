@@ -333,6 +333,22 @@ export const AdminUsers: React.FC = () => {
                     );
                   })}
                 </div>
+                {/* Fluxul ales aici bate alegerea automată de la crearea contului:
+                    un întârziat de la Flux 1 nu mai aterizează în Flux 2 doar
+                    pentru că e cel mai recent pornit. */}
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <span style={formLabel}>Flux</span>
+                  {[{ id: '', name: 'Automat (cel mai recent)' }, ...flowsOf(newCourse)].map(f => {
+                    const active = (newFlow || '') === f.id;
+                    return (
+                      <button key={f.id || 'auto'} onClick={() => setNewFlow(f.id || null)} aria-pressed={active} className="aa-tap"
+                        style={{ padding: '6px 13px', borderRadius: 8, fontSize: 12, cursor: 'pointer', fontWeight: active ? 700 : 400, background: active ? 'var(--accent-dim)' : 'transparent', border: `1px solid ${active ? 'var(--border-hi)' : 'var(--border)'}`, color: active ? 'var(--fg)' : 'var(--fg-3)' }}>
+                        {f.name}
+                      </button>
+                    );
+                  })}
+                </div>
+
               </div>
             </motion.div>
           )}
