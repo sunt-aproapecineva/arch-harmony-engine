@@ -96,7 +96,10 @@ export const AdminUsers: React.FC = () => {
     if (!courseTiers(newCourse).some(t => t.id === newTariff)) {
       setNewTariff(defaultTier(newCourse)?.id || 'student');
     }
-  }, [newCourse, newTariff]);
+    // Fluxul aparține și el programului: la schimbarea programului se resetează.
+    setNewFlow(prev => (prev && !allFlows.some(f => f.id === prev && f.course_id === newCourse) ? null : prev));
+  }, [newCourse, newTariff, allFlows]);
+
 
   const doneMap = React.useMemo(() => doneByUser(progress), [progress]);
   // Un index de lecții per program: procentul se calculează în programul lui, nu
