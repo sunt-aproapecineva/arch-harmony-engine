@@ -25,7 +25,7 @@ export const START_MODULES: Module[] = [
         title: 'Bun venit. Hai să începem.',
         description:
           'Mesaj de bun venit în practicum: ce construiești în următoarele săptămâni, cum să folosești platforma și cum să lucrezi direct pe ideea ta de afacere.',
-        video_url: 'https://www.youtube.com/watch?v=l3M552Rm_e8',
+        video_url: 'https://www.youtube.com/watch?v=xVn5iZF8o_Q',
         duration_min: 0,
         order_index: 0,
         is_published: true,
@@ -36,7 +36,7 @@ export const START_MODULES: Module[] = [
         module_id: 'st-m-0',
         title: 'Business vs. Freelancing vs. Job cu Firmă Proprie',
         description: 'Cele trei forme de activitate independentă și de ce diferența nu e juridică, ci structurală. Un freelancer vinde timp. Un antreprenor construiește un sistem.',
-        video_url: 'https://www.youtube.com/watch?v=QOu_cepNQ8I',
+        video_url: 'https://www.youtube.com/watch?v=qtkp9N5_20A',
         duration_min: 0,
         order_index: 1,
         is_published: true,
