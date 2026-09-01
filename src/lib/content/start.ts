@@ -20,14 +20,26 @@ export const START_MODULES: Module[] = [
     deliverable: 'Înțelegi diferența reală dintre tipurile de structuri de business și decizi conștient ce construiești — nu din entuziasm, ci din claritate.',
     lessons: [
       {
+        id: 'st-l-0-0',
+        module_id: 'st-m-0',
+        title: 'Bun venit. Hai să începem.',
+        description:
+          'Mesaj de bun venit în practicum: ce construiești în următoarele săptămâni, cum să folosești platforma și cum să lucrezi direct pe ideea ta de afacere.',
+        video_url: 'https://www.youtube.com/watch?v=l3M552Rm_e8',
+        duration_min: 0,
+        order_index: 0,
+        is_published: true,
+        type: 'video',
+      },
+      {
         id: 'st-l-0-1',
         module_id: 'st-m-0',
         title: 'Business vs. Freelancing vs. Job cu Firmă Proprie',
         description: 'Cele trei forme de activitate independentă și de ce diferența nu e juridică, ci structurală. Un freelancer vinde timp. Un antreprenor construiește un sistem.',
-        video_url: '',
+        video_url: 'https://www.youtube.com/watch?v=QOu_cepNQ8I',
         duration_min: 0,
         order_index: 1,
-        is_published: false,
+        is_published: true,
         type: 'video',
       },
       {
