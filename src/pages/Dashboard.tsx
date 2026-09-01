@@ -477,7 +477,25 @@ export const Dashboard: React.FC = () => {
               Calendar program
             </h3>
           </div>
-          <Calendar events={liveEvents} moduleUnlocks={moduleUnlocks} />
+          <div style={{ position: 'relative', borderRadius: 20, overflow: 'hidden' }}>
+            <div style={{ filter: 'blur(6px)', pointerEvents: 'none', userSelect: 'none', opacity: 0.55 }} aria-hidden="true">
+              <Calendar events={liveEvents} moduleUnlocks={moduleUnlocks} />
+            </div>
+            <div style={{
+              position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center', gap: 10,
+              background: 'color-mix(in oklab, var(--surface) 55%, transparent)',
+              padding: 24, textAlign: 'center',
+            }}>
+              <div style={{ fontSize: 26 }}>🗓️</div>
+              <div className="font-aboreto" style={{ fontSize: 14, letterSpacing: '0.06em', color: 'var(--fg-1)', textTransform: 'uppercase' }}>
+                În curând
+              </div>
+              <p style={{ fontSize: 13, color: 'var(--fg-2)', maxWidth: 420, margin: 0, lineHeight: 1.6 }}>
+                În curând va fi disponibil calendarul cu toate evenimentele practicumului.
+              </p>
+            </div>
+          </div>
         </motion.div>
 
         {/* ── MODULE GRID ── */}
