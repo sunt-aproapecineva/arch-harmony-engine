@@ -53,6 +53,9 @@ export const AdminUsers: React.FC = () => {
   const [newEmail, setNewEmail] = useState('');
   const [newCourse, setNewCourse] = useState<string>(courses[0]?.id || 'business');
   const [newTariff, setNewTariff] = useState<Tariff>(defaultTier(courses[0]?.id)?.id || 'student');
+  /** Fluxul în care intră emailul la crearea contului. Null = cel mai recent activ. */
+  const [newFlow, setNewFlow] = useState<string | null>(null);
+
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -93,7 +96,10 @@ export const AdminUsers: React.FC = () => {
     if (!courseTiers(newCourse).some(t => t.id === newTariff)) {
       setNewTariff(defaultTier(newCourse)?.id || 'student');
     }
-  }, [newCourse, newTariff]);
+    // Fluxul aparține și el programului: la schimbarea programului se resetează.
+    setNewFlow(prev => (prev && !allFlows.some(f => f.id === prev && f.course_id === newCourse) ? null : prev));
+  }, [newCourse, newTariff, allFlows]);
+
 
   const doneMap = React.useMemo(() => doneByUser(progress), [progress]);
   // Un index de lecții per program: procentul se calculează în programul lui, nu
@@ -119,14 +125,23 @@ export const AdminUsers: React.FC = () => {
       setAddError('Adresa de email nu este validă.');
       return;
     }
-    const { error } = await supabase.from('whitelist').insert({ email, tariff: newTariff, course_id: newCourse });
+    // Fluxul se trimite doar dacă e al programului ales — altfel ar putea rămâne
+    // selectat unul de la programul dinainte, iar omul ar ateriza în fluxul greșit.
+    const flowOk = newFlow && flowsOf(newCourse).some(f => f.id === newFlow) ? newFlow : null;
+    const payload: any = { email, tariff: newTariff, course_id: newCourse, flow_id: flowOk };
+    let { error } = await supabase.from('whitelist').insert(payload);
+    // Fără coloana de flux (migrație neaplicată) reîncercăm fără ea.
+    if (error?.code === '42703') {
+      ({ error } = await supabase.from('whitelist').insert({ email, tariff: newTariff, course_id: newCourse }));
+    }
     if (error) {
       if (error.code === '23505') setAddError(`${email} este deja în lista de acces pentru ${getCourse(newCourse)?.shortTitle}.`);
       else setAddError(error.message);
       return;
     }
     setNewEmail(''); setShowAddForm(false);
-    setAddSuccess(`✓ ${email} · acces la ${getCourse(newCourse)?.shortTitle}, treapta ${getTier(newCourse, newTariff)?.label}.`);
+    setAddSuccess(`✓ ${email} · acces la ${getCourse(newCourse)?.shortTitle}, treapta ${getTier(newCourse, newTariff)?.label}${flowOk ? ` · ${flowName(flowOk)}` : ''}.`);
+
     setTimeout(() => setAddSuccess(''), 4000);
     reload();
   };
@@ -333,6 +348,22 @@ export const AdminUsers: React.FC = () => {
                     );
                   })}
                 </div>
+                {/* Fluxul ales aici bate alegerea automată de la crearea contului:
+                    un întârziat de la Flux 1 nu mai aterizează în Flux 2 doar
+                    pentru că e cel mai recent pornit. */}
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <span style={formLabel}>Flux</span>
+                  {[{ id: '', name: 'Automat (cel mai recent)' }, ...flowsOf(newCourse)].map(f => {
+                    const active = (newFlow || '') === f.id;
+                    return (
+                      <button key={f.id || 'auto'} onClick={() => setNewFlow(f.id || null)} aria-pressed={active} className="aa-tap"
+                        style={{ padding: '6px 13px', borderRadius: 8, fontSize: 12, cursor: 'pointer', fontWeight: active ? 700 : 400, background: active ? 'var(--accent-dim)' : 'transparent', border: `1px solid ${active ? 'var(--border-hi)' : 'var(--border)'}`, color: active ? 'var(--fg)' : 'var(--fg-3)' }}>
+                        {f.name}
+                      </button>
+                    );
+                  })}
+                </div>
+
               </div>
             </motion.div>
           )}
