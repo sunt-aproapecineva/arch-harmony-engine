@@ -53,6 +53,9 @@ export const AdminUsers: React.FC = () => {
   const [newEmail, setNewEmail] = useState('');
   const [newCourse, setNewCourse] = useState<string>(courses[0]?.id || 'business');
   const [newTariff, setNewTariff] = useState<Tariff>(defaultTier(courses[0]?.id)?.id || 'student');
+  /** Fluxul în care intră emailul la crearea contului. Null = cel mai recent activ. */
+  const [newFlow, setNewFlow] = useState<string | null>(null);
+
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
   const [search, setSearch] = useState('');
