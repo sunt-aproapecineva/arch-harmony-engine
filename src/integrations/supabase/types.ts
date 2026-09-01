@@ -933,6 +933,7 @@ export type Database = {
           added_by: string | null
           course_id: string
           email: string
+          flow_id: string | null
           id: string
           tariff: string
         }
@@ -941,6 +942,7 @@ export type Database = {
           added_by?: string | null
           course_id?: string
           email: string
+          flow_id?: string | null
           id?: string
           tariff?: string
         }
@@ -949,6 +951,7 @@ export type Database = {
           added_by?: string | null
           course_id?: string
           email?: string
+          flow_id?: string | null
           id?: string
           tariff?: string
         }
@@ -958,6 +961,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whitelist_flow_id_fkey"
+            columns: ["flow_id"]
+            isOneToOne: false
+            referencedRelation: "flows"
             referencedColumns: ["id"]
           },
         ]
