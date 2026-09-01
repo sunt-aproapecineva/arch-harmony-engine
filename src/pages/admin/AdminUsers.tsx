@@ -122,14 +122,23 @@ export const AdminUsers: React.FC = () => {
       setAddError('Adresa de email nu este validă.');
       return;
     }
-    const { error } = await supabase.from('whitelist').insert({ email, tariff: newTariff, course_id: newCourse });
+    // Fluxul se trimite doar dacă e al programului ales — altfel ar putea rămâne
+    // selectat unul de la programul dinainte, iar omul ar ateriza în fluxul greșit.
+    const flowOk = newFlow && flowsOf(newCourse).some(f => f.id === newFlow) ? newFlow : null;
+    const payload: any = { email, tariff: newTariff, course_id: newCourse, flow_id: flowOk };
+    let { error } = await supabase.from('whitelist').insert(payload);
+    // Fără coloana de flux (migrație neaplicată) reîncercăm fără ea.
+    if (error?.code === '42703') {
+      ({ error } = await supabase.from('whitelist').insert({ email, tariff: newTariff, course_id: newCourse }));
+    }
     if (error) {
       if (error.code === '23505') setAddError(`${email} este deja în lista de acces pentru ${getCourse(newCourse)?.shortTitle}.`);
       else setAddError(error.message);
       return;
     }
     setNewEmail(''); setShowAddForm(false);
-    setAddSuccess(`✓ ${email} · acces la ${getCourse(newCourse)?.shortTitle}, treapta ${getTier(newCourse, newTariff)?.label}.`);
+    setAddSuccess(`✓ ${email} · acces la ${getCourse(newCourse)?.shortTitle}, treapta ${getTier(newCourse, newTariff)?.label}${flowOk ? ` · ${flowName(flowOk)}` : ''}.`);
+
     setTimeout(() => setAddSuccess(''), 4000);
     reload();
   };
