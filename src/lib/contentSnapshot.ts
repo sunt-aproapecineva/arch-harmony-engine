@@ -6,6 +6,7 @@ export const CONTENT_SNAPSHOT = {
   "mods": [
     {
       "id": "1f2cd77d-826b-42be-89e8-3ce7dc2d30d5",
+      "course_id": "business",
       "order_index": 0,
       "title": "Proiectul Casei: Diagnostică & Plan",
       "subtitle": "Înainte să sapi fundația, desenezi proiectul.",
@@ -15,6 +16,7 @@ export const CONTENT_SNAPSHOT = {
     },
     {
       "id": "89415b87-8739-47e2-8439-0fc8296acd35",
+      "course_id": "business",
       "order_index": 1,
       "title": "Fundația: Claritate & Poziționare",
       "subtitle": "Dacă fundația e strâmbă, toată casa e strâmbă.",
@@ -24,6 +26,7 @@ export const CONTENT_SNAPSHOT = {
     },
     {
       "id": "32656a4c-d805-4dbf-8e27-6c95ced6766d",
+      "course_id": "business",
       "order_index": 2,
       "title": "Pereții Portanți: Structură Organizațională",
       "subtitle": "Pereții portanți împart casa în camere și o țin în picioare la cutremur.",
@@ -33,6 +36,7 @@ export const CONTENT_SNAPSHOT = {
     },
     {
       "id": "98bb20f0-9a21-4cdd-ac7b-44ee57a4ae8c",
+      "course_id": "business",
       "order_index": 3,
       "title": "Instalațiile: Procese Operaționale",
       "subtitle": "Fără țevi, fără curent — nu poți locui în casă.",
@@ -42,6 +46,7 @@ export const CONTENT_SNAPSHOT = {
     },
     {
       "id": "fceaf485-9834-4e78-8b77-f37a37f798f9",
+      "course_id": "business",
       "order_index": 4,
       "title": "Contoarele: Control & KPI",
       "subtitle": "Fără contoare nu conduci — ghicești.",
@@ -51,6 +56,7 @@ export const CONTENT_SNAPSHOT = {
     },
     {
       "id": "66e80264-74e8-499d-bc86-827ff4547e84",
+      "course_id": "business",
       "order_index": 5,
       "title": "Predarea Cheilor: Delegare Reală",
       "subtitle": "Constructorul nu locuiește în casa pe care a construit-o.",
@@ -60,6 +66,7 @@ export const CONTENT_SNAPSHOT = {
     },
     {
       "id": "f728d8b1-c836-4a14-aa29-27c2da892398",
+      "course_id": "business",
       "order_index": 6,
       "title": "Recepția Finală: Management & Scalare",
       "subtitle": "La recepție verifici că totul funcționează și semnezi.",
@@ -69,6 +76,7 @@ export const CONTENT_SNAPSHOT = {
     },
     {
       "id": "e111821a-e2ec-44ac-b9d0-208990a6f1c6",
+      "course_id": "start",
       "order_index": 0,
       "title": "Ce Construiești de Fapt",
       "subtitle": "Claritate înainte de orice construcție.",
