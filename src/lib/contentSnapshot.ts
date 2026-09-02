@@ -66,6 +66,15 @@ export const CONTENT_SNAPSHOT = {
       "description": "Nivelul de management, owner de sistem.",
       "etapa": "Etapa 6",
       "saptamana": "Săptămâna 8"
+    },
+    {
+      "id": "e111821a-e2ec-44ac-b9d0-208990a6f1c6",
+      "order_index": 0,
+      "title": "Ce Construiești de Fapt",
+      "subtitle": "Claritate înainte de orice construcție.",
+      "description": "Înainte să vorbim despre nișă, validare sau vânzări, trebuie să existe claritate despre ce construim și de ce ordinea pașilor contează mai mult decât energia cu care pornești.",
+      "etapa": "Etapa 0",
+      "saptamana": "Săptămâna 0"
     }
   ],
   "lessons": [
