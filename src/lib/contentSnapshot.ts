@@ -66,6 +66,15 @@ export const CONTENT_SNAPSHOT = {
       "description": "Nivelul de management, owner de sistem.",
       "etapa": "Etapa 6",
       "saptamana": "Săptămâna 8"
+    },
+    {
+      "id": "e111821a-e2ec-44ac-b9d0-208990a6f1c6",
+      "order_index": 0,
+      "title": "Ce Construiești de Fapt",
+      "subtitle": "Claritate înainte de orice construcție.",
+      "description": "Înainte să vorbim despre nișă, validare sau vânzări, trebuie să existe claritate despre ce construim și de ce ordinea pașilor contează mai mult decât energia cu care pornești.",
+      "etapa": "Etapa 0",
+      "saptamana": "Săptămâna 0"
     }
   ],
   "lessons": [
@@ -332,6 +341,61 @@ export const CONTENT_SNAPSHOT = {
       "video_url": "https://www.youtube.com/watch?v=EgQ1OkeBMZA",
       "pdf_url": "",
       "duration_min": 25,
+      "is_published": true
+    },
+    {
+      "id": "1c7a92c8-a0b3-418b-b8ed-1759a168f367",
+      "module_id": "e111821a-e2ec-44ac-b9d0-208990a6f1c6",
+      "order_index": 0,
+      "title": "Bun venit. Hai să începem.",
+      "description": "Mesaj de bun venit în practicum: ce construiești în următoarele săptămâni, cum să folosești platforma și cum să lucrezi direct pe ideea ta de afacere.",
+      "video_url": "https://www.youtube.com/watch?v=xVn5iZF8o_Q",
+      "pdf_url": null,
+      "duration_min": 0,
+      "is_published": true
+    },
+    {
+      "id": "c7e3d76e-270c-43ac-9259-6fc02460adde",
+      "module_id": "e111821a-e2ec-44ac-b9d0-208990a6f1c6",
+      "order_index": 1,
+      "title": "Business vs. Freelancing vs. Job cu Firmă Proprie",
+      "description": "Cele trei forme de activitate independentă și de ce diferența nu e juridică, ci structurală. Un freelancer vinde timp. Un antreprenor construiește un sistem.",
+      "video_url": "https://www.youtube.com/watch?v=qtkp9N5_20A",
+      "pdf_url": null,
+      "duration_min": 0,
+      "is_published": true
+    },
+    {
+      "id": "54647238-2cbf-40fd-b6bf-66923992ab76",
+      "module_id": "e111821a-e2ec-44ac-b9d0-208990a6f1c6",
+      "order_index": 2,
+      "title": "De Ce Eșuează 80% din Afacerile Noi",
+      "description": "Cei 3 factori comuni ai eșecului din consultațiile reale: pornesc fără validare, construiesc fără sistem, vând fără strategie.",
+      "video_url": "https://www.youtube.com/watch?v=R-0_W7DEYpQ",
+      "pdf_url": null,
+      "duration_min": 0,
+      "is_published": true
+    },
+    {
+      "id": "cb72e0e2-05c9-4f44-8e13-37f13a86de7a",
+      "module_id": "e111821a-e2ec-44ac-b9d0-208990a6f1c6",
+      "order_index": 3,
+      "title": "Erorile de Mentalitate Care Omoară Afacerile Înainte să Înceapă",
+      "description": "Pasiunea ca criteriu de nișă, energia ca substitut al sistemului, capcana pregătirii infinite. Construiești pentru supraviețuire sau pentru scalare?",
+      "video_url": "https://www.youtube.com/watch?v=07xM9FbSojc",
+      "pdf_url": null,
+      "duration_min": 0,
+      "is_published": true
+    },
+    {
+      "id": "76f8a942-6d94-435b-9350-e28d22a8da53",
+      "module_id": "e111821a-e2ec-44ac-b9d0-208990a6f1c6",
+      "order_index": 4,
+      "title": "Primul Filtru: Merită Să Continui?",
+      "description": "Cum testezi o idee înainte să investești timp și bani. Diferența dintre o idee interesantă și una cu șanse reale de a deveni afacere.",
+      "video_url": "https://www.youtube.com/watch?v=3FLJ_3gP8RY",
+      "pdf_url": null,
+      "duration_min": 0,
       "is_published": true
     }
   ]
