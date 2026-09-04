@@ -17,6 +17,8 @@ import { TariffBadge } from '../../components/aa/TariffBadge';
 import { ProgressBar } from '../../components/aa/ProgressBar';
 import { getActivityForUser, ActivityEvent, timeAgo, ActivityType } from '../../lib/activity';
 import { generateProfile, QuizProfile } from '../../lib/quizProfile';
+import { generateStartProfile, StartProfile } from '../../lib/startQuizProfile';
+import { getQuizDefinition } from '../../lib/quiz';
 import { EXERCISE_TEMPLATES } from '../../lib/exerciseData';
 import { recoverStudentExerciseResponses } from '../../lib/adminRecovery.functions';
 import { StudentBriefingPanel } from '@/components/admin/StudentBriefingPanel';
@@ -313,6 +315,7 @@ export const AdminStudentProfile: React.FC = () => {
   const [progress, setProgress] = useState<Progress[]>([]);
   const [activity, setActivity] = useState<ActivityEvent[]>([]);
   const [quizProfile, setQuizProfile] = useState<QuizProfile | null>(null);
+  const [startProfile, setStartProfile] = useState<StartProfile | null>(null);
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string | string[]> | null>(null);
   const [showQuizDetails, setShowQuizDetails] = useState(false);
   const [showAllActivity, setShowAllActivity] = useState(false);
@@ -394,10 +397,19 @@ export const AdminStudentProfile: React.FC = () => {
       if (quiz?.answers) {
         const answers = quiz.answers as Record<string, string | string[]>;
         setQuizAnswers(answers);
-        setQuizProfile(generateProfile(answers));
+        // Fiecare program are diagnosticul lui: START are întrebări proprii (s1…s17),
+        // deci profilul Business (q1…q15) nu i se aplică.
+        if (courseId === 'start') {
+          setStartProfile(generateStartProfile(answers as any));
+          setQuizProfile(null);
+        } else {
+          setQuizProfile(generateProfile(answers));
+          setStartProfile(null);
+        }
       } else {
         setQuizAnswers(null);
         setQuizProfile(null);
+        setStartProfile(null);
       }
       const notesMap: Record<string, string> = {};
       (notesRows || []).forEach((n: any) => { notesMap[n.lesson_id] = n.content || ''; });
@@ -415,7 +427,7 @@ export const AdminStudentProfile: React.FC = () => {
     } finally {
       setRefreshing(false);
     }
-  }, [userId]);
+  }, [userId, courseId]);
 
   useEffect(() => {
     loadAll();
@@ -609,7 +621,97 @@ export const AdminStudentProfile: React.FC = () => {
       {/* ── Section 2: Quiz Profile ── */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} style={cardStyle}>
         <div style={sectionLabel}>Profil Quiz</div>
-        {!quizProfile ? (
+        {startProfile ? (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 12, fontWeight: 700, padding: '4px 14px', borderRadius: 99, background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)', color: 'var(--accent)' }}>
+                {startProfile.segmentLabel}
+              </span>
+              <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>
+                Pregătire: <strong style={{ color: 'var(--fg)' }}>{startProfile.readiness}/100</strong>
+              </span>
+              <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>
+                Urgență: <strong style={{ color: startProfile.urgency >= 8 ? 'var(--error)' : 'var(--fg)' }}>{startProfile.urgency}/10</strong>
+              </span>
+              <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>
+                {startProfile.hoursPerWeek}h/săptămână
+              </span>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ height: 6, background: 'var(--border)', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${startProfile.readiness}%`, background: 'var(--accent)', borderRadius: 3, transition: 'width 0.8s ease' }} />
+              </div>
+            </div>
+            <p style={{ fontSize: 13, color: 'var(--fg-2)', lineHeight: 1.7, marginBottom: 16 }}>
+              {startProfile.mentorBriefing}
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+              <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 99, background: 'var(--bg-3)', border: '1px solid var(--border)', color: 'var(--fg-2)' }}>
+                Validare: {startProfile.validationLabel}
+              </span>
+              <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 99, background: 'var(--bg-3)', border: '1px solid var(--border)', color: 'var(--fg-2)' }}>
+                Risc: {startProfile.riskLabel}
+              </span>
+              <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 99, background: 'var(--bg-3)', border: '1px solid var(--border)', color: 'var(--fg-2)' }}>
+                Deschidere la feedback: {startProfile.coachability}
+              </span>
+              {startProfile.belongsInBusiness && (
+                <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 99, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: 'var(--error)' }}>
+                  Pare potrivit pentru AA Business
+                </span>
+              )}
+            </div>
+            {startProfile.riskFlags.length > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                <p style={{ fontSize: 11, color: 'var(--fg-3)', marginBottom: 8, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Riscuri identificate</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {startProfile.riskFlags.map(flag => (
+                    <span key={flag} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, padding: '4px 10px', borderRadius: 99, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: 'var(--error)' }}>
+                      <AlertTriangle size={10} /> {flag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            <button
+              onClick={() => setShowQuizDetails(v => !v)}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 14px', cursor: 'pointer', color: 'var(--fg-3)', fontSize: 12 }}
+            >
+              {showQuizDetails ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+              {showQuizDetails ? 'Ascunde răspunsurile quiz' : 'Vezi toate răspunsurile quiz'}
+            </button>
+            {showQuizDetails && quizAnswers && (
+              <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {(() => {
+                  const qs = getQuizDefinition('start')?.questions || [];
+                  const blocks: Record<string, any[]> = {};
+                  qs.forEach((q: any) => {
+                    const b = q.block || 'Răspunsuri';
+                    if (!blocks[b]) blocks[b] = [];
+                    blocks[b].push(q);
+                  });
+                  return Object.entries(blocks).map(([block, list]) => (
+                    <div key={block}>
+                      <p style={{ fontSize: 10, color: 'var(--fg-3)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>{block}</p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {list.map((q: any) => {
+                          const ans = quizAnswers[q.id];
+                          const displayAns = Array.isArray(ans) ? ans.join(', ') : String(ans ?? '') || '—';
+                          return (
+                            <div key={q.id} style={{ background: 'var(--bg-3)', borderRadius: 8, padding: '10px 14px' }}>
+                              <p style={{ fontSize: 11, color: 'var(--fg-3)', marginBottom: 4 }}>{q.question}</p>
+                              <p style={{ fontSize: 13, color: 'var(--fg)', fontWeight: 500 }}>{displayAns}</p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            )}
+          </>
+        ) : !quizProfile ? (
           <p style={{ fontSize: 13, color: 'var(--fg-3)', textAlign: 'center', padding: '16px 0' }}>
             Quiz-ul de onboarding nu a fost completat.
           </p>
