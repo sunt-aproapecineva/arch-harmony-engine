@@ -17,6 +17,8 @@ import { TariffBadge } from '../../components/aa/TariffBadge';
 import { ProgressBar } from '../../components/aa/ProgressBar';
 import { getActivityForUser, ActivityEvent, timeAgo, ActivityType } from '../../lib/activity';
 import { generateProfile, QuizProfile } from '../../lib/quizProfile';
+import { generateStartProfile, StartProfile } from '../../lib/startQuizProfile';
+import { getQuizDefinition } from '../../lib/quiz';
 import { EXERCISE_TEMPLATES } from '../../lib/exerciseData';
 import { recoverStudentExerciseResponses } from '../../lib/adminRecovery.functions';
 import { StudentBriefingPanel } from '@/components/admin/StudentBriefingPanel';
