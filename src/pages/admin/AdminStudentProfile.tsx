@@ -397,10 +397,19 @@ export const AdminStudentProfile: React.FC = () => {
       if (quiz?.answers) {
         const answers = quiz.answers as Record<string, string | string[]>;
         setQuizAnswers(answers);
-        setQuizProfile(generateProfile(answers));
+        // Fiecare program are diagnosticul lui: START are întrebări proprii (s1…s17),
+        // deci profilul Business (q1…q15) nu i se aplică.
+        if (courseId === 'start') {
+          setStartProfile(generateStartProfile(answers as any));
+          setQuizProfile(null);
+        } else {
+          setQuizProfile(generateProfile(answers));
+          setStartProfile(null);
+        }
       } else {
         setQuizAnswers(null);
         setQuizProfile(null);
+        setStartProfile(null);
       }
       const notesMap: Record<string, string> = {};
       (notesRows || []).forEach((n: any) => { notesMap[n.lesson_id] = n.content || ''; });
