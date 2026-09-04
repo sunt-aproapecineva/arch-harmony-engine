@@ -315,6 +315,7 @@ export const AdminStudentProfile: React.FC = () => {
   const [progress, setProgress] = useState<Progress[]>([]);
   const [activity, setActivity] = useState<ActivityEvent[]>([]);
   const [quizProfile, setQuizProfile] = useState<QuizProfile | null>(null);
+  const [startProfile, setStartProfile] = useState<StartProfile | null>(null);
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string | string[]> | null>(null);
   const [showQuizDetails, setShowQuizDetails] = useState(false);
   const [showAllActivity, setShowAllActivity] = useState(false);
