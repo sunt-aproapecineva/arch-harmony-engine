@@ -427,7 +427,7 @@ export const AdminStudentProfile: React.FC = () => {
     } finally {
       setRefreshing(false);
     }
-  }, [userId]);
+  }, [userId, courseId]);
 
   useEffect(() => {
     loadAll();
