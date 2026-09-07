@@ -128,9 +128,10 @@ export const ForgotPassword: React.FC = () => {
     });
     setLoading(false);
     if (otpErr) {
-      setError('Cod incorect sau expirat. Verifică emailul sau cere un cod nou.');
+      setError('Cod incorect sau expirat. Folosește ultimul cod primit pe email (nu apăsa linkul din email) sau cere un cod nou.');
       return;
     }
+
     setStep('password');
   };
 
