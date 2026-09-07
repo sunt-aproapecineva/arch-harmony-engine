@@ -47,6 +47,16 @@ export const ResetPassword: React.FC = () => {
       };
 
       try {
+        // 1) SDK-ul are detectSessionInUrl activ: îi dăm șansa să consume el tokenul.
+        //    Dacă a reușit, NU mai verificăm manual (tokenul e single-use).
+        for (let i = 0; i < 12; i++) {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) { if (!mounted) return; cleanUrl(); setStatus('ready'); return; }
+          const stillHasToken = Boolean(get('access_token') || query.get('code') || get('token_hash') || get('token'));
+          if (!stillHasToken) break;
+          await new Promise(r => setTimeout(r, 250));
+        }
+
         const accessToken = get('access_token');
         const refreshToken = get('refresh_token');
         const code = query.get('code');
@@ -71,6 +81,7 @@ export const ResetPassword: React.FC = () => {
       } catch (e) {
         if (mounted) setError(e instanceof Error ? e.message : '');
       }
+
 
       // Fallback: dacă SDK-ul a procesat deja linkul (detectSessionInUrl), avem sesiune.
       const { data: { session } } = await supabase.auth.getSession();
