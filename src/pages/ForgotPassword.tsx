@@ -52,7 +52,36 @@ export const ForgotPassword: React.FC = () => {
 
   const cleanEmail = email.trim().toLowerCase();
 
+  const friendlyAuthError = (msg: string): string => {
+    const m = (msg || '').toLowerCase();
+    if (m.includes('rate limit') || m.includes('after') && m.includes('seconds')) {
+      const secs = /(\d+)\s*second/.exec(m)?.[1];
+      return secs
+        ? `Ai cerut prea multe coduri. Mai așteaptă ${secs} secunde și încearcă din nou.`
+        : 'Ai cerut prea multe coduri. Mai așteaptă un minut și încearcă din nou.';
+    }
+    if (m.includes('token') || m.includes('expired') || m.includes('invalid')) {
+      return 'Codul nu mai este valid. Cere un cod nou și folosește-l pe ultimul primit.';
+    }
+    if (m.includes('password')) return 'Parola nu îndeplinește cerințele. Alege alta, minim 8 caractere.';
+    return 'A apărut o eroare. Încearcă din nou peste câteva momente.';
+  };
+
+  const startCooldown = (secs = 60) => {
+    setCooldown(secs);
+    const id = setInterval(() => {
+      setCooldown(prev => {
+        if (prev <= 1) { clearInterval(id); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
   const sendCode = async (silent = false) => {
+    if (cooldown > 0) {
+      setError(`Mai poți cere un cod nou peste ${cooldown} secunde.`);
+      return;
+    }
     setError('');
     setLoading(true);
 
@@ -73,11 +102,14 @@ export const ForgotPassword: React.FC = () => {
     });
     setLoading(false);
     if (resetErr) {
-      setError(resetErr.message);
+      setError(friendlyAuthError(resetErr.message));
       return;
     }
+    startCooldown(60);
+    setCode('');
     if (!silent) setStep('code');
   };
+
 
   const verifyCode = async () => {
     setError('');
