@@ -113,7 +113,8 @@ export const START_MODULES: Module[] = [
         id: 'st-l-1-1',
         module_id: 'st-m-1',
         title: 'O afacere începe cu o problemă, nu cu un produs',
-        description: 'De ce pornești de la ce doare, nu de la ce ți-ar plăcea să vinzi. Problema, omul care o trăiește și costul pe care îl plătește deja.',
+        description: 'Ce cumpără de fapt omul: produs vs. rezultat, problemă vs. neplăcere. Cele trei costuri ale unei probleme — bani, timp, stres — și cum deosebești „nice to have" de „must solve". Livrabil: 10 probleme reale, nu 10 idei de business.',
+
         video_url: 'https://youtu.be/HHco-8PCDRs',
         duration_min: 0,
         order_index: 1,
