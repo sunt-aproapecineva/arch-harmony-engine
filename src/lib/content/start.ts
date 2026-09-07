@@ -184,8 +184,9 @@ export const START_MODULES: Module[] = [
       {
         id: 'st-l-1-4',
         module_id: 'st-m-1',
-        title: 'Problema reală și soluția actuală',
-        description: 'Cu ce concurezi de fapt: ce face omul azi ca să compenseze, unde e limita și de ce rămâne totuși acolo.',
+        title: 'Problema reală și soluția pe care clientul o folosește acum',
+        description: 'Simptomul vizibil vs. problema din spate. Concurentul real poate fi obiceiul, Excelul, WhatsApp-ul sau amânarea — de ce omul rămâne acolo ani întregi și unde e golul. Livrabil: harta problemei și a soluției actuale.',
+
         video_url: '',
         duration_min: 0,
         order_index: 7,
