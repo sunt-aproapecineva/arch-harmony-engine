@@ -92,9 +92,9 @@ export const CONTENT_SNAPSHOT = {
       "order_index": 0,
       "title": "Bun venit. Hai să începem.",
       "description": "Mesaj de bun venit în practicum: ce construiești în 8 săptămâni, cum să folosești platforma și cum să lucrezi direct pe firma ta.",
-      "video_url": null,
+      "video_url": "https://www.youtube.com/watch?v=pekuGxrB-LU",
       "pdf_url": null,
-      "duration_min": 0,
+      "duration_min": 19,
       "is_published": true
     },
     {
