@@ -74,6 +74,13 @@ export interface Module {
    */
   unlockWeek?: number;
   /**
+   * Blocaj manual: modulul rămâne închis indiferent de data de start a fluxului,
+   * până când e scos explicit din cod. Se folosește când conținutul nu e încă
+   * confirmat — un orar automat l-ar deschide oricum, la data calculată.
+   */
+  manualLock?: boolean;
+
+  /**
    * Modul-poartă: modulele următoare presupun că acesta a fost livrat.
    * La START, Modulul 2 (Validarea) e poartă — „dacă sari peste, construiești pe nisip".
    */
