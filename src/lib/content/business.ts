@@ -24,9 +24,9 @@ export const BUSINESS_MODULES: Module[] = [
         title: 'Bun venit. Hai să începem.',
         description:
           'Mesaj de bun venit în practicum: ce construiești în 8 săptămâni, cum să folosești platforma și cum să lucrezi direct pe firma ta.',
-        video_url: '',
+        video_url: 'https://www.youtube.com/watch?v=pekuGxrB-LU',
         pdf_url: '',
-        duration_min: 0,
+        duration_min: 7,
         order_index: 1,
         is_published: true,
       },
