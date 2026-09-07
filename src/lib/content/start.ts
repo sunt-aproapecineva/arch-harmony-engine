@@ -113,7 +113,8 @@ export const START_MODULES: Module[] = [
         id: 'st-l-1-1',
         module_id: 'st-m-1',
         title: 'O afacere începe cu o problemă, nu cu un produs',
-        description: 'De ce pornești de la ce doare, nu de la ce ți-ar plăcea să vinzi. Problema, omul care o trăiește și costul pe care îl plătește deja.',
+        description: 'Ce cumpără de fapt omul: produs vs. rezultat, problemă vs. neplăcere. Cele trei costuri ale unei probleme — bani, timp, stres — și cum deosebești „nice to have" de „must solve". Livrabil: 10 probleme reale, nu 10 idei de business.',
+
         video_url: 'https://youtu.be/HHco-8PCDRs',
         duration_min: 0,
         order_index: 1,
@@ -123,8 +124,9 @@ export const START_MODULES: Module[] = [
       {
         id: 'st-l-1-2',
         module_id: 'st-m-1',
-        title: 'Cu ce avantaj pornești',
-        description: 'Experiență, acces la oameni, resurse existente și credibilitate. Unde startul e mai rapid, mai ieftin sau mai puțin riscant pentru tine.',
+        title: 'Cu ce avantaj pornești?',
+        description: 'Experiență, acces la clienți și oameni din industrie, resurse reale și credibilitate — de ce doi oameni pot vedea aceeași problemă, dar pornesc din poziții diferite. Livrabil: harta avantajului de start și 2–3 direcții.',
+
         video_url: 'https://youtu.be/iXd5P35G8lI',
         duration_min: 0,
         order_index: 2,
@@ -159,7 +161,8 @@ export const START_MODULES: Module[] = [
         id: 'st-l-1-3',
         module_id: 'st-m-1',
         title: 'Ce este piața și cum o segmentezi corect',
-        description: 'De la o piață largă la 5–7 grupuri concrete: cine + situație + problemă. De ce „vând tuturor" nu e o piață.',
+        description: 'De ce „toți oamenii" nu e o piață. Cele patru lentile de segmentare — omul, situația, momentul, nivelul de așteptare — și regula cine + situație + problemă. Livrabil: 5–7 segmente concrete.',
+
         video_url: '',
         duration_min: 0,
         order_index: 5,
@@ -181,8 +184,9 @@ export const START_MODULES: Module[] = [
       {
         id: 'st-l-1-4',
         module_id: 'st-m-1',
-        title: 'Problema reală și soluția actuală',
-        description: 'Cu ce concurezi de fapt: ce face omul azi ca să compenseze, unde e limita și de ce rămâne totuși acolo.',
+        title: 'Problema reală și soluția pe care clientul o folosește acum',
+        description: 'Simptomul vizibil vs. problema din spate. Concurentul real poate fi obiceiul, Excelul, WhatsApp-ul sau amânarea — de ce omul rămâne acolo ani întregi și unde e golul. Livrabil: harta problemei și a soluției actuale.',
+
         video_url: '',
         duration_min: 0,
         order_index: 7,
@@ -192,8 +196,9 @@ export const START_MODULES: Module[] = [
       {
         id: 'st-l-1-5',
         module_id: 'st-m-1',
-        title: 'Observația pieței: teren, tranzacții, ce spun oamenii',
-        description: 'Cum aduni dovezi observabile și cum separi faptul de interpretare.',
+        title: 'Uită-te înainte să alegi',
+        description: 'Cele trei locuri unde observi piața: terenul, ce cumpără oamenii deja, ce spun în public. Semnalele care contează — repetiție, fricțiune, plată, compromis — și separarea faptului de interpretare. Livrabil: fișa de observație.',
+
         video_url: '',
         duration_min: 0,
         order_index: 8,
@@ -216,7 +221,8 @@ export const START_MODULES: Module[] = [
         id: 'st-l-1-6',
         module_id: 'st-m-1',
         title: 'Cum îți alegi nișa',
-        description: 'Criteriile eliminatorii, comparația pe aceleași criterii și decizia argumentată pentru validarea din Săptămâna 3.',
+        description: 'Nișa formulată ca om + situație + problemă. Cele două porți de trecere — dovada problemei și accesul la client — și cele trei criterii de ordonare: golul soluției actuale, avantajul de start, spațiul de creștere. Livrabil: matricea de selecție și nișa aleasă.',
+
         video_url: '',
         duration_min: 0,
         order_index: 10,
