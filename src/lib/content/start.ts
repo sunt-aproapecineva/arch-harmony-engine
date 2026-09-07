@@ -124,8 +124,9 @@ export const START_MODULES: Module[] = [
       {
         id: 'st-l-1-2',
         module_id: 'st-m-1',
-        title: 'Cu ce avantaj pornești',
-        description: 'Experiență, acces la oameni, resurse existente și credibilitate. Unde startul e mai rapid, mai ieftin sau mai puțin riscant pentru tine.',
+        title: 'Cu ce avantaj pornești?',
+        description: 'Experiență, acces la clienți și oameni din industrie, resurse reale și credibilitate — de ce doi oameni pot vedea aceeași problemă, dar pornesc din poziții diferite. Livrabil: harta avantajului de start și 2–3 direcții.',
+
         video_url: 'https://youtu.be/iXd5P35G8lI',
         duration_min: 0,
         order_index: 2,
