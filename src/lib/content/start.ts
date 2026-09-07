@@ -196,8 +196,9 @@ export const START_MODULES: Module[] = [
       {
         id: 'st-l-1-5',
         module_id: 'st-m-1',
-        title: 'Observația pieței: teren, tranzacții, ce spun oamenii',
-        description: 'Cum aduni dovezi observabile și cum separi faptul de interpretare.',
+        title: 'Uită-te înainte să alegi',
+        description: 'Cele trei locuri unde observi piața: terenul, ce cumpără oamenii deja, ce spun în public. Semnalele care contează — repetiție, fricțiune, plată, compromis — și separarea faptului de interpretare. Livrabil: fișa de observație.',
+
         video_url: '',
         duration_min: 0,
         order_index: 8,
