@@ -104,7 +104,7 @@ export const START_MODULES: Module[] = [
     subtitle: 'Nișa se alege cu metodă, nu cu intuiție.',
     description: 'Cel mai frecvent răspuns greșit la „ce business fac" e fie prea larg, fie prea pasional. Nișa se alege cu metodă, nu cu intuiție și nu cu pasiune.',
     order_index: 1,
-    unlockWeek: 1,
+    unlockWeek: 0,
     etapa: 'Modulul 1',
     saptamana: 'Săptămâna 1',
     deliverable: 'Ai o nișă aleasă cu metodă și știi dacă piața există — nu prin prezumție, ci prin dovezi de suprafață.',
