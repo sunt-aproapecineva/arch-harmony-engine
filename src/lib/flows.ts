@@ -120,6 +120,8 @@ export async function fetchFlowEvents(flowId: string): Promise<FlowEvent[]> {
  *  3. nimic → modulul e deschis
  */
 export function moduleUnlockDate(mod: any, flow: Flow | null | undefined): Date | null {
+  // Blocaj manual: nu există dată de deschidere, deci UI-ul nu promite una.
+  if (mod?.manualLock) return null;
   if (flow?.starts_on && typeof mod?.unlockWeek === 'number') {
     const start = new Date(`${flow.starts_on}T00:00:00+03:00`);
     if (!Number.isNaN(start.getTime())) {
@@ -135,9 +137,11 @@ export function moduleUnlockDate(mod: any, flow: Flow | null | undefined): Date 
 }
 
 export function isModuleUnlocked(mod: any, flow: Flow | null | undefined, now = new Date()): boolean {
+  if (mod?.manualLock) return false;
   const unlock = moduleUnlockDate(mod, flow);
   return !unlock || now >= unlock;
 }
+
 
 /** Data la care se încheie accesul într-un flux: explicită sau calculată din durată. */
 export function flowAccessUntil(flow: Flow | null | undefined): Date | null {
