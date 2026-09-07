@@ -210,7 +210,7 @@ export const ForgotPassword: React.FC = () => {
             </h2>
             <p style={{ fontSize: 14, color: 'var(--fg-3)', marginBottom: 28, lineHeight: 1.6 }}>
               {step === 'email' && 'Introdu adresa de email cu care te-ai înregistrat. Îți trimitem un cod de 6 cifre pe care îl scrii aici, direct pe platformă.'}
-              {step === 'code' && <>Am trimis un cod de 6 cifre la <strong style={{ color: 'var(--fg-2)' }}>{cleanEmail}</strong>. Verifică inboxul (și Spam). Codul expiră în 60 de minute.</>}
+              {step === 'code' && <>Am trimis un cod de 6 cifre la <strong style={{ color: 'var(--fg-2)' }}>{cleanEmail}</strong>. Verifică inboxul (și Spam) și scrie codul aici — <strong style={{ color: 'var(--fg-2)' }}>nu apăsa linkul din email</strong>, altfel codul devine inutilizabil. Codul expiră în 60 de minute.</>}
               {step === 'password' && 'Alege o parolă de minim 8 caractere. După salvare, te loghezi din nou cu noua parolă.'}
             </p>
 
