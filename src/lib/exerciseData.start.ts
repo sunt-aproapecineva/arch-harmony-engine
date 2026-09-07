@@ -27,22 +27,84 @@ export const START_EXERCISE_TEMPLATES: ExerciseTemplate[] = [
   },
 
   // ── Modulul 1 · Nișa ───────────────────────────────────────────────────────
+  // Cele 5 exerciții practice ale Săptămânii 2 (Dosarul Oportunității). Fiecare e
+  // legat de o lecție și construiește materia primă pentru următorul — de aceea sunt
+  // exerciții separate, nu un singur formular lung.
   {
     exerciseId: 'st-e-1-1',
     type: 'form-fields',
-    title: 'Nișa aleasă cu metodă',
+    title: 'Harta problemelor — ce merită explorat',
     instructions:
-      'Nu completa din cap. Fiecare rând trebuie să aibă în spate ceva ce ai văzut: o postare, un comentariu, o recenzie, o conversație.',
+      'Legat de Lecția 1.1. Scrie 10 probleme observabile, formulate ca situații ale unui om sau ale unei companii — fără să numești încă produsul pe care l-ai vinde. Evită „oamenii vor servicii mai bune"; descrie ce se întâmplă concret.',
     fields: [
-      { id: 'probleme', type: 'dynamic-table', label: '5 probleme reale pe care le-ai observat și pentru care oamenii au cheltuit bani', columns: ['Problema', 'Unde am văzut-o', 'Cine plătește deja pentru o soluție'], addLabel: 'Adaugă o problemă' },
-      { id: 'info_matrice', type: 'info', text: 'Matricea nișei are 3 axe. Cerere: există piață sau trebuie s-o creezi? Competiție: absența ei nu e un semn bun, e îngrijorător. Capacitate: nu e despre ce știi, e despre cu ce poți fi credibil.' },
-      { id: 'matrice', type: 'dynamic-table', label: 'Matricea aplicată pe top 3 idei', columns: ['Ideea', 'Cerere (1–5)', 'Competiție (1–5)', 'Capacitatea mea (1–5)', 'Concluzia'], addLabel: 'Adaugă o idee' },
-      { id: 'dovezi', type: 'checkboxes', label: 'Testul de 72 de ore — ce am verificat efectiv', options: ['Am găsit concurenți activi', 'Am găsit grupuri online unde publicul discută problema', 'Am citit recenzii negative la concurenți', 'Am găsit anunțuri de angajare în industrie', 'Am vorbit informal cu 3 persoane din publicul țintă'] },
-      { id: 'raport', type: 'textarea', label: 'Raportul de 1 pagină despre nișa selectată', placeholder: 'Ce nișă am ales, ce dovezi am că piața există, ce m-a surprins.' },
-      { id: 'pozitionare', type: 'input', label: 'Poziționarea mea într-o singură propoziție', placeholder: 'Pentru [cine], rezolv [ce problemă], prin [ce anume te face credibil].' },
-      { id: 'reactii', type: 'dynamic-table', label: 'Poziționarea testată pe 3 persoane din publicul țintă', columns: ['Cine', 'Reacția exactă (cuvintele lui)', 'Ce am schimbat după'], addLabel: 'Adaugă o reacție' },
+      { id: 'info', type: 'info', text: 'Criteriul de acceptare: 10 probleme distincte, cel puțin 7 formulate fără numele unui produs, fiecare cu un om/companie și un rezultat dorit.' },
+      { id: 'probleme', type: 'dynamic-table', label: 'Cele 10 probleme observate', columns: ['Problema — ce se întâmplă acum', 'Cine o trăiește', 'Rezultatul dorit', 'Costul principal (bani / timp / efort-stres)', 'Observația ta — de ce merită explorată'], addLabel: 'Adaugă o problemă' },
+      { id: 'concluzie', type: 'textarea', label: 'Ce ai observat comparând problemele între ele', placeholder: 'Care se repetă, care produc cel mai mare cost, care ți-au atras atenția și de ce.' },
     ],
   },
+
+  {
+    exerciseId: 'st-e-1-2',
+    type: 'form-fields',
+    title: 'Harta avantajului de start — unde pornesc cu un pas înainte',
+    instructions:
+      'Legat de Lecția 1.2. Nu alegi încă nișa. Inventariezi ce ai deja și legi resursele de problemele din exercițiul anterior, ca să vezi unde startul e mai rapid, mai ieftin sau mai puțin riscant.',
+    fields: [
+      { id: 'experienta', type: 'textarea', label: 'Ce știu să fac și ce am văzut din interior', placeholder: 'Experiențe și competențe folosibile într-o afacere.' },
+      { id: 'acces', type: 'textarea', label: 'La ce oameni, piețe sau companii pot ajunge direct sau prin relații', placeholder: 'Comunități, tipuri de clienți, canale la care ai deja acces.' },
+      { id: 'resurse', type: 'textarea', label: 'Ce resurse pot folosi fără să le construiesc de la zero', placeholder: 'Timp, bani, echipamente, spațiu, tehnologie, furnizori, echipă, infrastructură.' },
+      { id: 'credibilitate', type: 'textarea', label: 'De ce ar avea cineva încredere în mine', placeholder: 'Rezultate anterioare, portofoliu, reputație, relații de încredere.' },
+      { id: 'info_directii', type: 'info', text: 'Minimum 2 direcții, fiecare susținută de ceva real pe care îl ai deja — nu de interes sau pasiune. Nu declara încă nișa finală.' },
+      { id: 'directii', type: 'dynamic-table', label: 'Direcțiile unde avantajul e cel mai clar', columns: ['Direcția (problema din Exercițiul 1)', 'Avantajul meu concret', 'Pe ce anume real se sprijină'], addLabel: 'Adaugă o direcție' },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-1-3',
+    type: 'form-fields',
+    title: 'Harta segmentelor — pentru cine exact există problema',
+    instructions:
+      'Legat de Lecția 1.3. Transformi o piață largă în 5–7 grupuri concrete. Fiecare segment se formulează prin cine + situație/context + problemă. Evită segmentele pur demografice, de tip „femei 25–45" sau „antreprenori".',
+    fields: [
+      { id: 'probleme_alese', type: 'textarea', label: 'Ce 1–3 probleme duci mai departe din exercițiile precedente', placeholder: 'Scrie-le exact așa cum le-ai formulat, ca să poți compara segmentele pe aceeași bază.' },
+      { id: 'segmente', type: 'dynamic-table', label: 'Cele 5–7 segmente concrete', columns: ['Denumirea internă', 'Cine', 'Situația / contextul', 'Problema concretă', 'Momentul / ocazia', 'Așteptarea principală (rapiditate, preț, confort, premium, personalizare…)'], addLabel: 'Adaugă un segment' },
+      { id: 'verificare', type: 'checkboxes', label: 'Verificarea segmentelor', options: ['Am 5–7 segmente distincte', 'Fiecare segment poate fi imaginat ca un om sau o companie într-o situație reală', 'Fiecare formulare include problema, nu doar categoria demografică', 'Segmentele sunt suficient de diferite ca să poată fi comparate'] },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-1-4',
+    type: 'form-fields',
+    title: 'Realitatea pieței — soluția actuală și observația de teren',
+    instructions:
+      'Legat de Lecțiile 1.4 și 1.5. Minimum 3 segmente. Partea A: cu ce concurezi în realitate. Partea B: ce ai văzut efectiv. Ține faptele separate de interpretare și adună dovezi din cel puțin două surse: teren, ce cumpără oamenii, ce spun public.',
+    fields: [
+      { id: 'info_a', type: 'info', text: 'Partea A — Soluția actuală. Dacă omul nu face nimic, scrie explicit că acceptă sau amână problema; și asta e o soluție actuală.' },
+      { id: 'solutii', type: 'dynamic-table', label: 'Harta soluțiilor actuale (minimum 3 segmente)', columns: ['Segment', 'Simptomul vizibil', 'Problema din spate', 'Soluția actuală / alternativa reală', 'Limita ei', 'De ce nu schimbă', 'Rezultatul dorit'], addLabel: 'Adaugă un segment' },
+      { id: 'info_b', type: 'info', text: 'Partea B — Observația. Un fapt e ceva ce ai putut vedea, număra sau cita. Restul e interpretare.' },
+      { id: 'observatii', type: 'dynamic-table', label: 'Fișa de observație a pieței', columns: ['Segment', 'Unde și când am observat', 'Ce am văzut efectiv (fapt)', 'Cantități / frecvențe / prețuri', 'Formulări folosite de oameni', 'Sursa (teren / cumpărături / public)', 'Interpretarea mea'], addLabel: 'Adaugă o observație' },
+      { id: 'surprize', type: 'textarea', label: 'Ce presupuneam înainte și ce m-a surprins după observație', placeholder: 'Scrie ipoteza inițială și ce a contrazis-o realitatea.' },
+      { id: 'gol', type: 'textarea', label: 'Cel puțin un gol concret între ce primește clientul azi și ce și-ar dori', placeholder: 'Formulează-l ca diferență observabilă, nu ca oportunitate generală.' },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-1-5',
+    type: 'form-fields',
+    title: 'Matricea nișei — alegerea oportunității de testat',
+    instructions:
+      'Legat de Lecția 1.6. Selectezi exact 3 segmente și le compari pe aceleași criterii. Dacă nu ai informație pentru un criteriu, scrie „necunoscut" — nu inventa. Alegerea nu e un verdict definitiv, e nișa pe care o validezi în Săptămâna 3.',
+    fields: [
+      { id: 'info_eliminatorii', type: 'info', text: 'Două criterii eliminatorii: problema produce suficientă acțiune și poți ajunge efectiv la client pentru testare. Ce nu trece de ele iese din comparație, oricât de atrăgător ar părea.' },
+      { id: 'matrice', type: 'dynamic-table', label: 'Matricea de decizie — cele 3 nișe pe aceleași criterii', columns: ['Nișa (cine + situație + problemă)', 'Problema produce acțiune? (eliminatoriu)', 'Pot ajunge la client? (eliminatoriu)', 'Golul soluției actuale', 'Avantajul meu de start', 'Spațiu de creștere', 'Dovezi disponibile acum'], addLabel: 'Adaugă o nișă' },
+      { id: 'nisa_aleasa', type: 'input', label: 'Nișa aleasă — cine + situație + problemă', placeholder: 'Ex.: proprietari de cafenele mici din Chișinău care pierd comenzi în orele de vârf.' },
+      { id: 'motiv', type: 'textarea', label: 'De ce această nișă e mai bună de testat acum decât celelalte două (maximum 5 propoziții)', placeholder: 'Sprijină-te pe dovezile din săptămână, nu pe preferință.' },
+      { id: 'ipoteza', type: 'textarea', label: 'Cel mai mare lucru pe care încă nu îl știu și trebuie validat în Săptămâna 3', placeholder: 'O singură ipoteză, formulată ca afirmație verificabilă.' },
+      { id: 'praguri', type: 'dynamic-table', label: 'Ce dovadă mă face să continui și ce dovadă mă face să pivotez', columns: ['Tipul dovezii', 'Continuu dacă…', 'Pivotez dacă…'], addLabel: 'Adaugă un prag' },
+      { id: 'propozitie', type: 'input', label: 'Propoziția finală a Dosarului Oportunității', placeholder: 'Aleg să testez [cine + situație + problemă], pentru că [dovezile principale].' },
+    ],
+  },
+
 
   // ── Modulul 2 · Validarea ★ ────────────────────────────────────────────────
   {
