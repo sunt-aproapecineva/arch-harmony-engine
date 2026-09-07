@@ -306,11 +306,12 @@ export const ForgotPassword: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => void sendCode(true)}
-                  disabled={loading}
-                  style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: 12, fontWeight: 600, padding: 0 }}
+                  disabled={loading || cooldown > 0}
+                  style={{ background: 'none', border: 'none', color: cooldown > 0 ? 'var(--fg-3)' : 'var(--accent)', cursor: cooldown > 0 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 600, padding: 0 }}
                 >
-                  Trimite din nou
+                  {cooldown > 0 ? `Trimite din nou (${cooldown}s)` : 'Trimite din nou'}
                 </button>
+
                 {' · '}
                 <button
                   type="button"
