@@ -270,7 +270,12 @@ export const ModulePage: React.FC = () => {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
                           <span style={{ fontSize: 10, color: isExLesson ? 'var(--gold)' : 'var(--fg-3)', fontWeight: isExLesson ? 700 : 400 }}>
-                            {isExLesson ? `✦ Exercițiu practic` : `Lecția ${lesson.order_index}`}
+                            {/* Numerotarea video se face printre lecțiile video, nu după
+                                order_index: exercițiile intercalate lăsau găuri („Lecția 5" după „Lecția 2"). */}
+                            {isExLesson
+                              ? `✦ Exercițiu practic`
+                              : `Lecția ${module.lessons.filter(l => l.type !== 'exercise').findIndex(l => l.id === lesson.id) + 1}`}
+
                           </span>
                         </div>
                         <div style={{ fontSize: 13, fontWeight: 500, color: lessonDone ? 'var(--fg-2)' : 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
