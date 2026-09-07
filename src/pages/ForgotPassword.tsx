@@ -49,10 +49,41 @@ export const ForgotPassword: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
+  const [cooldown, setCooldown] = useState(0);
+
 
   const cleanEmail = email.trim().toLowerCase();
 
+  const friendlyAuthError = (msg: string): string => {
+    const m = (msg || '').toLowerCase();
+    if (m.includes('rate limit') || m.includes('after') && m.includes('seconds')) {
+      const secs = /(\d+)\s*second/.exec(m)?.[1];
+      return secs
+        ? `Ai cerut prea multe coduri. Mai așteaptă ${secs} secunde și încearcă din nou.`
+        : 'Ai cerut prea multe coduri. Mai așteaptă un minut și încearcă din nou.';
+    }
+    if (m.includes('token') || m.includes('expired') || m.includes('invalid')) {
+      return 'Codul nu mai este valid. Cere un cod nou și folosește-l pe ultimul primit.';
+    }
+    if (m.includes('password')) return 'Parola nu îndeplinește cerințele. Alege alta, minim 8 caractere.';
+    return 'A apărut o eroare. Încearcă din nou peste câteva momente.';
+  };
+
+  const startCooldown = (secs = 60) => {
+    setCooldown(secs);
+    const id = setInterval(() => {
+      setCooldown(prev => {
+        if (prev <= 1) { clearInterval(id); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
   const sendCode = async (silent = false) => {
+    if (cooldown > 0) {
+      setError(`Mai poți cere un cod nou peste ${cooldown} secunde.`);
+      return;
+    }
     setError('');
     setLoading(true);
 
@@ -73,11 +104,14 @@ export const ForgotPassword: React.FC = () => {
     });
     setLoading(false);
     if (resetErr) {
-      setError(resetErr.message);
+      setError(friendlyAuthError(resetErr.message));
       return;
     }
+    startCooldown(60);
+    setCode('');
     if (!silent) setStep('code');
   };
+
 
   const verifyCode = async () => {
     setError('');
@@ -94,9 +128,10 @@ export const ForgotPassword: React.FC = () => {
     });
     setLoading(false);
     if (otpErr) {
-      setError('Cod incorect sau expirat. Verifică emailul sau cere un cod nou.');
+      setError('Cod incorect sau expirat. Folosește ultimul cod primit pe email (nu apăsa linkul din email) sau cere un cod nou.');
       return;
     }
+
     setStep('password');
   };
 
@@ -114,9 +149,10 @@ export const ForgotPassword: React.FC = () => {
     const { error: updErr } = await supabase.auth.updateUser({ password });
     setLoading(false);
     if (updErr) {
-      setError(updErr.message);
+      setError(friendlyAuthError(updErr.message));
       return;
     }
+
     setStep('done');
     setTimeout(async () => {
       await supabase.auth.signOut();
@@ -174,7 +210,7 @@ export const ForgotPassword: React.FC = () => {
             </h2>
             <p style={{ fontSize: 14, color: 'var(--fg-3)', marginBottom: 28, lineHeight: 1.6 }}>
               {step === 'email' && 'Introdu adresa de email cu care te-ai înregistrat. Îți trimitem un cod de 6 cifre pe care îl scrii aici, direct pe platformă.'}
-              {step === 'code' && <>Am trimis un cod de 6 cifre la <strong style={{ color: 'var(--fg-2)' }}>{cleanEmail}</strong>. Verifică inboxul (și Spam). Codul expiră în 60 de minute.</>}
+              {step === 'code' && <>Am trimis un cod de 6 cifre la <strong style={{ color: 'var(--fg-2)' }}>{cleanEmail}</strong>. Verifică inboxul (și Spam) și scrie codul aici — <strong style={{ color: 'var(--fg-2)' }}>nu apăsa linkul din email</strong>, altfel codul devine inutilizabil. Codul expiră în 60 de minute.</>}
               {step === 'password' && 'Alege o parolă de minim 8 caractere. După salvare, te loghezi din nou cu noua parolă.'}
             </p>
 
@@ -270,11 +306,12 @@ export const ForgotPassword: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => void sendCode(true)}
-                  disabled={loading}
-                  style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: 12, fontWeight: 600, padding: 0 }}
+                  disabled={loading || cooldown > 0}
+                  style={{ background: 'none', border: 'none', color: cooldown > 0 ? 'var(--fg-3)' : 'var(--accent)', cursor: cooldown > 0 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 600, padding: 0 }}
                 >
-                  Trimite din nou
+                  {cooldown > 0 ? `Trimite din nou (${cooldown}s)` : 'Trimite din nou'}
                 </button>
+
                 {' · '}
                 <button
                   type="button"
