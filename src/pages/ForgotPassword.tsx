@@ -49,6 +49,8 @@ export const ForgotPassword: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
+  const [cooldown, setCooldown] = useState(0);
+
 
   const cleanEmail = email.trim().toLowerCase();
 
