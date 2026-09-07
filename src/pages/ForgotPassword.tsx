@@ -149,9 +149,10 @@ export const ForgotPassword: React.FC = () => {
     const { error: updErr } = await supabase.auth.updateUser({ password });
     setLoading(false);
     if (updErr) {
-      setError(updErr.message);
+      setError(friendlyAuthError(updErr.message));
       return;
     }
+
     setStep('done');
     setTimeout(async () => {
       await supabase.auth.signOut();
