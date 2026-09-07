@@ -221,7 +221,8 @@ export const START_MODULES: Module[] = [
         id: 'st-l-1-6',
         module_id: 'st-m-1',
         title: 'Cum îți alegi nișa',
-        description: 'Criteriile eliminatorii, comparația pe aceleași criterii și decizia argumentată pentru validarea din Săptămâna 3.',
+        description: 'Nișa formulată ca om + situație + problemă. Cele două porți de trecere — dovada problemei și accesul la client — și cele trei criterii de ordonare: golul soluției actuale, avantajul de start, spațiul de creștere. Livrabil: matricea de selecție și nișa aleasă.',
+
         video_url: '',
         duration_min: 0,
         order_index: 10,
