@@ -161,7 +161,8 @@ export const START_MODULES: Module[] = [
         id: 'st-l-1-3',
         module_id: 'st-m-1',
         title: 'Ce este piața și cum o segmentezi corect',
-        description: 'De la o piață largă la 5–7 grupuri concrete: cine + situație + problemă. De ce „vând tuturor" nu e o piață.',
+        description: 'De ce „toți oamenii" nu e o piață. Cele patru lentile de segmentare — omul, situația, momentul, nivelul de așteptare — și regula cine + situație + problemă. Livrabil: 5–7 segmente concrete.',
+
         video_url: '',
         duration_min: 0,
         order_index: 5,
