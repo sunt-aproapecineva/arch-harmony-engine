@@ -27,6 +27,12 @@ export interface Flow {
   ends_on: string | null;
   /** Alternativa automată la ends_on: durata accesului în săptămâni de la start. */
   access_weeks: number | null;
+  /**
+   * Câte module sunt deschise în fluxul ăsta, numărate în ordinea `unlockWeek`
+   * (0, 1, 2...). Null = toate. Blocaj per flux, nu per curs: Fluxul 2 Business
+   * poate avea 2 module deschise în timp ce Fluxul 1 le are pe toate.
+   */
+  open_modules: number | null;
   telegram_url: string | null;
   is_active: boolean;
 }
@@ -73,7 +79,7 @@ export async function fetchFlows(courseId?: string | null): Promise<Flow[]> {
   try {
     let q = supabase
       .from('flows')
-      .select('id,course_id,name,slug,starts_on,ends_on,access_weeks,telegram_url,is_active');
+      .select('id,course_id,name,slug,starts_on,ends_on,access_weeks,open_modules,telegram_url,is_active');
     if (courseId) q = q.eq('course_id', courseId);
     const { data, error } = await q.order('starts_on', { ascending: false });
     if (error) throw error;
@@ -112,16 +118,29 @@ export async function fetchFlowEvents(flowId: string): Promise<FlowEvent[]> {
 }
 
 /**
+ * Modulul e blocat de limita fluxului? `open_modules = N` deschide modulele cu
+ * `unlockWeek` 0..N-1 și le închide pe restul, indiferent de dată. Modulele fără
+ * `unlockWeek` numeric nu sunt atinse de limită.
+ */
+export function isModuleLockedByFlow(mod: any, flow: Flow | null | undefined): boolean {
+  if (typeof flow?.open_modules !== 'number') return false;
+  if (typeof mod?.unlockWeek !== 'number') return false;
+  return mod.unlockWeek >= flow.open_modules;
+}
+
+/**
  * Data la care se deschide un modul pentru un flux anume.
  *
  * Ordinea de decizie contează:
- *  1. flux cu dată de start + unlockWeek pe modul → calcul relativ (cazul normal)
- *  2. fără flux, dar cu unlockDate în cod → data absolută veche (elevi nemigrați)
- *  3. nimic → modulul e deschis
+ *  1. blocaj manual sau limita fluxului → nicio dată, UI-ul nu promite una
+ *  2. flux cu dată de start + unlockWeek pe modul → calcul relativ (cazul normal)
+ *  3. fără flux, dar cu unlockDate în cod → data absolută veche (elevi nemigrați)
+ *  4. nimic → modulul e deschis
  */
 export function moduleUnlockDate(mod: any, flow: Flow | null | undefined): Date | null {
-  // Blocaj manual: nu există dată de deschidere, deci UI-ul nu promite una.
+  // Blocaj manual sau limită de flux: nu există dată de deschidere, deci UI-ul nu promite una.
   if (mod?.manualLock) return null;
+  if (isModuleLockedByFlow(mod, flow)) return null;
   if (flow?.starts_on && typeof mod?.unlockWeek === 'number') {
     const start = new Date(`${flow.starts_on}T00:00:00+03:00`);
     if (!Number.isNaN(start.getTime())) {
@@ -138,6 +157,7 @@ export function moduleUnlockDate(mod: any, flow: Flow | null | undefined): Date 
 
 export function isModuleUnlocked(mod: any, flow: Flow | null | undefined, now = new Date()): boolean {
   if (mod?.manualLock) return false;
+  if (isModuleLockedByFlow(mod, flow)) return false;
   const unlock = moduleUnlockDate(mod, flow);
   return !unlock || now >= unlock;
 }
