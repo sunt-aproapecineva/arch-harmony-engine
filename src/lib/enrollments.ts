@@ -13,7 +13,9 @@ import { CourseId, activeCourses, getCourse } from './courses';
 
 export type { Enrollment };
 
-const cacheKey = (userId: string) => `aa_enrollments_${userId}`;
+// v2: schema fluxului s-a schimbat (open_modules) — cheia nouă invalidează
+// cache-urile vechi, care n-ar fi avut limita de module a fluxului.
+const cacheKey = (userId: string) => `aa_enrollments_v2_${userId}`;
 
 export function readCachedEnrollments(userId: string): Enrollment[] {
   if (!userId || typeof window === 'undefined') return [];
