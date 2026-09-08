@@ -452,6 +452,7 @@ export type Database = {
           is_active: boolean
           name: string
           notes: string | null
+          open_modules: number | null
           slug: string
           starts_on: string
           telegram_url: string | null
@@ -466,6 +467,7 @@ export type Database = {
           is_active?: boolean
           name: string
           notes?: string | null
+          open_modules?: number | null
           slug: string
           starts_on: string
           telegram_url?: string | null
@@ -480,6 +482,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           notes?: string | null
+          open_modules?: number | null
           slug?: string
           starts_on?: string
           telegram_url?: string | null

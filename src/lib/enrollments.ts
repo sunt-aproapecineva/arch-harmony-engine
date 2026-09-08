@@ -13,7 +13,9 @@ import { CourseId, activeCourses, getCourse } from './courses';
 
 export type { Enrollment };
 
-const cacheKey = (userId: string) => `aa_enrollments_${userId}`;
+// v2: schema fluxului s-a schimbat (open_modules) — cheia nouă invalidează
+// cache-urile vechi, care n-ar fi avut limita de module a fluxului.
+const cacheKey = (userId: string) => `aa_enrollments_v2_${userId}`;
 
 export function readCachedEnrollments(userId: string): Enrollment[] {
   if (!userId || typeof window === 'undefined') return [];
@@ -60,7 +62,7 @@ export async function fetchEnrollments(userId: string, fallbackTariff: Tariff = 
     let data: any[] | null = null;
     const withFlow = await supabase
       .from('enrollments')
-      .select('course_id,tariff,granted_at,flow_id,access_until,source_group_id,flows(id,course_id,name,slug,starts_on,ends_on,access_weeks,telegram_url,is_active)')
+      .select('course_id,tariff,granted_at,flow_id,access_until,source_group_id,flows(id,course_id,name,slug,starts_on,ends_on,access_weeks,open_modules,telegram_url,is_active)')
       .eq('user_id', userId);
     if (withFlow.error) {
       if (!MISSING_SCHEMA_CODES.has(withFlow.error.code)) throw withFlow.error;

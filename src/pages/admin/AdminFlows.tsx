@@ -85,6 +85,7 @@ export const AdminFlows: React.FC = () => {
         name: c.name, starts_on: c.starts_on, telegram_url: c.telegram_url,
         is_active: c.is_active, ends_on: c.ends_on || null,
         access_weeks: c.access_weeks === '' || c.access_weeks == null ? null : Number(c.access_weeks),
+        open_modules: c.open_modules === '' || c.open_modules == null ? null : Number(c.open_modules),
       })
       .eq('id', c.id);
     if (err) { alert(err.message); return; }
@@ -184,11 +185,16 @@ export const AdminFlows: React.FC = () => {
 
                 {/* Fereastra de acces. Data explicită bate durata: dacă e completată,
                     `access_weeks` devine doar o notă informativă. */}
-                <div className="aa-stack-sm" style={{ display: 'grid', gridTemplateColumns: '150px 150px minmax(0,1fr)', gap: 10, alignItems: 'end', marginTop: 10 }}>
+                <div className="aa-stack-sm" style={{ display: 'grid', gridTemplateColumns: '150px 150px 130px minmax(0,1fr)', gap: 10, alignItems: 'end', marginTop: 10 }}>
                   <Field label="Acces până la (manual)" type="date" value={c.ends_on || ''} onChange={v => setFlows(p => p.map(x => x.id === c.id ? { ...x, ends_on: v || null } : x))} />
                   <Field label="…sau durată (săptămâni)" type="number" value={c.access_weeks ?? ''} onChange={v => setFlows(p => p.map(x => x.id === c.id ? { ...x, access_weeks: v === '' ? null : Number(v) } : x))} />
+                  <Field label="Module deschise" type="number" value={c.open_modules ?? ''} onChange={v => setFlows(p => p.map(x => x.id === c.id ? { ...x, open_modules: v === '' ? null : Number(v) } : x))} />
                   <p style={{ fontSize: 11, color: 'var(--fg-3)', lineHeight: 1.5, margin: 0 }}>
                     {accessUntilLabel(c)}
+                    <br />
+                    {c.open_modules != null
+                      ? `Doar primele ${c.open_modules} module sunt deschise în fluxul ăsta; restul rămân închise. Gol = toate.`
+                      : 'Toate modulele se deschid după orar. Poți limita la primele N module.'}
                   </p>
                 </div>
 
