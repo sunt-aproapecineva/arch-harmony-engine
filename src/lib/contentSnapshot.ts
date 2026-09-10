@@ -443,7 +443,7 @@ export const CONTENT_SNAPSHOT = {
       "module_id": "a111821a-e2ec-44ac-b9d0-208990a6f1c7",
       "order_index": 5,
       "title": "Ce este piața și cum o segmentezi corect",
-      "description": "De ce „toți oamenii" nu e o piață. Cele patru lentile de segmentare — omul, situația, momentul, nivelul de așteptare — și regula cine + situație + problemă. Livrabil: 5–7 segmente concrete.",
+      "description": "De ce „toți oamenii\" nu e o piață. Cele patru lentile de segmentare — omul, situația, momentul, nivelul de așteptare — și regula cine + situație + problemă. Livrabil: 5–7 segmente concrete.",
       "video_url": "https://www.youtube.com/watch?v=sI6iHUA1RA0",
       "pdf_url": null,
       "duration_min": 0,
