@@ -415,6 +415,72 @@ export const CONTENT_SNAPSHOT = {
       "pdf_url": null,
       "duration_min": 0,
       "is_published": true
+    },
+    {
+      "id": "b111821a-e2ec-44ac-b9d0-208990a6f1c8",
+      "module_id": "a111821a-e2ec-44ac-b9d0-208990a6f1c7",
+      "order_index": 1,
+      "title": "O afacere începe cu o problemă, nu cu un produs",
+      "description": "Ce cumpără de fapt omul: produs vs. rezultat, problemă vs. neplăcere. Cele trei costuri ale unei probleme — bani, timp, stres — și cum deosebești „nice to have" de „must solve". Livrabil: 10 probleme reale, nu 10 idei de business.",
+      "video_url": "https://youtu.be/HHco-8PCDRs",
+      "pdf_url": null,
+      "duration_min": 0,
+      "is_published": true
+    },
+    {
+      "id": "c111821a-e2ec-44ac-b9d0-208990a6f1c9",
+      "module_id": "a111821a-e2ec-44ac-b9d0-208990a6f1c7",
+      "order_index": 2,
+      "title": "Cu ce avantaj pornești?",
+      "description": "Experiență, acces la clienți și oameni din industrie, resurse reale și credibilitate — de ce doi oameni pot vedea aceeași problemă, dar pornesc din poziții diferite. Livrabil: harta avantajului de start și 2–3 direcții.",
+      "video_url": "https://youtu.be/iXd5P35G8lI",
+      "pdf_url": null,
+      "duration_min": 0,
+      "is_published": true
+    },
+    {
+      "id": "d111821a-e2ec-44ac-b9d0-208990a6f1ca",
+      "module_id": "a111821a-e2ec-44ac-b9d0-208990a6f1c7",
+      "order_index": 5,
+      "title": "Ce este piața și cum o segmentezi corect",
+      "description": "De ce „toți oamenii" nu e o piață. Cele patru lentile de segmentare — omul, situația, momentul, nivelul de așteptare — și regula cine + situație + problemă. Livrabil: 5–7 segmente concrete.",
+      "video_url": "https://www.youtube.com/watch?v=sI6iHUA1RA0",
+      "pdf_url": null,
+      "duration_min": 0,
+      "is_published": true
+    },
+    {
+      "id": "e111821a-e2ec-44ac-b9d0-208990a6f1cb",
+      "module_id": "a111821a-e2ec-44ac-b9d0-208990a6f1c7",
+      "order_index": 7,
+      "title": "Problema reală și soluția pe care clientul o folosește acum",
+      "description": "Simptomul vizibil vs. problema din spate. Concurentul real poate fi obiceiul, Excelul, WhatsApp-ul sau amânarea — de ce omul rămâne acolo ani întregi și unde e golul. Livrabil: harta problemei și a soluției actuale.",
+      "video_url": "https://www.youtube.com/watch?v=RqXyuSPxxuE",
+      "pdf_url": null,
+      "duration_min": 0,
+      "is_published": true
+    },
+    {
+      "id": "f111821a-e2ec-44ac-b9d0-208990a6f1cc",
+      "module_id": "a111821a-e2ec-44ac-b9d0-208990a6f1c7",
+      "order_index": 8,
+      "title": "Uită-te înainte să alegi",
+      "description": "Cele trei locuri unde observi piața: terenul, ce cumpără oamenii deja, ce spun în public. Semnalele care contează — repetiție, fricțiune, plată, compromis — și separarea faptului de interpretare. Livrabil: fișa de observație.",
+      "video_url": "https://www.youtube.com/watch?v=YsJsLL0Q4fg",
+      "pdf_url": null,
+      "duration_min": 0,
+      "is_published": true
+    },
+    {
+      "id": "0111821a-e2ec-44ac-b9d0-208990a6f1cd",
+      "module_id": "a111821a-e2ec-44ac-b9d0-208990a6f1c7",
+      "order_index": 10,
+      "title": "Cum îți alegi nișa",
+      "description": "Nișa formulată ca om + situație + problemă. Cele două porți de trecere — dovada problemei și accesul la client — și cele trei criterii de ordonare: golul soluției actuale, avantajul de start, spațiul de creștere. Livrabil: matricea de selecție și nișa aleasă.",
+      "video_url": "https://www.youtube.com/watch?v=2N006ukkKNc",
+      "pdf_url": null,
+      "duration_min": 0,
+      "is_published": true
     }
   ]
 } as const;
