@@ -421,7 +421,7 @@ export const CONTENT_SNAPSHOT = {
       "module_id": "a111821a-e2ec-44ac-b9d0-208990a6f1c7",
       "order_index": 1,
       "title": "O afacere începe cu o problemă, nu cu un produs",
-      "description": "Ce cumpără de fapt omul: produs vs. rezultat, problemă vs. neplăcere. Cele trei costuri ale unei probleme — bani, timp, stres — și cum deosebești „nice to have" de „must solve". Livrabil: 10 probleme reale, nu 10 idei de business.",
+      "description": "Ce cumpără de fapt omul: produs vs. rezultat, problemă vs. neplăcere. Cele trei costuri ale unei probleme — bani, timp, stres — și cum deosebești „nice to have\" de „must solve\". Livrabil: 10 probleme reale, nu 10 idei de business.",
       "video_url": "https://youtu.be/HHco-8PCDRs",
       "pdf_url": null,
       "duration_min": 0,
