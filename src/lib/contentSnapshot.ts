@@ -90,7 +90,7 @@ export const CONTENT_SNAPSHOT = {
       "order_index": 1,
       "title": "Nișa și Ideea",
       "subtitle": "Nișa se alege cu metodă, nu cu intuiție.",
-      "description": "Cel mai frecvent răspuns greșit la „ce business fac" e fie prea larg, fie prea pasional. Nișa se alege cu metodă, nu cu intuiție și nu cu pasiune.",
+      "description": "Cel mai frecvent răspuns greșit la „ce business fac\" e fie prea larg, fie prea pasional. Nișa se alege cu metodă, nu cu intuiție și nu cu pasiune.",
       "etapa": "Modulul 1",
       "saptamana": "Săptămâna 1"
     }
