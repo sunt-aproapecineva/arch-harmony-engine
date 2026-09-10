@@ -163,10 +163,10 @@ export const START_MODULES: Module[] = [
         title: 'Ce este piața și cum o segmentezi corect',
         description: 'De ce „toți oamenii" nu e o piață. Cele patru lentile de segmentare — omul, situația, momentul, nivelul de așteptare — și regula cine + situație + problemă. Livrabil: 5–7 segmente concrete.',
 
-        video_url: '',
+        video_url: 'https://www.youtube.com/watch?v=sI6iHUA1RA0',
         duration_min: 0,
         order_index: 5,
-        is_published: false,
+        is_published: true,
         type: 'video',
       },
       {
@@ -187,10 +187,10 @@ export const START_MODULES: Module[] = [
         title: 'Problema reală și soluția pe care clientul o folosește acum',
         description: 'Simptomul vizibil vs. problema din spate. Concurentul real poate fi obiceiul, Excelul, WhatsApp-ul sau amânarea — de ce omul rămâne acolo ani întregi și unde e golul. Livrabil: harta problemei și a soluției actuale.',
 
-        video_url: '',
+        video_url: 'https://www.youtube.com/watch?v=RqXyuSPxxuE',
         duration_min: 0,
         order_index: 7,
-        is_published: false,
+        is_published: true,
         type: 'video',
       },
       {
@@ -199,10 +199,10 @@ export const START_MODULES: Module[] = [
         title: 'Uită-te înainte să alegi',
         description: 'Cele trei locuri unde observi piața: terenul, ce cumpără oamenii deja, ce spun în public. Semnalele care contează — repetiție, fricțiune, plată, compromis — și separarea faptului de interpretare. Livrabil: fișa de observație.',
 
-        video_url: '',
+        video_url: 'https://www.youtube.com/watch?v=YsJsLL0Q4fg',
         duration_min: 0,
         order_index: 8,
-        is_published: false,
+        is_published: true,
         type: 'video',
       },
       {
@@ -223,10 +223,10 @@ export const START_MODULES: Module[] = [
         title: 'Cum îți alegi nișa',
         description: 'Nișa formulată ca om + situație + problemă. Cele două porți de trecere — dovada problemei și accesul la client — și cele trei criterii de ordonare: golul soluției actuale, avantajul de start, spațiul de creștere. Livrabil: matricea de selecție și nișa aleasă.',
 
-        video_url: '',
+        video_url: 'https://www.youtube.com/watch?v=2N006ukkKNc',
         duration_min: 0,
         order_index: 10,
-        is_published: false,
+        is_published: true,
         type: 'video',
       },
       {
