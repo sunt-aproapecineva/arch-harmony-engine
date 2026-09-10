@@ -83,6 +83,16 @@ export const CONTENT_SNAPSHOT = {
       "description": "Înainte să vorbim despre nișă, validare sau vânzări, trebuie să existe claritate despre ce construim și de ce ordinea pașilor contează mai mult decât energia cu care pornești.",
       "etapa": "Etapa 0",
       "saptamana": "Săptămâna 0"
+    },
+    {
+      "id": "a111821a-e2ec-44ac-b9d0-208990a6f1c7",
+      "course_id": "start",
+      "order_index": 1,
+      "title": "Nișa și Ideea",
+      "subtitle": "Nișa se alege cu metodă, nu cu intuiție.",
+      "description": "Cel mai frecvent răspuns greșit la „ce business fac" e fie prea larg, fie prea pasional. Nișa se alege cu metodă, nu cu intuiție și nu cu pasiune.",
+      "etapa": "Modulul 1",
+      "saptamana": "Săptămâna 1"
     }
   ],
   "lessons": [
