@@ -453,13 +453,23 @@ export const AdminStudentProfile: React.FC = () => {
       const exMap: Record<string, any> = {};
       (exRows || []).forEach((e: any) => { exMap[e.exercise_id] = e.response; });
       setExercisesById(exMap);
+      let acts: any[] = [];
       try {
-        const acts = await getActivityForUser(userId);
+        acts = await getActivityForUser(userId);
         setActivity(acts);
       } catch {
         setActivity([]);
       }
+      // Ultima prezență = cea mai recentă urmă din oricare sursă.
+      setLastSeen(maxIso(
+        acts[0]?.timestamp,
+        ...(progressRows || []).map((p: any) => p.completed_at),
+        ...(exRows || []).map((e: any) => e.updated_at),
+        ...(notesRows || []).map((n: any) => n.updated_at),
+        (quiz as any)?.completed_at,
+      ));
       setLastRefreshed(new Date());
+
     } finally {
       setRefreshing(false);
     }
