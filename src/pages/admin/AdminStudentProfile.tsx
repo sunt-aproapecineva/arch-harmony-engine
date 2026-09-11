@@ -308,6 +308,24 @@ export const AdminStudentProfile: React.FC = () => {
     || activeCourses()[0]?.id
     || 'business';
   const courseModules = getCourseModules(courseId);
+  // Exercițiile unui modul înseamnă și cele din `exercises`, și cele livrate ca lecții
+  // de tip exercițiu (ex. Săptămâna 2 Business). Fără a doua sursă, răspunsurile lor
+  // erau salvate în cloud dar nu apăreau nicăieri în panoul adminului.
+  const moduleExercises = React.useCallback((mod: any) => {
+    const list: { id: string; title: string }[] = ((mod as any).exercises || []).map((ex: any) => ({ id: ex.id, title: ex.title }));
+    const seen = new Set(list.map(e => e.id));
+    (mod.lessons || []).forEach((l: any) => {
+      if (l.type === 'exercise' && l.exercise_id && !seen.has(l.exercise_id)) {
+        seen.add(l.exercise_id);
+        list.push({ id: l.exercise_id, title: l.title });
+      }
+    });
+    return list;
+  }, []);
+  const courseExerciseList = React.useMemo(
+    () => courseModules.flatMap((m: any) => moduleExercises(m)),
+    [courseModules, moduleExercises],
+  );
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
 
