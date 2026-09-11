@@ -620,7 +620,7 @@ export const AdminStudentProfile: React.FC = () => {
                   {user.city ? `${user.city}, ` : ''}{user.country}
                 </span>
               )}
-              <span>Ultima conectare: <strong style={{ color: 'var(--fg)' }}>{lastLoginLabel(user.last_login)}</strong></span>
+              <span>Ultima activitate: <strong style={{ color: 'var(--fg)' }}>{lastSeenLabel(lastSeen)}</strong></span>
               <span>Înregistrat: <strong style={{ color: 'var(--fg)' }}>{formatDate(user.created_at)}</strong></span>
               <span>Progres: <strong style={{ color: 'var(--accent)' }}>{overallPct}%</strong> ({completedCount}/{totalLessons} lecții)</span>
             </div>
