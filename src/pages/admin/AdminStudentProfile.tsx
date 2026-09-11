@@ -515,11 +515,10 @@ export const AdminStudentProfile: React.FC = () => {
   // Activity events
   const visibleActivity = showAllActivity ? activity : activity.slice(0, 50);
 
-  // Today's logins
+  // Activ azi = orice urmă de azi, nu doar evenimentul „login" (scris o dată pe zi/browser).
   const todayStr = new Date().toDateString();
-  const loggedInToday = activity.some(e =>
-    e.type === 'login' && new Date(e.timestamp).toDateString() === todayStr
-  );
+  const loggedInToday = !!lastSeen && new Date(lastSeen).toDateString() === todayStr;
+
 
   return (
     <div style={{ maxWidth: 880, margin: '0 auto', padding: '32px 24px' }}>
