@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { MockUser, Progress } from '../../lib/types';
-import { getCourseModules } from '../../lib/content';
+import { getCourseModules, allCourseModules } from '../../lib/content';
 import { useAdminCourseScope } from '../../hooks/useAdminCourseScope';
 import { activeCourses, getCourse, COURSE_ACCENT } from '../../lib/courses';
 import { courseModulePath } from '../../lib/navigation';
@@ -1098,32 +1098,64 @@ export const AdminStudentProfile: React.FC = () => {
           );
         })}
 
-        {/* Răspunsuri care nu aparțin programului deschis acum (sau exerciții scoase din conținut):
-            fără asta, adminul nu le-ar vedea nicăieri. */}
+        {/* Orice răspuns care nu ține de programul deschis acum (alt curs, exercițiu arhivat
+            sau conținut mutat) trebuie totuși să fie vizibil: adminul vede TOT ce a completat elevul. */}
         {(() => {
           const known = new Set(courseExerciseList.map(e => e.id));
           const orphans = Object.keys(exercisesById).filter(id => !known.has(id));
           if (orphans.length === 0) return null;
+
+          // Unde stă fiecare exercițiu în restul conținutului (ca să arătăm curs + etapă, nu doar un id).
+          const location: Record<string, { courseId: string; modLabel: string; title: string }> = {};
+          allCourseModules().forEach(({ courseId: cid, modules: mods }) => {
+            (mods || []).forEach((m: any) => {
+              moduleExercises(m).forEach((ex: any) => {
+                if (!location[ex.id]) location[ex.id] = { courseId: cid, modLabel: `${m.etapa || ''} — ${m.title}`, title: ex.title };
+              });
+            });
+          });
+
+          const groups = new Map<string, string[]>();
+          orphans.forEach(id => {
+            const loc = location[id];
+            const label = loc
+              ? `${getCourse(loc.courseId)?.title || loc.courseId} · ${loc.modLabel}`
+              : 'Exerciții arhivate sau scoase din conținut';
+            if (!groups.has(label)) groups.set(label, []);
+            groups.get(label)!.push(id);
+          });
+
           return (
             <div style={{ marginTop: 8 }}>
               <p style={{ fontSize: 11, color: 'var(--fg-3)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
-                Alte răspunsuri (alt program sau exercițiu arhivat)
+                Alte răspunsuri ale elevului ({orphans.length})
               </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {orphans.map(id => {
-                  const template = EXERCISE_TEMPLATES.find(t => t.exerciseId === id);
-                  const summary = renderReadableAnswer(exercisesById[id], template);
-                  return (
-                    <div key={id} style={{ background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px' }}>
-                      <div style={{ fontSize: 13, color: 'var(--fg)', fontWeight: 600, marginBottom: 8 }}>{template?.title || id}</div>
-                      {summary.node}
-                    </div>
-                  );
-                })}
-              </div>
+              {[...groups.entries()].map(([label, ids]) => (
+                <div key={label} style={{ marginBottom: 16 }}>
+                  <p style={{ fontSize: 11, color: 'var(--fg-3)', fontWeight: 600, marginBottom: 8 }}>{label}</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {ids.map(id => {
+                      const template = EXERCISE_TEMPLATES.find(t => t.exerciseId === id);
+                      const summary = renderReadableAnswer(exercisesById[id], template);
+                      return (
+                        <div key={id} style={{ background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 8 }}>
+                            <span style={{ fontSize: 13, color: 'var(--fg)', fontWeight: 600, flex: 1 }}>{location[id]?.title || template?.title || id}</span>
+                            {summary.metric && (
+                              <span style={{ fontSize: 11, color: summary.metricColor || 'var(--fg-3)', fontWeight: 600 }}>{summary.metric}</span>
+                            )}
+                          </div>
+                          {summary.node}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           );
         })()}
+
 
         {Object.keys(exercisesById).length === 0 && (
           <p style={{ fontSize: 13, color: 'var(--fg-3)', textAlign: 'center', padding: '16px 0' }}>Niciun exercițiu completat.</p>
