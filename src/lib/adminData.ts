@@ -194,10 +194,26 @@ export async function fetchAdminUsers(): Promise<AdminUserRow[]> {
     });
   });
 
+  // „Ultima activitate" nu se poate baza doar pe activity_log: acolo scriem cel mult
+  // un eveniment pe zi/browser, iar lista e plafonată. Completăm cu urmele reale de
+  // lucru — lecții finalizate, exerciții salvate, notițe scrise.
   const lastActivityBy: Record<string, string> = {};
-  (activity || []).forEach((a: any) => {
-    if (!lastActivityBy[a.user_id]) lastActivityBy[a.user_id] = a.created_at;
-  });
+  const bump = (userId: string, iso?: string | null) => {
+    if (!userId || !iso) return;
+    const cur = lastActivityBy[userId];
+    if (!cur || new Date(iso).getTime() > new Date(cur).getTime()) lastActivityBy[userId] = iso;
+  };
+  (activity || []).forEach((a: any) => bump(a.user_id, a.created_at));
+
+  const [progressRes, exerciseRes, notesRes] = await Promise.all([
+    supabase.from('progress').select('user_id,completed_at').order('completed_at', { ascending: false }).limit(5000),
+    supabase.from('exercise_responses').select('user_id,updated_at').order('updated_at', { ascending: false }).limit(5000),
+    supabase.from('lesson_notes').select('user_id,updated_at').order('updated_at', { ascending: false }).limit(5000),
+  ]);
+  (progressRes.data || []).forEach((r: any) => bump(r.user_id, r.completed_at));
+  (exerciseRes.data || []).forEach((r: any) => bump(r.user_id, r.updated_at));
+  (notesRes.data || []).forEach((r: any) => bump(r.user_id, r.updated_at));
+
 
   return (profiles || []).map((p: any) => {
     const legacyTariff = (p.tariff as Tariff) || 'student';

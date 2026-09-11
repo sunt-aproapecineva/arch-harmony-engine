@@ -30,14 +30,31 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-function lastLoginLabel(iso?: string): string {
+// Ultima prezență reală a elevului: „login" se scrie o singură dată pe zi și pe
+// browser, deci nu e un semnal de încredere. Luăm maximul dintre toate urmele pe
+// care le lasă un elev: activitate, lecții finalizate, exerciții și notițe.
+function lastSeenLabel(iso?: string | null): string {
   if (!iso) return 'Niciodată';
-  const diff = Date.now() - new Date(iso).getTime();
+  const then = new Date(iso);
+  const diff = Date.now() - then.getTime();
   const d = Math.floor(diff / 86400000);
-  if (d === 0) return `Astăzi la ${new Date(iso).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}`;
+  if (d === 0) return `Astăzi la ${then.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}`;
   if (d === 1) return 'Ieri';
-  return `Acum ${d} zile`;
+  if (d < 30) return `Acum ${d} zile`;
+  return then.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
 }
+
+function maxIso(...values: (string | null | undefined)[]): string | null {
+  let best: string | null = null;
+  for (const v of values) {
+    if (!v) continue;
+    const t = new Date(v).getTime();
+    if (Number.isNaN(t)) continue;
+    if (!best || t > new Date(best).getTime()) best = v;
+  }
+  return best;
+}
+
 
 function isVideoLesson(lesson: any): boolean {
   return lesson?.type !== 'exercise' && !!(
@@ -342,6 +359,8 @@ export const AdminStudentProfile: React.FC = () => {
   const [exercisesById, setExercisesById] = useState<Record<string, any>>({});
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const [lastSeen, setLastSeen] = useState<string | null>(null);
+
   const [recoveringDrafts, setRecoveringDrafts] = useState(false);
   const [recoveryMessage, setRecoveryMessage] = useState<string | null>(null);
   const recoverResponses = useServerFn(recoverStudentExerciseResponses);
@@ -393,8 +412,9 @@ export const AdminStudentProfile: React.FC = () => {
         .then(r => (r.error?.code === '42703'
           ? supabase.from('quiz_responses').select('answers,completed_at').eq('user_id', userId).maybeSingle()
           : r)),
-        supabase.from('lesson_notes').select('lesson_id,content').eq('user_id', userId),
-        supabase.from('exercise_responses').select('exercise_id,response').eq('user_id', userId),
+        supabase.from('lesson_notes').select('lesson_id,content,updated_at').eq('user_id', userId),
+        supabase.from('exercise_responses').select('exercise_id,response,updated_at').eq('user_id', userId),
+
       ]);
       // Înscrierile lui: decid ce programe se pot deschide în profil.
       const enrRes = await supabase.from('enrollments')
@@ -435,13 +455,23 @@ export const AdminStudentProfile: React.FC = () => {
       const exMap: Record<string, any> = {};
       (exRows || []).forEach((e: any) => { exMap[e.exercise_id] = e.response; });
       setExercisesById(exMap);
+      let acts: any[] = [];
       try {
-        const acts = await getActivityForUser(userId);
+        acts = await getActivityForUser(userId);
         setActivity(acts);
       } catch {
         setActivity([]);
       }
+      // Ultima prezență = cea mai recentă urmă din oricare sursă.
+      setLastSeen(maxIso(
+        acts[0]?.timestamp,
+        ...(progressRows || []).map((p: any) => p.completed_at),
+        ...(exRows || []).map((e: any) => e.updated_at),
+        ...(notesRows || []).map((n: any) => n.updated_at),
+        (quiz as any)?.completed_at,
+      ));
       setLastRefreshed(new Date());
+
     } finally {
       setRefreshing(false);
     }
@@ -485,11 +515,10 @@ export const AdminStudentProfile: React.FC = () => {
   // Activity events
   const visibleActivity = showAllActivity ? activity : activity.slice(0, 50);
 
-  // Today's logins
+  // Activ azi = orice urmă de azi, nu doar evenimentul „login" (scris o dată pe zi/browser).
   const todayStr = new Date().toDateString();
-  const loggedInToday = activity.some(e =>
-    e.type === 'login' && new Date(e.timestamp).toDateString() === todayStr
-  );
+  const loggedInToday = !!lastSeen && new Date(lastSeen).toDateString() === todayStr;
+
 
   return (
     <div style={{ maxWidth: 880, margin: '0 auto', padding: '32px 24px' }}>
@@ -591,7 +620,7 @@ export const AdminStudentProfile: React.FC = () => {
                   {user.city ? `${user.city}, ` : ''}{user.country}
                 </span>
               )}
-              <span>Ultima conectare: <strong style={{ color: 'var(--fg)' }}>{lastLoginLabel(user.last_login)}</strong></span>
+              <span>Ultima activitate: <strong style={{ color: 'var(--fg)' }}>{lastSeenLabel(lastSeen)}</strong></span>
               <span>Înregistrat: <strong style={{ color: 'var(--fg)' }}>{formatDate(user.created_at)}</strong></span>
               <span>Progres: <strong style={{ color: 'var(--accent)' }}>{overallPct}%</strong> ({completedCount}/{totalLessons} lecții)</span>
             </div>
