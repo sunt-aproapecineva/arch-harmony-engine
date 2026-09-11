@@ -359,6 +359,8 @@ export const AdminStudentProfile: React.FC = () => {
   const [exercisesById, setExercisesById] = useState<Record<string, any>>({});
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const [lastSeen, setLastSeen] = useState<string | null>(null);
+
   const [recoveringDrafts, setRecoveringDrafts] = useState(false);
   const [recoveryMessage, setRecoveryMessage] = useState<string | null>(null);
   const recoverResponses = useServerFn(recoverStudentExerciseResponses);
