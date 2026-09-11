@@ -30,14 +30,31 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-function lastLoginLabel(iso?: string): string {
+// Ultima prezență reală a elevului: „login" se scrie o singură dată pe zi și pe
+// browser, deci nu e un semnal de încredere. Luăm maximul dintre toate urmele pe
+// care le lasă un elev: activitate, lecții finalizate, exerciții și notițe.
+function lastSeenLabel(iso?: string | null): string {
   if (!iso) return 'Niciodată';
-  const diff = Date.now() - new Date(iso).getTime();
+  const then = new Date(iso);
+  const diff = Date.now() - then.getTime();
   const d = Math.floor(diff / 86400000);
-  if (d === 0) return `Astăzi la ${new Date(iso).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}`;
+  if (d === 0) return `Astăzi la ${then.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}`;
   if (d === 1) return 'Ieri';
-  return `Acum ${d} zile`;
+  if (d < 30) return `Acum ${d} zile`;
+  return then.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
 }
+
+function maxIso(...values: (string | null | undefined)[]): string | null {
+  let best: string | null = null;
+  for (const v of values) {
+    if (!v) continue;
+    const t = new Date(v).getTime();
+    if (Number.isNaN(t)) continue;
+    if (!best || t > new Date(best).getTime()) best = v;
+  }
+  return best;
+}
+
 
 function isVideoLesson(lesson: any): boolean {
   return lesson?.type !== 'exercise' && !!(
