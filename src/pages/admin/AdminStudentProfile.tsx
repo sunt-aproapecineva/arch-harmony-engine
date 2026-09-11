@@ -1022,7 +1022,7 @@ export const AdminStudentProfile: React.FC = () => {
           return (
             <div style={{ marginBottom: 16 }}>
               <p style={{ fontSize: 12, color: 'var(--fg-3)', marginBottom: missingResponses.length ? 10 : 0 }}>
-                <strong style={{ color: 'var(--accent)' }}>{completedEx}</strong> răspunsuri salvate din <strong style={{ color: 'var(--fg)' }}>{totalEx}</strong> exerciții · <strong style={{ color: 'var(--fg)' }}>{completedLessons.length}</strong> exerciții marcate finalizate
+                <strong style={{ color: 'var(--accent)' }}>{completedEx}</strong> răspunsuri salvate din <strong style={{ color: 'var(--fg)' }}>{totalEx}</strong> exerciții · <strong style={{ color: 'var(--fg)' }}>{completedLessons.length}</strong> exerciții marcate finalizate · <strong style={{ color: 'var(--fg)' }}>{Object.keys(exercisesById).length}</strong> răspunsuri în total (toate programele)
               </p>
               {missingResponses.length > 0 && (
                 <div style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.22)', borderRadius: 8, padding: '10px 12px' }}>
