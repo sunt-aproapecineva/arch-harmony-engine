@@ -410,8 +410,9 @@ export const AdminStudentProfile: React.FC = () => {
         .then(r => (r.error?.code === '42703'
           ? supabase.from('quiz_responses').select('answers,completed_at').eq('user_id', userId).maybeSingle()
           : r)),
-        supabase.from('lesson_notes').select('lesson_id,content').eq('user_id', userId),
-        supabase.from('exercise_responses').select('exercise_id,response').eq('user_id', userId),
+        supabase.from('lesson_notes').select('lesson_id,content,updated_at').eq('user_id', userId),
+        supabase.from('exercise_responses').select('exercise_id,response,updated_at').eq('user_id', userId),
+
       ]);
       // Înscrierile lui: decid ce programe se pot deschide în profil.
       const enrRes = await supabase.from('enrollments')
