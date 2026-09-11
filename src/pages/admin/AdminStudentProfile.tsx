@@ -997,9 +997,9 @@ export const AdminStudentProfile: React.FC = () => {
 
         {(() => {
           const exerciseLessons = courseModules.flatMap(m => m.lessons.filter((l: any) => l.type === 'exercise' && l.exercise_id));
-          const totalEx = exerciseLessons.length;
+          const totalEx = courseExerciseList.length;
           const completedLessons = exerciseLessons.filter((l: any) => progress.some(p => p.lesson_id === l.id));
-          const completedEx = Object.keys(exercisesById).length;
+          const completedEx = courseExerciseList.filter(ex => exercisesById[ex.id] !== undefined).length;
           const missingResponses = completedLessons.filter((l: any) => exercisesById[l.exercise_id] === undefined);
           return (
             <div style={{ marginBottom: 16 }}>
@@ -1027,10 +1027,9 @@ export const AdminStudentProfile: React.FC = () => {
         })()}
 
         {courseModules.map(mod => {
-          const exWithAnswers = ((mod as any).exercises || []).map((ex: any) => ({
-            ex,
-            parsed: exercisesById[ex.id],
-          })).filter((x: any) => x.parsed !== undefined);
+          const exWithAnswers = moduleExercises(mod)
+            .map((ex: any) => ({ ex, parsed: exercisesById[ex.id] }))
+            .filter((x: any) => x.parsed !== undefined);
 
           if (exWithAnswers.length === 0) return null;
 
@@ -1080,6 +1079,34 @@ export const AdminStudentProfile: React.FC = () => {
             </div>
           );
         })}
+
+        {/* Răspunsuri care nu aparțin programului deschis acum (sau exerciții scoase din conținut):
+            fără asta, adminul nu le-ar vedea nicăieri. */}
+        {(() => {
+          const known = new Set(courseExerciseList.map(e => e.id));
+          const orphans = Object.keys(exercisesById).filter(id => !known.has(id));
+          if (orphans.length === 0) return null;
+          return (
+            <div style={{ marginTop: 8 }}>
+              <p style={{ fontSize: 11, color: 'var(--fg-3)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+                Alte răspunsuri (alt program sau exercițiu arhivat)
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {orphans.map(id => {
+                  const template = EXERCISE_TEMPLATES.find(t => t.exerciseId === id);
+                  const summary = renderReadableAnswer(exercisesById[id], template);
+                  return (
+                    <div key={id} style={{ background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px' }}>
+                      <div style={{ fontSize: 13, color: 'var(--fg)', fontWeight: 600, marginBottom: 8 }}>{template?.title || id}</div>
+                      {summary.node}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
+
         {Object.keys(exercisesById).length === 0 && (
           <p style={{ fontSize: 13, color: 'var(--fg-3)', textAlign: 'center', padding: '16px 0' }}>Niciun exercițiu completat.</p>
         )}
