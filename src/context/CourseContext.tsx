@@ -11,7 +11,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 import { Course, getCourse, getCourseBySlug } from '@/lib/courses';
 import { getCourseModules, getCourseLiveEvents } from '@/lib/content';
 import { tariffForCourse, flowForCourse } from '@/lib/enrollments';
-import { fetchFlowEvents, type Flow, type FlowEvent } from '@/lib/flows';
+import { fetchFlowEvents, fetchFlows, type Flow, type FlowEvent } from '@/lib/flows';
 import { useAuthContext } from './AuthContext';
 import type { Module, LiveEvent, Tariff } from '@/lib/types';
 
