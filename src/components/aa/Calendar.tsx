@@ -343,22 +343,29 @@ export const Calendar: React.FC<CalendarProps> = ({ events, moduleUnlocks }) => 
         </div>
       )}
 
-      {/* Download ICS button */}
-      <div style={{ padding: '0 16px 16px' }}>
-        <button
-          onClick={() => downloadAllIcs(events)}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            padding: '7px 14px', background: 'transparent', border: '1px solid var(--border)',
-            borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--fg-2)',
-            transition: 'all 0.15s',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-hi)'; e.currentTarget.style.color = 'var(--fg)'; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--fg-2)'; }}
-        >
-          <Download size={13} /> Descarcă .ics (Apple Calendar)
-        </button>
-      </div>
+      {/* Download ICS button — doar când există întâlniri de exportat */}
+      {events.length > 0 ? (
+        <div style={{ padding: '0 16px 16px' }}>
+          <button
+            onClick={() => downloadAllIcs(events)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '7px 14px', background: 'transparent', border: '1px solid var(--border)',
+              borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--fg-2)',
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-hi)'; e.currentTarget.style.color = 'var(--fg)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--fg-2)'; }}
+          >
+            <Download size={13} /> Descarcă .ics (Apple Calendar)
+          </button>
+        </div>
+      ) : (
+        <div style={{ padding: '0 20px 16px', fontSize: 12, color: 'var(--fg-3)', lineHeight: 1.6 }}>
+          Încă nu sunt întâlniri live programate pentru fluxul tău. Punctele verzi apar
+          aici imediat ce sunt anunțate datele.
+        </div>
+      )}
     </div>
   );
 };
