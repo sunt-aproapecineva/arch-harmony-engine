@@ -472,11 +472,28 @@ export const Dashboard: React.FC = () => {
 
         {/* ── CALENDAR ── */}
         <motion.div {...fade(0.32)} style={{ marginBottom: 32 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, gap: 12, flexWrap: 'wrap' }}>
             <h3 className="font-aboreto" style={{ fontSize: 11, letterSpacing: '0.1em', color: 'var(--fg-3)', textTransform: 'uppercase' }}>
               Calendar program
             </h3>
+            {/* Adminul nu e înscris în fiecare flux; fără selectorul ăsta vedea un
+                calendar gol la programele unde n-are înscriere. */}
+            {adminFlows.length > 0 && (
+              <select
+                value={flow?.id || ''}
+                onChange={e => setPreviewFlowId(e.target.value || null)}
+                style={{
+                  background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8,
+                  color: 'var(--fg-2)', fontSize: 12, padding: '5px 10px', cursor: 'pointer',
+                }}
+              >
+                {adminFlows.map(f => (
+                  <option key={f.id} value={f.id}>{f.name}</option>
+                ))}
+              </select>
+            )}
           </div>
+
           <Calendar events={liveEvents} moduleUnlocks={moduleUnlocks} />
         </motion.div>
 
