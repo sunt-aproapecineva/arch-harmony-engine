@@ -100,8 +100,13 @@ function getFirstDayOfMonth(year: number, month: number): number {
 
 export const Calendar: React.FC<CalendarProps> = ({ events, moduleUnlocks }) => {
   const today = new Date();
-  const [viewYear, setViewYear] = useState(today.getFullYear());
-  const [viewMonth, setViewMonth] = useState(today.getMonth());
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  // Luna de start: cea a primului eveniment viitor, ca elevul să nu deschidă
+  // o lună goală când întâlnirile sunt peste câteva săptămâni.
+  const firstUpcoming = [...events].map(e => e.date).sort().find(d => d >= todayKey);
+  const initial = firstUpcoming ? firstUpcoming.split('-').map(Number) : null;
+  const [viewYear, setViewYear] = useState(initial ? initial[0] : today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(initial ? initial[1] - 1 : today.getMonth());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const prevMonth = () => {
