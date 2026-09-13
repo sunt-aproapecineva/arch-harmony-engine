@@ -27,6 +27,14 @@ interface CourseContextValue {
    * comunicare. Null pentru elevii neasignați — atunci se cade pe datele absolute vechi.
    */
   flow: Flow | null;
+  /**
+   * Fluxurile pe care adminul le poate inspecta la acest curs. Gol pentru elevi:
+   * ei au exact un flux, cel din înscriere.
+   */
+  adminFlows: Flow[];
+  /** Adminul privește dashboardul ca fluxul ăsta. Null = fluxul propriu / implicit. */
+  previewFlowId: string | null;
+  setPreviewFlowId: (id: string | null) => void;
 }
 
 const CourseContext = createContext<CourseContextValue>({
@@ -36,7 +44,11 @@ const CourseContext = createContext<CourseContextValue>({
   liveEvents: [],
   tariff: 'student',
   flow: null,
+  adminFlows: [],
+  previewFlowId: null,
+  setPreviewFlowId: () => {},
 });
+
 
 export const useCourse = () => useContext(CourseContext);
 
