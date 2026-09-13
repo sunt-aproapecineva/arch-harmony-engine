@@ -93,7 +93,7 @@ export const Dashboard: React.FC = () => {
   const { getModuleProgress, getOverallProgress, isModuleLocked, getCompletedLessonsCount, getTotalLessonsCount, isCompleted, progress } = useProgress();
   const navigate = useNavigate();
 
-  const { course, courseId, modules, liveEvents, tariff: courseTariff, flow } = useCourse();
+  const { course, courseId, modules, liveEvents, tariff: courseTariff, flow, adminFlows, setPreviewFlowId } = useCourse();
   const quizDone = hasCompletedOnboarding(user, courseId);
   const [quizModalOpen, setQuizModalOpen] = useState(false);
 
