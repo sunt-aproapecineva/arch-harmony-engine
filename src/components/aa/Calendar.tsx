@@ -19,37 +19,73 @@ const MONTHS = [
   'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie',
 ];
 
+/**
+ * Începutul și sfârșitul unui eveniment, ca text local `YYYYMMDDTHHMMSS`.
+ * Ora lipsă înseamnă 19:00; durata implicită e o oră, iar trecerea peste
+ * miezul nopții e lăsată pe seama Date, ca 23:30 să nu devină „24:30”.
+ */
+function eventRange(event: LiveEvent): { start: string; end: string } {
+  const [hRaw, mRaw] = (event.time || '19:00').split(':');
+  const h = Number(hRaw) || 0;
+  const m = Number(mRaw) || 0;
+  const [y, mo, d] = event.date.split('-').map(Number);
+  const startDate = new Date(y, (mo || 1) - 1, d || 1, h, m);
+  const minutes = Number((event.duration || '').match(/\d+/)?.[0]) || 60;
+  const endDate = new Date(startDate.getTime() + minutes * 60000);
+  const fmt = (dt: Date) =>
+    `${dt.getFullYear()}${String(dt.getMonth() + 1).padStart(2, '0')}${String(dt.getDate()).padStart(2, '0')}` +
+    `T${String(dt.getHours()).padStart(2, '0')}${String(dt.getMinutes()).padStart(2, '0')}00`;
+  return { start: fmt(startDate), end: fmt(endDate) };
+}
+
 function toGCalUrl(event: LiveEvent): string {
-  const start = event.date.replace(/-/g, '') + 'T' + event.time.replace(':', '') + '00';
-  const endHour = parseInt(event.time.split(':')[0]) + 1;
-  const end = event.date.replace(/-/g, '') + 'T' + String(endHour).padStart(2, '0') + event.time.split(':')[1] + '00';
+  const { start, end } = eventRange(event);
   const params = new URLSearchParams({
     action: 'TEMPLATE',
     text: event.title,
     dates: `${start}/${end}`,
-    details: event.description,
+    details: event.description || '',
+    ctz: 'Europe/Chisinau',
   });
   return `https://calendar.google.com/calendar/render?${params}`;
 }
 
+function escapeIcs(text: string): string {
+  return (text || '').replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
+}
+
 function downloadAllIcs(events: LiveEvent[]) {
-  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Arhitectura Afacerii//RO'];
+  if (events.length === 0) return;
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'CALSCALE:GREGORIAN',
+    'PRODID:-//Arhitectura Afacerii//RO',
+  ];
   events.forEach(ev => {
-    const dt = ev.date.replace(/-/g, '') + 'T' + ev.time.replace(':', '') + '00';
+    const { start, end } = eventRange(ev);
     lines.push(
       'BEGIN:VEVENT',
-      `DTSTART:${dt}`,
-      `SUMMARY:${ev.title}`,
-      `DESCRIPTION:${ev.description}`,
+      `UID:${ev.id}@arhitectura-afacerii`,
+      `DTSTAMP:${stamp}`,
+      `DTSTART;TZID=Europe/Chisinau:${start}`,
+      `DTEND;TZID=Europe/Chisinau:${end}`,
+      `SUMMARY:${escapeIcs(ev.title)}`,
+      `DESCRIPTION:${escapeIcs(ev.description)}`,
       'END:VEVENT'
     );
   });
   lines.push('END:VCALENDAR');
-  const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar' });
+  const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  a.href = url;
   a.download = 'arhitectura-afacerii.ics';
+  document.body.appendChild(a);
   a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function getDaysInMonth(year: number, month: number): number {
@@ -64,8 +100,13 @@ function getFirstDayOfMonth(year: number, month: number): number {
 
 export const Calendar: React.FC<CalendarProps> = ({ events, moduleUnlocks }) => {
   const today = new Date();
-  const [viewYear, setViewYear] = useState(today.getFullYear());
-  const [viewMonth, setViewMonth] = useState(today.getMonth());
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  // Luna de start: cea a primului eveniment viitor, ca elevul să nu deschidă
+  // o lună goală când întâlnirile sunt peste câteva săptămâni.
+  const firstUpcoming = [...events].map(e => e.date).sort().find(d => d >= todayKey);
+  const initial = firstUpcoming ? firstUpcoming.split('-').map(Number) : null;
+  const [viewYear, setViewYear] = useState(initial ? initial[0] : today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(initial ? initial[1] - 1 : today.getMonth());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const prevMonth = () => {
@@ -302,22 +343,29 @@ export const Calendar: React.FC<CalendarProps> = ({ events, moduleUnlocks }) => 
         </div>
       )}
 
-      {/* Download ICS button */}
-      <div style={{ padding: '0 16px 16px' }}>
-        <button
-          onClick={() => downloadAllIcs(events)}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            padding: '7px 14px', background: 'transparent', border: '1px solid var(--border)',
-            borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--fg-2)',
-            transition: 'all 0.15s',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-hi)'; e.currentTarget.style.color = 'var(--fg)'; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--fg-2)'; }}
-        >
-          <Download size={13} /> Descarcă .ics (Apple Calendar)
-        </button>
-      </div>
+      {/* Download ICS button — doar când există întâlniri de exportat */}
+      {events.length > 0 ? (
+        <div style={{ padding: '0 16px 16px' }}>
+          <button
+            onClick={() => downloadAllIcs(events)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '7px 14px', background: 'transparent', border: '1px solid var(--border)',
+              borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--fg-2)',
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-hi)'; e.currentTarget.style.color = 'var(--fg)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--fg-2)'; }}
+          >
+            <Download size={13} /> Descarcă .ics (Apple Calendar)
+          </button>
+        </div>
+      ) : (
+        <div style={{ padding: '0 20px 16px', fontSize: 12, color: 'var(--fg-3)', lineHeight: 1.6 }}>
+          Încă nu sunt întâlniri live programate pentru fluxul tău. Punctele verzi apar
+          aici imediat ce sunt anunțate datele.
+        </div>
+      )}
     </div>
   );
 };
