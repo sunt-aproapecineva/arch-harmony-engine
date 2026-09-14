@@ -106,25 +106,100 @@ export const START_EXERCISE_TEMPLATES: ExerciseTemplate[] = [
   },
 
 
-  // ── Modulul 2 · Validarea ★ ────────────────────────────────────────────────
+  // ── Modulul 2 · Clientul și Validarea ★ ────────────────────────────────────
   {
     exerciseId: 'st-e-2-1',
     type: 'form-fields',
-    title: 'Jurnalul de validare',
+    title: 'Filtrul clientului',
     instructions:
-      'Livrabilul cel mai important din tot programul. Minimum 10 conversații, documentate în cuvintele lor, nu în interpretarea ta. Nu ai voie să treci la Modulul 3 până nu completezi raportul de la final.',
+      'Legat de Lecția 2.1. Alegi oamenii ale căror experiențe pot testa ipoteza ta, nu oamenii ușor accesibili. Lista trebuie să fie suficient de mare încât să obții minimum 10 conversații reale la Exercițiul 2.5, chiar dacă o parte nu răspund.',
     fields: [
-      { id: 'info_ierarhie', type: 'info', text: 'Ierarhia dovezilor: complimentul nu valorează nimic · interesul valorează puțin · pre-comanda valorează mult · plata e singura validare reală. Prietenii te mint involuntar — nu vor să te descurajeze, dar asta te costă luni.' },
-      { id: 'mvp', type: 'textarea', label: 'MVP-ul meu în 3 propoziții', placeholder: 'Minimul necesar ca să obții o dovadă de plată. Dacă durează mai mult de 2 săptămâni, e prea complex.' },
-      { id: 'metoda', type: 'checkboxes', label: 'Metoda de validare pe care o execut săptămâna asta', options: ['Conversații directe (10 oameni)', 'Pre-vânzarea cu prețul real', 'Post de testare pe social media', 'Landing page + 20–50€ trafic', 'Propunere directă la 5 companii'] },
-      { id: 'info_jurnal', type: 'info', text: 'Regula conversației: explorezi problema LOR fără să menționezi soluția TA. Întrebările care aduc adevărul — „Povestește-mi cum gestionezi acum asta." „Cât te costă lunar, în timp sau bani?" „Ai mai căutat soluții? De ce nu ai cumpărat?"' },
-      { id: 'jurnal', type: 'dynamic-table', label: 'Jurnalul conversațiilor', columns: ['Nume / cum l-am găsit', 'Problema în cuvintele lui', 'Cheltuiește deja pe o soluție? Cât?', 'A spus că ar plăti?', 'A plătit sau s-a angajat ferm?'], addLabel: 'Adaugă o conversație' },
-      { id: 'semnale_da', type: 'checkboxes', label: 'Semnale că ideea are piață', options: ['Oamenii au descris problema fără să o menționez eu', 'Cineva a plătit sau a promis ferm că plătește', 'Oamenii cheltuiesc deja bani pe soluții alternative'] },
-      { id: 'semnale_nu', type: 'checkboxes', label: 'Semnale că ideea nu are piață', options: ['Toți zic că ar cumpăra, nimeni nu plătește', 'Problema nu e urgentă pentru ei', 'Nu am găsit 10 persoane care au problema'] },
-      { id: 'raport', type: 'textarea', label: 'Raportul de validare — ce am testat, cu cine, ce am aflat', placeholder: 'Fii brutal de sincer. Un rezultat negativ aflat acum te costă o săptămână. Aflat peste 8 luni te costă firma.' },
-      { id: 'decizie', type: 'checkboxes', label: 'Decizia mea', options: ['Merg mai departe — am dovezi de plată', 'Pivotez nișa', 'Pivotez problema', 'Pivotez formatul soluției'] },
+      { id: 'ipoteza', type: 'textarea', label: 'Problema și situația pe care vreau să le testez (o singură propoziție)', placeholder: 'Ex.: proprietarii de cafenele mici pierd comenzi în orele de vârf pentru că iau comenzile manual.' },
+      { id: 'info_filtru', type: 'info', text: 'Filtrul se scrie pe cinci dimensiuni: problemă, situație, comportament, potrivire practică și excluderi. Fiecare criteriu trebuie să poată fi verificat înainte de conversație.' },
+      { id: 'filtru', type: 'dynamic-table', label: 'A. Filtrul clientului', columns: ['Dimensiune (problemă / situație / comportament / potrivire practică / excluderi)', 'Criteriul meu', 'Cum îl pot verifica?'], addLabel: 'Adaugă o dimensiune' },
+      { id: 'lista', type: 'dynamic-table', label: 'B. Lista oamenilor potriviți', columns: ['Nume / cod', 'De ce trece filtrul?', 'Rol în decizie', 'Canal de contact', 'Status'], addLabel: 'Adaugă o persoană' },
+      { id: 'control', type: 'checkboxes', label: 'Control final', options: ['Pot explica de ce fiecare persoană de pe listă este relevantă', 'Am inclus oameni cu comportament real legat de problemă', 'Am separat prietenii și cunoștințele care ar răspunde prea politicos, dacă nu trec filtrul', 'Lista îmi permite să ajung la minimum 10 conversații reale'] },
     ],
   },
+
+  {
+    exerciseId: 'st-e-2-2',
+    type: 'form-fields',
+    title: 'Harta schimbării',
+    instructions:
+      'Legat de Lecția 2.2. Formulezi ipotezele despre momentul care activează problema și despre forțele care împing sau frânează schimbarea. Totul rămâne IPOTEZĂ până când e susținut de conversații sau de comportament real.',
+    fields: [
+      { id: 'problema_latenta', type: 'textarea', label: 'Problema latentă, în cuvinte simple', placeholder: 'Cum arată problema atunci când omul încă nu face nimic în privința ei.' },
+      { id: 'declansatoare', type: 'dynamic-table', label: '2–3 declanșatoare care ar face problema relevantă acum', columns: ['Declanșatorul', 'Ce se schimbă în viața / munca omului în acel moment', 'Cât de des apare'], addLabel: 'Adaugă un declanșator' },
+      { id: 'info_forte', type: 'info', text: 'Cele patru forțe: presiunea situației actuale și atracția rezultatului nou împing spre schimbare; teama de schimbare și obișnuința cu soluția actuală o frânează.' },
+      { id: 'forte', type: 'dynamic-table', label: 'Cele patru forțe', columns: ['Forța (presiune / atracție / teamă / obișnuință)', 'Ipoteza mea', 'Ce dovadă ar confirma?', 'Ce dovadă ar contrazice?'], addLabel: 'Adaugă o forță' },
+      { id: 'necunoscute', type: 'dynamic-table', label: 'Întrebări pe care vreau să le clarific în interviuri', columns: ['Întrebare / necunoscut', 'De ce contează pentru business?'], addLabel: 'Adaugă o întrebare' },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-2-3',
+    type: 'form-fields',
+    title: 'Harta deciziei de cumpărare',
+    instructions:
+      'Legat de Lecția 2.3. Completezi numai rolurile care există în realitate. Dacă o singură persoană are mai multe roluri, scrie același nume — nu complica artificial harta.',
+    fields: [
+      { id: 'cumpararea', type: 'textarea', label: 'Cumpărarea reală pe care vreau s-o testez', placeholder: 'Ce anume cumpără omul, în ce moment și pentru ce rezultat.' },
+      { id: 'roluri', type: 'dynamic-table', label: 'Rolurile din decizie', columns: ['Rol (om cu problema / utilizator / influențator / decident / plătitor / blocator)', 'Nume / tip de persoană', 'Ce îl interesează?', 'Ce poate bloca?', 'Ce trebuie să aflu?'], addLabel: 'Adaugă un rol' },
+      { id: 'traseu', type: 'dynamic-table', label: 'Traseul cumpărării', columns: ['Pas', 'Cine intervine?', 'Ce trebuie să se întâmple ca procesul să meargă mai departe?'], addLabel: 'Adaugă un pas' },
+      { id: 'control', type: 'checkboxes', label: 'Control final', options: ['Am marcat cine plătește efectiv', 'Am identificat cine poate bloca decizia', 'Știu de la cine am nevoie de dovadă în conversații'] },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-2-4',
+    type: 'form-fields',
+    title: 'Scriptul Customer Development',
+    instructions:
+      'Pregătești o conversație care scoate la suprafață episoade, comportamente și decizii reale, fără să sugereze răspunsul. Elimini orice întrebare care conține beneficiul soluției tale sau care cere persoanei să-ți evalueze ideea.',
+    fields: [
+      { id: 'deschidere', type: 'textarea', label: 'Deschiderea mea — ce investighez și de ce vreau să înțeleg experiența persoanei', placeholder: 'Scurt și transparent. Fără pitch.' },
+      { id: 'structura', type: 'checkboxes', label: 'Structura interviului — bifez ce am pregătit', options: ['Context: ce se întâmplă în jurul problemei', 'Ultimul episod: povestește-mi despre ultima dată când…', 'Ce s-a întâmplat înainte de episod', 'Ce ai făcut prima dată', 'Ce ai încercat după', 'Ce soluție ai folosit în final', 'Ce te-a costat în timp, bani, energie sau risc', 'Ce a făcut problema importantă atunci', 'Cine a mai participat la alegere', 'Ce te-a făcut să alegi soluția respectivă', 'Ce te-a făcut să eziți sau să amâni', 'Ce am înțeles greșit sau ce ar trebui să mai știu'] },
+      { id: 'intrebari', type: 'dynamic-table', label: 'Întrebările mele, în ordinea în care le pun', columns: ['Întrebarea', 'Ce vreau să aflu din ea', 'Follow-up dacă răspunsul e vag'], addLabel: 'Adaugă o întrebare' },
+      { id: 'info_rescriere', type: 'info', text: 'O întrebare slabă sună așa: „Ți-ar plăcea o aplicație care…?". Varianta bună întreabă despre ultimul episod real: „Când ai avut ultima dată situația asta, ce ai făcut concret?".' },
+      { id: 'rescriere', type: 'dynamic-table', label: 'Rescrierea întrebărilor slabe', columns: ['Întrebarea mea inițială', 'De ce poate influența răspunsul?', 'Varianta despre comportament / episod real'], addLabel: 'Adaugă o rescriere' },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-2-5',
+    type: 'form-fields',
+    title: 'Conversațiile și dovezile',
+    instructions:
+      'Minimum 10 conversații cu persoane care trec filtrul din 2.1. După fiecare conversație notează faptele imediat, separat de interpretarea ta. Abia la final cauți tipare și scrii excepțiile.',
+    fields: [
+      { id: 'info_ierarhie', type: 'info', text: 'Ierarhia dovezilor: complimentul nu valorează nimic · interesul valorează puțin · pre-comanda valorează mult · plata e singura validare reală. Prietenii te mint involuntar — nu vor să te descurajeze, dar asta te costă luni.' },
+      { id: 'conversatii', type: 'dynamic-table', label: 'Tabelul conversațiilor (minimum 10 rânduri)', columns: ['Persoană / de ce trece filtrul', 'Ultimul episod concret', 'Soluția folosită acum', 'Acțiunea / efortul făcut', 'Cost / consecință', 'Declanșator + roluri în decizie', 'Ce susține ipoteza', 'Ce contrazice ipoteza'], addLabel: 'Adaugă o conversație' },
+      { id: 'tipare', type: 'dynamic-table', label: 'Tiparele care se repetă', columns: ['Tiparul observat', 'În câte conversații apare', 'Faptul care îl susține (citat / comportament / cifră)'], addLabel: 'Adaugă un tipar' },
+      { id: 'sustin', type: 'textarea', label: 'Top 3 dovezi care SUSȚIN ipoteza', placeholder: 'Fapte, nu impresii. Câte una pe rând.' },
+      { id: 'contrazic', type: 'textarea', label: 'Top 3 dovezi care CONTRAZIC ipoteza', placeholder: 'Excepțiile și contradicțiile. Dacă nu găsești niciuna, cel mai probabil nu ai ascultat destul.' },
+      { id: 'control', type: 'checkboxes', label: 'Control final', options: ['Am minimum 10 conversații finalizate', 'Toate persoanele trec filtrul din 2.1', 'Faptele sunt scrise separat de interpretarea mea', 'Am notat cel puțin o dovadă care mă contrazice'] },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-2-6',
+    type: 'form-fields',
+    title: 'Testul de angajament și verdictul',
+    instructions:
+      'Ceri o acțiune cu miză reală și decizi pe baza pragurilor stabilite ÎNAINTE de rezultate. Notează răspunsul exact, fără să transformi refuzul într-o negociere.',
+    fields: [
+      { id: 'info_angajament', type: 'info', text: 'Angajamentul e cea mai mică acțiune realistă care seamănă cu următorul pas din cumpărarea adevărată: timp, acces, pilot, programare, cerere de ofertă, rezervare, avans sau cumpărare.' },
+      { id: 'praguri', type: 'dynamic-table', label: 'A. Pragurile stabilite înainte de test', columns: ['Angajamentul cerut', 'De ce este relevant?', 'Pragul MERG', 'Pragul PIVOT / STOP'], addLabel: 'Adaugă un prag' },
+      { id: 'rezultate', type: 'dynamic-table', label: 'B. Rezultate', columns: ['Persoană / rol', 'Angajamentul cerut', 'Răspuns / acțiune', 'Ce a blocat?', 'Greutatea dovezii'], addLabel: 'Adaugă un rezultat' },
+      { id: 'raport_ipoteza', type: 'textarea', label: 'C. Raportul de validare — ipoteza pe care am testat-o', placeholder: 'Formulată ca afirmație verificabilă.' },
+      { id: 'raport_cine', type: 'textarea', label: 'Cine a fost testat și de ce', placeholder: 'Câte persoane, din ce segmente, pe ce criterii au trecut filtrul.' },
+      { id: 'raport_tipare', type: 'textarea', label: 'Tiparele principale din conversații', placeholder: 'Ce se repetă și ce contrazice, pe scurt.' },
+      { id: 'verdict', type: 'checkboxes', label: 'Verdictul', options: ['MERG — angajamentele au atins pragul stabilit', 'PIVOTEZ nișa', 'PIVOTEZ problema', 'PIVOTEZ formatul soluției sau angajamentul cerut', 'OPRESC IPOTEZA curentă'] },
+      { id: 'motiv', type: 'textarea', label: 'Pe ce dovezi se sprijină verdictul și care e următorul pas concret', placeholder: 'Un rezultat negativ aflat acum te costă o săptămână. Aflat peste 8 luni te costă firma.' },
+    ],
+  },
+
 
   // ── Modulul 3 · Sistematizare ──────────────────────────────────────────────
   {
