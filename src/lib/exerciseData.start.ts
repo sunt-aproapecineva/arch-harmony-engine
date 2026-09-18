@@ -26,6 +26,71 @@ export const START_EXERCISE_TEMPLATES: ExerciseTemplate[] = [
     ],
   },
 
+  // Cele 4 exerciții ale Săptămânii 1 (Fișa de Start) — câte unul pentru lecțiile
+  // 0.0, 0.2, 0.3 și 0.4. Lecția 0.1 nu are exercițiu: testul vânzării e un
+  // instrument mental, aplicat la nișă în săptămâna 2.
+  {
+    exerciseId: 'st-e-0-2',
+    type: 'form-fields',
+    title: 'Contractul cu tine însuți',
+    instructions:
+      'Legat de Lecția 0.0. Ai terminat prima lecție. Înainte să treci mai departe, scrie-ți contractul cu tine însuți. Nu-l face perfect — scrie-l onest, în două minute. Îl vei reciti la finalul practicumului.',
+    fields: [
+      { id: 'info', type: 'info', text: 'Răspunsurile sunt private. Le recitești în Săptămâna 8, la reflecția finală — de aceea contează onestitatea, nu formularea frumoasă.' },
+      { id: 'data', type: 'input', label: '1. Data de azi', placeholder: 'ex: 18.09.2026' },
+      { id: 'motiv', type: 'textarea', label: '2. Cel mai onest motiv pentru care încep acum, nu peste șase luni', placeholder: 'Scrie motivul real, nu cel pe care l-ai spune altcuiva.' },
+      { id: 'program', type: 'dynamic-table', label: '3. Câte ore pe săptămână aloc practicumului, pe zile', columns: ['Ziua', 'Ore alocate', 'Intervalul orar'], addLabel: 'Adaugă o zi' },
+      { id: 'total_ore', type: 'input', label: 'Total ore pe săptămână', placeholder: 'ex: 4' },
+    ],
+  },
+  {
+    exerciseId: 'st-e-0-3',
+    type: 'form-fields',
+    title: 'Lista celor 10 cheltuieli',
+    instructions:
+      'Legat de Lecția 0.2. Scrie 10 lucruri pe care crezi că trebuie să le faci sau să le cumperi ca să pornești (sau ca să crești, dacă ai deja ceva). Pentru fiecare, notează dacă poate aștepta până după prima vânzare, sau chiar trebuie înainte.',
+    fields: [
+      { id: 'info', type: 'info', text: 'Regulă din lecție: aproape tot ce ține de formă — logo, site, spațiu, stoc, branding — merge în coloana „După". Dacă ai mai mult de 3 rânduri marcate „Înainte", verifică din nou: majoritatea acestor cheltuieli pot aștepta.' },
+      { id: 'cheltuieli', type: 'dynamic-table', label: 'Cele 10 cheltuieli', columns: ['Cheltuiala', 'Cost estimat', 'Înainte sau După prima vânzare', 'De ce — într-o propoziție'], addLabel: 'Adaugă o cheltuială' },
+      { id: 'nr_inainte', type: 'input', label: 'Câte rânduri ai marcat „Înainte"', placeholder: 'ex: 2' },
+      { id: 'suma_evitata', type: 'input', label: 'O singură cifră: câți bani ai fi cheltuit dacă n-ai fi făcut exercițiul ăsta', placeholder: 'ex: 18 000 MDL' },
+      { id: 'prima_cheltuiala', type: 'textarea', label: 'Prima cheltuială pe care o faci efectiv și ce trebuie să fie adevărat ca s-o faci', placeholder: 'ex: „Plătesc materia primă doar după ce am 3 comenzi confirmate."' },
+    ],
+  },
+  {
+    exerciseId: 'st-e-0-4',
+    type: 'form-fields',
+    title: 'Două erori și două semnale',
+    instructions:
+      'Legat de Lecția 0.3. Alege exact 2 erori în care te recunoști cel mai mult. Pentru fiecare, scrie un semnal concret, verificabil — nu o intenție de tipul „voi fi mai atent", ci ceva ce poate fi doar adevărat sau fals mâine dimineață.',
+    fields: [
+      { id: 'erori', type: 'checkboxes', label: 'Bifează exact 2 erori în care te recunoști', options: ['Pasiunea ca singur criteriu', 'Energia ca înlocuitor pentru sistem', 'Pregătirea infinită', 'Viteza fără ordine', 'Decizia neasumată dintre supraviețuire și scalare'] },
+      { id: 'info', type: 'info', text: 'Exemple de semnal bun: „Au trecut 14 zile și n-am vorbit cu niciun om nou despre ideea mea." · „Am făcut același lucru a cincea oară fără să-l scriu nicăieri." · „Sunt pe cale să plătesc ceva ce nimeni nu mi-a cerut încă." Fiecare conține o cifră sau o unitate de timp.' },
+      { id: 'eroare_1', type: 'input', label: 'Eroarea 1 aleasă', placeholder: 'Scrie numele erorii bifate.' },
+      { id: 'semnal_1', type: 'textarea', label: 'Semnalul meu pentru eroarea 1 — verificabil, cu cifră sau interval de timp', placeholder: 'ex: „Au trecut 10 zile și n-am trimis niciun mesaj unui client potențial."' },
+      { id: 'eroare_2', type: 'input', label: 'Eroarea 2 aleasă', placeholder: 'Scrie numele celei de-a doua erori bifate.' },
+      { id: 'semnal_2', type: 'textarea', label: 'Semnalul meu pentru eroarea 2 — verificabil, cu cifră sau interval de timp', placeholder: 'ex: „Am refăcut logo-ul a treia oară fără să fi vândut nimic."' },
+      { id: 'actiune_7_zile', type: 'textarea', label: 'Un singur lucru concret pe care-l fac în următoarele 7 zile ca să ies din tiparul dominant', placeholder: 'O acțiune cu dată și rezultat observabil.' },
+    ],
+  },
+  {
+    exerciseId: 'st-e-0-5',
+    type: 'form-fields',
+    title: 'Plasarea pe hartă',
+    instructions:
+      'Legat de Lecția 0.4. Bifează doar criteriile adevărate azi, nu cele la care lucrezi. Bifele se citesc de sus în jos: ultimul criteriu adevărat arată stadiul real în care ești.',
+    fields: [
+      { id: 'criterii', type: 'checkboxes', label: 'Bifează ce e adevărat astăzi', options: ['N-am făcut încă nicio vânzare', 'Am vândut, dar sporadic, fără repetiție', 'Am vânzări repetate, de la clienți diferiți', 'Am cel puțin un om care lucrează cu mine', 'Le spun eu direct fiecăruia ce are de făcut', 'Am pe cineva care coordonează alți oameni', 'Există lucruri scrise pe care alții le urmează fără mine', 'Pot lipsi două săptămâni și lucrurile merg mai departe', 'Am mai mult de un punct de lucru sau o afacere'] },
+      { id: 'info', type: 'info', text: 'Grila de citire: primele două bife → stadiul de pornire; vânzări repetate → stadiul de tracțiune; primii oameni coordonați direct → stadiul de echipă; lucruri scrise urmate fără tine → stadiul de sistem; absența ta de două săptămâni fără efect → stadiul de scalare.' },
+      { id: 'stadiu', type: 'input', label: '1. Stadiul meu e…', placeholder: 'ex: tracțiune' },
+      { id: 'stadiu_de_ce', type: 'textarea', label: 'Pentru că (o singură propoziție)', placeholder: 'Argumentul concret, legat de bifele de mai sus.' },
+      { id: 'criteriu_trecere', type: 'textarea', label: '2. Criteriul prin care voi ști că am trecut la următorul stadiu', placeholder: 'Ceva măsurabil, nu o senzație.' },
+      { id: 'de_amanat', type: 'dynamic-table', label: '3. Trei lucruri pe care am fost tentat să le fac, dar aparțin unui stadiu mai avansat — deci le amân', columns: ['Lucrul tentant', 'Cărui stadiu aparține', 'Când îl reiau'], addLabel: 'Adaugă un lucru amânat' },
+    ],
+  },
+
+
+
   // ── Modulul 1 · Nișa ───────────────────────────────────────────────────────
   // Cele 5 exerciții practice ale Săptămânii 2 (Dosarul Oportunității). Fiecare e
   // legat de o lecție și construiește materia primă pentru următorul — de aceea sunt
