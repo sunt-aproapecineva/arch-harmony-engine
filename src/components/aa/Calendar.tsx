@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, X, ExternalLink, Download } from 'lucide-react';
 import { LiveEvent } from '../../lib/types';
 
@@ -108,12 +108,24 @@ export const Calendar: React.FC<CalendarProps> = ({ events, moduleUnlocks }) => 
   const [viewYear, setViewYear] = useState(initial ? initial[0] : today.getFullYear());
   const [viewMonth, setViewMonth] = useState(initial ? initial[1] - 1 : today.getMonth());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  // Evenimentele vin asincron din context: la primul render `events` e gol,
+  // deci starea s-ar bloca pe luna curentă. Cât timp elevul n-a navigat manual,
+  // când ajung evenimentele mutăm vederea pe luna primei întâlniri viitoare.
+  const userNavigated = useRef(false);
+  useEffect(() => {
+    if (userNavigated.current || !firstUpcoming) return;
+    const [y, m] = firstUpcoming.split('-').map(Number);
+    setViewYear(y);
+    setViewMonth(m - 1);
+  }, [firstUpcoming]);
 
   const prevMonth = () => {
+    userNavigated.current = true;
     if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
     else setViewMonth(m => m - 1);
   };
   const nextMonth = () => {
+    userNavigated.current = true;
     if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
     else setViewMonth(m => m + 1);
   };
