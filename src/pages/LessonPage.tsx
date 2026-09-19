@@ -601,11 +601,8 @@ export const LessonPage: React.FC = () => {
                 </div>
               </div>
             ) : youtubeId ? (
-              <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}>
-                <iframe style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
-                  src={`https://www.youtube.com/embed/${youtubeId}?rel=0`} title={lesson.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-              </div>
+              <YouTubePlayer videoId={youtubeId} title={lesson.title} />
+
             ) : (
               <div style={{ position: 'relative', paddingTop: '56.25%' }}>
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, background: 'linear-gradient(135deg, var(--bg-2) 0%, var(--bg-3) 100%)', padding: 32, textAlign: 'center' }}>
