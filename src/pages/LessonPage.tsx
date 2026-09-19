@@ -20,6 +20,8 @@ import { flushExerciseResponse, getStoredExerciseResponse } from '../lib/exercis
 import { hasCompletedOnboarding } from '../lib/access';
 import { formatLessonNumber } from '../lib/lessonNumbering';
 import { useLessonNote } from '../hooks/useLessonNote';
+import { YouTubePlayer } from '../components/aa/YouTubePlayer';
+
 
 function isTrackableTimelineItem(lesson: Lesson): boolean {
   return lesson.type === 'exercise' || !!(
