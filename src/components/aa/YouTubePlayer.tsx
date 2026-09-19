@@ -71,7 +71,14 @@ export const YouTubePlayer: React.FC<{ videoId: string; title?: string }> = ({ v
     loadYouTubeApi()
       .then((YT) => {
         if (cancelled || !hostRef.current) return;
-        playerRef.current = new YT.Player(hostRef.current, {
+        // YT înlocuiește nodul primit cu un iframe. Îi dăm un nod creat manual,
+        // nu unul gestionat de React, altfel demontarea paginii poate crăpa cu
+        // „removeChild" pentru că React nu mai găsește copilul original.
+        const mount = document.createElement('div');
+        mount.style.width = '100%';
+        mount.style.height = '100%';
+        hostRef.current.appendChild(mount);
+        playerRef.current = new YT.Player(mount, {
           videoId,
           playerVars: {
             rel: 0,
@@ -99,6 +106,8 @@ export const YouTubePlayer: React.FC<{ videoId: string; title?: string }> = ({ v
       window.removeEventListener('pagehide', save);
       try { playerRef.current?.destroy?.(); } catch { /* deja distrus */ }
       playerRef.current = null;
+      // Curățăm ce a lăsat YT în urmă, ca React să găsească gazda goală.
+      try { if (hostRef.current) hostRef.current.innerHTML = ''; } catch { /* ignoră */ }
     };
   }, [videoId]);
 
