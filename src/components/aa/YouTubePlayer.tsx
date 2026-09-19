@@ -106,6 +106,8 @@ export const YouTubePlayer: React.FC<{ videoId: string; title?: string }> = ({ v
       window.removeEventListener('pagehide', save);
       try { playerRef.current?.destroy?.(); } catch { /* deja distrus */ }
       playerRef.current = null;
+      // Curățăm ce a lăsat YT în urmă, ca React să găsească gazda goală.
+      try { if (hostRef.current) hostRef.current.innerHTML = ''; } catch { /* ignoră */ }
     };
   }, [videoId]);
 
