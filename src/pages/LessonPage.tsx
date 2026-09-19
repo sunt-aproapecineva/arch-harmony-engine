@@ -621,11 +621,8 @@ export const LessonPage: React.FC = () => {
           {youtubeId2 && lesson.id !== 'l-0-1' && (
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}
               style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, overflow: 'hidden', marginBottom: 24, boxShadow: 'var(--shadow)' }}>
-              <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}>
-                <iframe style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
-                  src={`https://www.youtube.com/embed/${youtubeId2}?rel=0`} title={`${lesson.title} — partea 2`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-              </div>
+              <YouTubePlayer videoId={youtubeId2} title={`${lesson.title} — partea 2`} />
+
             </motion.div>
           )}
 
