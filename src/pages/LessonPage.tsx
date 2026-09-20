@@ -604,6 +604,17 @@ export const LessonPage: React.FC = () => {
               </div>
             ) : youtubeId ? (
               <YouTubePlayer videoId={youtubeId} title={lesson.title} />
+            ) : null}
+            {/* Lecția de bun venit (l-0-1) are și card de întâmpinare, și video —
+                cardul stă deasupra, playerul dedesubt, în același container. */}
+            {lesson.id === 'l-0-1' && youtubeId && (
+              <YouTubePlayer videoId={youtubeId} title={lesson.title} />
+            )}
+            {!youtubeId && lesson.id !== 'l-0-1' && (
+              <YouTubePlayer videoId="" title="" />
+            )}{/* placeholder nefolosit — ramura de mai jos o înlocuiește */}
+            {false as boolean && youtubeId ? (
+              <YouTubePlayer videoId={youtubeId} title={lesson.title} />
 
             ) : (
               <div style={{ position: 'relative', paddingTop: '56.25%' }}>
