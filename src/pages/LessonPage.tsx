@@ -602,21 +602,28 @@ export const LessonPage: React.FC = () => {
                   </p>
                 </div>
               </div>
-            ) : youtubeId ? (
+            ) : null}
+            {/* Lecția de bun venit (l-0-1) are și card de întâmpinare, și video —
+                cardul stă deasupra, playerul dedesubt, în același container. */}
+            {lesson.id === 'l-0-1' && youtubeId && (
               <YouTubePlayer videoId={youtubeId} title={lesson.title} />
-
-            ) : (
-              <div style={{ position: 'relative', paddingTop: '56.25%' }}>
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, background: 'linear-gradient(135deg, var(--bg-2) 0%, var(--bg-3) 100%)', padding: 32, textAlign: 'center' }}>
-                  <div style={{ width: 64, height: 64, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)' }}>
-                    <Play size={24} style={{ color: 'var(--accent)', marginLeft: 4 }} />
-                  </div>
-                  <div>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--accent)', marginBottom: 8 }}>Video în curs de adăugare</p>
-                    <p style={{ fontSize: 13, color: 'var(--fg-3)', lineHeight: 1.6, maxWidth: 380 }}>{lesson.description}</p>
+            )}
+            {lesson.id !== 'l-0-1' && (
+              youtubeId ? (
+                <YouTubePlayer videoId={youtubeId} title={lesson.title} />
+              ) : (
+                <div style={{ position: 'relative', paddingTop: '56.25%' }}>
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, background: 'linear-gradient(135deg, var(--bg-2) 0%, var(--bg-3) 100%)', padding: 32, textAlign: 'center' }}>
+                    <div style={{ width: 64, height: 64, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--accent-dim)', border: '1px solid rgba(196,240,228,0.2)' }}>
+                      <Play size={24} style={{ color: 'var(--accent)', marginLeft: 4 }} />
+                    </div>
+                    <div>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--accent)', marginBottom: 8 }}>Video în curs de adăugare</p>
+                      <p style={{ fontSize: 13, color: 'var(--fg-3)', lineHeight: 1.6, maxWidth: 380 }}>{lesson.description}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )
             )}
           </motion.div>
 
