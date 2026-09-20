@@ -80,6 +80,11 @@ export const YouTubePlayer: React.FC<{ videoId: string; title?: string }> = ({ v
         hostRef.current.appendChild(mount);
         playerRef.current = new YT.Player(mount, {
           videoId,
+          // Fără width/height explicite, API-ul generează iframe-ul fix la
+          // 640×390 și ignoră stilurile nodului mount — videoul ieșea din
+          // ecran pe mobil sau rămânea o căsuță mică pe desktop.
+          width: '100%',
+          height: '100%',
           playerVars: {
             rel: 0,
             playsinline: 1,
