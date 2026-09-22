@@ -535,10 +535,10 @@ export const START_MODULES: Module[] = [
         module_id: 'st-m-3',
         title: 'De Ce Construiești Sistemul Înainte să Ai Clienți Mulți',
         description: 'Studiul de caz Victor — Aurelius și Bacio di Bolle. Investitorii nu cumpără ideea ta, cumpără sistemul tău.',
-        video_url: '',
-        duration_min: 0,
+        video_url: 'https://www.youtube.com/watch?v=0l0NYystXGM',
+        duration_min: 15,
         order_index: 1,
-        is_published: false,
+        is_published: true,
         type: 'video',
       },
       {
