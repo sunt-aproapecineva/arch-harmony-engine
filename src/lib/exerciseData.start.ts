@@ -367,7 +367,7 @@ export const START_EXERCISE_TEMPLATES: ExerciseTemplate[] = [
       { id: 'livrare', type: 'checkboxes', label: 'Livrarea poate fi executată', options: ['Harta livrării e completă', 'Resursele necesare există', 'Am testat cel puțin o dată traseul, cap-coadă', 'Standardul minim e definit'] },
       { id: 'risc', type: 'textarea', label: 'Riscul principal și planul B', placeholder: 'Ce te poate opri și ce faci atunci.' },
       { id: 'aman', type: 'dynamic-table', label: 'Ce amân până după dovadă', columns: ['Investiția amânată', 'Ce dovadă o deblochează'], addLabel: 'Adaugă o investiție' },
-      { id: 'verdict', type: 'radio', label: 'Verdict', options: ['GATA', 'MAI AM DE REZOLVAT'] },
+      { id: 'verdict', type: 'checkboxes', label: 'Verdict', options: ['GATA — pot accepta un client mâine', 'MAI AM DE REZOLVAT'] },
       { id: 'motiv', type: 'textarea', label: 'Ce mai am de rezolvat și până când', placeholder: 'Dacă verdictul e GATA, scrie prima persoană căreia îi faci oferta.' },
     ],
   },
