@@ -266,22 +266,109 @@ export const START_EXERCISE_TEMPLATES: ExerciseTemplate[] = [
   },
 
 
-  // ── Modulul 3 · Sistematizare ──────────────────────────────────────────────
+  // ── Modulul 3 · Oferta și Fundația ─────────────────────────────────────────
   {
     exerciseId: 'st-e-3-1',
     type: 'form-fields',
-    title: 'Cele 3 documente și arhitectura afacerii',
+    title: 'Fișa ofertei',
     instructions:
-      'Nu trebuie să fie perfecte. Trebuie să existe. Un document scris prost e infinit mai util decât unul perfect care e încă în capul tău.',
+      'Legat de Lecția 3.1. Alege segmentul și problema care au primit cele mai puternice dovezi în Săptămâna 3. Oferta se scrie pentru un client și o situație clară, nu pentru „toată lumea". Păstrează ipotezele separate de dovezi.',
     fields: [
-      { id: 'flux', type: 'dynamic-table', label: 'Fluxul complet al unui client — de la prima interacțiune la feedback', columns: ['Pasul', 'Cine face', 'Ce iese din pas', 'Se blochează în mine?'], addLabel: 'Adaugă un pas' },
-      { id: 'doc1', type: 'textarea', label: 'Document 1 · Fișa produsului sau serviciului', placeholder: 'Ce livrez exact, în ce format, în cât timp, la ce standard, cu ce garanții.' },
-      { id: 'doc2', type: 'textarea', label: 'Document 2 · Procesul de vânzare', placeholder: 'Pașii de la primul contact până la plată. Cine face ce. Ce se spune la fiecare etapă.' },
-      { id: 'doc3', type: 'textarea', label: 'Document 3 · Onboardingul clientului', placeholder: 'Ce se întâmplă după plată. Ce primește, când, cine îi răspunde.' },
-      { id: 'info_functii', type: 'info', text: 'Cele 4 funcții obligatorii ale oricărei afaceri: producție/livrare · vânzare și marketing · operațional și administrativ · finanțe. Acum ești tu în toate patru.' },
-      { id: 'organigrama', type: 'dynamic-table', label: 'Organigrama mea de azi și planul de ieșire', columns: ['Funcția', 'Cine o face acum', 'Din care vreau să ies primul (1–4)'], addLabel: 'Adaugă o funcție' },
-      { id: 'automatizare', type: 'textarea', label: '1 proces pe care l-aș automatiza — scris mai întâi complet manual', placeholder: 'Dacă nu poți explica procesul unui angajat, nu îl poți explica nici unui AI.' },
-      { id: 'gata', type: 'checkboxes', label: 'Checklist „gata de prima vânzare"', options: ['Cele 3 documente sunt scrise', 'Modalitatea de plată funcționează', 'Canalul de comunicare cu clienții e definit', 'Răspunsul la cele mai frecvente 5 întrebări e scris', 'Procesul de livrare a fost testat o dată, cap-coadă'] },
+      { id: 'client', type: 'input', label: 'Clientul pentru care construiesc', placeholder: 'Cine + situație, exact ca în nișa validată.' },
+      { id: 'situatie', type: 'textarea', label: 'Situația / declanșatorul relevant', placeholder: 'Momentul în care problema devine urgentă pentru el.' },
+      { id: 'problema', type: 'textarea', label: 'Problema validată', placeholder: 'Formulată în cuvintele oamenilor cu care ai vorbit.' },
+      { id: 'rezultat', type: 'textarea', label: 'Rezultatul principal dorit', placeholder: 'Ce caută clientul de fapt — un rezultat, nu o listă de funcții.' },
+      { id: 'solutie', type: 'textarea', label: 'Soluția pe care o propun acum', placeholder: 'Ce poți livra efectiv în forma actuală, nu peste 6 luni.' },
+      { id: 'oferta', type: 'textarea', label: 'Prima mea ofertă testabilă (o propoziție)', placeholder: 'Ajut [client] care [situație] să obțină [rezultat] prin [soluție].' },
+      { id: 'dovada', type: 'textarea', label: 'Dovada din S3 care justifică această ofertă', placeholder: 'Fapte, citate, comportamente — nu impresii.' },
+      { id: 'control', type: 'checkboxes', label: 'Control final', options: ['Propoziția include clientul', 'Include situația', 'Include rezultatul', 'Include soluția', 'Se sprijină pe o dovadă reală din validare'] },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-3-2',
+    type: 'form-fields',
+    title: 'Structura pachetului inițial',
+    instructions:
+      'Legat de Lecția 3.2. Prima ofertă trebuie să livreze rezultatul principal fără supraîncărcare. Ce nu e obligatoriu pentru rezultat sau pentru încredere se mută în backlog.',
+    fields: [
+      { id: 'rezultat', type: 'textarea', label: 'Rezultatul principal (copiat din Fișa ofertei)', placeholder: 'Un singur rezultat.' },
+      { id: 'elemente', type: 'dynamic-table', label: 'Elementele ofertei', columns: ['Elementul', 'Obligatoriu sau secundar?', 'Dovada care îl justifică', 'Contribuie la rezultat sau la încredere?'], addLabel: 'Adaugă un element' },
+      { id: 'backlog', type: 'dynamic-table', label: 'Backlog — elemente pentru mai târziu', columns: ['Elementul amânat', 'Ce dovadă îl aduce înapoi în ofertă?'], addLabel: 'Adaugă în backlog' },
+      { id: 'exclus', type: 'textarea', label: 'Ce este exclus explicit din prima ofertă', placeholder: 'Scris clar, ca să nu creezi așteptări pe care nu le poți livra.' },
+      { id: 'limita', type: 'textarea', label: 'Limita ofertei', placeholder: 'Până unde merge responsabilitatea ta: volum, durată, număr de revizuiri, acoperire.' },
+      { id: 'structura', type: 'textarea', label: 'Structura finală a pachetului', placeholder: 'Enumeră, în ordine, ce primește clientul.' },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-3-3',
+    type: 'form-fields',
+    title: 'Planul MVP / pilot',
+    instructions:
+      'Legat de Lecția 3.3. Alegi cea mai mică formă de soluție care poate testa ipoteza critică prin comportament real. Manual e permis și de multe ori preferabil — nu construiești ce încă nu are dovadă.',
+    fields: [
+      { id: 'ipoteza', type: 'textarea', label: 'Ipoteza critică pe care o testez', placeholder: 'Afirmație verificabilă: dacă asta e falsă, oferta nu are sens.' },
+      { id: 'forma', type: 'checkboxes', label: 'Forma testului', options: ['Prototip', 'MVP', 'Pilot cu un client real', 'Livrare 100% manuală', 'Combinație'] },
+      { id: 'primeste', type: 'textarea', label: 'Ce primește clientul concret', placeholder: 'Descrie livrabilul, nu intenția.' },
+      { id: 'functioneze', type: 'textarea', label: 'Ce trebuie să funcționeze pentru ca rezultatul să fie credibil', placeholder: 'Minimul de calitate fără de care testul nu e valid.' },
+      { id: 'manual', type: 'dynamic-table', label: 'Ce fac manual și ce amân', columns: ['Activitatea', 'Manual acum / amânată', 'De ce'], addLabel: 'Adaugă o activitate' },
+      { id: 'masor', type: 'textarea', label: 'Comportamentul sau rezultatul pe care îl măsor', placeholder: 'Un comportament observabil, nu o părere.' },
+      { id: 'criteriu', type: 'textarea', label: 'Criteriul de succes / dovada care îmi dă dreptul la următorul nivel', placeholder: 'Ex.: 3 clienți plătesc avansul în 14 zile.' },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-3-4',
+    type: 'form-fields',
+    title: 'Ipoteza de preț',
+    instructions:
+      'Legat de Lecția 3.4. Prețul inițial nu e definitiv — e o ipoteză argumentată, suficient de realistă ca să fie testată în vânzări reale. Se sprijină pe alternativele clientului și pe valoarea rezultatului.',
+    fields: [
+      { id: 'alternative', type: 'dynamic-table', label: 'Alternativele pe care clientul le folosește acum', columns: ['Alternativa', 'Cât îl costă (bani)', 'Cât îl costă (timp / efort / risc)', 'Ce nu rezolvă'], addLabel: 'Adaugă o alternativă' },
+      { id: 'valoare', type: 'textarea', label: 'Valoarea rezultatului pentru client', placeholder: 'Ce câștigă sau ce nu mai pierde, exprimat cât mai concret.' },
+      { id: 'pozitionare', type: 'textarea', label: 'Poziționarea primei oferte', placeholder: 'Sub, la nivelul sau peste alternative — și de ce.' },
+      { id: 'pret', type: 'input', label: 'Prețul propus', placeholder: 'O cifră, nu un interval vag.' },
+      { id: 'conditie', type: 'textarea', label: 'Condiția de plată', placeholder: 'Avans, integral, în rate, la livrare. Când intră banii efectiv.' },
+      { id: 'primeste', type: 'textarea', label: 'Ce primește clientul pentru acest preț', placeholder: 'Legat direct de structura pachetului din 3.2.' },
+      { id: 'pastrez', type: 'textarea', label: 'Dovada care mă face să păstrez prețul', placeholder: 'Ex.: oamenii plătesc fără să negocieze.' },
+      { id: 'reevaluez', type: 'textarea', label: 'Semnalul care mă face să reevaluez prețul', placeholder: 'Ex.: toți cer reducere sau amână decizia din cauza prețului.' },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-3-5',
+    type: 'form-fields',
+    title: 'Harta livrării',
+    instructions:
+      'Legat de Lecția 3.5. Vezi întregul traseu de la comandă la rezultat și identifici riscurile ÎNAINTE de prima vânzare. Fiecare pas al clientului are o acțiune vizibilă și una din spate.',
+    fields: [
+      { id: 'trasee', type: 'dynamic-table', label: 'Traseul livrării', columns: ['Pasul clientului', 'Acțiunea vizibilă a afacerii', 'Acțiunea din spate', 'Cât durează'], addLabel: 'Adaugă un pas' },
+      { id: 'resurse', type: 'dynamic-table', label: 'Resurse și furnizori de care depind', columns: ['Resursa / furnizorul', 'Pentru ce pas', 'Ce se întâmplă dacă lipsește'], addLabel: 'Adaugă o resursă' },
+      { id: 'riscuri', type: 'dynamic-table', label: 'Punctele de risc', columns: ['Riscul', 'Unde apare în traseu', 'Soluția minimă de rezervă'], addLabel: 'Adaugă un risc' },
+      { id: 'standard', type: 'textarea', label: 'Standardul minim de livrare', placeholder: 'Sub acest nivel nu livrez, oricât de grăbit aș fi.' },
+      { id: 'control', type: 'checkboxes', label: 'Control final', options: ['Traseul e complet, de la comandă la rezultat', 'Fiecare pas are un responsabil', 'Riscurile principale au un plan B', 'Pot executa traseul mâine, cu ce am acum'] },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-3-6',
+    type: 'form-fields',
+    title: 'Checklistul ofertei gata de vânzare',
+    instructions:
+      'Legat de Lecția 3.6. Verifici dacă poți accepta mâine un client, încasa banii și livra — fără investiții premature. Aspectele juridice și fiscale se confirmă local, cu specialistul potrivit.',
+    fields: [
+      { id: 'produs', type: 'textarea', label: 'Produs / pilot gata — ce anume e livrabil azi', placeholder: 'Legat de planul MVP din 3.3.' },
+      { id: 'pret', type: 'textarea', label: 'Preț și condiții', placeholder: 'Copiate din 3.4, în forma pe care o comunici clientului.' },
+      { id: 'plata', type: 'textarea', label: 'Metoda efectivă de încasare', placeholder: 'Cont, transfer, link de plată, numerar. Testată sau nu?' },
+      { id: 'admin', type: 'dynamic-table', label: 'Aspecte administrative de verificat local', columns: ['Ce trebuie verificat', 'Cu cine confirm', 'Termen'], addLabel: 'Adaugă o verificare' },
+      { id: 'mesaj', type: 'textarea', label: 'Mesajul de confirmare și următorul pas pentru client', placeholder: 'Ce primește imediat după ce spune „da".' },
+      { id: 'start', type: 'input', label: 'Data sau modul de începere', placeholder: 'Ex.: în maximum 48 de ore de la plată.' },
+      { id: 'livrare', type: 'checkboxes', label: 'Livrarea poate fi executată', options: ['Harta livrării e completă', 'Resursele necesare există', 'Am testat cel puțin o dată traseul, cap-coadă', 'Standardul minim e definit'] },
+      { id: 'risc', type: 'textarea', label: 'Riscul principal și planul B', placeholder: 'Ce te poate opri și ce faci atunci.' },
+      { id: 'aman', type: 'dynamic-table', label: 'Ce amân până după dovadă', columns: ['Investiția amânată', 'Ce dovadă o deblochează'], addLabel: 'Adaugă o investiție' },
+      { id: 'verdict', type: 'radio', label: 'Verdict', options: ['GATA', 'MAI AM DE REZOLVAT'] },
+      { id: 'motiv', type: 'textarea', label: 'Ce mai am de rezolvat și până când', placeholder: 'Dacă verdictul e GATA, scrie prima persoană căreia îi faci oferta.' },
     ],
   },
 
