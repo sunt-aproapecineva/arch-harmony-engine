@@ -5,7 +5,8 @@
 //
 // Compoziția e calmă intenționat: e un moment de alegere, nu un tablou de bord.
 // Fundalul, tipografia și cardurile refolosesc tokenii și clasele din src/styles.css.
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { fetchFlows, type Flow } from '../lib/flows';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Sun, Moon, LogOut, Lock, CheckCircle2, CalendarDays } from 'lucide-react';
 import { useNavigate } from '@/lib/router-compat';
@@ -73,6 +74,33 @@ export const CoursesHub: React.FC = () => {
   }), [courses, isCompleted, loading, getOverallProgressFor, user]);
 
   const single = cards.length === 1;
+
+  // Adminul alege fluxul direct de pe card. Alegerea se scrie în aceeași cheie pe
+  // care o citește CourseContext, deci dashboardul programului deschide fluxul ales.
+  const [allFlows, setAllFlows] = useState<Flow[]>([]);
+  const [picked, setPicked] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (!isAdmin) return;
+    fetchFlows(null).then(setAllFlows);
+    const saved: Record<string, string> = {};
+    try {
+      activeCourses().forEach(c => {
+        const v = localStorage.getItem(`aa_admin_flow_${c.id}`);
+        if (v) saved[c.id] = v;
+      });
+    } catch { /* noop */ }
+    setPicked(saved);
+  }, [isAdmin]);
+  const effectiveFlowId = (courseId: string, ownId?: string) => {
+    const list = allFlows.filter(f => f.course_id === courseId);
+    if (picked[courseId] && list.some(f => f.id === picked[courseId])) return picked[courseId];
+    if (ownId && list.some(f => f.id === ownId)) return ownId;
+    return (list.find(f => f.is_active) || list[0])?.id || null;
+  };
+  const pickFlow = (courseId: string, id: string) => {
+    setPicked(p => ({ ...p, [courseId]: id }));
+    try { localStorage.setItem(`aa_admin_flow_${courseId}`, id); } catch { /* noop */ }
+  };
 
   return (
     <div className="aa-viewport-min" style={{ background: 'var(--bg)', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
@@ -156,7 +184,11 @@ export const CoursesHub: React.FC = () => {
               gridTemplateColumns: single ? '1fr' : 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))',
             }}>
               {cards.map((c, index) => (
-                <CourseCard key={c.course.id} data={c} index={index} reduceMotion={reduceMotion} onOpen={() => navigate(
+                <CourseCard key={c.course.id} data={c} index={index} reduceMotion={reduceMotion}
+                  adminFlows={isAdmin ? allFlows.filter(f => f.course_id === c.course.id) : undefined}
+                  selectedFlowId={effectiveFlowId(c.course.id, c.flow?.id)}
+                  onPickFlow={id => pickFlow(c.course.id, id)}
+                  onOpen={() => navigate(
                   // Butonul scrie „Începe cu diagnosticul" — atunci acolo să și ducă.
                   // Înainte deschidea dashboardul, unde elevul primea un modal care îl
                   // trimitea tot la quiz: două clicuri pentru o singură intenție.
@@ -204,8 +236,8 @@ export const CoursesHub: React.FC = () => {
 
 // ─── Cardul unui program ──────────────────────────────────────────────────────
 
-const CourseCard: React.FC<{ data: any; index: number; reduceMotion: boolean; onOpen: () => void }> =
-  ({ data, index, reduceMotion, onOpen }) => {
+const CourseCard: React.FC<{ data: any; index: number; reduceMotion: boolean; onOpen: () => void; adminFlows?: any[]; selectedFlowId?: string | null; onPickFlow?: (id: string) => void }> =
+  ({ data, index, reduceMotion, onOpen, adminFlows, selectedFlowId, onPickFlow = () => {} }) => {
     const { course, pct, modulesDone, modules, lessonsTotal, deliverables, quizDone, flow } = data;
     const accent = COURSE_ACCENT[course.accent];
     const started = pct > 0;
@@ -241,7 +273,26 @@ const CourseCard: React.FC<{ data: any; index: number; reduceMotion: boolean; on
               }}>
                 {course.subtitle}
               </span>
-              {flow && (
+              {adminFlows && adminFlows.length > 0 ? (
+                <label style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10.5,
+                  color: 'var(--fg-2)', border: '1px solid var(--border)', padding: '2px 4px 2px 9px', borderRadius: 99,
+                }}>
+                  <CalendarDays size={10} />
+                  <select
+                    aria-label={`Alege fluxul pentru ${course.shortTitle}`}
+                    value={selectedFlowId || ''}
+                    onChange={e => onPickFlow(e.target.value)}
+                    style={{ background: 'transparent', border: 'none', color: 'var(--fg)', fontSize: 11, cursor: 'pointer', outline: 'none' }}
+                  >
+                    {adminFlows.map((f: any) => (
+                      <option key={f.id} value={f.id} style={{ background: 'var(--bg-3)' }}>
+                        {f.name.replace(/\s*·.*$/, '')}{f.is_active ? '' : ' (inactiv)'}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : flow && (
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10.5,
                   color: 'var(--fg-3)', border: '1px solid var(--border)', padding: '4px 9px', borderRadius: 99,
