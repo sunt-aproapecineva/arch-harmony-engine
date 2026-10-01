@@ -103,7 +103,7 @@ export const START_EXERCISE_TEMPLATES: ExerciseTemplate[] = [
       'Legat de Lecția 1.1. Scrie 10 probleme observabile, formulate ca situații ale unui om sau ale unei companii — fără să numești încă produsul pe care l-ai vinde. Evită „oamenii vor servicii mai bune"; descrie ce se întâmplă concret.',
     fields: [
       { id: 'info', type: 'info', text: 'Criteriul de acceptare: 10 probleme distincte, cel puțin 7 formulate fără numele unui produs, fiecare cu un om/companie și un rezultat dorit.' },
-      { id: 'probleme', type: 'dynamic-table', label: 'Cele 10 probleme observate', columns: ['Problema — ce se întâmplă acum', 'Cine o trăiește', 'Rezultatul dorit', 'Costul principal (bani / timp / efort-stres)', 'Observația ta — de ce merită explorată'], addLabel: 'Adaugă o problemă' },
+      { id: 'probleme', type: 'dynamic-table', label: 'Cele 10 probleme observate ale audienței-țintă/clienților mei', columns: ['Problema — ce se întâmplă acum', 'Cine o trăiește', 'Rezultatul dorit', 'Costul principal (bani / timp / efort-stres)', 'Observația ta — de ce merită explorată'], addLabel: 'Adaugă o problemă' },
       { id: 'concluzie', type: 'textarea', label: 'Ce ai observat comparând problemele între ele', placeholder: 'Care se repetă, care produc cel mai mare cost, care ți-au atras atenția și de ce.' },
     ],
   },
