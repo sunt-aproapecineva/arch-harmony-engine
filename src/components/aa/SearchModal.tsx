@@ -26,7 +26,7 @@ interface SearchResult {
 function buildIndex(modules: any[], course: any): SearchResult[] {
   const results: SearchResult[] = [];
   for (const mod of modules) {
-    for (const lesson of mod.lessons) {
+    for (const lesson of mod.lessons || []) {
       results.push({
         type: 'lesson',
         id: lesson.id,
@@ -37,7 +37,9 @@ function buildIndex(modules: any[], course: any): SearchResult[] {
         href: courseLessonPath(course, lesson.id),
       });
     }
-    for (const ex of mod.exercises) {
+    const lessonTitles = new Set(mod.lessons.map((l: any) => norm(l.title)));
+    for (const ex of mod.exercises || []) {
+      if (lessonTitles.has(norm(ex.title))) continue;
       results.push({
         type: 'exercise',
         id: ex.id,
