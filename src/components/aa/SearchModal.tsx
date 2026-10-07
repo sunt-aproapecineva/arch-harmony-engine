@@ -5,6 +5,10 @@ import { Search, X, BookOpen, Dumbbell } from 'lucide-react';
 import { useCourse } from '../../context/CourseContext';
 import { useLiveContent } from '../../context/LiveContentContext';
 import { courseLessonPath, courseModulePath } from '../../lib/navigation';
+import { COURSES } from '../../lib/courses';
+import { getCourseModules } from '../../lib/content';
+
+const norm = (s: any) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
 interface SearchResult {
   type: 'lesson' | 'exercise';
@@ -58,17 +62,22 @@ export const SearchModal: React.FC<SearchModalProps> = ({ open, onClose }) => {
   const { course, modules } = useCourse();
   const { version } = useLiveContent();
   const navigate = useNavigate();
-  const index = useMemo(() => buildIndex(modules, course), [modules, course, version]);
+  const index = useMemo(() => {
+    // Fără program ales (admin, „Programul tău") căutăm în toate programele.
+    if (course) return buildIndex(modules, course);
+    return COURSES.filter((c: any) => c.is_active !== false)
+      .flatMap((c: any) => buildIndex(getCourseModules(c.id), c).map(r => ({ ...r, moduleTitle: `${c.shortTitle || c.title} · ${r.moduleTitle}` })));
+  }, [modules, course, version, open]);
   const inputRef = useRef<HTMLInputElement>(null);
   const [selected, setSelected] = useState(0);
 
   const results = query.trim().length > 0
     ? index.filter(item => {
-        const q = query.toLowerCase();
+        const q = norm(query.trim());
         return (
-          item.title.toLowerCase().includes(q) ||
-          item.description.toLowerCase().includes(q) ||
-          item.moduleTitle.toLowerCase().includes(q)
+          norm(item.title).includes(q) ||
+          norm(item.description).includes(q) ||
+          norm(item.moduleTitle).includes(q)
         );
       }).slice(0, 8)
     : [];
@@ -178,7 +187,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ open, onClose }) => {
                 <div style={{ padding: '8px 8px' }}>
                   {results.map((result, idx) => (
                     <button
-                      key={result.id}
+                      key={result.href + result.id}
                       onClick={() => handleSelect(result)}
                       style={{
                         width: '100%', display: 'flex', alignItems: 'flex-start', gap: 12,
