@@ -376,19 +376,108 @@ export const START_EXERCISE_TEMPLATES: ExerciseTemplate[] = [
   {
     exerciseId: 'st-e-4-1',
     type: 'form-fields',
-    title: 'Tracker-ul primelor vânzări',
+    title: 'Lista primilor 30 de potențiali clienți',
     instructions:
-      'Modulul cel mai practic. Lista de 20, segmentată, contactată. Completează tabelul pe măsură ce vorbești cu oamenii — nu la final, din memorie.',
+      'Legat de Lecția 4.1. Construiește o listă de 30 de prospecți care trec filtrul clientului și pot fi contactați în sprintul curent. Completează cu informații reale din businessul tău: răspunsuri scurte, specifice și verificabile. Actualizează pe măsură ce apar date noi în sprint.',
     fields: [
-      { id: 'pret_metode', type: 'dynamic-table', label: 'Prețul calculat pe cele 3 metode', columns: ['Metoda', 'Rezultatul', 'Ce presupune'], addLabel: 'Adaugă o metodă' },
-      { id: 'pret_final', type: 'input', label: 'Prețul meu de lansare', placeholder: 'Cifra + moneda' },
-      { id: 'pret_argument', type: 'textarea', label: 'De ce acest preț — argumentele scrise', placeholder: 'Sub ce prag lucrez în pierdere. De ce nu merg mai jos.' },
-      { id: 'info_lista', type: 'info', text: 'Primul client ideal nu e cel mai profitabil — e cel mai ușor de convertit și cel mai probabil să dea testimonial și referrals.' },
-      { id: 'lista', type: 'dynamic-table', label: 'Lista de contactat', columns: ['Nume', 'De unde îl știu', 'Probabilitate (ridicată / medie / scăzută)', 'Contactat la', 'Rezultat'], addLabel: 'Adaugă o persoană' },
-      { id: 'obiectii', type: 'dynamic-table', label: 'Obiecțiile pe care le-am auzit efectiv', columns: ['Obiecția, în cuvintele lui', 'Ce am răspuns', 'A funcționat?'], addLabel: 'Adaugă o obiecție' },
-      { id: 'vanzari', type: 'input', label: 'Câte vânzări reale am făcut în program', placeholder: 'Un număr. Zero e un răspuns valid — arată unde trebuie lucrat.' },
-      { id: 'after_sale', type: 'textarea', label: 'Procesul meu de after-sale', placeholder: 'Ce se întâmplă în primele 24 de ore după plată. Când cer feedback. Când cer testimonial.' },
-      { id: 'ce_a_mers', type: 'textarea', label: 'Ce a funcționat și ce nu în conversațiile de vânzare', placeholder: 'Documentează acum, ca următoarea conversație să fie mai bună.' },
+      { id: 'prospecti', type: 'dynamic-table', label: 'Cei 30 de potențiali clienți', columns: ['Nume / companie', 'Sursa (relație caldă / recomandare / comunitate / outreach direct)', 'De ce trece filtrul', 'Persoana / rolul relevant', 'Canal de contact', 'Prioritate (A / B / C)'], addLabel: 'Adaugă un prospect' },
+      { id: 'control', type: 'checkboxes', label: 'Criteriu de finalizare', options: ['Am minimum 30 de prospecți nominalizați', 'Pentru fiecare pot explica de ce este potrivit', 'Lista include mai mult de o singură sursă de acces'] },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-4-2',
+    type: 'form-fields',
+    title: 'Cele 3 mesaje de contact',
+    instructions:
+      'Legat de Lecția 4.2. Scrie trei variante adaptate contextului: contact cald, recomandare și contact rece. Completează cu informații reale din businessul tău: răspunsuri scurte, specifice și verificabile. Actualizează pe măsură ce apar date noi în sprint.',
+    fields: [
+      { id: 'info_cald', type: 'info', text: 'Mesajul 1 · Contact cald' },
+      { id: 'cald_context', type: 'textarea', label: 'Context', placeholder: 'Cui scrii și pe ce canal.' },
+      { id: 'cald_relevanta', type: 'textarea', label: 'Relevanța pentru persoană', placeholder: 'De ce o contactezi tocmai pe ea.' },
+      { id: 'cald_problema', type: 'textarea', label: 'Problema sau rezultatul', placeholder: 'Ce o interesează, în cuvintele ei.' },
+      { id: 'cald_cta', type: 'input', label: 'Call to action', placeholder: 'Un singur pas următor.' },
+      { id: 'cald_mesaj', type: 'textarea', label: 'Mesaj final', placeholder: 'Textul exact pe care îl trimiți.' },
+      { id: 'info_recomandare', type: 'info', text: 'Mesajul 2 · Recomandare' },
+      { id: 'recomandare_context', type: 'textarea', label: 'Context', placeholder: 'Cui scrii și pe ce canal.' },
+      { id: 'recomandare_relevanta', type: 'textarea', label: 'Relevanța pentru persoană', placeholder: 'De ce o contactezi tocmai pe ea.' },
+      { id: 'recomandare_problema', type: 'textarea', label: 'Problema sau rezultatul', placeholder: 'Ce o interesează, în cuvintele ei.' },
+      { id: 'recomandare_cta', type: 'input', label: 'Call to action', placeholder: 'Un singur pas următor.' },
+      { id: 'recomandare_mesaj', type: 'textarea', label: 'Mesaj final', placeholder: 'Textul exact pe care îl trimiți.' },
+      { id: 'info_rece', type: 'info', text: 'Mesajul 3 · Contact rece' },
+      { id: 'rece_context', type: 'textarea', label: 'Context', placeholder: 'Cui scrii și pe ce canal.' },
+      { id: 'rece_relevanta', type: 'textarea', label: 'Relevanța pentru persoană', placeholder: 'De ce o contactezi tocmai pe ea.' },
+      { id: 'rece_problema', type: 'textarea', label: 'Problema sau rezultatul', placeholder: 'Ce o interesează, în cuvintele ei.' },
+      { id: 'rece_cta', type: 'input', label: 'Call to action', placeholder: 'Un singur pas următor.' },
+      { id: 'rece_mesaj', type: 'textarea', label: 'Mesaj final', placeholder: 'Textul exact pe care îl trimiți.' },
+      { id: 'control', type: 'checkboxes', label: 'Criteriu de finalizare', options: ['Mesajul explică de ce contactez persoana respectivă', 'Are un singur pas următor', 'Poate fi citit rapid și nu încearcă să vândă totul din primul contact'] },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-4-3',
+    type: 'form-fields',
+    title: 'Structura conversației de vânzare',
+    instructions:
+      'Legat de Lecția 4.3. Pregătește harta conversației astfel încât să descoperi situația și să califici înainte de pitch. Completează cu informații reale din businessul tău: răspunsuri scurte, specifice și verificabile. Actualizează pe măsură ce apar date noi în sprint.',
+    fields: [
+      { id: 'deschidere', type: 'textarea', label: 'Deschidere și cadru', placeholder: 'Cum începi și ce stabilești despre durata și scopul discuției.' },
+      { id: 'situatie', type: 'textarea', label: 'Întrebări despre situația actuală', placeholder: 'Cum face acum, ce folosește.' },
+      { id: 'problema', type: 'textarea', label: 'Întrebări despre problemă și impact', placeholder: 'Ce o costă problema — bani, timp, stres.' },
+      { id: 'rezultat', type: 'textarea', label: 'Întrebări despre rezultatul dorit', placeholder: 'Cum arată „rezolvat” pentru client.' },
+      { id: 'calificare', type: 'textarea', label: 'Calificare și proces de decizie', placeholder: 'Cine decide, buget, termen, potrivire.' },
+      { id: 'rezumat', type: 'textarea', label: 'Rezumat + permisiunea de a prezenta oferta', placeholder: 'Formularea exactă cu care ceri voie.' },
+      { id: 'pas', type: 'textarea', label: 'Următor pas posibil', placeholder: 'Ce propui la final.' },
+      { id: 'control', type: 'checkboxes', label: 'Criteriu de finalizare', options: ['Structura pornește din situația clientului', 'Am întrebări care verifică decizia și potrivirea', 'Am o formulare clară pentru următorul pas'] },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-4-4',
+    type: 'form-fields',
+    title: 'Pitch-ul ofertei',
+    instructions:
+      'Legat de Lecția 4.4. Construiește pitch-ul scurt pe baza situației descoperite în conversație. Completează cu informații reale din businessul tău: răspunsuri scurte, specifice și verificabile. Actualizează pe măsură ce apar date noi în sprint.',
+    fields: [
+      { id: 'recap', type: 'textarea', label: 'Recapitularea situației', placeholder: 'Ce ai auzit de la client, pe scurt.' },
+      { id: 'rezultat', type: 'textarea', label: 'Rezultatul promis', placeholder: 'Concret și verificabil.' },
+      { id: 'mecanism', type: 'textarea', label: 'Mecanismul', placeholder: 'Cum ajungi la rezultat — de ce funcționează.' },
+      { id: 'include', type: 'textarea', label: 'Ce include relevant', placeholder: 'Doar ce contează pentru situația lui.' },
+      { id: 'pret', type: 'input', label: 'Preț', placeholder: 'O cifră clară, nu un interval.' },
+      { id: 'pas', type: 'input', label: 'Pas următor', placeholder: 'Ce îi ceri să facă acum.' },
+      { id: 'control', type: 'checkboxes', label: 'Criteriu de finalizare', options: ['Pitch-ul poate fi spus natural', 'Prețul este formulat clar', 'Oferta e legată de situația clientului, nu e o listă de caracteristici'] },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-4-5',
+    type: 'form-fields',
+    title: 'Harta obiecțiilor',
+    instructions:
+      'Legat de Lecția 4.5. Transformă obiecțiile întâlnite în date comerciale și pregătește răspunsuri fără manipulare. Completează cu informații reale din businessul tău: răspunsuri scurte, specifice și verificabile. Actualizează pe măsură ce apar date noi în sprint.',
+    fields: [
+      { id: 'obiectii', type: 'dynamic-table', label: 'Obiecțiile și răspunsurile', columns: ['Formularea exactă a obiecției', 'Cauza probabilă (încredere / urgență / valoare / bani / risc / altceva)', 'Întrebarea de clarificare', 'Răspuns / dovadă / opțiune', 'Cum verific dacă s-a rezolvat'], addLabel: 'Adaugă o obiecție' },
+      { id: 'refuz', type: 'textarea', label: 'Situațiile în care răspunsul sănătos e acceptarea refuzului', placeholder: 'Când clientul nu e potrivit și e corect să-l lași să plece.' },
+      { id: 'control', type: 'checkboxes', label: 'Criteriu de finalizare', options: ['Am folosit obiecții reale pe cât posibil', 'Răspunsul tratează cauza, nu doar formularea', 'Am marcat situațiile în care răspunsul sănătos este acceptarea refuzului'] },
+    ],
+  },
+
+  {
+    exerciseId: 'st-e-4-6',
+    type: 'form-fields',
+    title: 'Pipeline-ul primelor vânzări',
+    instructions:
+      'Construiește pipeline-ul sprintului și actualizează fiecare oportunitate cu etapa și următoarea acțiune. Completează cu informații reale din businessul tău: răspunsuri scurte, specifice și verificabile. Actualizează pe măsură ce apar date noi în sprint.',
+    fields: [
+      { id: 'pipeline', type: 'dynamic-table', label: 'Pipeline-ul sprintului', columns: ['Prospect', 'Sursa', 'Etapa (prospect / discuție / ofertă / decizie / câștigat / pierdut)', 'Ultima interacțiune', 'Următoarea acțiune', 'Data următoarei acțiuni', 'Valoare', 'Motiv pierdere / blocaj'], addLabel: 'Adaugă o oportunitate' },
+      { id: 'info_rezumat', type: 'info', text: 'Rezumatul sprintului' },
+      { id: 'n_prospecti', type: 'input', label: 'Prospecți', placeholder: 'Un număr.' },
+      { id: 'n_discutii', type: 'input', label: 'Discuții', placeholder: 'Un număr.' },
+      { id: 'n_oferte', type: 'input', label: 'Oferte', placeholder: 'Un număr.' },
+      { id: 'n_decizii', type: 'input', label: 'Decizii', placeholder: 'Un număr.' },
+      { id: 'n_castigate', type: 'input', label: 'Câștigate', placeholder: 'Un număr.' },
+      { id: 'pierdere', type: 'textarea', label: 'Etapa cu cea mai mare pierdere și de ce', placeholder: 'Unde se opresc cei mai mulți și ce schimbi.' },
+      { id: 'control', type: 'checkboxes', label: 'Criteriu de finalizare', options: ['Fiecare oportunitate activă are următor pas și dată', 'Oportunitățile câștigate și pierdute sunt marcate clar', 'Pot identifica etapa cu cea mai mare pierdere', 'Am un rezumat al sprintului'] },
     ],
   },
 
