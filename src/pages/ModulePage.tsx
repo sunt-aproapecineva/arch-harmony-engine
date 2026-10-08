@@ -40,9 +40,22 @@ export const ModulePage: React.FC = () => {
 
   const statusColor = done ? 'var(--ok)' : 'var(--accent)';
 
+  // Lecțiile nepublicate (video fără link încă) se ascund din listă împreună cu
+  // exercițiul care le urmează — elevul vede doar ce poate parcurge efectiv.
+  const visibleLessons: any[] = [];
+  let lastVideoPublished = true;
+  module.lessons.forEach((l: any) => {
+    if (l.type === 'exercise') {
+      if (lastVideoPublished) visibleLessons.push(l);
+    } else {
+      lastVideoPublished = l.is_published !== false;
+      if (lastVideoPublished) visibleLessons.push(l);
+    }
+  });
+
   // All lessons (video + exercise) + deliverable
   const timelineItems = [
-    ...module.lessons.map((lesson, idx) => ({ type: 'lesson' as const, item: lesson, idx })),
+    ...visibleLessons.map((lesson, idx) => ({ type: 'lesson' as const, item: lesson, idx })),
     { type: 'deliverable' as const, item: null as null, idx: 0 },
   ];
 
@@ -138,7 +151,7 @@ export const ModulePage: React.FC = () => {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
             <span>{done ? 'Modul finalizat' : `${progress}% completat`}</span>
-            <span>{module.lessons.filter(l => isCompleted(l.id)).length}/{module.lessons.length} lecții + exerciții</span>
+            <span>{visibleLessons.filter(l => isCompleted(l.id)).length}/{visibleLessons.length} lecții + exerciții</span>
           </div>
           <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
             <motion.div
@@ -151,10 +164,10 @@ export const ModulePage: React.FC = () => {
         </div>
 
         {/* CTA */}
-        {!locked && module.lessons.length > 0 && (
+        {!locked && visibleLessons.length > 0 && (
           <div style={{ marginTop: 20 }}>
             <button
-              onClick={() => { if (!quizDone) { setQuizModalOpen(true); return; } navigate(courseLessonPath(course, module.lessons[0].id)); }}
+              onClick={() => { if (!quizDone) { setQuizModalOpen(true); return; } navigate(courseLessonPath(course, visibleLessons[0].id)); }}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 padding: '10px 22px', background: 'var(--accent)', color: '#0D0907',
@@ -165,7 +178,7 @@ export const ModulePage: React.FC = () => {
               onMouseLeave={e => (e.currentTarget.style.filter = '')}
             >
               <Play size={14} />
-              {isCompleted(module.lessons[0].id) ? 'Revedea prima lecție' : 'Începe prima lecție'}
+              {isCompleted(visibleLessons[0].id) ? 'Revedea prima lecție' : 'Începe prima lecție'}
             </button>
           </div>
         )}
@@ -236,7 +249,7 @@ export const ModulePage: React.FC = () => {
                 const lesson = entry.item;
                 const isExLesson = lesson.type === 'exercise';
                 const lessonDone = isCompleted(lesson.id);
-                const isCurrentLesson = !lessonDone && module.lessons.slice(0, entry.idx).every(l => isCompleted(l.id));
+                const isCurrentLesson = !lessonDone && visibleLessons.slice(0, entry.idx).every(l => isCompleted(l.id));
                 const accentCol = isExLesson ? 'var(--gold)' : 'var(--accent)';
                 const nodeColor = lessonDone ? 'var(--ok)' : isCurrentLesson ? accentCol : 'var(--border)';
                 const nodeBg = lessonDone ? 'rgba(74,222,128,0.15)' : isCurrentLesson ? (isExLesson ? 'var(--gold-dim)' : 'var(--accent-dim)') : 'var(--bg-3)';
@@ -274,7 +287,7 @@ export const ModulePage: React.FC = () => {
                                 order_index: exercițiile intercalate lăsau găuri („Lecția 5" după „Lecția 2"). */}
                             {isExLesson
                               ? `✦ Exercițiu practic`
-                              : `Lecția ${module.lessons.filter(l => l.type !== 'exercise').findIndex(l => l.id === lesson.id) + 1}`}
+                              : `Lecția ${visibleLessons.filter(l => l.type !== 'exercise').findIndex(l => l.id === lesson.id) + 1}`}
 
                           </span>
                         </div>
