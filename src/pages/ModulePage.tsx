@@ -178,7 +178,7 @@ export const ModulePage: React.FC = () => {
               onMouseLeave={e => (e.currentTarget.style.filter = '')}
             >
               <Play size={14} />
-              {isCompleted(module.lessons[0].id) ? 'Revedea prima lecție' : 'Începe prima lecție'}
+              {isCompleted(visibleLessons[0].id) ? 'Revedea prima lecție' : 'Începe prima lecție'}
             </button>
           </div>
         )}
@@ -249,7 +249,7 @@ export const ModulePage: React.FC = () => {
                 const lesson = entry.item;
                 const isExLesson = lesson.type === 'exercise';
                 const lessonDone = isCompleted(lesson.id);
-                const isCurrentLesson = !lessonDone && module.lessons.slice(0, entry.idx).every(l => isCompleted(l.id));
+                const isCurrentLesson = !lessonDone && visibleLessons.slice(0, entry.idx).every(l => isCompleted(l.id));
                 const accentCol = isExLesson ? 'var(--gold)' : 'var(--accent)';
                 const nodeColor = lessonDone ? 'var(--ok)' : isCurrentLesson ? accentCol : 'var(--border)';
                 const nodeBg = lessonDone ? 'rgba(74,222,128,0.15)' : isCurrentLesson ? (isExLesson ? 'var(--gold-dim)' : 'var(--accent-dim)') : 'var(--bg-3)';
