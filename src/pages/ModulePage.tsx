@@ -287,7 +287,7 @@ export const ModulePage: React.FC = () => {
                                 order_index: exercițiile intercalate lăsau găuri („Lecția 5" după „Lecția 2"). */}
                             {isExLesson
                               ? `✦ Exercițiu practic`
-                              : `Lecția ${module.lessons.filter(l => l.type !== 'exercise').findIndex(l => l.id === lesson.id) + 1}`}
+                              : `Lecția ${visibleLessons.filter(l => l.type !== 'exercise').findIndex(l => l.id === lesson.id) + 1}`}
 
                           </span>
                         </div>
