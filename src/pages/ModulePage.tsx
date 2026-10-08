@@ -151,7 +151,7 @@ export const ModulePage: React.FC = () => {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
             <span>{done ? 'Modul finalizat' : `${progress}% completat`}</span>
-            <span>{module.lessons.filter(l => isCompleted(l.id)).length}/{module.lessons.length} lecții + exerciții</span>
+            <span>{visibleLessons.filter(l => isCompleted(l.id)).length}/{visibleLessons.length} lecții + exerciții</span>
           </div>
           <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
             <motion.div
@@ -164,10 +164,10 @@ export const ModulePage: React.FC = () => {
         </div>
 
         {/* CTA */}
-        {!locked && module.lessons.length > 0 && (
+        {!locked && visibleLessons.length > 0 && (
           <div style={{ marginTop: 20 }}>
             <button
-              onClick={() => { if (!quizDone) { setQuizModalOpen(true); return; } navigate(courseLessonPath(course, module.lessons[0].id)); }}
+              onClick={() => { if (!quizDone) { setQuizModalOpen(true); return; } navigate(courseLessonPath(course, visibleLessons[0].id)); }}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 padding: '10px 22px', background: 'var(--accent)', color: '#0D0907',
