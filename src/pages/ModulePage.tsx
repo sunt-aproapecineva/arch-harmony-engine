@@ -40,9 +40,22 @@ export const ModulePage: React.FC = () => {
 
   const statusColor = done ? 'var(--ok)' : 'var(--accent)';
 
+  // Lecțiile nepublicate (video fără link încă) se ascund din listă împreună cu
+  // exercițiul care le urmează — elevul vede doar ce poate parcurge efectiv.
+  const visibleLessons: any[] = [];
+  let lastVideoPublished = true;
+  module.lessons.forEach((l: any) => {
+    if (l.type === 'exercise') {
+      if (lastVideoPublished) visibleLessons.push(l);
+    } else {
+      lastVideoPublished = l.is_published !== false;
+      if (lastVideoPublished) visibleLessons.push(l);
+    }
+  });
+
   // All lessons (video + exercise) + deliverable
   const timelineItems = [
-    ...module.lessons.map((lesson, idx) => ({ type: 'lesson' as const, item: lesson, idx })),
+    ...visibleLessons.map((lesson, idx) => ({ type: 'lesson' as const, item: lesson, idx })),
     { type: 'deliverable' as const, item: null as null, idx: 0 },
   ];
 
