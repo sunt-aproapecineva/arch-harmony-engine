@@ -21,6 +21,7 @@ import { hasCompletedOnboarding } from '../lib/access';
 import { formatLessonNumber } from '../lib/lessonNumbering';
 import { useLessonNote } from '../hooks/useLessonNote';
 import { YouTubePlayer } from '../components/aa/YouTubePlayer';
+import { getVisibleLessons } from '../lib/lessonVisibility';
 
 
 function isTrackableTimelineItem(lesson: Lesson): boolean {
@@ -60,7 +61,9 @@ const LessonSidebar: React.FC<{
   const navigate = useNavigate();
   const { course } = useCourse();
 
-  const items = module.lessons || [];
+  // Sidebar-ul respectă aceeași regulă de vizibilitate: lecțiile video
+  // nepublicate și exercițiile lor nu apar nici aici.
+  const items = getVisibleLessons(module);
   const trackable = items.filter((l: any) => l.type === 'exercise' || !!(l.video_url && String(l.video_url).trim()));
   const done = trackable.filter((l: any) => isCompleted(l.id)).length;
   const pct = trackable.length ? Math.round((done / trackable.length) * 100) : 0;
@@ -364,13 +367,19 @@ export const LessonPage: React.FC = () => {
   }
 
   const done = isCompleted(lesson.id);
-  const prevLesson = lessonIndex > 0 ? module.lessons[lessonIndex - 1] : null;
-  const nextLesson = lessonIndex < module.lessons.length - 1 ? module.lessons[lessonIndex + 1] : null;
+  // Navigarea și progresul folosesc DOAR lecțiile vizibile: o lecție video
+  // nepublicată și exercițiul ei nu apar nici în „Înapoi/Înainte", nici în
+  // numărătoarea de progres — altfel elevul ajungea din butonul „Înainte" pe
+  // lecții ascunse, iar modulul nu ajungea niciodată la 100%.
+  const timelineLessons = getVisibleLessons(module);
+  const timelineIndex = timelineLessons.findIndex(l => l.id === lesson.id);
+  const prevLesson = timelineIndex > 0 ? timelineLessons[timelineIndex - 1] : null;
+  const nextLesson = timelineIndex >= 0 && timelineIndex < timelineLessons.length - 1 ? timelineLessons[timelineIndex + 1] : null;
   const moduleIndex = modules.findIndex(m => m.id === module!.id);
   const nextModule = moduleIndex < modules.length - 1 ? modules[moduleIndex + 1] : null;
   const nextModuleLesson = nextModule?.lessons[0] || null;
 
-  const trackableLessons = module.lessons.filter(isTrackableTimelineItem);
+  const trackableLessons = timelineLessons.filter(isTrackableTimelineItem);
   const completedCount = trackableLessons.filter(l => isCompleted(l.id)).length;
   const totalCount = trackableLessons.length;
   const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
@@ -439,8 +448,8 @@ export const LessonPage: React.FC = () => {
 
   // ── EXERCISE PAGE ──────────────────────────────────────────────────────────
   if (isExercise && lesson.exercise_id) {
-    const exNumber = module.lessons.filter(l => l.type === 'exercise').findIndex(l => l.id === lesson.id) + 1;
-    const exTotal = module.lessons.filter(l => l.type === 'exercise').length;
+    const exNumber = timelineLessons.filter(l => l.type === 'exercise').findIndex(l => l.id === lesson.id) + 1;
+    const exTotal = timelineLessons.filter(l => l.type === 'exercise').length;
 
     return (
       <div style={{ minHeight: '100%', background: 'var(--bg)', position: 'relative' }}>

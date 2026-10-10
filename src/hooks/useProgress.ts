@@ -6,6 +6,7 @@ import { useAuthContext } from '../context/AuthContext';
 import { useCourse } from '../context/CourseContext';
 import { getCourseModules } from '../lib/content';
 import { isModuleUnlocked } from '../lib/flows';
+import { getVisibleLessons } from '../lib/lessonVisibility';
 
 const STORAGE_PROGRESS_KEY = 'aa_progress';
 
@@ -219,7 +220,9 @@ export function useProgress(explicitCourseId?: string) {
     (moduleId: string) => {
       const mod = modules.find((m) => m.id === moduleId);
       if (!mod) return 0;
-      const trackableLessons = mod.lessons.filter(isTrackableLesson);
+      // Doar lecțiile vizibile (video publicat + exercițiul lui) contează la
+      // progres — altfel exercițiile ascunse țineau modulul sub 100%.
+      const trackableLessons = getVisibleLessons(mod).filter(isTrackableLesson);
       const total = trackableLessons.length;
       if (total === 0) return 0;
       const lessonsDone = trackableLessons.filter((l) => isCompleted(l.id)).length;
@@ -232,7 +235,7 @@ export function useProgress(explicitCourseId?: string) {
     (moduleId: string) => {
       const mod = modules.find((m) => m.id === moduleId);
       if (!mod) return false;
-      const trackableLessons = mod.lessons.filter(isTrackableLesson);
+      const trackableLessons = getVisibleLessons(mod).filter(isTrackableLesson);
       return trackableLessons.length > 0 && trackableLessons.every((l) => isCompleted(l.id));
     },
     [isCompleted, modules]
@@ -242,7 +245,7 @@ export function useProgress(explicitCourseId?: string) {
   const getOverallProgressFor = useCallback(
     (targetCourseId: string) => {
       const trackableLessons = getCourseModules(targetCourseId)
-        .flatMap((m) => m.lessons)
+        .flatMap((m) => getVisibleLessons(m))
         .filter(isTrackableLesson);
       const total = trackableLessons.length;
       // Un curs fără nimic de parcurs e 0%, nu 100%. Fără garda asta, START (lecții
@@ -307,11 +310,11 @@ export function useProgress(explicitCourseId?: string) {
   // video, iar procentul se calcula peste tot ce e trackabil — deci același dashboard
   // arăta „3/24" lângă „6%", două numitoare diferite pentru aceeași realitate.
   const getCompletedLessonsCount = useCallback(() => {
-    const ids = new Set(modules.flatMap((m) => m.lessons).filter(isTrackableLesson).map((l) => l.id));
+    const ids = new Set(modules.flatMap((m) => getVisibleLessons(m)).filter(isTrackableLesson).map((l) => l.id));
     return progress.filter((p) => ids.has(p.lesson_id)).length;
   }, [progress, modules]);
   const getTotalLessonsCount = useCallback(
-    () => modules.flatMap((m) => m.lessons).filter(isTrackableLesson).length,
+    () => modules.flatMap((m) => getVisibleLessons(m)).filter(isTrackableLesson).length,
     [modules]
   );
 
