@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { TariffBadge } from '../../components/aa/TariffBadge';
 import { ProgressBar } from '../../components/aa/ProgressBar';
 import { getActivity, ActivityEvent, timeAgo, ActivityType } from '../../lib/activity';
+import { displayActivityLabel } from '../../lib/activityLabels';
 import {
   fetchAdminUsers, fetchAllProgress, AdminUserRow, AdminProgressRow,
   matchesScope, userQuizDone, userTariff,
@@ -248,7 +249,7 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: 12, color: 'var(--fg)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {ev.label}
+                      {displayActivityLabel(ev)}
                     </p>
                     <div style={{ display: 'flex', gap: 8, marginTop: 2, alignItems: 'center' }}>
                       <span style={{ fontSize: 10, color: 'var(--fg-3)' }}>{timeAgo(ev.timestamp)}</span>
