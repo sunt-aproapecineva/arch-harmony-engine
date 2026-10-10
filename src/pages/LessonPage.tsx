@@ -21,6 +21,7 @@ import { hasCompletedOnboarding } from '../lib/access';
 import { formatLessonNumber } from '../lib/lessonNumbering';
 import { useLessonNote } from '../hooks/useLessonNote';
 import { YouTubePlayer } from '../components/aa/YouTubePlayer';
+import { getVisibleLessons } from '../lib/lessonVisibility';
 
 
 function isTrackableTimelineItem(lesson: Lesson): boolean {
