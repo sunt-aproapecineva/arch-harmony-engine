@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { allModulesFlat } from './content';
 import { EXERCISE_TEMPLATES as EXERCISES } from './exerciseData';
-import { formatLessonNumber, getModuleNumber } from './lessonNumbering';
+import { formatLessonNumber, formatExerciseTitle, getModuleNumber } from './lessonNumbering';
 import {
   openPrintWindow,
   FONTS,
@@ -313,11 +313,11 @@ function buildHtml(pageTitle: string, docTag: string, topic: string, inner: stri
 export function exportExercisePDF(exerciseId: string, response: any) {
   const { mod, lesson, exercise } = findExercise(exerciseId);
   const lessonLabel = lesson && mod ? formatLessonNumber(mod, lesson) : '';
-  const title = exercise?.title || lesson?.title || 'Exercițiu';
+  const title = mod && lesson ? formatExerciseTitle(mod, lesson) : exercise?.title || 'Exercițiu';
   const topic = mod?.etapa || 'Materialele mele';
   const docTag = `EX · ${lessonLabel || 'Materialele mele'}`;
 
-  const meta = [lessonLabel && `Lecția ${lessonLabel}`, lesson?.title, mod?.etapa]
+  const meta = [lessonLabel && `Exercițiul ${lessonLabel}`, mod?.etapa]
     .filter(Boolean).join('  •  ');
 
   const instructions = exercise?.instructions
@@ -378,8 +378,8 @@ export function exportAllPDF(items: {
     for (const ex of items.exercises) {
       const { mod, lesson, exercise } = findExercise(ex.id);
       const lessonLabel = lesson && mod ? formatLessonNumber(mod, lesson) : '';
-      const title = exercise?.title || lesson?.title || ex.id;
-      const meta = [lessonLabel && `Lecția ${lessonLabel}`, mod?.etapa].filter(Boolean).join('  •  ');
+      const title = mod && lesson ? formatExerciseTitle(mod, lesson) : exercise?.title || ex.id;
+      const meta = [lessonLabel && `Exercițiul ${lessonLabel}`, mod?.etapa].filter(Boolean).join('  •  ');
       parts.push(`
         <div class="mat-item">
           <div class="mat-item-title">${esc(title)}</div>
