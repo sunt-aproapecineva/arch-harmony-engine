@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import { useParams, useNavigate, Link } from '@/lib/router-compat';
 import { motion } from 'framer-motion';
