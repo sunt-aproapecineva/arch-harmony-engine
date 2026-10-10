@@ -1,3 +1,3 @@
 # Architecture rules
 
-- Use `src/lib/lessonNumbering.ts` for displayed lesson and exercise numbers: video positions exclude exercises and publication state, while explicit workbook exercise numbers take precedence, so lists, pages and exports agree without changing saved IDs.
+- Use `src/lib/lessonNumbering.ts` for displayed numbers and exercise headings, including administrator answers and exports: the prefix always comes from the module, video positions exclude exercises and publication state, and explicit workbook exercise suffixes take precedence, so all views agree without changing saved IDs.

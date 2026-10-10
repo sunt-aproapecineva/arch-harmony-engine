@@ -20,6 +20,7 @@ import { generateProfile, QuizProfile } from '../../lib/quizProfile';
 import { generateStartProfile, StartProfile } from '../../lib/startQuizProfile';
 import { getQuizDefinition } from '../../lib/quiz';
 import { EXERCISE_TEMPLATES } from '../../lib/exerciseData';
+import { formatExerciseTitle } from '../../lib/lessonNumbering';
 import { recoverStudentExerciseResponses } from '../../lib/adminRecovery.functions';
 import { StudentBriefingPanel } from '@/components/admin/StudentBriefingPanel';
 import { SupervisorNotesPanel } from '@/components/admin/SupervisorNotesPanel';
@@ -329,12 +330,12 @@ export const AdminStudentProfile: React.FC = () => {
   // de tip exercițiu (ex. Săptămâna 2 Business). Fără a doua sursă, răspunsurile lor
   // erau salvate în cloud dar nu apăreau nicăieri în panoul adminului.
   const moduleExercises = React.useCallback((mod: any) => {
-    const list: { id: string; title: string }[] = ((mod as any).exercises || []).map((ex: any) => ({ id: ex.id, title: ex.title }));
+    const list: { id: string; title: string }[] = ((mod as any).exercises || []).map((ex: any) => ({ id: ex.id, title: formatExerciseTitle(mod, ex) }));
     const seen = new Set(list.map(e => e.id));
     (mod.lessons || []).forEach((l: any) => {
       if (l.type === 'exercise' && l.exercise_id && !seen.has(l.exercise_id)) {
         seen.add(l.exercise_id);
-        list.push({ id: l.exercise_id, title: l.title });
+        list.push({ id: l.exercise_id, title: formatExerciseTitle(mod, l) });
       }
     });
     return list;

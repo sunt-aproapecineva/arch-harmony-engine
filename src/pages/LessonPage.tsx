@@ -18,7 +18,7 @@ import { logActivity, logActivityOnce } from '../lib/activity';
 import { ExerciseBlock } from '../components/exercises/ExerciseBlock';
 import { flushExerciseResponse, getStoredExerciseResponse } from '../lib/exerciseSync';
 import { hasCompletedOnboarding } from '../lib/access';
-import { formatLessonNumber, formatExerciseNumber } from '../lib/lessonNumbering';
+import { formatLessonNumber, formatExerciseNumber, formatExerciseTitle } from '../lib/lessonNumbering';
 import { useLessonNote } from '../hooks/useLessonNote';
 import { YouTubePlayer } from '../components/aa/YouTubePlayer';
 import { getVisibleLessons } from '../lib/lessonVisibility';
@@ -511,7 +511,7 @@ export const LessonPage: React.FC = () => {
                   </div>
 
                   <h1 className="font-aboreto" style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', color: 'var(--fg)', lineHeight: 1.1, marginBottom: 14, letterSpacing: '-0.01em' }}>
-                    {lesson.title}
+                    {formatExerciseTitle(module, lesson)}
                   </h1>
                   <p style={{ fontSize: 14, color: 'var(--fg-3)', lineHeight: 1.7 }}>{lesson.description}</p>
                 </div>
