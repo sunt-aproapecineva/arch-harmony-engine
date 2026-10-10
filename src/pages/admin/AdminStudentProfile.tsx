@@ -21,6 +21,7 @@ import { generateStartProfile, StartProfile } from '../../lib/startQuizProfile';
 import { getQuizDefinition } from '../../lib/quiz';
 import { EXERCISE_TEMPLATES } from '../../lib/exerciseData';
 import { formatExerciseTitle } from '../../lib/lessonNumbering';
+import { displayActivityLabel } from '../../lib/activityLabels';
 import { recoverStudentExerciseResponses } from '../../lib/adminRecovery.functions';
 import { StudentBriefingPanel } from '@/components/admin/StudentBriefingPanel';
 import { SupervisorNotesPanel } from '@/components/admin/SupervisorNotesPanel';
@@ -953,7 +954,7 @@ export const AdminStudentProfile: React.FC = () => {
                     </div>
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 13, color: 'var(--fg)', lineHeight: 1.4, marginBottom: 3 }}>{ev.label}</p>
+                    <p style={{ fontSize: 13, color: 'var(--fg)', lineHeight: 1.4, marginBottom: 3 }}>{displayActivityLabel(ev)}</p>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                       <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>{timeAgo(ev.timestamp)}</span>
                       {ev.country && (
