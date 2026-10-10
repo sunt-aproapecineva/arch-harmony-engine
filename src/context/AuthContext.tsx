@@ -167,12 +167,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let cancelled = false;
     let hydrationSeq = 0;
+    let hydratedUserId: string | null = null;
 
     const runHydration = async (authUser: any, showLoading = false) => {
       const seq = ++hydrationSeq;
       if (showLoading) setLoading(true);
       const u = await hydrateUser(authUser);
       if (cancelled || seq !== hydrationSeq) return;
+      hydratedUserId = u?.id ?? null;
       setUser(u);
       setLoading(false);
     };
@@ -229,13 +231,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (event !== 'SIGNED_IN' && event !== 'SIGNED_OUT' && event !== 'USER_UPDATED') return;
       if (event === 'SIGNED_OUT') {
         hydrationSeq++;
+        hydratedUserId = null;
         clearSessionBackup();
         setUser(null);
         setLoading(false);
         return;
       }
+      // SIGNED_IN also fires when an already signed-in tab regains focus.
+      // Do not tear down the route (and its tabs/scroll) for the same identity.
+      const sameIdentity = !!session?.user && session.user.id === hydratedUserId;
+      if (event === 'SIGNED_IN' && sameIdentity) return;
+      // USER_UPDATED refreshes the profile in place; real identity changes gate it.
+      if (!sameIdentity) setLoading(true);
       // defer DB calls to avoid deadlock inside listener
-      setLoading(true);
       setTimeout(() => runHydration(session?.user, false), 0);
     });
 

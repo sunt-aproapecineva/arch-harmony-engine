@@ -13,6 +13,7 @@ import { getCourseModules, getCourseLiveEvents } from '@/lib/content';
 import { tariffForCourse, flowForCourse } from '@/lib/enrollments';
 import { fetchFlowEvents, fetchFlows, type Flow, type FlowEvent } from '@/lib/flows';
 import { useAuthContext } from './AuthContext';
+import { useLiveContent } from './LiveContentContext';
 import type { Module, LiveEvent, Tariff } from '@/lib/types';
 
 interface CourseContextValue {
@@ -71,6 +72,7 @@ export const CourseProvider: React.FC<{ courseSlug?: string; courseId?: string; 
   children,
 }) => {
   const { user } = useAuthContext();
+  const { version: contentVersion } = useLiveContent();
   const [flowEvents, setFlowEvents] = useState<FlowEvent[]>([]);
   const [adminFlows, setAdminFlows] = useState<Flow[]>([]);
   const [previewFlowId, setPreviewFlowIdState] = useState<string | null>(null);
@@ -149,7 +151,7 @@ export const CourseProvider: React.FC<{ courseSlug?: string; courseId?: string; 
       previewFlowId: isAdmin ? previewFlowId : null,
       setPreviewFlowId,
     }),
-    [course, user?.enrollments, flow, flowEvents, isAdmin, adminFlows, previewFlowId],
+    [course, user?.enrollments, flow, flowEvents, isAdmin, adminFlows, previewFlowId, contentVersion],
   );
 
 
