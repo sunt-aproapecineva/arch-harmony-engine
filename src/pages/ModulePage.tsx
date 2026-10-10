@@ -12,6 +12,7 @@ import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
 import { useAuthContext } from '../context/AuthContext';
 import { hasCompletedOnboarding } from '../lib/access';
 import { getVisibleLessons } from '../lib/lessonVisibility';
+import { formatLessonNumber, formatExerciseNumber } from '../lib/lessonNumbering';
 
 export const ModulePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -276,11 +277,9 @@ export const ModulePage: React.FC = () => {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
                           <span style={{ fontSize: 10, color: isExLesson ? 'var(--gold)' : 'var(--fg-3)', fontWeight: isExLesson ? 700 : 400 }}>
-                            {/* Numerotarea video se face printre lecțiile video, nu după
-                                order_index: exercițiile intercalate lăsau găuri („Lecția 5" după „Lecția 2"). */}
                             {isExLesson
-                              ? `✦ Exercițiu practic`
-                              : `Lecția ${visibleLessons.filter(l => l.type !== 'exercise').findIndex(l => l.id === lesson.id) + 1}`}
+                              ? `✦ Exercițiu ${formatExerciseNumber(module, lesson)}`
+                              : `Lecția ${formatLessonNumber(module, lesson)}`}
 
                           </span>
                         </div>

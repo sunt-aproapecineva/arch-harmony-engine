@@ -18,7 +18,7 @@ import { logActivity, logActivityOnce } from '../lib/activity';
 import { ExerciseBlock } from '../components/exercises/ExerciseBlock';
 import { flushExerciseResponse, getStoredExerciseResponse } from '../lib/exerciseSync';
 import { hasCompletedOnboarding } from '../lib/access';
-import { formatLessonNumber } from '../lib/lessonNumbering';
+import { formatLessonNumber, formatExerciseNumber } from '../lib/lessonNumbering';
 import { useLessonNote } from '../hooks/useLessonNote';
 import { YouTubePlayer } from '../components/aa/YouTubePlayer';
 import { getVisibleLessons } from '../lib/lessonVisibility';
@@ -93,7 +93,7 @@ const LessonSidebar: React.FC<{
       </div>
 
       <ol style={{ listStyle: 'none', margin: 0, padding: 6, display: 'flex', flexDirection: 'column', gap: 1 }}>
-        {items.map((l: any, i: number) => {
+        {items.map((l: Lesson) => {
           const isActive = l.id === currentId;
           const isDone = isCompleted(l.id);
           const isExercise = l.type === 'exercise';
@@ -132,8 +132,8 @@ const LessonSidebar: React.FC<{
                     color: isActive ? 'var(--fg)' : isDone ? 'var(--fg-3)' : 'var(--fg-2)',
                     fontWeight: isActive ? 600 : 400,
                   }}>
-                    <span style={{ color: 'var(--fg-3)', fontVariantNumeric: 'tabular-nums' }}>{i + 1}.</span>{' '}
-                    {l.title}
+                    <span style={{ color: 'var(--fg-3)', fontVariantNumeric: 'tabular-nums' }}>{formatLessonNumber(module, l)}</span>{' · '}
+                    {l.title.replace(/^Exercițiul\s+\d+\.\d+\s*[·:–-]\s*/i, '')}
                   </span>
 
                   {/* „ex" era criptic. Spunem ce e, cu cuvinte. */}
@@ -448,8 +448,7 @@ export const LessonPage: React.FC = () => {
 
   // ── EXERCISE PAGE ──────────────────────────────────────────────────────────
   if (isExercise && lesson.exercise_id) {
-    const exNumber = timelineLessons.filter(l => l.type === 'exercise').findIndex(l => l.id === lesson.id) + 1;
-    const exTotal = timelineLessons.filter(l => l.type === 'exercise').length;
+    const exNumber = formatExerciseNumber(module, lesson);
 
     return (
       <div style={{ minHeight: '100%', background: 'var(--bg)', position: 'relative' }}>
@@ -469,13 +468,13 @@ export const LessonPage: React.FC = () => {
               {module.title}
             </Link>
             <ChevronRight size={12} />
-            <span style={{ color: 'var(--fg)' }}>Exercițiu {lesson.order_index}</span>
+            <span style={{ color: 'var(--fg)' }}>Exercițiul {exNumber}</span>
           </div>
 
           {/* Progress bar */}
           <div style={{ marginBottom: 28 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
-              <span>Exercițiu {exNumber} din {exTotal} · {module.title}</span>
+              <span>Exercițiul {exNumber} · {module.title}</span>
               <span style={{ color: progressPct === 100 ? 'var(--ok)' : 'var(--gold)' }}>{progressPct}%</span>
             </div>
             <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
@@ -499,7 +498,7 @@ export const LessonPage: React.FC = () => {
                   {/* Badges */}
                   <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)', background: 'var(--gold-dim)', border: '1px solid rgba(201,169,110,0.25)', padding: '4px 12px', borderRadius: 99 }}>
-                      <Pencil size={10} /> Exercițiu practic {exNumber}/{exTotal}
+                      <Pencil size={10} /> Exercițiu practic {exNumber}
                     </span>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10, color: 'var(--fg-3)', background: 'var(--bg-3)', border: '1px solid var(--border)', padding: '4px 10px', borderRadius: 99 }}>
                       <Clock size={10} /> {lesson.duration_min} min
