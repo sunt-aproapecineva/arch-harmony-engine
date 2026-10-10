@@ -567,7 +567,7 @@ export const AdminStudentProfile: React.FC = () => {
 
 
   return (
-    <div style={{ maxWidth: 880, margin: '0 auto', padding: '32px 24px' }}>
+    <div ref={rootRef} style={{ maxWidth: 880, margin: '0 auto', padding: '32px 24px' }}>
       {/* Back link + Refresh */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
         <Link
