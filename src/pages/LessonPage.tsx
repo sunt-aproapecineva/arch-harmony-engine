@@ -376,7 +376,7 @@ export const LessonPage: React.FC = () => {
   const nextModule = moduleIndex < modules.length - 1 ? modules[moduleIndex + 1] : null;
   const nextModuleLesson = nextModule?.lessons[0] || null;
 
-  const trackableLessons = module.lessons.filter(isTrackableTimelineItem);
+  const trackableLessons = timelineLessons.filter(isTrackableTimelineItem);
   const completedCount = trackableLessons.filter(l => isCompleted(l.id)).length;
   const totalCount = trackableLessons.length;
   const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
