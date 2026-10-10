@@ -11,6 +11,7 @@ import { useProgress } from '../hooks/useProgress';
 import { QuizRequiredModal } from '../components/aa/QuizRequiredModal';
 import { useAuthContext } from '../context/AuthContext';
 import { hasCompletedOnboarding } from '../lib/access';
+import { getVisibleLessons } from '../lib/lessonVisibility';
 
 export const ModulePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -42,16 +43,8 @@ export const ModulePage: React.FC = () => {
 
   // Lecțiile nepublicate (video fără link încă) se ascund din listă împreună cu
   // exercițiul care le urmează — elevul vede doar ce poate parcurge efectiv.
-  const visibleLessons: any[] = [];
-  let lastVideoPublished = true;
-  module.lessons.forEach((l: any) => {
-    if (l.type === 'exercise') {
-      if (lastVideoPublished) visibleLessons.push(l);
-    } else {
-      lastVideoPublished = l.is_published !== false;
-      if (lastVideoPublished) visibleLessons.push(l);
-    }
-  });
+  // Aceeași regulă e aplicată și în navigarea dintre lecții și în progres.
+  const visibleLessons = getVisibleLessons(module);
 
   // All lessons (video + exercise) + deliverable
   const timelineItems = [
