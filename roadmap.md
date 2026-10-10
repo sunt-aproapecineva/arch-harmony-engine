@@ -6,4 +6,4 @@
 
 # Window return
 
-- [ ] Preserve the current page and scroll position when returning from another window; reproduce the recording and verify the fix.
+- [x] Preserve the current page and scroll position when returning from another window; verified same-user sign-in events and changed-content refresh retain the Date brute tab, URL and scroll position (1400 → 1400), without runtime errors.
