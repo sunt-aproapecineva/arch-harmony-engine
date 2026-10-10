@@ -218,8 +218,7 @@ export function LiveContentProvider({ children }: { children: React.ReactNode })
         } catch {
           /* storage full / blocked */
         }
-        // Only remount the tree when the content actually changed, so a
-        // background re-sync never disturbs what the student is doing.
+        // Notify consumers without remounting their local state or scroll area.
         if (changed) setVersion((v) => v + 1);
         setLoadedForUserId(user.id);
         setReady(true);
@@ -276,11 +275,7 @@ export function LiveContentProvider({ children }: { children: React.ReactNode })
         refresh,
       }}
     >
-      {/* key bump remounts the route tree once overrides land, so any
-          component that captured stale content values re-reads them. */}
-      <div key={version} style={{ display: 'contents' }}>
-        {children}
-      </div>
+      {children}
     </LiveCtx.Provider>
   );
 }
