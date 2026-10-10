@@ -483,6 +483,50 @@ export const AdminStudentProfile: React.FC = () => {
     loadAll();
   }, [loadAll]);
 
+  // Mobile browsers may reload a backgrounded tab; keep the chosen tab and the
+  // reading position per student for this browser session.
+  const tabKey = `aa_admin_student_tab_${userId}`;
+  const scrollKey = `aa_admin_student_scroll_${userId}`;
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const restoredRef = useRef(false);
+  const [tabRestored, setTabRestored] = useState(false);
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(tabKey) as TabKey | null;
+      if (saved === 'briefing' || saved === 'raw' || saved === 'notes') setTab(saved);
+    } catch { /* noop */ }
+    restoredRef.current = false;
+    setTabRestored(true);
+  }, [tabKey]);
+  useEffect(() => {
+    if (!tabRestored) return;
+    try { sessionStorage.setItem(tabKey, tab); } catch { /* noop */ }
+  }, [tab, tabKey, tabRestored]);
+  useEffect(() => {
+    const scroller = rootRef.current?.closest('main') as HTMLElement | null;
+    if (!scroller || !user || !lastRefreshed) return;
+    if (!restoredRef.current) {
+      restoredRef.current = true;
+      const y = Number(sessionStorage.getItem(scrollKey) || 0);
+      if (y > 0) requestAnimationFrame(() => requestAnimationFrame(() => { scroller.scrollTop = y; }));
+    }
+    let t: ReturnType<typeof setTimeout> | null = null;
+    const save = () => {
+      if (t) clearTimeout(t);
+      t = setTimeout(() => { try { sessionStorage.setItem(scrollKey, String(scroller.scrollTop)); } catch { /* noop */ } }, 150);
+    };
+    const saveNow = () => { try { sessionStorage.setItem(scrollKey, String(scroller.scrollTop)); } catch { /* noop */ } };
+    scroller.addEventListener('scroll', save, { passive: true });
+    document.addEventListener('visibilitychange', saveNow);
+    window.addEventListener('pagehide', saveNow);
+    return () => {
+      if (t) clearTimeout(t);
+      scroller.removeEventListener('scroll', save);
+      document.removeEventListener('visibilitychange', saveNow);
+      window.removeEventListener('pagehide', saveNow);
+    };
+  }, [user, lastRefreshed, scrollKey]);
+
   if (!user) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300 }}>
