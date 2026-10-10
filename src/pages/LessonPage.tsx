@@ -364,8 +364,14 @@ export const LessonPage: React.FC = () => {
   }
 
   const done = isCompleted(lesson.id);
-  const prevLesson = lessonIndex > 0 ? module.lessons[lessonIndex - 1] : null;
-  const nextLesson = lessonIndex < module.lessons.length - 1 ? module.lessons[lessonIndex + 1] : null;
+  // Navigarea și progresul folosesc DOAR lecțiile vizibile: o lecție video
+  // nepublicată și exercițiul ei nu apar nici în „Înapoi/Înainte", nici în
+  // numărătoarea de progres — altfel elevul ajungea din butonul „Înainte" pe
+  // lecții ascunse, iar modulul nu ajungea niciodată la 100%.
+  const timelineLessons = getVisibleLessons(module);
+  const timelineIndex = timelineLessons.findIndex(l => l.id === lesson.id);
+  const prevLesson = timelineIndex > 0 ? timelineLessons[timelineIndex - 1] : null;
+  const nextLesson = timelineIndex >= 0 && timelineIndex < timelineLessons.length - 1 ? timelineLessons[timelineIndex + 1] : null;
   const moduleIndex = modules.findIndex(m => m.id === module!.id);
   const nextModule = moduleIndex < modules.length - 1 ? modules[moduleIndex + 1] : null;
   const nextModuleLesson = nextModule?.lessons[0] || null;
