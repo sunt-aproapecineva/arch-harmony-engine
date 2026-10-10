@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { getActivity, timeAgo, ActivityEvent, ActivityType } from '../../lib/activity';
+import { displayActivityLabel } from '../../lib/activityLabels';
 import { Search, RefreshCw, LogIn, CheckCircle2, FileText, Award, UserPlus, BookOpen } from 'lucide-react';
 import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
 import { AdminScopeBar } from '../../components/admin/AdminScopeBar';
@@ -154,7 +155,7 @@ export const AdminActivity: React.FC = () => {
                     {(ev.userName || ev.userEmail).charAt(0).toUpperCase()}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.label}</div>
+                    <div style={{ fontSize: 13, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displayActivityLabel(ev)}</div>
                     <div style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 2 }}>
                       {ev.userEmail}
                       {ev.data?.lessonTitle && <span style={{ marginLeft: 8, color: 'var(--accent)' }}>· {ev.data.lessonTitle}</span>}
