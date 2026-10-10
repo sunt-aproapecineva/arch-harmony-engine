@@ -26,6 +26,14 @@ function LessonErrorComponent({ error, reset }: { error: Error; reset: () => voi
 }
 
 export const Route = createFileRoute("/_app/c/$courseSlug/lesson/$id")({
+  head: ({ params }) => ({ meta: [
+    { title: `Arhitectura Afacerii · ${params.courseSlug} · ${params.id}` },
+    { name: 'description', content: 'Lecții video și exerciții practice din programul Arhitectura Afacerii.' },
+    { property: 'og:title', content: `Arhitectura Afacerii · ${params.courseSlug} · ${params.id}` },
+    { property: 'og:description', content: 'Lecții video și exerciții practice din programul Arhitectura Afacerii.' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary' },
+  ] }),
   component: LessonPage,
   errorComponent: LessonErrorComponent,
 });

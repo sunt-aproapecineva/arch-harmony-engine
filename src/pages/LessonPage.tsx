@@ -133,7 +133,7 @@ const LessonSidebar: React.FC<{
                     fontWeight: isActive ? 600 : 400,
                   }}>
                     <span style={{ color: 'var(--fg-3)', fontVariantNumeric: 'tabular-nums' }}>{formatLessonNumber(module, l)}</span>{' · '}
-                    {l.title}
+                    {l.title.replace(/^Exercițiul\s+\d+\.\d+\s*[·:–-]\s*/i, '')}
                   </span>
 
                   {/* „ex" era criptic. Spunem ce e, cu cuvinte. */}
