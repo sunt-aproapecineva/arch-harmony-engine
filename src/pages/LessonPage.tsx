@@ -61,7 +61,9 @@ const LessonSidebar: React.FC<{
   const navigate = useNavigate();
   const { course } = useCourse();
 
-  const items = module.lessons || [];
+  // Sidebar-ul respectă aceeași regulă de vizibilitate: lecțiile video
+  // nepublicate și exercițiile lor nu apar nici aici.
+  const items = getVisibleLessons(module);
   const trackable = items.filter((l: any) => l.type === 'exercise' || !!(l.video_url && String(l.video_url).trim()));
   const done = trackable.filter((l: any) => isCompleted(l.id)).length;
   const pct = trackable.length ? Math.round((done / trackable.length) * 100) : 0;
@@ -446,8 +448,8 @@ export const LessonPage: React.FC = () => {
 
   // ── EXERCISE PAGE ──────────────────────────────────────────────────────────
   if (isExercise && lesson.exercise_id) {
-    const exNumber = module.lessons.filter(l => l.type === 'exercise').findIndex(l => l.id === lesson.id) + 1;
-    const exTotal = module.lessons.filter(l => l.type === 'exercise').length;
+    const exNumber = timelineLessons.filter(l => l.type === 'exercise').findIndex(l => l.id === lesson.id) + 1;
+    const exTotal = timelineLessons.filter(l => l.type === 'exercise').length;
 
     return (
       <div style={{ minHeight: '100%', background: 'var(--bg)', position: 'relative' }}>
