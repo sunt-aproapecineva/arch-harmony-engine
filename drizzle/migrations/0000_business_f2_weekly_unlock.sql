@@ -1,0 +1,1 @@
+select cron.schedule('business-f2-weekly-unlock', '0 6 * * 1', $$update public.flows set open_modules = least(coalesce(open_modules,0) + 1, 7) where id = 'business-f2' and open_modules is not null and open_modules < 7$$);

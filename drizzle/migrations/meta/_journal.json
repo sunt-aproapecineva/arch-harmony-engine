@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791874174030,
+      "tag": "0000_business_f2_weekly_unlock",
+      "breakpoints": true
+    }
+  ]
+}
