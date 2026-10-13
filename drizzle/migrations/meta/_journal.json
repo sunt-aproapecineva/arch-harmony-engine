@@ -8,6 +8,13 @@
       "when": 1791874174030,
       "tag": "0000_business_f2_weekly_unlock",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791875499478,
+      "tag": "0001_video_positions",
+      "breakpoints": true
     }
   ]
 }

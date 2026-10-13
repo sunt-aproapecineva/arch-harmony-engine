@@ -930,6 +930,30 @@ export type Database = {
         }
         Relationships: []
       }
+      video_positions: {
+        Row: {
+          duration: number
+          position: number
+          updated_at: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          duration?: number
+          position?: number
+          updated_at?: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          duration?: number
+          position?: number
+          updated_at?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
       whitelist: {
         Row: {
           added_at: string | null
