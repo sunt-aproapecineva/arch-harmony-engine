@@ -820,7 +820,7 @@ export const START_MODULES: Module[] = [
         description: 'Fiecare oportunitate cu etapa, următoarea acțiune și data — plus rezumatul sprintului.',
         video_url: '',
         duration_min: 0,
-        order_index: 11,
+        order_index: 12,
         is_published: true,
         type: 'exercise',
         exercise_id: 'st-e-4-6',
