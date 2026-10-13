@@ -118,14 +118,15 @@ export async function fetchFlowEvents(flowId: string): Promise<FlowEvent[]> {
 }
 
 /**
- * Modulul e blocat de limita fluxului? `open_modules = N` deschide modulele cu
- * `unlockWeek` 0..N-1 și le închide pe restul, indiferent de dată. Modulele fără
- * `unlockWeek` numeric nu sunt atinse de limită.
+ * Modulul e blocat de limita fluxului? `open_modules = N` deschide primele N
+ * module (poziția `order_index` 0..N-1) și le închide pe restul, indiferent de
+ * dată. Poziția, nu săptămâna: unele etape durează 2 săptămâni.
  */
 export function isModuleLockedByFlow(mod: any, flow: Flow | null | undefined): boolean {
   if (typeof flow?.open_modules !== 'number') return false;
-  if (typeof mod?.unlockWeek !== 'number') return false;
-  return mod.unlockWeek >= flow.open_modules;
+  const pos = typeof mod?.order_index === 'number' ? mod.order_index : mod?.unlockWeek;
+  if (typeof pos !== 'number') return false;
+  return pos >= flow.open_modules;
 }
 
 /**
