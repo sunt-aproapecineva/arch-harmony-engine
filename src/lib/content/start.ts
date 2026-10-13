@@ -804,6 +804,16 @@ export const START_MODULES: Module[] = [
         exercise_id: 'st-e-4-5',
       },
       {
+        id: 'st-l-4-6',
+        module_id: 'st-m-4',
+        title: 'Pipeline-ul primelor vânzări',
+        description: 'Cum construiești pipeline-ul sprintului și actualizezi fiecare oportunitate cu etapa și următoarea acțiune.',
+        video_url: 'https://www.youtube.com/watch?v=WRItjaYYQp0',
+        duration_min: 0,
+        order_index: 11,
+        is_published: true,
+      },
+      {
         id: 'st-l-4-ex-6',
         module_id: 'st-m-4',
         title: 'Exercițiul 4.6 · Pipeline-ul primelor vânzări',
