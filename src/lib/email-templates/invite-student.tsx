@@ -1,6 +1,9 @@
 import React from 'react'
 import { Body, Button, Container, Head, Heading, Html, Img, Preview, Text } from '@react-email/components'
 import type { TemplateEntry } from './registry'
+import logoAsset from '@/assets/aa-logo-email.png.asset.json'
+
+const logoUrl = new URL(logoAsset.url, 'https://aa.morarvictor.com').href
 
 interface Props {
   registerUrl?: string
@@ -13,7 +16,7 @@ const Email = ({ registerUrl, courseName }: Props) => (
     <Preview>Ai acces la platforma Arhitectura Afacerii — creează-ți contul</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Img src="https://aa.morarvictor.com/logo-email.png" alt="Arhitectura Afacerii" width="56" height="56" style={logoImg} />
+        <Img src={logoUrl} alt="Arhitectura Afacerii" width="56" height="56" style={logoImg} />
         <Text style={logo}>ARHITECTURA AFACERII</Text>
         <Heading style={heading}>Bine ai venit!</Heading>
         <Text style={text}>
