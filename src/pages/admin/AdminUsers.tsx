@@ -15,7 +15,7 @@ import { useNavigate } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, ChevronDown, ChevronUp, Shield, Search, X, RefreshCw, CheckCircle2, Link2, ShieldOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { sendTransactionalEmail } from '@/lib/email/send';
+import { sendStudentInvite } from '@/lib/inviteEmail.functions';
 import { timeAgo } from '../../lib/activity';
 import {
   fetchAdminUsers, fetchAllProgress, setUserAdmin,
@@ -145,13 +145,9 @@ export const AdminUsers: React.FC = () => {
 
     // Trimitem automat invitația pe email cu link direct spre crearea contului.
     const courseTitle = getCourse(newCourse)?.shortTitle || 'Arhitectura Afacerii';
-    const registerUrl = `${window.location.origin}/register?email=${encodeURIComponent(email)}`;
-    const invite = await sendTransactionalEmail({
-      templateName: 'invite-student',
-      recipientEmail: email,
-      idempotencyKey: `invite-${newCourse}-${email}`,
-      templateData: { registerUrl, courseName: courseTitle },
-    });
+    const invite = await sendStudentInvite({
+      data: { email, courseId: newCourse, courseName: courseTitle, origin: window.location.origin },
+    }).catch((e: unknown) => ({ ok: false, error: e instanceof Error ? e.message : String(e) }));
     setAddSuccess(invite.ok
       ? `✓ ${email} adăugat(ă) și invitația a fost trimisă pe email.`
       : `✓ ${email} adăugat(ă), dar emailul de invitație nu a putut fi trimis (${invite.error || 'eroare necunoscută'}). Copiază linkul manual.`);
