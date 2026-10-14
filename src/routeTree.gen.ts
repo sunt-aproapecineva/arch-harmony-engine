@@ -38,6 +38,7 @@ import { Route as AppMaterialsIndexRouteImport } from './routes/_app.materials.i
 import { Route as AppModuleIdRouteImport } from './routes/_app.module.$id'
 import { Route as AdminStudentUserIdRouteImport } from './routes/admin.student.$userId'
 import { Route as CCourseSlugQuizRouteImport } from './routes/c.$courseSlug.quiz'
+import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as AppCCourseSlugIndexRouteImport } from './routes/_app.c.$courseSlug.index'
 import { Route as AppCCourseSlugDashboardRouteImport } from './routes/_app.c.$courseSlug.dashboard'
@@ -196,6 +197,11 @@ const CCourseSlugQuizRoute = CCourseSlugQuizRouteImport.update({
   path: '/c/$courseSlug/quiz',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableEmailEventsRoute = LovableEmailEventsRouteImport.update({
+  id: '/lovable/email/events',
+  path: '/lovable/email/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -296,6 +302,7 @@ export interface FileRoutesByFullPath {
   '/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
   '/c/$courseSlug/quiz': typeof CCourseSlugQuizRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/documents/': typeof AppDocumentsIndexRoute
   '/library/': typeof AppLibraryIndexRoute
@@ -337,6 +344,7 @@ export interface FileRoutesByTo {
   '/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
   '/c/$courseSlug/quiz': typeof CCourseSlugQuizRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/documents': typeof AppDocumentsIndexRoute
   '/library': typeof AppLibraryIndexRoute
@@ -382,6 +390,7 @@ export interface FileRoutesById {
   '/_app/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
   '/c/$courseSlug/quiz': typeof CCourseSlugQuizRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_app/documents/': typeof AppDocumentsIndexRoute
   '/_app/library/': typeof AppLibraryIndexRoute
@@ -427,6 +436,7 @@ export interface FileRouteTypes {
     | '/module/$id'
     | '/admin/student/$userId'
     | '/c/$courseSlug/quiz'
+    | '/lovable/email/events'
     | '/lovable/email/suppression'
     | '/documents/'
     | '/library/'
@@ -468,6 +478,7 @@ export interface FileRouteTypes {
     | '/module/$id'
     | '/admin/student/$userId'
     | '/c/$courseSlug/quiz'
+    | '/lovable/email/events'
     | '/lovable/email/suppression'
     | '/documents'
     | '/library'
@@ -512,6 +523,7 @@ export interface FileRouteTypes {
     | '/_app/module/$id'
     | '/admin/student/$userId'
     | '/c/$courseSlug/quiz'
+    | '/lovable/email/events'
     | '/lovable/email/suppression'
     | '/_app/documents/'
     | '/_app/library/'
@@ -544,6 +556,7 @@ export interface RootRouteChildren {
   WelcomeRoute: typeof WelcomeRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   CCourseSlugQuizRoute: typeof CCourseSlugQuizRoute
+  LovableEmailEventsRoute: typeof LovableEmailEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -755,6 +768,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CCourseSlugQuizRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/events': {
+      id: '/lovable/email/events'
+      path: '/lovable/email/events'
+      fullPath: '/lovable/email/events'
+      preLoaderRoute: typeof LovableEmailEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -939,6 +959,7 @@ const rootRouteChildren: RootRouteChildren = {
   WelcomeRoute: WelcomeRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   CCourseSlugQuizRoute: CCourseSlugQuizRoute,
+  LovableEmailEventsRoute: LovableEmailEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
