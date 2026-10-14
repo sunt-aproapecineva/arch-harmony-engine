@@ -1,5 +1,5 @@
 import React from 'react'
-import { Body, Button, Container, Head, Heading, Html, Preview, Text } from '@react-email/components'
+import { Body, Button, Container, Head, Heading, Html, Img, Preview, Text } from '@react-email/components'
 import type { TemplateEntry } from './registry'
 
 interface Props {
@@ -13,6 +13,7 @@ const Email = ({ registerUrl, courseName }: Props) => (
     <Preview>Ai acces la platforma Arhitectura Afacerii — creează-ți contul</Preview>
     <Body style={main}>
       <Container style={container}>
+        <Img src="https://aa.morarvictor.com/logo-email.png" alt="Arhitectura Afacerii" width="56" height="56" style={logoImg} />
         <Text style={logo}>ARHITECTURA AFACERII</Text>
         <Heading style={heading}>Bine ai venit!</Heading>
         <Text style={text}>
@@ -43,6 +44,7 @@ export const template = {
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
 const container = { padding: '32px 28px', maxWidth: '560px' }
+const logoImg = { borderRadius: '12px', marginBottom: '12px' }
 const logo = { fontSize: '12px', letterSpacing: '3px', color: '#1A5C38', fontWeight: 'bold' as const, marginBottom: '24px' }
 const heading = { fontSize: '24px', color: '#0D0907', margin: '0 0 16px' }
 const text = { fontSize: '15px', lineHeight: '1.6', color: '#333333', margin: '0 0 24px' }
