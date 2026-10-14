@@ -14,6 +14,7 @@ export const sendStudentInvite = createServerFn({ method: 'POST' })
       courseId: z.string().min(1).max(64),
       courseName: z.string().min(1).max(120),
       origin: z.string().url().max(200),
+      retryKey: z.string().max(64).optional(),
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -41,7 +42,7 @@ export const sendStudentInvite = createServerFn({ method: 'POST' })
     try {
       const result = await sendTemplateEmail('invite-student', email, {
         templateData: { registerUrl, courseName: data.courseName },
-        idempotencyKey: `invite-${data.courseId}-${email}`,
+        idempotencyKey: `invite-${data.courseId}-${email}${data.retryKey ? `-${data.retryKey}` : ''}`,
       });
       if (result.sent) {
         await log({ status: 'sent' });
