@@ -15,6 +15,7 @@ import { useNavigate } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, ChevronDown, ChevronUp, Shield, Search, X, RefreshCw, CheckCircle2, Link2, ShieldOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { sendTransactionalEmail } from '@/lib/email/send';
 import { timeAgo } from '../../lib/activity';
 import {
   fetchAdminUsers, fetchAllProgress, setUserAdmin,
