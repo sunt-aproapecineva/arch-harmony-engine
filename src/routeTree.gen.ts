@@ -18,6 +18,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -93,6 +94,11 @@ const RegisterRoute = RegisterRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WelcomeRoute = WelcomeRouteImport.update({
@@ -273,6 +279,7 @@ export interface FileRoutesByFullPath {
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
@@ -314,6 +321,7 @@ export interface FileRoutesByTo {
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
@@ -357,6 +365,7 @@ export interface FileRoutesById {
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/welcome': typeof WelcomeRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
@@ -401,6 +410,7 @@ export interface FileRouteTypes {
     | '/quiz'
     | '/register'
     | '/reset-password'
+    | '/unsubscribe'
     | '/welcome'
     | '/dashboard'
     | '/admin/activity'
@@ -442,6 +452,7 @@ export interface FileRouteTypes {
     | '/quiz'
     | '/register'
     | '/reset-password'
+    | '/unsubscribe'
     | '/welcome'
     | '/dashboard'
     | '/admin/activity'
@@ -484,6 +495,7 @@ export interface FileRouteTypes {
     | '/quiz'
     | '/register'
     | '/reset-password'
+    | '/unsubscribe'
     | '/welcome'
     | '/_app/dashboard'
     | '/admin/activity'
@@ -528,6 +540,7 @@ export interface RootRouteChildren {
   QuizRoute: typeof QuizRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   WelcomeRoute: typeof WelcomeRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   CCourseSlugQuizRoute: typeof CCourseSlugQuizRoute
@@ -600,6 +613,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/welcome': {
@@ -915,6 +935,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuizRoute: QuizRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   WelcomeRoute: WelcomeRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   CCourseSlugQuizRoute: CCourseSlugQuizRoute,
