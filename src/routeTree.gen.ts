@@ -18,6 +18,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -28,6 +29,7 @@ import { Route as AdminGrupeRouteImport } from './routes/admin.grupe'
 import { Route as AdminLessonsRouteImport } from './routes/admin.lessons'
 import { Route as AdminProgressRouteImport } from './routes/admin.progress'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as AppCCourseSlugRouteImport } from './routes/_app.c.$courseSlug'
 import { Route as AppDocumentsIndexRouteImport } from './routes/_app.documents.index'
 import { Route as AppLessonIdRouteImport } from './routes/_app.lesson.$id'
@@ -36,9 +38,12 @@ import { Route as AppMaterialsIndexRouteImport } from './routes/_app.materials.i
 import { Route as AppModuleIdRouteImport } from './routes/_app.module.$id'
 import { Route as AdminStudentUserIdRouteImport } from './routes/admin.student.$userId'
 import { Route as CCourseSlugQuizRouteImport } from './routes/c.$courseSlug.quiz'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as AppCCourseSlugIndexRouteImport } from './routes/_app.c.$courseSlug.index'
 import { Route as AppCCourseSlugDashboardRouteImport } from './routes/_app.c.$courseSlug.dashboard'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as AppCCourseSlugDocumentsIndexRouteImport } from './routes/_app.c.$courseSlug.documents.index'
 import { Route as AppCCourseSlugLessonIdRouteImport } from './routes/_app.c.$courseSlug.lesson.$id'
 import { Route as AppCCourseSlugLibraryIndexRouteImport } from './routes/_app.c.$courseSlug.library.index'
@@ -91,6 +96,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
@@ -141,6 +151,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppCCourseSlugRoute = AppCCourseSlugRouteImport.update({
   id: '/c/$courseSlug',
   path: '/c/$courseSlug',
@@ -181,6 +196,11 @@ const CCourseSlugQuizRoute = CCourseSlugQuizRouteImport.update({
   path: '/c/$courseSlug/quiz',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppCCourseSlugIndexRoute = AppCCourseSlugIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -195,6 +215,18 @@ const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
     path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AppCCourseSlugDocumentsIndexRoute =
@@ -247,6 +279,7 @@ export interface FileRoutesByFullPath {
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
@@ -256,17 +289,21 @@ export interface FileRoutesByFullPath {
   '/admin/lessons': typeof AdminLessonsRoute
   '/admin/progress': typeof AdminProgressRoute
   '/admin/users': typeof AdminUsersRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/admin/': typeof AdminIndexRoute
   '/c/$courseSlug': typeof AppCCourseSlugRouteWithChildren
   '/lesson/$id': typeof AppLessonIdRoute
   '/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
   '/c/$courseSlug/quiz': typeof CCourseSlugQuizRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/documents/': typeof AppDocumentsIndexRoute
   '/library/': typeof AppLibraryIndexRoute
   '/materials/': typeof AppMaterialsIndexRoute
   '/c/$courseSlug/dashboard': typeof AppCCourseSlugDashboardRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/c/$courseSlug/': typeof AppCCourseSlugIndexRoute
   '/c/$courseSlug/lesson/$id': typeof AppCCourseSlugLessonIdRoute
   '/c/$courseSlug/library/$slug': typeof AppCCourseSlugLibrarySlugRoute
@@ -284,6 +321,7 @@ export interface FileRoutesByTo {
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/welcome': typeof WelcomeRoute
   '/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
@@ -293,16 +331,20 @@ export interface FileRoutesByTo {
   '/admin/lessons': typeof AdminLessonsRoute
   '/admin/progress': typeof AdminProgressRoute
   '/admin/users': typeof AdminUsersRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/admin': typeof AdminIndexRoute
   '/lesson/$id': typeof AppLessonIdRoute
   '/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
   '/c/$courseSlug/quiz': typeof CCourseSlugQuizRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/documents': typeof AppDocumentsIndexRoute
   '/library': typeof AppLibraryIndexRoute
   '/materials': typeof AppMaterialsIndexRoute
   '/c/$courseSlug/dashboard': typeof AppCCourseSlugDashboardRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/c/$courseSlug': typeof AppCCourseSlugIndexRoute
   '/c/$courseSlug/lesson/$id': typeof AppCCourseSlugLessonIdRoute
   '/c/$courseSlug/library/$slug': typeof AppCCourseSlugLibrarySlugRoute
@@ -323,6 +365,7 @@ export interface FileRoutesById {
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/welcome': typeof WelcomeRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/admin/activity': typeof AdminActivityRoute
@@ -332,17 +375,21 @@ export interface FileRoutesById {
   '/admin/lessons': typeof AdminLessonsRoute
   '/admin/progress': typeof AdminProgressRoute
   '/admin/users': typeof AdminUsersRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/admin/': typeof AdminIndexRoute
   '/_app/c/$courseSlug': typeof AppCCourseSlugRouteWithChildren
   '/_app/lesson/$id': typeof AppLessonIdRoute
   '/_app/module/$id': typeof AppModuleIdRoute
   '/admin/student/$userId': typeof AdminStudentUserIdRoute
   '/c/$courseSlug/quiz': typeof CCourseSlugQuizRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_app/documents/': typeof AppDocumentsIndexRoute
   '/_app/library/': typeof AppLibraryIndexRoute
   '/_app/materials/': typeof AppMaterialsIndexRoute
   '/_app/c/$courseSlug/dashboard': typeof AppCCourseSlugDashboardRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/_app/c/$courseSlug/': typeof AppCCourseSlugIndexRoute
   '/_app/c/$courseSlug/lesson/$id': typeof AppCCourseSlugLessonIdRoute
   '/_app/c/$courseSlug/library/$slug': typeof AppCCourseSlugLibrarySlugRoute
@@ -363,6 +410,7 @@ export interface FileRouteTypes {
     | '/quiz'
     | '/register'
     | '/reset-password'
+    | '/unsubscribe'
     | '/welcome'
     | '/dashboard'
     | '/admin/activity'
@@ -372,17 +420,21 @@ export interface FileRouteTypes {
     | '/admin/lessons'
     | '/admin/progress'
     | '/admin/users'
+    | '/email/unsubscribe'
     | '/admin/'
     | '/c/$courseSlug'
     | '/lesson/$id'
     | '/module/$id'
     | '/admin/student/$userId'
     | '/c/$courseSlug/quiz'
+    | '/lovable/email/suppression'
     | '/documents/'
     | '/library/'
     | '/materials/'
     | '/c/$courseSlug/dashboard'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
     | '/c/$courseSlug/'
     | '/c/$courseSlug/lesson/$id'
     | '/c/$courseSlug/library/$slug'
@@ -400,6 +452,7 @@ export interface FileRouteTypes {
     | '/quiz'
     | '/register'
     | '/reset-password'
+    | '/unsubscribe'
     | '/welcome'
     | '/dashboard'
     | '/admin/activity'
@@ -409,16 +462,20 @@ export interface FileRouteTypes {
     | '/admin/lessons'
     | '/admin/progress'
     | '/admin/users'
+    | '/email/unsubscribe'
     | '/admin'
     | '/lesson/$id'
     | '/module/$id'
     | '/admin/student/$userId'
     | '/c/$courseSlug/quiz'
+    | '/lovable/email/suppression'
     | '/documents'
     | '/library'
     | '/materials'
     | '/c/$courseSlug/dashboard'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
     | '/c/$courseSlug'
     | '/c/$courseSlug/lesson/$id'
     | '/c/$courseSlug/library/$slug'
@@ -438,6 +495,7 @@ export interface FileRouteTypes {
     | '/quiz'
     | '/register'
     | '/reset-password'
+    | '/unsubscribe'
     | '/welcome'
     | '/_app/dashboard'
     | '/admin/activity'
@@ -447,17 +505,21 @@ export interface FileRouteTypes {
     | '/admin/lessons'
     | '/admin/progress'
     | '/admin/users'
+    | '/email/unsubscribe'
     | '/admin/'
     | '/_app/c/$courseSlug'
     | '/_app/lesson/$id'
     | '/_app/module/$id'
     | '/admin/student/$userId'
     | '/c/$courseSlug/quiz'
+    | '/lovable/email/suppression'
     | '/_app/documents/'
     | '/_app/library/'
     | '/_app/materials/'
     | '/_app/c/$courseSlug/dashboard'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
     | '/_app/c/$courseSlug/'
     | '/_app/c/$courseSlug/lesson/$id'
     | '/_app/c/$courseSlug/library/$slug'
@@ -478,9 +540,14 @@ export interface RootRouteChildren {
   QuizRoute: typeof QuizRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   WelcomeRoute: typeof WelcomeRoute
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   CCourseSlugQuizRoute: typeof CCourseSlugQuizRoute
+  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -546,6 +613,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/welcome': {
@@ -618,6 +692,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/c/$courseSlug': {
       id: '/_app/c/$courseSlug'
       path: '/c/$courseSlug'
@@ -674,6 +755,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CCourseSlugQuizRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/c/$courseSlug/': {
       id: '/_app/c/$courseSlug/'
       path: '/'
@@ -693,6 +781,20 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/queue/process'
       fullPath: '/lovable/email/queue/process'
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/c/$courseSlug/documents/': {
@@ -833,9 +935,14 @@ const rootRouteChildren: RootRouteChildren = {
   QuizRoute: QuizRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   WelcomeRoute: WelcomeRoute,
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   CCourseSlugQuizRoute: CCourseSlugQuizRoute,
+  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
