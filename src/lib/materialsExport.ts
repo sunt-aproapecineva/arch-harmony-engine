@@ -364,10 +364,11 @@ export function exportNotePDF(lessonId: string, content: string) {
 export function exportAllPDF(items: {
   exercises: { id: string; response: any }[];
   notes: { lesson_id: string; content: string }[];
+  title?: string;
 }) {
   const parts: string[] = [];
 
-  parts.push(titleBand('Materialele mele', 'Toate materialele — Arhitectura Afacerii',
+  parts.push(titleBand('Materialele mele', items.title || 'Toate materialele — Arhitectura Afacerii',
     `Generat ${new Date().toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' })}`));
 
   parts.push('<div class="mat-body">');

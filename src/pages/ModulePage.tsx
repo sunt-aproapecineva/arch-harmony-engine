@@ -1,5 +1,8 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Download } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { exportAllPDF } from '../lib/materialsExport';
 import { useParams, useNavigate, Link } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -25,6 +28,21 @@ export const ModulePage: React.FC = () => {
 
   const module = modules.find(m => m.id === id);
   const moduleIndex = modules.findIndex(m => m.id === id);
+  const [moduleAnswers, setModuleAnswers] = useState<{ id: string; response: any }[]>([]);
+
+  useEffect(() => {
+    if (!user?.id || !module) return;
+    const ids: string[] = [];
+    (module.lessons || []).forEach((l: any) => { if (l.type === 'exercise') { const x = l.exercise_id || l.id; if (!ids.includes(x)) ids.push(x); } });
+    ((module as any).exercises || []).forEach((e: any) => { if (e?.id && !ids.includes(e.id)) ids.push(e.id); });
+    if (!ids.length) { setModuleAnswers([]); return; }
+    supabase.from('exercise_responses').select('exercise_id, response').eq('user_id', user.id).in('exercise_id', ids)
+      .then(({ data }) => {
+        const rows = (data || []).filter((r: any) => r.response != null);
+        rows.sort((a: any, b: any) => ids.indexOf(a.exercise_id) - ids.indexOf(b.exercise_id));
+        setModuleAnswers(rows.map((r: any) => ({ id: r.exercise_id, response: r.response })));
+      });
+  }, [user?.id, module?.id]);
 
   if (!module) {
     return (
@@ -140,6 +158,14 @@ export const ModulePage: React.FC = () => {
         </h1>
         <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--gold)', marginBottom: 10 }}>{module.subtitle}</p>
         <p style={{ fontSize: 14, color: 'var(--fg-3)', lineHeight: 1.7, marginBottom: 20 }}>{module.description}</p>
+
+        {moduleAnswers.length > 0 && (
+          <button
+            onClick={() => exportAllPDF({ exercises: moduleAnswers, notes: [], title: `Exercițiile mele — ${module.title}` })}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700, background: 'var(--accent)', color: 'var(--bg)', border: 'none', cursor: 'pointer', marginBottom: 20 }}>
+            <Download size={13} /> Descarcă exercițiile ({moduleAnswers.length}) · PDF
+          </button>
+        )}
 
         {/* Progress bar */}
         <div>
