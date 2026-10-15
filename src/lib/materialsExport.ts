@@ -6,6 +6,7 @@
 import { allModulesFlat } from './content';
 import { EXERCISE_TEMPLATES as EXERCISES } from './exerciseData';
 import { formatLessonNumber, formatExerciseTitle, getModuleNumber } from './lessonNumbering';
+import { renderMaterialResponse } from './materialsResponse';
 import {
   openPrintWindow,
   FONTS,
@@ -53,71 +54,7 @@ function nl2br(s: string): string {
 
 // ─── Label lookup from exercise template ─────────────────────────────────────
 
-function labelForKey(template: any, key: string): string {
-  if (!template) return key;
-  const inFields = template.fields?.find((f: any) => f.id === key);
-  if (inFields?.label) return inFields.label;
-  const inItems = template.items?.find((i: any) => i.id === key);
-  if (inItems?.label) return inItems.label;
-  const inQuestions = template.questions?.find((q: any) => q.id === key);
-  if (inQuestions?.text) return inQuestions.text;
-  const inSituations = template.situations?.find((s: any) => s.id === key);
-  if (inSituations) return inSituations.title || inSituations.text;
-  const inReflection = template.dmReflection?.find((r: any) => r.id === key);
-  if (inReflection?.label) return inReflection.label;
-  // humanize snake / kebab
-  return key.replace(/[_-]+/g, ' ').replace(/^./, (c) => c.toUpperCase());
-}
-
-// ─── Smart response → HTML ───────────────────────────────────────────────────
-
-function isPlainObject(v: any) {
-  return v && typeof v === 'object' && !Array.isArray(v);
-}
-
-function renderValue(v: any, template: any): string {
-  if (v == null || v === '') {
-    return `<span class="mat-empty">— gol —</span>`;
-  }
-  if (typeof v === 'boolean') return v ? '✓ Da' : '✗ Nu';
-  if (typeof v === 'number') return esc(String(v));
-  if (typeof v === 'string') {
-    // Highlight if it looks like a URL
-    if (/^https?:\/\//.test(v)) {
-      return `<a href="${esc(v)}" style="color:#1A5C38">${esc(v)}</a>`;
-    }
-    return nl2br(v);
-  }
-  if (Array.isArray(v)) {
-    if (v.length === 0) return `<span class="mat-empty">— gol —</span>`;
-    // Array of plain objects → table
-    if (v.every(isPlainObject)) {
-      const keys = Array.from(v.reduce((set: Set<string>, row: any) => {
-        Object.keys(row).forEach((k) => set.add(k));
-        return set;
-      }, new Set<string>()));
-      const head = keys.map((k) => `<th>${esc(labelForKey(template, k))}</th>`).join('');
-      const rows = v.map((row: any) => {
-        const cells = keys.map((k) => `<td>${renderValue(row[k], template)}</td>`).join('');
-        return `<tr>${cells}</tr>`;
-      }).join('');
-      return `<table class="mat-table"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
-    }
-    // Array of scalars / mixed → bullets
-    return `<ul class="mat-list">${v.map((x) => `<li>${renderValue(x, template)}</li>`).join('')}</ul>`;
-  }
-  if (isPlainObject(v)) {
-    const entries = Object.entries(v).filter(([, val]) => val !== undefined);
-    if (entries.length === 0) return `<span class="mat-empty">— gol —</span>`;
-    return entries.map(([k, val]) => `
-      <div class="mat-field">
-        <div class="mat-field-label">${esc(labelForKey(template, k))}</div>
-        <div class="mat-field-value">${renderValue(val, template)}</div>
-      </div>
-    `).join('');
-  }
-  return esc(String(v));
-}
+const renderValue = renderMaterialResponse;
 
 // ─── Extra styles layered on top of BASE_STYLES ──────────────────────────────
 
@@ -280,6 +217,39 @@ const MATERIALS_STYLES = `
     border-radius: 0 4px 4px 0;
     white-space: pre-wrap;
     word-break: break-word;
+  }
+
+  /* Reading and print layout; preserve the shared AA document palette. */
+  .mat-title-band { background: var(--ink); color: var(--paper); }
+  .mat-title-band h1, .mat-item-title { letter-spacing: 0; }
+  .mat-title-band .mat-tag { color: var(--gold); }
+  .mat-body { line-height: 1.65; }
+  .mat-section { break-inside: auto; }
+  .mat-item { padding: 18px 0; border: 0; border-bottom: 1px solid var(--line); background: none; break-inside: auto; }
+  .mat-item-title { font-family: 'Arimo', Arial, sans-serif; font-size: 17px; font-weight: 700; text-transform: none; color: var(--green); break-after: avoid; }
+  .mat-item-meta { color: var(--muted); border-color: var(--line); }
+  .mat-field { margin-bottom: 18px; }
+  .mat-field-label { font-size: 12px; line-height: 1.5; letter-spacing: 0; text-transform: none; color: var(--ink-light); break-after: avoid; margin-bottom: 6px; }
+  .mat-field-value { font-size: 13px; line-height: 1.65; color: var(--ink); background: none; border: 0; border-radius: 0; padding: 0; white-space: normal; overflow-wrap: anywhere; }
+  .mat-field-value .mat-field-value { background: none; border: 0; }
+  .mat-field-value a { color: var(--green); }
+  .mat-empty { color: var(--muted); }
+  .mat-list { padding-left: 18px; margin: 0; }
+  .mat-list li { padding-left: 3px; margin-bottom: 6px; }
+  .mat-table { table-layout: fixed; font-size: 12px; margin: 8px 0 12px; }
+  .mat-table th, .mat-table td { padding: 9px 10px; border-color: var(--line); overflow-wrap: anywhere; }
+  .mat-table th { font-family: 'Arimo', Arial, sans-serif; font-size: 11px; letter-spacing: 0; text-transform: none; font-weight: 700; color: var(--green); background: var(--paper-dark); }
+  .mat-table thead { display: table-header-group; }
+  .mat-table tr { break-inside: avoid; }
+  .mat-record { border-top: 1px solid var(--line); padding: 12px 0; }
+  .mat-record-number { font-weight: 700; color: var(--green); margin-bottom: 8px; }
+  .mat-record .mat-field { margin-bottom: 10px; }
+  @media print {
+    @page { size: A4; margin: 12mm; }
+    .page { width: 100%; min-height: 0 !important; height: auto !important; overflow: visible; break-after: auto; }
+    .mat-body { padding: 20px 0; }
+    .mat-title-band { padding: 20px; }
+    .aa-header, .aa-footer { break-inside: avoid; }
   }
 `;
 

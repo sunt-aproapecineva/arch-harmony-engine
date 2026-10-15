@@ -7,3 +7,7 @@
 # Window return
 
 - [x] Preserve the current page and scroll position when returning from another window; verified same-user sign-in events and changed-content refresh retain the Date brute tab, URL and scroll position (1400 → 1400), without runtime errors.
+
+# Exercise downloads
+
+- [x] Replace serialized answers with readable questions, lists and tables; verified the connected account’s module export and two printed regression pages, including missing cells, wide worksheets and multiline answers, without clipping.
