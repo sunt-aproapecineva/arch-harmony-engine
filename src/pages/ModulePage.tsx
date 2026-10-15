@@ -159,14 +159,6 @@ export const ModulePage: React.FC = () => {
         <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--gold)', marginBottom: 10 }}>{module.subtitle}</p>
         <p style={{ fontSize: 14, color: 'var(--fg-3)', lineHeight: 1.7, marginBottom: 20 }}>{module.description}</p>
 
-        {moduleAnswers.length > 0 && (
-          <button
-            onClick={() => exportAllPDF({ exercises: moduleAnswers, notes: [], title: `Exercițiile mele — ${module.title}` })}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700, background: 'var(--accent)', color: 'var(--bg)', border: 'none', cursor: 'pointer', marginBottom: 20 }}>
-            <Download size={13} /> Descarcă exercițiile ({moduleAnswers.length}) · PDF
-          </button>
-        )}
-
         {/* Progress bar */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--fg-3)', marginBottom: 6 }}>
@@ -183,23 +175,41 @@ export const ModulePage: React.FC = () => {
           </div>
         </div>
 
-        {/* CTA */}
-        {!locked && visibleLessons.length > 0 && (
-          <div style={{ marginTop: 20 }}>
-            <button
-              onClick={() => { if (!quizDone) { setQuizModalOpen(true); return; } navigate(courseLessonPath(course, visibleLessons[0].id)); }}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8,
-                padding: '10px 22px', background: 'var(--accent)', color: '#0D0907',
-                border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 700,
-                transition: 'filter 0.15s',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.07)')}
-              onMouseLeave={e => (e.currentTarget.style.filter = '')}
-            >
-              <Play size={14} />
-              {isCompleted(visibleLessons[0].id) ? 'Revedea prima lecție' : 'Începe prima lecție'}
-            </button>
+        {/* CTA + descărcare exerciții — pe aceeași linie */}
+        {((!locked && visibleLessons.length > 0) || moduleAnswers.length > 0) && (
+          <div style={{ marginTop: 20, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            {!locked && visibleLessons.length > 0 && (
+              <button
+                onClick={() => { if (!quizDone) { setQuizModalOpen(true); return; } navigate(courseLessonPath(course, visibleLessons[0].id)); }}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '10px 22px', background: 'var(--accent)', color: '#0D0907',
+                  border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 700,
+                  transition: 'filter 0.15s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.07)')}
+                onMouseLeave={e => (e.currentTarget.style.filter = '')}
+              >
+                <Play size={14} />
+                {isCompleted(visibleLessons[0].id) ? 'Revedea prima lecție' : 'Începe prima lecție'}
+              </button>
+            )}
+            {moduleAnswers.length > 0 && (
+              <button
+                onClick={() => exportAllPDF({ exercises: moduleAnswers, notes: [], title: `Exercițiile mele — ${module.title}` })}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '10px 18px', borderRadius: 10, fontSize: 13, fontWeight: 700,
+                  background: 'transparent', color: 'var(--fg-2)',
+                  border: '1px solid var(--border)', cursor: 'pointer',
+                  transition: 'border-color 0.15s, color 0.15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-hi)'; e.currentTarget.style.color = 'var(--fg)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--fg-2)'; }}
+              >
+                <Download size={13} /> Descarcă exercițiile ({moduleAnswers.length}) · PDF
+              </button>
+            )}
           </div>
         )}
       </motion.div>
