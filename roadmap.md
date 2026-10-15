@@ -10,4 +10,4 @@
 
 # Exercise downloads
 
-- [ ] Replace serialized answers with readable questions, lists and tables; verify the module export.
+- [x] Replace serialized answers with readable questions, lists and tables; verified the connected account’s module export and two printed regression pages, including missing cells, wide worksheets and multiline answers, without clipping.
