@@ -60,6 +60,21 @@ export const AdminUsers: React.FC = () => {
   const [newFlow, setNewFlow] = useState<string | null>(null);
 
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
+
+  // Regenerarea în masă a briefingurilor AI — pe programul selectat în bara de filtre.
+  const [regenBusy, setRegenBusy] = useState(false);
+  const [regenMsg, setRegenMsg] = useState<string | null>(null);
+  const regenerateAll = useServerFn(regenerateAllInsights);
+  const onRegenerateAll = async () => {
+    setRegenBusy(true); setRegenMsg(null);
+    try {
+      const res = await regenerateAll({ data: { courseId: courseId || 'business' } });
+      const base = `Briefinguri regenerate: ${res.done} din ${res.total}`;
+      setRegenMsg(res.failed ? `${base} · ${res.failed} eșuate` : base);
+    } catch (e: any) {
+      setRegenMsg(e?.message || 'Nu am putut regenera briefingurile.');
+    } finally { setRegenBusy(false); }
+  };
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
