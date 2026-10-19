@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { BookOpen, Clock, Lock, ArrowRight, Sparkles, FileText, Film, Wrench, Briefcase } from 'lucide-react';
 import { libraryItemsForCourse, LIBRARY_ACCENT, LibraryItem } from '../lib/libraryData';
 import { useAuthContext } from '../context/AuthContext';
+import { LibraryUploads } from '../components/library/LibraryUploads';
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
   article: <FileText size={12} />,
@@ -146,7 +147,7 @@ export const LibraryPage: React.FC = () => {
   const courseItems = React.useMemo(() => libraryItemsForCourse(courseId), [courseId]);
   const { user } = useAuthContext();
   // Tariful contează per curs: un elev poate fi arhitect la Business și student la Start.
-  const isArchitect = tierGrants(courseId, courseTariff, 'library');
+  const isArchitect = user?.role === 'admin' || tierGrants(courseId, courseTariff, 'library');
 
   if (!isArchitect) {
     return (
@@ -190,6 +191,8 @@ export const LibraryPage: React.FC = () => {
           participanții la tariful Arhitect.
         </p>
       </motion.div>
+
+      {courseId && <LibraryUploads courseId={courseId} isAdmin={!!user && user.role === 'admin'} />}
 
       {/* Bento grid */}
       <div style={{

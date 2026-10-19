@@ -15,6 +15,13 @@
       "when": 1791875499478,
       "tag": "0001_video_positions",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792407078586,
+      "tag": "0002_library_materials",
+      "breakpoints": true
     }
   ]
 }
