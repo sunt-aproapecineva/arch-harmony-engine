@@ -13,9 +13,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, ChevronDown, ChevronUp, Shield, Search, X, RefreshCw, CheckCircle2, Link2, ShieldOff } from 'lucide-react';
+import { Plus, ChevronDown, ChevronUp, Shield, Search, X, RefreshCw, CheckCircle2, Link2, ShieldOff, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useServerFn } from '@tanstack/react-start';
 import { sendStudentInvite } from '@/lib/inviteEmail.functions';
+import { regenerateAllInsights } from '@/lib/studentInsights.functions';
 import { timeAgo } from '../../lib/activity';
 import {
   fetchAdminUsers, fetchAllProgress, setUserAdmin,
