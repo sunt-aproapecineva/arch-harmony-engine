@@ -13,9 +13,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, ChevronDown, ChevronUp, Shield, Search, X, RefreshCw, CheckCircle2, Link2, ShieldOff } from 'lucide-react';
+import { Plus, ChevronDown, ChevronUp, Shield, Search, X, RefreshCw, CheckCircle2, Link2, ShieldOff, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useServerFn } from '@tanstack/react-start';
 import { sendStudentInvite } from '@/lib/inviteEmail.functions';
+import { regenerateAllInsights } from '@/lib/studentInsights.functions';
 import { timeAgo } from '../../lib/activity';
 import {
   fetchAdminUsers, fetchAllProgress, setUserAdmin,
@@ -58,6 +60,21 @@ export const AdminUsers: React.FC = () => {
   const [newFlow, setNewFlow] = useState<string | null>(null);
 
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
+
+  // Regenerarea în masă a briefingurilor AI — pe programul selectat în bara de filtre.
+  const [regenBusy, setRegenBusy] = useState(false);
+  const [regenMsg, setRegenMsg] = useState<string | null>(null);
+  const regenerateAll = useServerFn(regenerateAllInsights);
+  const onRegenerateAll = async () => {
+    setRegenBusy(true); setRegenMsg(null);
+    try {
+      const res = await regenerateAll({ data: { courseId: courseId || 'business' } });
+      const base = `Briefinguri regenerate: ${res.done} din ${res.total}`;
+      setRegenMsg(res.failed ? `${base} · ${res.failed} eșuate` : base);
+    } catch (e: any) {
+      setRegenMsg(e?.message || 'Nu am putut regenera briefingurile.');
+    } finally { setRegenBusy(false); }
+  };
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -270,9 +287,15 @@ export const AdminUsers: React.FC = () => {
           <h1 className="font-aboreto" style={{ fontSize: 22, color: 'var(--fg)', marginBottom: 4 }}>Utilizatori</h1>
           <p style={{ fontSize: 13, color: 'var(--fg-3)' }}>Toate conturile și lista de acces, din toate programele</p>
         </div>
-        <button onClick={reload} className="aa-tap" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--fg-2)' }}>
-          <RefreshCw size={13} className={loading ? 'animate-spin' : ''} /> Reîncarcă
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {regenMsg && <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>{regenMsg}</span>}
+          <button onClick={onRegenerateAll} disabled={regenBusy} className="aa-tap" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: 8, cursor: regenBusy ? 'wait' : 'pointer', fontSize: 12, color: 'var(--fg-2)', opacity: regenBusy ? 0.6 : 1 }}>
+            <Sparkles size={13} className={regenBusy ? 'animate-spin' : ''} /> {regenBusy ? 'Se regenerează…' : 'Regenerează briefingurile'}
+          </button>
+          <button onClick={reload} className="aa-tap" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--fg-2)' }}>
+            <RefreshCw size={13} className={loading ? 'animate-spin' : ''} /> Reîncarcă
+          </button>
+        </div>
       </div>
 
       <AdminScopeBar summary={scopeSummary} />
