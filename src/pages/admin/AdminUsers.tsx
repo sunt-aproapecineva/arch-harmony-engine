@@ -287,9 +287,15 @@ export const AdminUsers: React.FC = () => {
           <h1 className="font-aboreto" style={{ fontSize: 22, color: 'var(--fg)', marginBottom: 4 }}>Utilizatori</h1>
           <p style={{ fontSize: 13, color: 'var(--fg-3)' }}>Toate conturile și lista de acces, din toate programele</p>
         </div>
-        <button onClick={reload} className="aa-tap" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--fg-2)' }}>
-          <RefreshCw size={13} className={loading ? 'animate-spin' : ''} /> Reîncarcă
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {regenMsg && <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>{regenMsg}</span>}
+          <button onClick={onRegenerateAll} disabled={regenBusy} className="aa-tap" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: 8, cursor: regenBusy ? 'wait' : 'pointer', fontSize: 12, color: 'var(--fg-2)', opacity: regenBusy ? 0.6 : 1 }}>
+            <Sparkles size={13} className={regenBusy ? 'animate-spin' : ''} /> {regenBusy ? 'Se regenerează…' : 'Regenerează briefingurile'}
+          </button>
+          <button onClick={reload} className="aa-tap" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--fg-2)' }}>
+            <RefreshCw size={13} className={loading ? 'animate-spin' : ''} /> Reîncarcă
+          </button>
+        </div>
       </div>
 
       <AdminScopeBar summary={scopeSummary} />
