@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { BookOpen, Clock, Lock, ArrowRight, Sparkles, FileText, Film, Wrench, Briefcase } from 'lucide-react';
 import { libraryItemsForCourse, LIBRARY_ACCENT, LibraryItem } from '../lib/libraryData';
 import { useAuthContext } from '../context/AuthContext';
+import { LibraryUploads } from '../components/library/LibraryUploads';
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
   article: <FileText size={12} />,
@@ -190,6 +191,8 @@ export const LibraryPage: React.FC = () => {
           participanții la tariful Arhitect.
         </p>
       </motion.div>
+
+      {courseId && <LibraryUploads courseId={courseId} isAdmin={!!user && user.role === 'admin'} />}
 
       {/* Bento grid */}
       <div style={{
