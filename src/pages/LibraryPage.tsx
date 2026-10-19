@@ -147,7 +147,7 @@ export const LibraryPage: React.FC = () => {
   const courseItems = React.useMemo(() => libraryItemsForCourse(courseId), [courseId]);
   const { user } = useAuthContext();
   // Tariful contează per curs: un elev poate fi arhitect la Business și student la Start.
-  const isArchitect = tierGrants(courseId, courseTariff, 'library');
+  const isArchitect = user?.role === 'admin' || tierGrants(courseId, courseTariff, 'library');
 
   if (!isArchitect) {
     return (
