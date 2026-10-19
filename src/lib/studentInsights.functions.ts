@@ -264,65 +264,106 @@ export const generateStudentInsight = createServerFn({ method: 'POST' })
       }
     }
 
-    const gathered = await gatherStudent(admin, data.studentId, data.courseId);
-    const prompt = buildPrompt({
-      profile: gathered.profile,
-      mods: gathered.mods,
-      quizAnswers: gathered.quizAnswers,
-      notes: gathered.notes,
-      exerciseRows: gathered.exerciseRows,
-      progress: gathered.progress,
-      scores: gathered.scores,
-      stuck: gathered.stuck,
-    });
+    return runGeneration(admin, data.studentId, data.courseId);
+  });
 
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error('LOVABLE_API_KEY lipsește din mediul serverului.');
+// Nucleul generării, folosit și de regenerarea în masă de mai jos.
+async function runGeneration(admin: any, studentId: string, courseId: string) {
+  const gathered = await gatherStudent(admin, studentId, courseId);
+  const prompt = buildPrompt({
+    profile: gathered.profile,
+    mods: gathered.mods,
+    quizAnswers: gathered.quizAnswers,
+    notes: gathered.notes,
+    exerciseRows: gathered.exerciseRows,
+    progress: gathered.progress,
+    scores: gathered.scores,
+    stuck: gathered.stuck,
+  });
 
-    const model = 'google/gemini-2.5-flash';
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Lovable-API-Key': apiKey,
-        'X-Lovable-AIG-SDK': 'fetch',
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: 'system', content: 'Ești un analist educațional precis, factual, scris în română corectă.' },
-          { role: 'user', content: prompt },
-        ],
-        temperature: 0.4,
-      }),
-    });
+  const apiKey = process.env.LOVABLE_API_KEY;
+  if (!apiKey) throw new Error('LOVABLE_API_KEY lipsește din mediul serverului.');
 
-    if (!response.ok) {
-      const text = await response.text();
-      if (response.status === 429) throw new Error('Prea multe cereri AI. Reîncearcă peste un minut.');
-      if (response.status === 402) throw new Error('Creditele AI sunt epuizate. Adaugă credite în setări.');
-      throw new Error(`Eroare AI (${response.status}): ${text.slice(0, 200)}`);
+  const model = 'google/gemini-2.5-flash';
+  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Lovable-API-Key': apiKey,
+      'X-Lovable-AIG-SDK': 'fetch',
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: 'Ești un analist educațional precis, factual, scris în română corectă.' },
+        { role: 'user', content: prompt },
+      ],
+      temperature: 0.4,
+    }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    if (response.status === 429) throw new Error('Prea multe cereri AI. Reîncearcă peste un minut.');
+    if (response.status === 402) throw new Error('Creditele AI sunt epuizate. Adaugă credite în setări.');
+    throw new Error(`Eroare AI (${response.status}): ${text.slice(0, 200)}`);
+  }
+
+  const json = await response.json();
+  const summary: string = json?.choices?.[0]?.message?.content?.trim() || '';
+  if (!summary) throw new Error('Răspunsul AI a fost gol.');
+
+  const upsertPayload = {
+    user_id: studentId,
+    course_id: courseId,
+    summary,
+    scores: gathered.scores,
+    model_used: model,
+    generated_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+  const { error: upErr } = await admin
+    .from('student_insights')
+    .upsert(upsertPayload, { onConflict: 'user_id,course_id' });
+  if (upErr) throw new Error(upErr.message);
+
+  return { ...upsertPayload, fromCache: false };
+}
+
+// ── Regenerare în masă ───────────────────────────────────────────────────────
+// Regenerează briefingul pentru TOȚI elevii înscriși la un program, pe rând
+// (nu în paralel — altfel am lovi limita de cereri AI). Un elev eșuat nu oprește
+// restul; rezultatul spune câți au reușit și câți nu.
+export const regenerateAllInsights = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({
+    courseId: z.string().default('business'),
+  }).parse(input ?? {}))
+  .handler(async ({ data, context }) => {
+    const admin = await ensureAdmin(context);
+
+    const [enrollRes, rolesRes] = await Promise.all([
+      admin.from('enrollments').select('user_id').eq('course_id', data.courseId),
+      admin.from('user_roles').select('user_id,role'),
+    ]);
+    const adminIds = new Set((rolesRes.data || []).filter((r: any) => r.role === 'admin').map((r: any) => r.user_id));
+    const studentIds = [...new Set((enrollRes.data || []).map((e: any) => e.user_id))]
+      .filter((id: string) => !adminIds.has(id))
+      .slice(0, 50); // plafon de siguranță per rulare
+
+    let done = 0;
+    const failed: string[] = [];
+    for (const id of studentIds) {
+      try {
+        await runGeneration(admin, id, data.courseId);
+        done++;
+      } catch (e: any) {
+        failed.push(e?.message || 'eroare necunoscută');
+        // La limită de cereri sau credite epuizate ne oprim — restul ar eșua oricum.
+        if (e?.message?.includes('Prea multe cereri') || e?.message?.includes('Creditele AI')) break;
+      }
     }
-
-    const json = await response.json();
-    const summary: string = json?.choices?.[0]?.message?.content?.trim() || '';
-    if (!summary) throw new Error('Răspunsul AI a fost gol.');
-
-    const upsertPayload = {
-      user_id: data.studentId,
-      course_id: data.courseId,
-      summary,
-      scores: gathered.scores,
-      model_used: model,
-      generated_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    const { error: upErr } = await admin
-      .from('student_insights')
-      .upsert(upsertPayload, { onConflict: 'user_id,course_id' });
-    if (upErr) throw new Error(upErr.message);
-
-    return { ...upsertPayload, fromCache: false };
+    return { total: studentIds.length, done, failed: failed.length, stoppedEarly: done + failed.length < studentIds.length };
   });
 
 // ── Supervisor notes CRUD ────────────────────────────────────────────────────
