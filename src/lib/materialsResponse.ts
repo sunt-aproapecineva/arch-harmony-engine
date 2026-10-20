@@ -44,6 +44,9 @@ export function renderMaterialResponse(raw: unknown, template?: Template, field?
   if (Array.isArray(value)) {
     if (!value.length) return empty;
     if (value.every(isRecord)) {
+      // Rândurile goale ale foii (ex. {} necompletate) nu se afișează.
+      value = value.filter(row => Object.values(row).some(v => v != null && String(v).trim() !== ''));
+      if (!value.length) return empty;
       const savedKeys = [...new Set(value.flatMap(row => Object.keys(row)))];
       const columns = [...(field?.columns ?? []), ...savedKeys.filter(key => !field?.columns?.includes(key))];
       if (!columns.length) return empty;
