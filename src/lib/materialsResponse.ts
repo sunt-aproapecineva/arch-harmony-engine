@@ -32,7 +32,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 export function renderMaterialResponse(raw: unknown, template?: Template, field?: Field): string {
-  let value = structuredValue(raw);
+  const value = structuredValue(raw);
   const empty = '<span class="mat-empty">Fără răspuns</span>';
   if (value == null || value === '') return empty;
   if (typeof value === 'boolean') return value ? 'Da' : 'Nu';
@@ -45,15 +45,16 @@ export function renderMaterialResponse(raw: unknown, template?: Template, field?
     if (!value.length) return empty;
     if (value.every(isRecord)) {
       // Rândurile goale ale foii (ex. {} necompletate) nu se afișează.
-      value = value.filter(row => Object.values(row).some(v => v != null && String(v).trim() !== ''));
-      if (!value.length) return empty;
-      const savedKeys = [...new Set(value.flatMap(row => Object.keys(row)))];
+      const rowsAll = value as Record<string, unknown>[];
+      const filledRows = rowsAll.filter(row => Object.values(row).some(v => v != null && String(v).trim() !== ''));
+      if (!filledRows.length) return empty;
+      const savedKeys = [...new Set(filledRows.flatMap(row => Object.keys(row)))];
       const columns = [...(field?.columns ?? []), ...savedKeys.filter(key => !field?.columns?.includes(key))];
       if (!columns.length) return empty;
       // Wide worksheets become numbered records instead of cramped A4 columns.
-      if (columns.length > 4) return `<div class="mat-records">${value.map((row, index) => `<div class="mat-record"><div class="mat-record-number">${index + 1}.</div>${columns.map(key => `<div class="mat-field"><div class="mat-field-label">${escapeMaterial(labelFor(template, key))}</div><div class="mat-field-value">${renderMaterialResponse(row[key], template)}</div></div>`).join('')}</div>`).join('')}</div>`;
+      if (columns.length > 4) return `<div class="mat-records">${filledRows.map((row, index) => `<div class="mat-record"><div class="mat-record-number">${index + 1}.</div>${columns.map(key => `<div class="mat-field"><div class="mat-field-label">${escapeMaterial(labelFor(template, key))}</div><div class="mat-field-value">${renderMaterialResponse(row[key], template)}</div></div>`).join('')}</div>`).join('')}</div>`;
       const header = columns.map(key => `<th scope="col">${escapeMaterial(labelFor(template, key))}</th>`).join('');
-      const rows = value.map(row => `<tr>${columns.map(key => `<td>${renderMaterialResponse(row[key], template)}</td>`).join('')}</tr>`).join('');
+      const rows = filledRows.map(row => `<tr>${columns.map(key => `<td>${renderMaterialResponse(row[key], template)}</td>`).join('')}</tr>`).join('');
       return `<table class="mat-table"><thead><tr>${header}</tr></thead><tbody>${rows}</tbody></table>`;
     }
     return `<ul class="mat-list">${value.map(item => `<li>${renderMaterialResponse(item, template)}</li>`).join('')}</ul>`;
