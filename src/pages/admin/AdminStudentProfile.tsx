@@ -25,6 +25,7 @@ import { displayActivityLabel } from '../../lib/activityLabels';
 import { recoverStudentExerciseResponses } from '../../lib/adminRecovery.functions';
 import { StudentBriefingPanel } from '@/components/admin/StudentBriefingPanel';
 import { SupervisorNotesPanel } from '@/components/admin/SupervisorNotesPanel';
+import { renderMaterialResponse } from '@/lib/materialsResponse';
 
 type TabKey = 'briefing' | 'raw' | 'notes';
 
@@ -294,9 +295,8 @@ function renderReadableAnswer(
               <div key={k}>
                 <div style={{ fontSize: 11, color: 'var(--fg-3)', marginBottom: 3 }}>{label}</div>
                 {val ? (
-                  <div style={{ fontSize: 13, color: 'var(--fg)', whiteSpace: 'pre-wrap', lineHeight: 1.5, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 10px' }}>
-                    {val}
-                  </div>
+                  <div className="mat-view" style={{ fontSize: 13, color: 'var(--fg)', lineHeight: 1.5, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 10px' }}
+                    dangerouslySetInnerHTML={{ __html: renderMaterialResponse(v, template, (template?.fields || []).find((f: any) => f.id === k)) }} />
                 ) : (
                   <div style={{ fontSize: 12, color: 'var(--fg-3)', fontStyle: 'italic' }}>—</div>
                 )}
@@ -308,7 +308,7 @@ function renderReadableAnswer(
     };
   }
 
-  return { node: <pre style={{ fontSize: 11, color: 'var(--fg-2)' }}>{JSON.stringify(parsed, null, 2)}</pre> };
+  return { node: <div className="mat-view" style={{ fontSize: 13, color: 'var(--fg)' }} dangerouslySetInnerHTML={{ __html: renderMaterialResponse(parsed, template) }} /> };
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
