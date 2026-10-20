@@ -32,7 +32,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 export function renderMaterialResponse(raw: unknown, template?: Template, field?: Field): string {
-  const value = structuredValue(raw);
+  let value = structuredValue(raw);
   const empty = '<span class="mat-empty">Fără răspuns</span>';
   if (value == null || value === '') return empty;
   if (typeof value === 'boolean') return value ? 'Da' : 'Nu';
