@@ -557,3 +557,19 @@ input::placeholder, textarea::placeholder { color: var(--fg-3); }
 /* Fără coloană laterală lecția respiră la 820px; cu ea, are nevoie de loc. */
 .aa-lesson-page { max-width: 820px; }
 @media (min-width: 1024px) { .aa-lesson-page { max-width: 1112px; } }
+
+/* Răspunsuri elevi lizibile în admin (aceeași logică ca PDF-ul) */
+.mat-view { white-space: normal; overflow-x: auto; }
+.mat-view .mat-empty { color: var(--fg-3); font-style: italic; font-size: 12px; }
+.mat-view .mat-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.mat-view .mat-table th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--fg-3); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--border); background: var(--bg-3); }
+.mat-view .mat-table td { padding: 7px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.mat-view .mat-table tr:last-child td { border-bottom: none; }
+.mat-view .mat-records { display: flex; flex-direction: column; gap: 8px; }
+.mat-view .mat-record { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; background: var(--bg-card); }
+.mat-view .mat-record-number { font-weight: 700; color: var(--accent); font-size: 12px; margin-bottom: 4px; }
+.mat-view .mat-field { padding: 4px 0; }
+.mat-view .mat-field + .mat-field { border-top: 1px dashed var(--border); }
+.mat-view .mat-field-label { font-size: 10.5px; color: var(--fg-3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+.mat-view .mat-list { margin: 0; padding-left: 18px; }
+.mat-view a { color: var(--accent); text-decoration: underline; }
