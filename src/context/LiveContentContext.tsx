@@ -119,6 +119,10 @@ function overlayContent(dbMods: any[], dbLessons: any[]) {
         if (db.is_published != null) sl.is_published = db.is_published || !!sl.video_url;
       });
 
+      // Publicarea unei lecții cu video deschide automat modulul blocat manual.
+      if (staticMod.manualLock && videoLessons.some((l: any) => l.is_published !== false && !!l.video_url)) {
+        staticMod.manualLock = false;
+      }
     });
     });
     return true;
