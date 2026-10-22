@@ -11,3 +11,7 @@
 # Exercise downloads
 
 - [x] Replace serialized answers with readable questions, lists and tables; verified the connected account’s module export and two printed regression pages, including missing cells, wide worksheets and multiline answers, without clipping.
+
+# Module 5 START visibility
+
+- [ ] Explain and fix why lessons the admin publishes in START module 5 stay invisible to students.
