@@ -5,3 +5,4 @@
 - Persist admin student-profile tab and scroll in sessionStorage per student, because mobile browsers may reload backgrounded tabs and in-memory state is lost.
 - Use uploaded asset pointers resolved to absolute public HTTPS URLs for email images, because email clients cannot load relative paths or unpublished static files.
 - Render material answers through the browser-safe materialsResponse formatter using template field metadata; decode structured values only for presentation so exported worksheets remain readable without changing saved responses.
+- Publishing a video lesson unlocks its manually locked module (overlay in LiveContentContext), so admins never need a separate module-open step.

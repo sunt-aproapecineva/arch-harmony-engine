@@ -14,4 +14,4 @@
 
 # Module 5 START visibility
 
-- [ ] Explain and fix why lessons the admin publishes in START module 5 stay invisible to students.
+- [x] Publishing a lesson with video now opens its manually locked module; START module 5 verified open in preview.
