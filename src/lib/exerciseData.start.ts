@@ -481,21 +481,98 @@ export const START_EXERCISE_TEMPLATES: ExerciseTemplate[] = [
     ],
   },
 
-  // ── Modulul 5 · Marketing ──────────────────────────────────────────────────
+  // ── Modulul 5 · Marketing și Promovare (Planul de Marketing pe 30 de zile) ──
   {
     exerciseId: 'st-e-5-1',
     type: 'form-fields',
-    title: 'Planul de marketing pe 60 de zile',
+    title: 'Harta simplă de marketing',
     instructions:
-      'Semnalul că ești gata de marketing: ai 2–3 clienți plătitori și știi ce spui care convinge. Dacă nu ai, întoarce-te la Modulul 4.',
+      'Legat de Lecția 5.1. Construiește traseul de bază prin care un om potrivit ajunge din piață în pipeline-ul tău. Lucrează direct pe businessul tău: răspunsuri scurte, specifice și verificabile.',
     fields: [
-      { id: 'audit', type: 'dynamic-table', label: 'Auditul prezenței mele online', columns: ['Canal', 'Există?', 'Ce lipsește / ce e greșit', 'Prioritate (1–3)'], addLabel: 'Adaugă un canal' },
-      { id: 'bio', type: 'textarea', label: 'Bio-ul rescris', placeholder: 'Cine ești · pentru cine lucrezi · ce faci · cum te contactează.' },
-      { id: 'piloni', type: 'dynamic-table', label: 'Pilonii de conținut și primele 3 postări', columns: ['Pilonul', 'Ideea postării', 'Publicată la'], addLabel: 'Adaugă o postare' },
-      { id: 'info_ads', type: 'info', text: 'Nu faci ads dacă postarea organică n-a funcționat deja. Ads amplifică ce există, nu repară ce nu merge. Buget de test: 20–50€.' },
-      { id: 'boost', type: 'textarea', label: 'Setul de boost pregătit', placeholder: 'Care postare, ce audiență, ce buget, câte zile. Ce măsor.' },
-      { id: 'greseli', type: 'checkboxes', label: 'Greșeli de marketing pe care le-am comis deja', options: ['Am făcut ads înainte să știu ce mesaj convertește', 'Am promovat produsul înainte de problemă', 'Am targetat prea larg', 'Nu am urmărit cifrele', 'Am schimbat strategia prea repede', 'Am așteptat rezultate mari din buget mic'] },
-      { id: 'plan60', type: 'textarea', label: 'Planul meu pe 60 de zile', placeholder: 'Ce fac săptămânal, concret, singur, cu bugetul pe care îl am.' },
+      { id: 'client', type: 'textarea', label: 'Clientul prioritar', placeholder: 'Descrie-l prin criteriile deja validate.' },
+      { id: 'mesaj', type: 'textarea', label: 'Mesajul de bază', placeholder: 'Ce idee trebuie să înțeleagă despre situația și rezultatul lui.' },
+      { id: 'canal', type: 'textarea', label: 'Canalul actual sau ipoteza de canal', placeholder: 'Unde îl poți întâlni.' },
+      { id: 'actiune', type: 'textarea', label: 'Acțiunea', placeholder: 'Ce pas observabil vrei să facă.' },
+      { id: 'lead', type: 'textarea', label: 'Definiția leadului', placeholder: 'Ce comportament înseamnă că persoana poate intra în pipeline.' },
+      { id: 'metrici', type: 'textarea', label: 'Metricile de început', placeholder: 'Ce vei urmări ca să vezi dacă traseul se mișcă.' },
+      { id: 'control', type: 'checkboxes', label: 'Livrabil final', options: ['Am harta completă: Client → Mesaj → Canal → Acțiune → Lead → Pipeline'] },
+    ],
+  },
+  {
+    exerciseId: 'st-e-5-2',
+    type: 'form-fields',
+    title: 'Mesajul central',
+    instructions:
+      'Legat de Lecția 5.2. Transformă limbajul real al clientului într-un mesaj recognoscibil și testabil. Lucrează direct pe businessul tău: răspunsuri scurte, specifice și verificabile.',
+    fields: [
+      { id: 'situatie', type: 'textarea', label: 'Situația concretă în care problema devine relevantă', placeholder: '' },
+      { id: 'problema', type: 'textarea', label: 'Problema, în formulări apropiate de cele auzite de la clienți', placeholder: '' },
+      { id: 'rezultat', type: 'textarea', label: 'Rezultatul dorit, în termeni concreți', placeholder: '' },
+      { id: 'diferentiere', type: 'textarea', label: 'Diferențierea relevantă pentru problemă', placeholder: '' },
+      { id: 'dovada', type: 'textarea', label: 'Dovada care susține promisiunea', placeholder: '' },
+      { id: 'cta', type: 'input', label: 'Call to action', placeholder: 'Un singur pas următor.' },
+      { id: 'final', type: 'textarea', label: 'Mesajul central — varianta finală', placeholder: '2–4 propoziții.' },
+      { id: 'control', type: 'checkboxes', label: 'Livrabil final', options: ['Am mesajul central + dovada + call to action'] },
+    ],
+  },
+  {
+    exerciseId: 'st-e-5-3',
+    type: 'form-fields',
+    title: 'Alegerea canalului principal',
+    instructions:
+      'Legat de Lecția 5.3. Alege un singur canal principal pentru următorul test, pe criterii clare. Lucrează direct pe businessul tău: răspunsuri scurte, specifice și verificabile.',
+    fields: [
+      { id: 'canale', type: 'dynamic-table', label: 'Canalele posibile (3–5)', columns: ['Canal', 'Unde și cât de natural apare clientul', 'Comportamentul clientului în canal', 'Resursa principală cerută (timp / bani / competență / relații)', 'Cum măsor o acțiune relevantă'], addLabel: 'Adaugă un canal' },
+      { id: 'principal', type: 'textarea', label: 'Canalul principal ales și motivul alegerii', placeholder: '' },
+      { id: 'sprijin', type: 'textarea', label: 'Canalul de sprijin (opțional) și rolul lui exact', placeholder: '' },
+      { id: 'control', type: 'checkboxes', label: 'Livrabil final', options: ['Am canalul principal + motivul alegerii + modul de măsurare'] },
+    ],
+  },
+  {
+    exerciseId: 'st-e-5-4',
+    type: 'form-fields',
+    title: 'Matricea de conținut',
+    instructions:
+      'Legat de Lecția 5.4. Construiește conținut cu rol comercial clar, pornind de la client și mesaj. Lucrează direct pe businessul tău: răspunsuri scurte, specifice și verificabile.',
+    fields: [
+      { id: 'matrice', type: 'dynamic-table', label: 'Matricea de conținut (5 teme reale)', columns: ['Temă (problemă / întrebare / obiecție / rezultat)', 'Funcție (atenție / educație / demonstrație / încredere)', 'Dovadă pe care o pot arăta', 'Format', 'Acțiunea spre care duce'], addLabel: 'Adaugă o temă' },
+      { id: 'executie', type: 'textarea', label: 'Materialele pe care le pot executa realist în următoarele 30 de zile', placeholder: '' },
+      { id: 'control', type: 'checkboxes', label: 'Livrabil final', options: ['Am matricea: Temă → Funcție → Dovadă → Format → Acțiune'] },
+    ],
+  },
+  {
+    exerciseId: 'st-e-5-5',
+    type: 'form-fields',
+    title: 'Workflow AI pentru marketing',
+    instructions:
+      'Legat de Lecția 5.5. Construiește un flux repetabil în care AI accelerează munca, iar tu păstrezi controlul asupra adevărului și vocii. Lucrează direct pe businessul tău: răspunsuri scurte, specifice și verificabile.',
+    fields: [
+      { id: 'sarcina', type: 'textarea', label: 'Sarcina reală de marketing pe care o repet', placeholder: '' },
+      { id: 'input', type: 'textarea', label: 'Inputul real pe care îl ofer', placeholder: 'Client, mesaj, notițe, exemple, date.' },
+      { id: 'instructiune', type: 'textarea', label: 'Instrucțiunea de lucru pentru AI', placeholder: 'Obiectiv, context, format, criterii.' },
+      { id: 'verificare', type: 'textarea', label: 'Etapa de critică și verificare factuală', placeholder: '' },
+      { id: 'eu', type: 'textarea', label: 'Ce adaug eu', placeholder: 'Voce, exemple, selecție, aprobare finală.' },
+      { id: 'rezultate', type: 'textarea', label: 'Cum aduc rezultatele testului înapoi pentru analiză', placeholder: '' },
+      { id: 'control', type: 'checkboxes', label: 'Livrabil final', options: ['Am un workflow AI repetabil, cu verificare și aprobare umană'] },
+    ],
+  },
+  {
+    exerciseId: 'st-e-5-6',
+    type: 'form-fields',
+    title: 'Planul de Marketing pe 30 de zile',
+    instructions:
+      'Legat de Lecția 5.6. Leagă toate livrabilele săptămânii într-un experiment executabil și măsurabil. Lucrează direct pe businessul tău: răspunsuri scurte, specifice și verificabile.',
+    fields: [
+      { id: 'ipoteza', type: 'textarea', label: 'Ipoteza experimentului', placeholder: 'Client, mesaj, canal, acțiune.' },
+      { id: 'sursa', type: 'textarea', label: 'Sursa principală de trafic sau atenție', placeholder: '' },
+      { id: 'continut', type: 'textarea', label: 'Conținutul / campania pe care o execut', placeholder: '' },
+      { id: 'lead', type: 'textarea', label: 'Ce înseamnă exact lead pentru acest experiment', placeholder: '' },
+      { id: 'followup', type: 'textarea', label: 'Procesul de follow-up și legătura cu pipeline-ul de vânzări', placeholder: '' },
+      { id: 'metrici', type: 'textarea', label: 'Cele 3–5 metrici pe care le urmăresc', placeholder: '' },
+      { id: 'ritm', type: 'textarea', label: 'Ritmul de execuție pe 30 de zile', placeholder: '' },
+      { id: 'review', type: 'textarea', label: 'Review-ul săptămânal', placeholder: 'Ce am executat, ce am observat, ce schimb.' },
+      { id: 'decizie', type: 'textarea', label: 'Criteriul de decizie la final', placeholder: 'Continui, modific sau schimb ipoteza.' },
+      { id: 'control', type: 'checkboxes', label: 'Livrabil final', options: ['Am Planul de Marketing pe 30 de zile — documentul final al săptămânii'] },
     ],
   },
 
