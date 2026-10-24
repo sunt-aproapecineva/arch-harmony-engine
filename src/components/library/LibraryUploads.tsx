@@ -45,7 +45,7 @@ export const LibraryUploads: React.FC<{ courseId: string; isAdmin: boolean; read
       .eq('course_id', courseId).order('created_at', { ascending: false });
     setItems((data as Material[]) || []);
     onCountChange?.(data?.length ?? 0);
-    setErr(error ? 'Les documents n’ont pas pu être chargés.' : '');
+    setErr(error ? 'Nu s-au putut încărca documentele. Încearcă din nou.' : '');
     setLoading(false);
   }, [courseId, onCountChange]);
   React.useEffect(() => { load(); }, [load]);
