@@ -15,3 +15,7 @@
 # Module 5 START visibility
 
 - [x] Publishing a lesson with video now opens its manually locked module; START module 5 verified open in preview.
+
+# Library documents in personal materials
+
+- [ ] Show all course library uploads in Materialele mele → Documente with downloads, regardless of package, and verify the loaded files.
