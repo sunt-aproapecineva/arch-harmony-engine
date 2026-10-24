@@ -18,4 +18,4 @@
 
 # Library documents in personal materials
 
-- [ ] Show all course library uploads in Materialele mele → Documente with downloads, regardless of package, and verify the loaded files.
+- [x] Show course library uploads in Materialele mele → Documente without a package gate; verified 21 START documents and a valid Word download (HTTP 200) using the signed-in administrator. Enrolled-user database/storage policies already allow all packages; student-session check remains unverified.
