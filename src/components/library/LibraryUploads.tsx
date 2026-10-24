@@ -28,19 +28,26 @@ const btn: React.CSSProperties = {
   font: 'inherit', fontSize: 13, fontWeight: 600, cursor: 'pointer',
 };
 
-export const LibraryUploads: React.FC<{ courseId: string; isAdmin: boolean }> = ({ courseId, isAdmin }) => {
+export const LibraryUploads: React.FC<{ courseId: string; isAdmin: boolean; readOnly?: boolean; onCountChange?: (count: number) => void }> = ({ courseId, isAdmin, readOnly = false, onCountChange }) => {
   const [items, setItems] = React.useState<Material[]>([]);
   const [open, setOpen] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
   const [err, setErr] = React.useState('');
+  const [loading, setLoading] = React.useState(true);
   const [form, setForm] = React.useState({ title: '', description: '', topic: '', url: '' });
   const [file, setFile] = React.useState<File | null>(null);
 
   const load = React.useCallback(async () => {
-    const { data } = await supabase.from('library_materials').select('*')
+    setLoading(true);
+    setItems([]);
+    onCountChange?.(0);
+    const { data, error } = await supabase.from('library_materials').select('*')
       .eq('course_id', courseId).order('created_at', { ascending: false });
     setItems((data as Material[]) || []);
-  }, [courseId]);
+    onCountChange?.(data?.length ?? 0);
+    setErr(error ? 'Nu s-au putut încărca documentele. Încearcă din nou.' : '');
+    setLoading(false);
+  }, [courseId, onCountChange]);
   React.useEffect(() => { load(); }, [load]);
 
   const save = async () => {
@@ -73,7 +80,8 @@ export const LibraryUploads: React.FC<{ courseId: string; isAdmin: boolean }> = 
 
   const openItem = async (m: Material) => {
     if (m.file_path) {
-      const { data } = await supabase.storage.from('library-files').createSignedUrl(m.file_path, 600);
+      const { data, error } = await supabase.storage.from('library-files').createSignedUrl(m.file_path, 600, { download: m.file_name || true });
+      if (error) setErr('Nu s-a putut descărca documentul. Încearcă din nou.');
       if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener');
     } else if (m.external_url) window.open(m.external_url, '_blank', 'noopener');
   };
@@ -85,18 +93,18 @@ export const LibraryUploads: React.FC<{ courseId: string; isAdmin: boolean }> = 
     load();
   };
 
-  if (!isAdmin && items.length === 0) return null;
+  if (!isAdmin && !readOnly && !loading && !err && items.length === 0) return null;
 
   return (
     <section style={{ marginBottom: 36 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
         <h2 className="font-aboreto" style={{ fontSize: 18, color: 'var(--fg)', margin: 0 }}>Documente & șabloane</h2>
-        {isAdmin && !open && (
+        {isAdmin && !readOnly && !open && (
           <button style={btn} onClick={() => setOpen(true)}><Plus size={15} /> Adaugă document</button>
         )}
       </div>
 
-      {isAdmin && open && (
+      {isAdmin && !readOnly && open && (
         <div style={{ ...box, marginBottom: 16, borderColor: 'var(--gold)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <strong style={{ color: 'var(--fg)' }}>Document nou</strong>
@@ -113,7 +121,8 @@ export const LibraryUploads: React.FC<{ courseId: string; isAdmin: boolean }> = 
         </div>
       )}
 
-      {items.length === 0 ? (
+      {!open && err && <p role="alert" className="text-destructive text-sm">{err}</p>}
+      {loading ? <p className="text-muted-foreground text-sm">Se încarcă documentele…</p> : items.length === 0 ? (
         <p style={{ fontSize: 13, color: 'var(--fg-3)' }}>Încă nu ai adăugat documente pentru acest program.</p>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
@@ -128,7 +137,7 @@ export const LibraryUploads: React.FC<{ courseId: string; isAdmin: boolean }> = 
                 <button style={btn} onClick={() => openItem(m)}>
                   {m.file_path ? <><Download size={14} /> Descarcă</> : <><ExternalLink size={14} /> Deschide</>}
                 </button>
-                {isAdmin && (
+                {isAdmin && !readOnly && (
                   <button style={{ ...btn, borderColor: 'var(--border)', color: 'var(--fg-3)' }} onClick={() => remove(m)} aria-label="Șterge"><Trash2 size={14} /></button>
                 )}
               </div>

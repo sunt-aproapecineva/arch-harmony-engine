@@ -6,3 +6,4 @@
 - Use uploaded asset pointers resolved to absolute public HTTPS URLs for email images, because email clients cannot load relative paths or unpublished static files.
 - Render material answers through the browser-safe materialsResponse formatter using template field metadata; decode structured values only for presentation so exported worksheets remain readable without changing saved responses.
 - Publishing a video lesson unlocks its manually locked module (overlay in LiveContentContext), so admins never need a separate module-open step.
+- Reuse LibraryUploads in read-only mode for MaterialsPage documents; keep course-scoped database and storage policies so student downloads use the same files without granting anonymous access.

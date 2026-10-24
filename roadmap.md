@@ -15,3 +15,7 @@
 # Module 5 START visibility
 
 - [x] Publishing a lesson with video now opens its manually locked module; START module 5 verified open in preview.
+
+# Library documents in personal materials
+
+- [x] Show course library uploads in Materialele mele → Documente without a package gate; verified 21 START documents and a valid Word download (HTTP 200) using the signed-in administrator. Enrolled-user database/storage policies already allow all packages; student-session check remains unverified.

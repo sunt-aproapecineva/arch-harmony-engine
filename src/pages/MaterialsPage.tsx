@@ -12,6 +12,7 @@ import { allModulesFlat } from '@/lib/content';
 import { documentsForCourse } from '@/lib/documentData';
 import { formatLessonNumber, getModuleNumber } from '@/lib/lessonNumbering';
 import { exportExercisePDF, exportNotePDF, exportAllPDF } from '@/lib/materialsExport';
+import { LibraryUploads } from '@/components/library/LibraryUploads';
 
 type Tab = 'exercitii' | 'notite' | 'documente';
 
@@ -62,6 +63,7 @@ export const MaterialsPage: React.FC = () => {
   const [exercises, setExercises] = useState<ExRow[]>([]);
   const [notes, setNotes] = useState<NoteRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [libraryDocumentCount, setLibraryDocumentCount] = useState(0);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -142,7 +144,7 @@ export const MaterialsPage: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 24, flexWrap: 'wrap' }}>
         <TabButton active={tab === 'exercitii'} onClick={() => setTab('exercitii')} icon={FileText} label="Exerciții" count={exercises.length} />
         <TabButton active={tab === 'notite'} onClick={() => setTab('notite')} icon={StickyNote} label="Notițe" count={notes.length} />
-        <TabButton active={tab === 'documente'} onClick={() => setTab('documente')} icon={FolderOpen} label="Documente" count={courseDocuments.length} />
+        <TabButton active={tab === 'documente'} onClick={() => setTab('documente')} icon={FolderOpen} label="Documente" count={courseDocuments.length + libraryDocumentCount} />
         <div style={{ marginLeft: 'auto' }}>
           {(exercises.length + notes.length) > 0 && (
             <button onClick={handleExportAll}
@@ -217,8 +219,10 @@ export const MaterialsPage: React.FC = () => {
       )}
 
       {/* Documente */}
+      <div hidden={tab !== 'documente'} className="mt-6">
+        {courseId && <LibraryUploads courseId={courseId} isAdmin={false} readOnly onCountChange={setLibraryDocumentCount} />}
       {!loading && tab === 'documente' && (
-        <div style={{ marginTop: 24 }}>
+        <div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
             {courseDocuments.map((d: any) => (
               <Link key={d.id} to={courseDocumentFillPath(course, d.id)}
@@ -237,11 +241,12 @@ export const MaterialsPage: React.FC = () => {
               </Link>
             ))}
           </div>
-          <p style={{ marginTop: 16, fontSize: 12, color: 'var(--fg-3)' }}>
+          {courseDocuments.length > 0 && <p style={{ marginTop: 16, fontSize: 12, color: 'var(--fg-3)' }}>
             Documentele completate se salvează automat și pot fi printate din pagina fiecărui document.
-          </p>
+          </p>}
         </div>
       )}
+      </div>
     </div>
   );
 };
