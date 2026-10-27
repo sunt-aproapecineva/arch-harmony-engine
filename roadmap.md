@@ -22,4 +22,4 @@
 
 # START self-paced module access
 
-- [ ] Enable all START modules for Singur while preserving other packages and unpublished lessons; verify Digor's enrollment and module access.
+- [x] Enable all START modules for Singur while preserving other packages and unpublished lessons; verified Digor's Singur enrollment, all ten modules unlocked and direct module 9 access in his student session. Four regression tests pass; unpublished content remains hidden. Production publication is not requested.

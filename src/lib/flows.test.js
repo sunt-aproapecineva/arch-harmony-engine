@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { tierGrants } from './courses';
 import { isModuleUnlocked, isModuleLockedByFlow, moduleUnlockDate } from './flows';
+import { getVisibleLessons } from './lessonVisibility';
 
 const flow = { starts_on: '2026-10-21', open_modules: 2 };
 const now = new Date('2026-10-27T07:22:00Z');
@@ -27,6 +28,10 @@ describe('START Singur independent module access', () => {
   test('unlock override leaves lesson publication untouched', () => {
     const mod = forTier('start', 'singur');
     expect(mod.lessons[0]?.is_published).toBe(false);
+    expect(getVisibleLessons({ ...mod, lessons: [
+      { id: 'st-l-9-1', is_published: false },
+      { id: 'st-l-9-ex', type: 'exercise' },
+    ] })).toEqual([]);
     expect(module.manualLock).toBe(true);
   });
 });
