@@ -19,3 +19,7 @@
 # Library documents in personal materials
 
 - [x] Show course library uploads in Materialele mele → Documente without a package gate; verified 21 START documents and a valid Word download (HTTP 200) using the signed-in administrator. Enrolled-user database/storage policies already allow all packages; student-session check remains unverified.
+
+# START self-paced module access
+
+- [ ] Enable all START modules for Singur while preserving other packages and unpublished lessons; verify Digor's enrollment and module access.
