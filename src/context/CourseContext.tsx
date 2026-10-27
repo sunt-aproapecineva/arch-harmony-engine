@@ -8,7 +8,7 @@
 // Providerul de aici doar expune cursul rutei curente și conținutul lui, ca paginile
 // să nu-l recalculeze fiecare din parametri.
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { Course, getCourse, getCourseBySlug } from '@/lib/courses';
+import { Course, getCourse, getCourseBySlug, tierGrants } from '@/lib/courses';
 import { getCourseModules, getCourseLiveEvents } from '@/lib/content';
 import { tariffForCourse, flowForCourse } from '@/lib/enrollments';
 import { fetchFlowEvents, fetchFlows, type Flow, type FlowEvent } from '@/lib/flows';
@@ -139,7 +139,10 @@ export const CourseProvider: React.FC<{ courseSlug?: string; courseId?: string; 
     () => ({
       course,
       courseId: course?.id || null,
-      modules: course ? getCourseModules(course.id) : [],
+      modules: course ? getCourseModules(course.id).map(mod => ({
+        ...mod,
+        selfPacedAccess: !isAdmin && tierGrants(course.id, tariffForCourse(user?.enrollments, course.id), 'selfPaced'),
+      })) : [],
       // Evenimentele fluxului au prioritate; cele din cod rămân ca plasă pentru
       // elevii fără flux asignat.
       liveEvents: flowEvents.length

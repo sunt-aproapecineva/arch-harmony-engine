@@ -123,6 +123,7 @@ export async function fetchFlowEvents(flowId: string): Promise<FlowEvent[]> {
  * dată. Poziția, nu săptămâna: unele etape durează 2 săptămâni.
  */
 export function isModuleLockedByFlow(mod: any, flow: Flow | null | undefined): boolean {
+  if (mod?.selfPacedAccess) return false;
   if (typeof flow?.open_modules !== 'number') return false;
   const pos = typeof mod?.order_index === 'number' ? mod.order_index : mod?.unlockWeek;
   if (typeof pos !== 'number') return false;
@@ -139,6 +140,7 @@ export function isModuleLockedByFlow(mod: any, flow: Flow | null | undefined): b
  *  4. nimic → modulul e deschis
  */
 export function moduleUnlockDate(mod: any, flow: Flow | null | undefined): Date | null {
+  if (mod?.selfPacedAccess) return null;
   // Blocaj manual sau limită de flux: nu există dată de deschidere, deci UI-ul nu promite una.
   if (mod?.manualLock) return null;
   if (isModuleLockedByFlow(mod, flow)) return null;
@@ -157,6 +159,7 @@ export function moduleUnlockDate(mod: any, flow: Flow | null | undefined): Date 
 }
 
 export function isModuleUnlocked(mod: any, flow: Flow | null | undefined, now = new Date()): boolean {
+  if (mod?.selfPacedAccess) return true;
   if (mod?.manualLock) return false;
   if (isModuleLockedByFlow(mod, flow)) return false;
   const unlock = moduleUnlockDate(mod, flow);

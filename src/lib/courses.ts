@@ -47,6 +47,8 @@ export interface CourseTier {
   grants: {
     /** Biblioteca de materiale bonus. */
     library?: boolean;
+    /** Module access without cohort release dates or manual module locks. */
+    selfPaced?: boolean;
     /** Mentor dedicat și urmărire personală. */
     mentor?: boolean;
     /** Consultație unu-la-unu. */
@@ -113,7 +115,7 @@ export const COURSES: Course[] = [
     is_active: true,
     // Treptele din pagina de vânzare a programului START.
     tiers: [
-      { id: 'singur', label: 'Singur', price: '397€', order: 1, accent: 'neutral', grants: { library: true } },
+      { id: 'singur', label: 'Singur', price: '397€', order: 1, accent: 'neutral', grants: { library: true, selfPaced: true } },
       { id: 'pro',    label: 'PRO',    price: '597€', order: 2, accent: 'accent',  grants: { library: true, mentor: true } },
       { id: 'ultra',  label: 'Ultra',  price: '997€', order: 3, accent: 'gold',    grants: { library: true, mentor: true, oneOnOne: true } },
     ],
