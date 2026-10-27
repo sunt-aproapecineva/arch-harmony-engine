@@ -79,6 +79,8 @@ export interface Module {
    * confirmat — un orar automat l-ar deschide oricum, la data calculată.
    */
   manualLock?: boolean;
+  /** Enrollment-scoped override, never persisted into shared course content. */
+  selfPacedAccess?: boolean;
 
   /**
    * Modul-poartă: modulele următoare presupun că acesta a fost livrat.

@@ -7,3 +7,4 @@
 - Render material answers through the browser-safe materialsResponse formatter using template field metadata; decode structured values only for presentation so exported worksheets remain readable without changing saved responses.
 - Publishing a video lesson unlocks its manually locked module (overlay in LiveContentContext), so admins never need a separate module-open step.
 - Reuse LibraryUploads in read-only mode for MaterialsPage documents; keep course-scoped database and storage policies so student downloads use the same files without granting anonymous access.
+- Resolve self-paced module access from course tier capabilities in CourseContext using enrollment-scoped module copies; central flow gates honor this override without mutating shared content or bypassing lesson publication and enrollment expiry.
