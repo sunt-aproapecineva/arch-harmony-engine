@@ -2,10 +2,10 @@ import { describe, expect, test } from 'bun:test';
 import { tierGrants } from './courses';
 import { isModuleUnlocked, isModuleLockedByFlow, moduleUnlockDate } from './flows';
 
-const flow = { starts_on: '2026-10-21', open_modules: 2 } as Parameters<typeof isModuleUnlocked>[1];
+const flow = { starts_on: '2026-10-21', open_modules: 2 };
 const now = new Date('2026-10-27T07:22:00Z');
 const module = { order_index: 9, unlockWeek: 20, manualLock: true, lessons: [{ is_published: false }] };
-const forTier = (course: string, tier: string) => ({ ...module, selfPacedAccess: tierGrants(course, tier, 'selfPaced') });
+const forTier = (course, tier) => ({ ...module, selfPacedAccess: tierGrants(course, tier, 'selfPaced') });
 
 describe('START Singur independent module access', () => {
   test('all ten modules bypass manual locks, flow caps and future release dates', () => {

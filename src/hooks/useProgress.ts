@@ -61,9 +61,9 @@ function saveMockProgress(progress: Progress[]) {
  */
 export function useProgress(explicitCourseId?: string) {
   const { user } = useAuthContext();
-  const { courseId: contextCourseId, flow } = useCourse();
+  const { courseId: contextCourseId, flow, modules: contextModules } = useCourse();
   const courseId = explicitCourseId || contextCourseId;
-  const modules = getCourseModules(courseId);
+  const modules = courseId === contextCourseId ? contextModules : getCourseModules(courseId);
   const [progress, setProgress] = useState<Progress[]>([]);
   const [exerciseDone, setExerciseDone] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
