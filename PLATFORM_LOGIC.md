@@ -298,6 +298,8 @@ apelează endpointul public `src/routes/lovable/email/queue/process.ts`, care le
 Jobul cron și secretul din vault sunt configurate **în afara migrațiilor** (nu se regăsesc în
 `supabase/migrations`), deci un reset de DB nu le recreează automat.
 
+- **Copie către echipă (regulă permanentă):** orice email tranzacțional din registry trimis cu succes unui elev pleacă și separat (nu CC/BCC) către fiecare adresă din `STUDENT_EMAIL_MONITORS` (`src/lib/email-templates/send-email.ts`), cu subiectul „[Copie elev: <email>] <subiect>” și cheie de idempotență `<cheie>-monitor-<adresă>`. Eșecul unei copii se loghează și nu afectează trimiterea către elev. Nu se trimit copii dacă destinatarul e deja în echipă. Emailurile de autentificare (OTP, confirmări) NU primesc copii.
+
 ## 19. Onboarding wizard & anunțuri
 
 `/welcome` (`OnboardingWizard.tsx`) rulează o singură dată per utilizator, marcat de flagul
