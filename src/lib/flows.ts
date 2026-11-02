@@ -144,6 +144,8 @@ export function moduleUnlockDate(mod: any, flow: Flow | null | undefined): Date 
   // Blocaj manual sau limită de flux: nu există dată de deschidere, deci UI-ul nu promite una.
   if (mod?.manualLock) return null;
   if (isModuleLockedByFlow(mod, flow)) return null;
+  // Flux cu deschidere pe număr de module (cron săptămânal): numărul decide, nu data.
+  if (typeof flow?.open_modules === 'number') return null;
   if (flow?.starts_on && typeof mod?.unlockWeek === 'number') {
     const start = new Date(`${flow.starts_on}T00:00:00+03:00`);
     if (!Number.isNaN(start.getTime())) {
