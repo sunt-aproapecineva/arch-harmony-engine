@@ -137,8 +137,9 @@ export const AdminFlows: React.FC = () => {
           {course && <span style={{ fontSize: 11, color: 'var(--fg-3)', padding: '2px 8px', borderRadius: 99, border: '1px solid var(--border)' }}>{course.shortTitle}</span>}
         </div>
         <p style={{ fontSize: 12.5, color: 'var(--fg-3)', lineHeight: 1.6, maxWidth: 660 }}>
-          Data de start ancorează toate deblocările: modulul din săptămâna 3 se deschide la start + 21 de zile,
-          pentru fiecare flux la data lui. Conținutul rămâne comun — deschiderea unui flux nou nu duplică nimic.
+          Data de start ancorează toate deblocările: modulele se deschd pe rând, câte unul în luni la 09:00
+          ora Moldovei, la săptămâna lui din flux — pentru fiecare flux la data lui, fără nicio setare separată.
+
         </p>
       </div>
 
