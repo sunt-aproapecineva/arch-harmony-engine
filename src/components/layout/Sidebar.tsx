@@ -7,6 +7,7 @@ import { useAuthContext } from '../../context/AuthContext';
 import { useCourse } from '../../context/CourseContext';
 import { courseDocumentsPath, courseLibraryPath, courseMaterialsPath, courseModulePath } from '../../lib/navigation';
 import { COURSE_ACCENT, tierGrants } from '../../lib/courses';
+import { courseLogo } from '../../lib/branding';
 import { enrolledCourses, enrollmentForCourse } from '../../lib/enrollments';
 import { flowAccessUntil } from '../../lib/flows';
 import { TariffBadge } from '../aa/TariffBadge';
@@ -44,16 +45,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       background: 'var(--sidebar-bg)',
       borderRight: '1px solid var(--border)',
     }}>
-      {/* Logo */}
+      {/* Logo — varianta oficială a programului curent (START / BUSINESS). */}
       <div style={{ padding: '20px 16px 16px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'linear-gradient(135deg, #1A5C38, #0f3d22)',
-            boxShadow: '0 2px 8px rgba(26,92,56,0.4)',
-          }}>
-            <span className="font-aboreto" style={{ fontSize: 11, color: '#C4F0E4', letterSpacing: 1 }}>AA</span>
-          </div>
+          {courseLogo(course?.id) ? (
+            <img
+              src={courseLogo(course?.id)!}
+              alt={course?.shortTitle || 'Arhitectura Afacerii'}
+              style={{
+                width: 40, height: 40, borderRadius: 10, objectFit: 'cover', flexShrink: 0,
+                boxShadow: '0 2px 8px rgba(26,92,56,0.4)',
+              }}
+            />
+          ) : (
+            <div style={{
+              width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'linear-gradient(135deg, #1A5C38, #0f3d22)',
+              boxShadow: '0 2px 8px rgba(26,92,56,0.4)',
+            }}>
+              <span className="font-aboreto" style={{ fontSize: 11, color: '#C4F0E4', letterSpacing: 1 }}>AA</span>
+            </div>
+          )}
           <div>
             <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--fg)', lineHeight: 1.3 }}>ARHITECTURA</div>
             <div className="font-aboreto" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--fg-3)', lineHeight: 1.3 }}>AFACERII</div>

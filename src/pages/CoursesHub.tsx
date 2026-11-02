@@ -15,6 +15,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useProgress } from '../hooks/useProgress';
 import { enrolledCourses, expiredCourses, enrollmentForCourse } from '../lib/enrollments';
 import { activeCourses, COURSE_ACCENT } from '../lib/courses';
+import { courseLogo } from '../lib/branding';
 import { getCourseModules } from '../lib/content';
 import { courseDashboardPath, courseQuizPath } from '../lib/navigation';
 import { hasCompletedOnboarding } from '../lib/access';
@@ -265,6 +266,13 @@ const CourseCard: React.FC<{ data: any; index: number; reduceMotion: boolean; on
           </div>
 
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', flex: 1 }}>
+            {courseLogo(course.id) && (
+              <img
+                src={courseLogo(course.id)!}
+                alt={course.shortTitle}
+                style={{ width: 52, height: 52, borderRadius: 12, objectFit: 'cover', marginBottom: 12, boxShadow: '0 2px 10px rgba(26,92,56,0.35)' }}
+              />
+            )}
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', marginBottom: 14 }}>
               <span style={{
                 fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
