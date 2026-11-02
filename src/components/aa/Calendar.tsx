@@ -212,56 +212,68 @@ export const Calendar: React.FC<CalendarProps> = ({ events, moduleUnlocks }) => 
             const hasZoom = evList.some(e => e.type === 'zoom');
             const hasWorkshop = evList.some(e => e.type === 'workshop');
 
+            const chips: { label: string; color: string; bg: string }[] = [
+              ...evList.map(e => ({
+                label: `${e.time || ''} ${e.type === 'zoom' ? 'Live Zoom' : 'Workshop'}`.trim(),
+                color: e.type === 'zoom' ? 'var(--ok)' : 'var(--gold)',
+                bg: e.type === 'zoom' ? 'color-mix(in srgb, var(--ok) 14%, transparent)' : 'var(--gold-dim)',
+              })),
+              ...(unlockMap[dateStr] || []).map(() => ({ label: 'Modul nou', color: 'var(--accent)', bg: 'var(--accent-dim)' })),
+            ];
+
             return (
               <button
                 key={dateStr}
+                title={[...evList.map(e => e.title), ...(unlockMap[dateStr] || []).map(u => `Se deschide: ${u.title}`)].join('\n') || undefined}
                 onClick={() => {
                   if (hasEvents || hasUnlocks) {
                     setSelectedDate(isSelected ? null : dateStr);
                   }
                 }}
                 style={{
-                  aspectRatio: '1',
-                  minHeight: 44,
+                  minHeight: 64,
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  alignItems: 'stretch',
+                  justifyContent: 'flex-start',
                   gap: 3,
                   borderRadius: 9,
-                  border: isToday ? '2px solid var(--accent)' : isSelected ? '2px solid var(--gold)' : '2px solid transparent',
-                  background: isSelected ? 'var(--gold-dim)' : isToday ? 'var(--accent-dim)' : 'transparent',
+                  border: isSelected ? '1px solid var(--gold)' : '1px solid transparent',
+                  borderTop: isSelected ? '1px solid var(--gold)' : '1px solid var(--border)',
+                  background: isSelected ? 'var(--gold-dim)' : 'transparent',
                   cursor: (hasEvents || hasUnlocks) ? 'pointer' : 'default',
-                  opacity: isPast && !isToday ? 0.5 : 1,
+                  opacity: isPast && !isToday ? 0.45 : 1,
                   transition: 'all 0.15s',
-                  padding: 0,
+                  padding: '5px 3px',
+                  minWidth: 0,
                 }}
                 onMouseEnter={e => {
                   if ((hasEvents || hasUnlocks) && !isSelected) {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                    e.currentTarget.style.background = 'var(--bg-3)';
                   }
                 }}
                 onMouseLeave={e => {
-                  if (!isSelected) e.currentTarget.style.background = isToday ? 'var(--accent-dim)' : 'transparent';
+                  if (!isSelected) e.currentTarget.style.background = 'transparent';
                 }}
               >
-                <span style={{ fontSize: 12, fontWeight: isToday ? 700 : 400, color: isToday ? 'var(--accent)' : 'var(--fg)', lineHeight: 1 }}>
+                <span style={{
+                  alignSelf: 'center', width: 22, height: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 12, fontWeight: isToday ? 700 : 500, lineHeight: 1,
+                  background: isToday ? 'var(--accent)' : 'transparent',
+                  color: isToday ? 'var(--bg)' : 'var(--fg)',
+                }}>
                   {day}
                 </span>
-                {/* Event dots */}
-                {(hasZoom || hasWorkshop || hasUnlocks) && (
-                  <div style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    {hasZoom && (
-                      <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--ok)', flexShrink: 0 }} />
-                    )}
-                    {hasWorkshop && (
-                      <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--gold)', flexShrink: 0 }} />
-                    )}
-                    {hasUnlocks && (
-                      <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--accent)', border: '1px solid var(--accent)', flexShrink: 0 }} />
-                    )}
-                  </div>
-                )}
+                {chips.slice(0, 2).map((c, i) => (
+                  <span key={i} style={{
+                    display: 'block', fontSize: 9, lineHeight: 1.3, fontWeight: 600, color: c.color, background: c.bg,
+                    borderLeft: `2px solid ${c.color}`, borderRadius: 3, padding: '1px 3px', textAlign: 'left',
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>
+                    {c.label}
+                  </span>
+                ))}
+                {chips.length > 2 && <span style={{ fontSize: 9, color: 'var(--fg-3)' }}>+{chips.length - 2}</span>}
               </button>
             );
           })}
@@ -271,15 +283,46 @@ export const Calendar: React.FC<CalendarProps> = ({ events, moduleUnlocks }) => 
       {/* Legend */}
       <div style={{ display: 'flex', gap: 16, padding: '0 20px 14px', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--fg-3)' }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--ok)' }} /> Zoom
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--ok)' }} /> Live pe Zoom cu grupul
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--fg-3)' }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--gold)' }} /> Workshop
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--gold)' }} /> Workshop practic
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--fg-3)' }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent)' }} /> Modul nou
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent)' }} /> Se deschide un modul nou
         </div>
       </div>
+
+      {/* Următoarele evenimente — listă în stil Apple, ca elevul să vadă ce e fiecare punct */}
+      {(() => {
+        const upcoming = [
+          ...events.filter(e => e.date >= todayStr).map(e => ({ key: e.id, date: e.date, title: e.title, sub: `${e.time || ''}${e.duration ? ' · ' + e.duration : ''} · ${e.type === 'zoom' ? 'Întâlnire live pe Zoom cu grupul' : 'Workshop practic'}`, color: e.type === 'zoom' ? 'var(--ok)' : 'var(--gold)' })),
+          ...moduleUnlocks.filter(u => u.date >= todayStr).map(u => ({ key: 'u-' + u.moduleId, date: u.date, title: u.title, sub: 'Se deschide un modul nou cu lecții și exerciții', color: 'var(--accent)' })),
+        ].sort((a, b) => a.date.localeCompare(b.date)).slice(0, 4);
+        if (upcoming.length === 0) return null;
+        return (
+          <div style={{ margin: '0 16px 16px', borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 8 }}>Urmează</div>
+            {upcoming.map(u => {
+              const d = new Date(u.date + 'T12:00:00');
+              return (
+                <button key={u.key} onClick={() => { userNavigated.current = true; setViewYear(d.getFullYear()); setViewMonth(d.getMonth()); setSelectedDate(u.date); }}
+                  style={{ display: 'flex', width: '100%', gap: 12, alignItems: 'center', padding: '8px 4px', background: 'none', border: 'none', borderBottom: '1px solid var(--border)', cursor: 'pointer', textAlign: 'left' }}>
+                  <div style={{ width: 40, flexShrink: 0, textAlign: 'center' }}>
+                    <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', color: 'var(--accent)' }}>{d.toLocaleDateString('ro-RO', { month: 'short' })}</div>
+                    <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--fg)', lineHeight: 1.1 }}>{d.getDate()}</div>
+                  </div>
+                  <div style={{ width: 3, alignSelf: 'stretch', borderRadius: 2, background: u.color, flexShrink: 0 }} />
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)' }}>{u.title}</div>
+                    <div style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 2 }}>{u.sub}</div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        );
+      })()}
 
       {/* Event detail popup */}
       {selectedDate && (selectedEvents.length > 0 || selectedUnlocks.length > 0) && (
