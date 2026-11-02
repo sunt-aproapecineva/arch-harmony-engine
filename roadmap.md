@@ -23,3 +23,8 @@
 # START self-paced module access
 
 - [x] Enable all START modules for Singur while preserving other packages and unpublished lessons; verified Digor's Singur enrollment, all ten modules unlocked and direct module 9 access in his student session. Four regression tests pass; unpublished content remains hidden. Production publication is not requested.
+
+# Weekly module release for every flow
+
+- [x] Modules open one per week from the flow's start date, on Monday at 09:00 Chisinau time, computed for every flow instead of a per-flow counter; verified START Ediția 2 opens „Nișa și Ideea" on 09.11.2026 09:00 while Business Flux 1, Business Flux 2 and START Ediția 1 keep their current access. Eight access-rule tests pass. Production publication is not requested.
+- [x] Invitations can be resent per student from the access list and always carry the public site link; sent to Eugen, Viorica and Lira (all three logged as sent).
