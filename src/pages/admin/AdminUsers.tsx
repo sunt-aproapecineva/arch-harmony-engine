@@ -432,7 +432,13 @@ export const AdminUsers: React.FC = () => {
           )}
         </AnimatePresence>
 
+        {inviteMsg && (
+          <div style={{ marginTop: 12, padding: '9px 12px', background: 'var(--gold-dim)', border: '1px solid var(--border-hi)', borderRadius: 8, fontSize: 12.5, color: 'var(--fg)' }}>
+            {inviteMsg}
+          </div>
+        )}
         {filteredWhitelist.length === 0 ? (
+
           <div style={{ marginTop: 14, padding: '18px', textAlign: 'center', fontSize: 12.5, color: 'var(--fg-3)', border: '1px dashed var(--border)', borderRadius: 10 }}>
             {whitelist.length === 0 ? 'Lista de acces e goală.' : 'Niciun email în lista de acces nu corespunde filtrului.'}
           </div>
@@ -463,6 +469,13 @@ export const AdminUsers: React.FC = () => {
                       style={{ padding: '4px 10px', borderRadius: 6, fontSize: 11, cursor: 'pointer', border: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, background: copiedLink === entry.email ? 'var(--ok-dim)' : 'rgba(196,240,228,0.08)', color: copiedLink === entry.email ? 'var(--ok)' : 'var(--accent)' }}>
                       <Link2 size={11} />{copiedLink === entry.email ? 'Copiat!' : 'Link'}
                     </button>
+                    <button onClick={() => handleSendInvite(entry)} disabled={inviteBusy === key}
+                      title="Trimite emailul de invitație, cu link direct de creare a contului" className="aa-tap"
+                      style={{ padding: '4px 10px', borderRadius: 6, fontSize: 11, cursor: inviteBusy === key ? 'wait' : 'pointer', border: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(201,169,110,0.10)', color: 'var(--gold)', opacity: inviteBusy === key ? 0.6 : 1 }}>
+                      {inviteBusy === key ? <RefreshCw size={11} className="animate-spin" /> : <Mail size={11} />}
+                      {inviteBusy === key ? 'Se trimite…' : 'Invitație'}
+                    </button>
+
                     <button onClick={() => handleRemoveWhitelist(entry)} className="aa-tap"
                       style={{ padding: '4px 10px', borderRadius: 6, fontSize: 11, cursor: 'pointer', border: 'none', fontWeight: 600, background: confirmRemove === key ? 'var(--error)' : 'rgba(248,113,113,0.08)', color: confirmRemove === key ? '#fff' : 'var(--error)' }}>
                       {confirmRemove === key ? 'Confirmă' : 'Elimină'}
