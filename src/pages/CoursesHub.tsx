@@ -15,6 +15,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useProgress } from '../hooks/useProgress';
 import { enrolledCourses, expiredCourses, enrollmentForCourse } from '../lib/enrollments';
 import { activeCourses, COURSE_ACCENT } from '../lib/courses';
+import { courseLogo } from '../lib/branding';
 import { getCourseModules } from '../lib/content';
 import { courseDashboardPath, courseQuizPath } from '../lib/navigation';
 import { hasCompletedOnboarding } from '../lib/access';
