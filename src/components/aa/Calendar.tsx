@@ -283,13 +283,13 @@ export const Calendar: React.FC<CalendarProps> = ({ events, moduleUnlocks }) => 
       {/* Legend */}
       <div style={{ display: 'flex', gap: 16, padding: '0 20px 14px', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--fg-3)' }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--ok)' }} /> Zoom
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--ok)' }} /> Live pe Zoom cu grupul
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--fg-3)' }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--gold)' }} /> Workshop
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--gold)' }} /> Workshop practic
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--fg-3)' }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent)' }} /> Modul nou
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent)' }} /> Se deschide un modul nou
         </div>
       </div>
 
