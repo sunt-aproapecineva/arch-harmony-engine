@@ -14,6 +14,17 @@ const SENDER_DOMAIN = "notificari.live.morarvictor.com"
 // Can be the root domain when display_from_root is enabled — this is cosmetic only.
 const FROM_DOMAIN = "notificari.live.morarvictor.com"
 
+/**
+ * Team addresses that receive a separate copy of every registry (transactional)
+ * email successfully sent to a student. Auth emails (OTP, confirmations) never
+ * go through this helper, so their secret codes never reach these addresses.
+ */
+export const STUDENT_EMAIL_MONITORS = [
+  'founder@morarvictor.com',
+  'vutcariov.valerie@gmail.com',
+  'petru.munteanu@aasco.md',
+] as const
+
 export type SendTemplateEmailResult =
   | { sent: true }
   | { sent: false; reason: 'recipient_suppressed' }
@@ -65,6 +76,8 @@ export async function sendTemplateEmail(
       ? template.subject(templateData)
       : template.subject
 
+  const baseKey = options.idempotencyKey || crypto.randomUUID()
+
   try {
     await sendLovableEmail(
       {
@@ -76,7 +89,7 @@ export async function sendTemplateEmail(
         text,
         purpose: 'transactional',
         label: templateName,
-        idempotency_key: options.idempotencyKey || crypto.randomUUID(),
+        idempotency_key: baseKey,
         ...(options.replyTo ? { reply_to: options.replyTo } : {}),
       },
       { apiKey, sendUrl: process.env['LOVABLE_SEND_URL'] }
@@ -86,6 +99,32 @@ export async function sendTemplateEmail(
       return { sent: false, reason: 'recipient_suppressed' }
     }
     throw error
+  }
+
+  // Monitor copies: separate sends, never affect the student result.
+  const normalizedRecipient = recipient.trim().toLowerCase()
+  const isMonitor = (STUDENT_EMAIL_MONITORS as readonly string[]).includes(normalizedRecipient)
+  if (!isMonitor) {
+    for (const monitor of STUDENT_EMAIL_MONITORS) {
+      try {
+        await sendLovableEmail(
+          {
+            to: monitor,
+            from: { name: SITE_NAME, address: `noreply@${FROM_DOMAIN}` },
+            sender_domain: SENDER_DOMAIN,
+            subject: `[Copie elev: ${recipient}] ${subject}`,
+            html,
+            text,
+            purpose: 'transactional',
+            label: `${templateName}-monitor`,
+            idempotency_key: `${baseKey}-monitor-${monitor}`,
+          },
+          { apiKey, sendUrl: process.env['LOVABLE_SEND_URL'] }
+        )
+      } catch (error) {
+        console.error(`[send-email] monitor copy to ${monitor} failed`, error)
+      }
+    }
   }
 
   return { sent: true }
