@@ -179,16 +179,12 @@ export const AdminUsers: React.FC = () => {
 
   const handleCopyLink = (email: string) => {
     const link = `${INVITE_SITE_ORIGIN}/register?email=${encodeURIComponent(email)}`;
-    navigator.clipboard.writeLink === undefined
-      ? navigator.clipboard.writeText(link).then(() => {
-        setCopiedLink(email);
-        setTimeout(() => setCopiedLink(null), 2500);
-      })
-      : navigator.clipboard.writeText(link).then(() => {
-        setCopiedLink(email);
-        setTimeout(() => setCopiedLink(null), 2500);
-      });
+    navigator.clipboard.writeText(link).then(() => {
+      setCopiedLink(email);
+      setTimeout(() => setCopiedLink(null), 2500);
+    });
   };
+
 
   // Invitația se poate retrimite oricând: un elev adăugat direct în listă, fără
   // formular, n-o primește altfel niciodată. `retryKey` face ca fiecare apăsare să
