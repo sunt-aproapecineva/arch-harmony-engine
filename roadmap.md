@@ -28,4 +28,4 @@
 
 - [x] Modules open one per week from the flow's start date, on Monday at 09:00 Chisinau time, computed for every flow instead of a per-flow counter; verified START Ediția 2 opens „Nișa și Ideea" on 09.11.2026 09:00 while Business Flux 1, Business Flux 2 and START Ediția 1 keep their current access. Eight access-rule tests pass. Production publication is not requested.
 - [x] Invitations can be resent per student from the access list and always carry the public site link; sent to Eugen, Viorica and Lira (all three logged as sent).
-- [ ] Invitații Business Flux 3 + Flux 2 fără cont
+- [x] Invitații Business Flux 3 + Flux 2 fără cont
