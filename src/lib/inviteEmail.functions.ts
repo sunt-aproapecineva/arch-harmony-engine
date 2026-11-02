@@ -3,9 +3,16 @@ import { z } from 'zod';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 
 /**
+ * Adresa publică a platformei. Invitațiile pleacă întotdeauna aici — nu către
+ * previzualizarea din care apasă adminul, pentru că acolo elevul n-ar avea acces.
+ */
+export const INVITE_SITE_ORIGIN = 'https://aa.morarvictor.com';
+
+/**
  * Trimite invitația „invite-student" unui elev nou adăugat în whitelist.
  * Doar adminii o pot apela; șablonul este fix.
  */
+
 export const sendStudentInvite = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>

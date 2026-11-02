@@ -8,3 +8,6 @@
 - Publishing a video lesson unlocks its manually locked module (overlay in LiveContentContext), so admins never need a separate module-open step.
 - Reuse LibraryUploads in read-only mode for MaterialsPage documents; keep course-scoped database and storage policies so student downloads use the same files without granting anonymous access.
 - Resolve self-paced module access from course tier capabilities in CourseContext using enrollment-scoped module copies; central flow gates honor this override without mutating shared content or bypassing lesson publication and enrollment expiry.
+- Keep the weekly module release computed from the flow's start date in `src/lib/flows.ts` (one module per week, at 09:00 Europe/Chisinau); a per-flow module count stays a manual administrator override only, so a newly created flow inherits the cadence without any per-flow job or setting.
+- Build student invitation and registration links from the canonical public site origin exported by `src/lib/inviteEmail.functions.ts`, never from the origin of the window the administrator is working in, because preview origins are not usable by students.
+

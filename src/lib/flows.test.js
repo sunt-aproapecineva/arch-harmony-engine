@@ -35,3 +35,27 @@ describe('START Singur independent module access', () => {
     expect(module.manualLock).toBe(true);
   });
 });
+
+describe('weekly module release is the rule for every flow', () => {
+  // Ediția 2 START: start 2 noiembrie 2026, fără limită manuală.
+  const weekly = { starts_on: '2026-11-02', open_modules: null };
+  const second = { order_index: 1, unlockWeek: 1 };
+
+  test('the next module opens on Monday at 09:00 Chisinau time', () => {
+    expect(moduleUnlockDate(second, weekly)?.toISOString()).toBe('2026-11-09T07:00:00.000Z');
+  });
+
+  test('a module stays closed until its 09:00, then opens on its own', () => {
+    expect(isModuleUnlocked(second, weekly, new Date('2026-11-09T06:30:00Z'))).toBe(false);
+    expect(isModuleUnlocked(second, weekly, new Date('2026-11-09T07:00:00Z'))).toBe(true);
+  });
+
+  test('the release hour follows summer time too', () => {
+    expect(moduleUnlockDate(second, { starts_on: '2026-06-01', open_modules: null })?.toISOString())
+      .toBe('2026-06-08T06:00:00.000Z');
+  });
+
+  test('a manual module limit still outranks the weekly schedule', () => {
+    expect(isModuleUnlocked(second, { starts_on: '2026-01-01', open_modules: 1 }, new Date('2026-11-02T12:00:00Z'))).toBe(false);
+  });
+});

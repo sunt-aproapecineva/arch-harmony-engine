@@ -13,10 +13,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from '@/lib/router-compat';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, ChevronDown, ChevronUp, Shield, Search, X, RefreshCw, CheckCircle2, Link2, ShieldOff, Sparkles } from 'lucide-react';
+import { Plus, ChevronDown, ChevronUp, Shield, Search, X, RefreshCw, CheckCircle2, Link2, ShieldOff, Sparkles, Mail, MailCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useServerFn } from '@tanstack/react-start';
-import { sendStudentInvite } from '@/lib/inviteEmail.functions';
+import { sendStudentInvite, INVITE_SITE_ORIGIN } from '@/lib/inviteEmail.functions';
 import { regenerateAllInsights } from '@/lib/studentInsights.functions';
 import { timeAgo } from '../../lib/activity';
 import {
@@ -80,6 +80,9 @@ export const AdminUsers: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [addSuccess, setAddSuccess] = useState('');
   const [addError, setAddError] = useState('');
+  const [inviteMsg, setInviteMsg] = useState('');
+  const [inviteBusy, setInviteBusy] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(true);
 
   const reload = useCallback(async () => {
@@ -163,8 +166,9 @@ export const AdminUsers: React.FC = () => {
     // Trimitem automat invitația pe email cu link direct spre crearea contului.
     const courseTitle = getCourse(newCourse)?.shortTitle || 'Arhitectura Afacerii';
     const invite = await sendStudentInvite({
-      data: { email, courseId: newCourse, courseName: courseTitle, origin: window.location.origin },
+      data: { email, courseId: newCourse, courseName: courseTitle, origin: INVITE_SITE_ORIGIN },
     }).catch((e: unknown) => ({ ok: false, error: e instanceof Error ? e.message : String(e) }));
+
     setAddSuccess(invite.ok
       ? `✓ ${email} adăugat(ă) și invitația a fost trimisă pe email.`
       : `✓ ${email} adăugat(ă), dar emailul de invitație nu a putut fi trimis (${invite.error || 'eroare necunoscută'}). Copiază linkul manual.`);
@@ -174,12 +178,38 @@ export const AdminUsers: React.FC = () => {
   };
 
   const handleCopyLink = (email: string) => {
-    const link = `${window.location.origin}/register?email=${encodeURIComponent(email)}`;
+    const link = `${INVITE_SITE_ORIGIN}/register?email=${encodeURIComponent(email)}`;
     navigator.clipboard.writeText(link).then(() => {
       setCopiedLink(email);
       setTimeout(() => setCopiedLink(null), 2500);
     });
   };
+
+
+  // Invitația se poate retrimite oricând: un elev adăugat direct în listă, fără
+  // formular, n-o primește altfel niciodată. `retryKey` face ca fiecare apăsare să
+  // fie o trimitere nouă, nu un duplicat respins de la primul email.
+  const handleSendInvite = async (entry: WLEntry) => {
+    const key = wlKey(entry);
+    setInviteBusy(key);
+    setInviteMsg('');
+    const courseTitle = getCourse(entry.course_id)?.shortTitle || 'Arhitectura Afacerii';
+    const invite = await sendStudentInvite({
+      data: {
+        email: entry.email,
+        courseId: entry.course_id,
+        courseName: courseTitle,
+        origin: INVITE_SITE_ORIGIN,
+        retryKey: String(Date.now()),
+      },
+    }).catch((e: unknown) => ({ ok: false, error: e instanceof Error ? e.message : String(e) }));
+    setInviteBusy(null);
+    setInviteMsg(invite.ok
+      ? `✓ Invitația a fost trimisă către ${entry.email}.`
+      : `✗ Invitația către ${entry.email} nu a plecat: ${invite.error || 'eroare necunoscută'}.`);
+    setTimeout(() => setInviteMsg(''), 8000);
+  };
+
 
   // Cheia unui rând e (email, program): același om poate fi preautorizat la ambele.
   const wlKey = (e: WLEntry) => `${e.course_id}:${e.email}`;
@@ -402,7 +432,13 @@ export const AdminUsers: React.FC = () => {
           )}
         </AnimatePresence>
 
+        {inviteMsg && (
+          <div style={{ marginTop: 12, padding: '9px 12px', background: 'var(--gold-dim)', border: '1px solid var(--border-hi)', borderRadius: 8, fontSize: 12.5, color: 'var(--fg)' }}>
+            {inviteMsg}
+          </div>
+        )}
         {filteredWhitelist.length === 0 ? (
+
           <div style={{ marginTop: 14, padding: '18px', textAlign: 'center', fontSize: 12.5, color: 'var(--fg-3)', border: '1px dashed var(--border)', borderRadius: 10 }}>
             {whitelist.length === 0 ? 'Lista de acces e goală.' : 'Niciun email în lista de acces nu corespunde filtrului.'}
           </div>
@@ -433,6 +469,13 @@ export const AdminUsers: React.FC = () => {
                       style={{ padding: '4px 10px', borderRadius: 6, fontSize: 11, cursor: 'pointer', border: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, background: copiedLink === entry.email ? 'var(--ok-dim)' : 'rgba(196,240,228,0.08)', color: copiedLink === entry.email ? 'var(--ok)' : 'var(--accent)' }}>
                       <Link2 size={11} />{copiedLink === entry.email ? 'Copiat!' : 'Link'}
                     </button>
+                    <button onClick={() => handleSendInvite(entry)} disabled={inviteBusy === key}
+                      title="Trimite emailul de invitație, cu link direct de creare a contului" className="aa-tap"
+                      style={{ padding: '4px 10px', borderRadius: 6, fontSize: 11, cursor: inviteBusy === key ? 'wait' : 'pointer', border: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(201,169,110,0.10)', color: 'var(--gold)', opacity: inviteBusy === key ? 0.6 : 1 }}>
+                      {inviteBusy === key ? <RefreshCw size={11} className="animate-spin" /> : <Mail size={11} />}
+                      {inviteBusy === key ? 'Se trimite…' : 'Invitație'}
+                    </button>
+
                     <button onClick={() => handleRemoveWhitelist(entry)} className="aa-tap"
                       style={{ padding: '4px 10px', borderRadius: 6, fontSize: 11, cursor: 'pointer', border: 'none', fontWeight: 600, background: confirmRemove === key ? 'var(--error)' : 'rgba(248,113,113,0.08)', color: confirmRemove === key ? '#fff' : 'var(--error)' }}>
                       {confirmRemove === key ? 'Confirmă' : 'Elimină'}
