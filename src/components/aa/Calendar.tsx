@@ -293,6 +293,37 @@ export const Calendar: React.FC<CalendarProps> = ({ events, moduleUnlocks }) => 
         </div>
       </div>
 
+      {/* Următoarele evenimente — listă în stil Apple, ca elevul să vadă ce e fiecare punct */}
+      {(() => {
+        const upcoming = [
+          ...events.filter(e => e.date >= todayStr).map(e => ({ key: e.id, date: e.date, title: e.title, sub: `${e.time || ''}${e.duration ? ' · ' + e.duration : ''} · ${e.type === 'zoom' ? 'Întâlnire live pe Zoom cu grupul' : 'Workshop practic'}`, color: e.type === 'zoom' ? 'var(--ok)' : 'var(--gold)' })),
+          ...moduleUnlocks.filter(u => u.date >= todayStr).map(u => ({ key: 'u-' + u.moduleId, date: u.date, title: u.title, sub: 'Se deschide un modul nou cu lecții și exerciții', color: 'var(--accent)' })),
+        ].sort((a, b) => a.date.localeCompare(b.date)).slice(0, 4);
+        if (upcoming.length === 0) return null;
+        return (
+          <div style={{ margin: '0 16px 16px', borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 8 }}>Urmează</div>
+            {upcoming.map(u => {
+              const d = new Date(u.date + 'T12:00:00');
+              return (
+                <button key={u.key} onClick={() => { userNavigated.current = true; setViewYear(d.getFullYear()); setViewMonth(d.getMonth()); setSelectedDate(u.date); }}
+                  style={{ display: 'flex', width: '100%', gap: 12, alignItems: 'center', padding: '8px 4px', background: 'none', border: 'none', borderBottom: '1px solid var(--border)', cursor: 'pointer', textAlign: 'left' }}>
+                  <div style={{ width: 40, flexShrink: 0, textAlign: 'center' }}>
+                    <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', color: 'var(--accent)' }}>{d.toLocaleDateString('ro-RO', { month: 'short' })}</div>
+                    <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--fg)', lineHeight: 1.1 }}>{d.getDate()}</div>
+                  </div>
+                  <div style={{ width: 3, alignSelf: 'stretch', borderRadius: 2, background: u.color, flexShrink: 0 }} />
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)' }}>{u.title}</div>
+                    <div style={{ fontSize: 11, color: 'var(--fg-3)', marginTop: 2 }}>{u.sub}</div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        );
+      })()}
+
       {/* Event detail popup */}
       {selectedDate && (selectedEvents.length > 0 || selectedUnlocks.length > 0) && (
         <div style={{ margin: '0 16px 16px', background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 12, padding: 16, position: 'relative' }}>
