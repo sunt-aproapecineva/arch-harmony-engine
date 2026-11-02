@@ -48,7 +48,7 @@ export const sendStudentInvite = createServerFn({ method: 'POST' })
 
     try {
       const result = await sendTemplateEmail('invite-student', email, {
-        templateData: { registerUrl, courseName: data.courseName },
+        templateData: { registerUrl, courseName: data.courseName, courseId: data.courseId },
         idempotencyKey: `invite-${data.courseId}-${email}${data.retryKey ? `-${data.retryKey}` : ''}`,
       });
       if (result.sent) {
