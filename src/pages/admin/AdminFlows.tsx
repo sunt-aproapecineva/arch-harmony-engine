@@ -188,14 +188,15 @@ export const AdminFlows: React.FC = () => {
                 <div className="aa-stack-sm" style={{ display: 'grid', gridTemplateColumns: '150px 150px 130px minmax(0,1fr)', gap: 10, alignItems: 'end', marginTop: 10 }}>
                   <Field label="Acces până la (manual)" type="date" value={c.ends_on || ''} onChange={v => setFlows(p => p.map(x => x.id === c.id ? { ...x, ends_on: v || null } : x))} />
                   <Field label="…sau durată (săptămâni)" type="number" value={c.access_weeks ?? ''} onChange={v => setFlows(p => p.map(x => x.id === c.id ? { ...x, access_weeks: v === '' ? null : Number(v) } : x))} />
-                  <Field label="Module deschise" type="number" value={c.open_modules ?? ''} onChange={v => setFlows(p => p.map(x => x.id === c.id ? { ...x, open_modules: v === '' ? null : Number(v) } : x))} />
+                  <Field label="Limită manuală de module" type="number" value={c.open_modules ?? ''} onChange={v => setFlows(p => p.map(x => x.id === c.id ? { ...x, open_modules: v === '' ? null : Number(v) } : x))} />
                   <p style={{ fontSize: 11, color: 'var(--fg-3)', lineHeight: 1.5, margin: 0 }}>
                     {accessUntilLabel(c)}
                     <br />
                     {c.open_modules != null
-                      ? `Doar primele ${c.open_modules} module sunt deschise în fluxul ăsta; restul rămân închise. Gol = toate.`
-                      : 'Toate modulele se deschid după orar. Poți limita la primele N module.'}
+                      ? `Ieșire din orar: doar primele ${c.open_modules} module sunt deschise, restul rămân închise chiar dacă li-a venit rândul. Gol = orar săptămânal.`
+                      : 'Orar săptămânal: câte un modul se deschide în luni la 09:00, pornește din data de start a fluxului.'}
                   </p>
+
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 12, flexWrap: 'wrap' }}>
