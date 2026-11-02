@@ -7,6 +7,7 @@ import { useAuthContext } from '../../context/AuthContext';
 import { useCourse } from '../../context/CourseContext';
 import { courseDocumentsPath, courseLibraryPath, courseMaterialsPath, courseModulePath } from '../../lib/navigation';
 import { COURSE_ACCENT, tierGrants } from '../../lib/courses';
+import { courseLogo } from '../../lib/branding';
 import { enrolledCourses, enrollmentForCourse } from '../../lib/enrollments';
 import { flowAccessUntil } from '../../lib/flows';
 import { TariffBadge } from '../aa/TariffBadge';
