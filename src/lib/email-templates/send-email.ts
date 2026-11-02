@@ -101,31 +101,7 @@ export async function sendTemplateEmail(
     throw error
   }
 
-  // Monitor copies: separate sends, never affect the student result.
-  const normalizedRecipient = recipient.trim().toLowerCase()
-  const isMonitor = (STUDENT_EMAIL_MONITORS as readonly string[]).includes(normalizedRecipient)
-  if (!isMonitor) {
-    for (const monitor of STUDENT_EMAIL_MONITORS) {
-      try {
-        await sendLovableEmail(
-          {
-            to: monitor,
-            from: { name: SITE_NAME, address: `noreply@${FROM_DOMAIN}` },
-            sender_domain: SENDER_DOMAIN,
-            subject: `[Copie elev: ${recipient}] ${subject}`,
-            html,
-            text,
-            purpose: 'transactional',
-            label: `${templateName}-monitor`,
-            idempotency_key: `${baseKey}-monitor-${monitor}`,
-          },
-          { apiKey, sendUrl: process.env['LOVABLE_SEND_URL'] }
-        )
-      } catch (error) {
-        console.error(`[send-email] monitor copy to ${monitor} failed`, error)
-      }
-    }
-  }
+  // No automatic per-student copies: the team receives one sample per program instead.
 
   return { sent: true }
 }
