@@ -32,4 +32,4 @@
 
 # Module 6 START exercises
 
-- [ ] Integrate the three financial workbook exercises after lessons 6.1–6.3, verify forms and lesson navigation, and publish to the student site.
+- [x] Integrated the three financial workbook exercises after lessons 6.1–6.3; 10 tests passed, signed-in browser verified all forms, saved answer readback and Next navigation without runtime errors; publication requested for aa.morarvictor.com.
