@@ -36,4 +36,4 @@
 
 # Module 7 START exercises
 
-- [ ] Integrate the workbook exercises beside their matching lessons, verify them, then open Module 7 for AA START students; blocked until the source document is uploaded or Google Docs access is authorized.
+- [x] Integrated workbook exercises 7.1–7.2 beside their published lessons and opened Module 7 for both AA START editions, including an immediate Edition 2 override. Thirteen regression tests passed; signed-in browser checks confirmed both forms, scorecard/review fields and saved-answer readback without runtime errors.
