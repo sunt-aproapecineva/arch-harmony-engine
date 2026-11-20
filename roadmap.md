@@ -33,3 +33,7 @@
 # Module 6 START exercises
 
 - [x] Integrated the three financial workbook exercises after lessons 6.1–6.3; 10 tests passed, signed-in browser verified all forms, saved answer readback and Next navigation without runtime errors; publication requested for aa.morarvictor.com.
+
+# Module 7 START exercises
+
+- [ ] Integrate the workbook exercises beside their matching lessons, verify them, then open Module 7 for AA START students; blocked until the source document is uploaded or Google Docs access is authorized.
