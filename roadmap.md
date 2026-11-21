@@ -40,8 +40,8 @@
 
 # ClickUp student mentoring sync
 
-- [ ] Create one student task with one subtask per course module and readable exercise answers in each subtask.
-- [ ] Sync exercise submissions automatically and publish/update the student's briefing as a task comment.
-- [ ] Add per-student ClickUp sync controls in Admin → Utilizatori.
-- [ ] Respect the full selected course/flow/tariff filter when regenerating briefings in bulk.
-- [ ] Run an end-to-end ClickUp test with a test student and verify the resulting task, subtasks, answers and briefing comment.
+- [x] Create one student task with one subtask per course module and readable exercise answers in each subtask.
+- [x] Sync exercise submissions automatically and publish/update the student's briefing as a task comment; the targeted server path updated only the affected module, and a separate student-session test was not run because the temporary-user request was declined.
+- [x] Add per-student ClickUp sync controls in Admin → Utilizatori.
+- [x] Respect the full selected course/flow/tariff filter when regenerating briefings in bulk, including visible students in Înainte de apel.
+- [x] Verified the existing test student's real ClickUp task: 10 module subtasks, readable test answers, stable task/comment IDs after repeated sync, and no duplicate briefing comment.
