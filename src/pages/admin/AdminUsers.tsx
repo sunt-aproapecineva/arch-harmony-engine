@@ -18,6 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useServerFn } from '@tanstack/react-start';
 import { sendStudentInvite, INVITE_SITE_ORIGIN } from '@/lib/inviteEmail.functions';
 import { regenerateAllInsights } from '@/lib/studentInsights.functions';
+import { syncStudentClickUp } from '@/lib/clickupSync.functions';
 import { timeAgo } from '../../lib/activity';
 import {
   fetchAdminUsers, fetchAllProgress, setUserAdmin,
@@ -68,7 +69,7 @@ export const AdminUsers: React.FC = () => {
   const onRegenerateAll = async () => {
     setRegenBusy(true); setRegenMsg(null);
     try {
-      const res = await regenerateAll({ data: { courseId: courseId || 'business' } });
+      const res = await regenerateAll({ data: { courseId, flowId, tariffId } });
       const base = `Briefinguri regenerate: ${res.done} din ${res.total}`;
       setRegenMsg(res.failed ? `${base} · ${res.failed} eșuate` : base);
     } catch (e: any) {
@@ -82,6 +83,34 @@ export const AdminUsers: React.FC = () => {
   const [addError, setAddError] = useState('');
   const [inviteMsg, setInviteMsg] = useState('');
   const [inviteBusy, setInviteBusy] = useState<string | null>(null);
+  const [clickupBusy, setClickupBusy] = useState<string | null>(null);
+  const [clickupMsg, setClickupMsg] = useState<string | null>(null);
+  const [clickupUrl, setClickupUrl] = useState<string | null>(null);
+  const syncClickUp = useServerFn(syncStudentClickUp);
+
+  const handleSyncClickUp = async (user: AdminUserRow, enrollments: AdminUserRow['enrollments']) => {
+    setClickupBusy(user.id);
+    setClickupMsg(null);
+    setClickupUrl(null);
+    try {
+      if (!enrollments.length) throw new Error('Elevul nu are un program și flux pentru sincronizare.');
+      let firstUrl: string | null = null;
+      let modules = 0;
+      for (const enrollment of enrollments) {
+        const result = await syncClickUp({
+          data: { studentId: user.id, courseId: enrollment.course_id },
+        });
+        firstUrl ||= result.taskUrl || null;
+        modules += result.modulesSynced;
+      }
+      setClickupUrl(firstUrl);
+      setClickupMsg(`✓ ${user.full_name || user.email}: ${modules} module sincronizate în ClickUp.`);
+    } catch (error: any) {
+      setClickupMsg(`✗ ${user.full_name || user.email}: ${error?.message || 'sincronizarea ClickUp a eșuat.'}`);
+    } finally {
+      setClickupBusy(null);
+    }
+  };
 
   const [loading, setLoading] = useState(true);
 
@@ -308,7 +337,7 @@ export const AdminUsers: React.FC = () => {
     return `${filteredUsers.length} din ${users.length} utilizatori · ${bits.join(' · ')}`;
   })();
 
-  const GRID = '34px minmax(200px,1fr) minmax(230px,1.3fr) 110px 120px 96px 120px 30px';
+  const GRID = '34px minmax(200px,1fr) minmax(230px,1.3fr) 110px 120px 96px 190px 30px';
 
   return (
     <div style={{ maxWidth: 1240, margin: '0 auto', padding: '32px 24px' }}>
@@ -329,6 +358,13 @@ export const AdminUsers: React.FC = () => {
       </div>
 
       <AdminScopeBar summary={scopeSummary} />
+
+      {clickupMsg && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', margin: '12px 0', padding: '10px 14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12.5, color: 'var(--fg-2)' }}>
+          <span>{clickupMsg}</span>
+          {clickupUrl && <a href={clickupUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--accent)', fontWeight: 700 }}>Deschide taskul ↗</a>}
+        </div>
+      )}
 
       <AnimatePresence>
         {addSuccess && (
@@ -589,7 +625,14 @@ export const AdminUsers: React.FC = () => {
                     })}
                   </div>
 
-                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <button onClick={e => { e.stopPropagation(); void handleSyncClickUp(user, shown); }}
+                      disabled={clickupBusy === user.id}
+                      title="Creează sau actualizează taskul, modulele, răspunsurile și briefingul în ClickUp" className="aa-tap"
+                      style={{ padding: '5px 9px', background: 'rgba(201,169,110,0.10)', border: '1px solid rgba(201,169,110,0.25)', borderRadius: 7, cursor: clickupBusy === user.id ? 'wait' : 'pointer', fontSize: 11, color: 'var(--gold)', fontWeight: 600, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 5, opacity: clickupBusy && clickupBusy !== user.id ? 0.55 : 1 }}>
+                      <RefreshCw size={11} className={clickupBusy === user.id ? 'animate-spin' : ''} />
+                      {clickupBusy === user.id ? 'Se sincronizează…' : 'ClickUp'}
+                    </button>
                     <button onClick={e => { e.stopPropagation(); navigate(`/admin/student/${user.id}`); }} className="aa-tap"
                       style={{ padding: '5px 10px', background: 'rgba(196,240,228,0.08)', border: '1px solid rgba(196,240,228,0.2)', borderRadius: 7, cursor: 'pointer', fontSize: 11, color: 'var(--accent)', fontWeight: 600, whiteSpace: 'nowrap' }}>
                       Profil →

@@ -22,6 +22,13 @@
       "when": 1792407078586,
       "tag": "0002_library_materials",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795261002560,
+      "tag": "0003_add_clickup_student_sync",
+      "breakpoints": true
     }
   ]
 }

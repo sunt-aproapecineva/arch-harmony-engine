@@ -88,6 +88,56 @@ export type Database = {
           },
         ]
       }
+      clickup_student_sync: {
+        Row: {
+          briefing_comment_id: string | null
+          course_id: string
+          created_at: string
+          id: string
+          last_error: string | null
+          last_synced_at: string | null
+          subtasks: Json
+          task_id: string
+          task_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          briefing_comment_id?: string | null
+          course_id: string
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          subtasks?: Json
+          task_id: string
+          task_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          briefing_comment_id?: string | null
+          course_id?: string
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          subtasks?: Json
+          task_id?: string
+          task_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clickup_student_sync_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           created_at: string

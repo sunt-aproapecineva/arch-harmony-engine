@@ -9,12 +9,14 @@
 // structura cursului din cod.
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, Users, ArrowRight, Clock, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, Users, ArrowRight, Clock, ShieldCheck, Sparkles } from 'lucide-react';
+import { useServerFn } from '@tanstack/react-start';
 import { useNavigate } from '@/lib/router-compat';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdminCourseScope } from '../../hooks/useAdminCourseScope';
 import { AdminScopeBar } from '../../components/admin/AdminScopeBar';
 import { getCourseModules } from '../../lib/content';
+import { regenerateAllInsights } from '../../lib/studentInsights.functions';
 
 interface Row {
   id: string;
@@ -40,6 +42,9 @@ export const AdminFlowPanel: React.FC = () => {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'toti' | 'semnale' | 'inainte-de-poarta' | 'fara-quiz'>('toti');
+  const [regenBusy, setRegenBusy] = useState(false);
+  const [regenMsg, setRegenMsg] = useState<string | null>(null);
+  const regenerateBriefings = useServerFn(regenerateAllInsights);
 
   const modules = useMemo(() => getCourseModules(courseId), [courseId]);
   const gateModule = useMemo(() => modules.find((m: any) => m.isGate) || null, [modules]);
@@ -133,6 +138,23 @@ export const AdminFlowPanel: React.FC = () => {
     return true;
   });
 
+  const regenerateVisible = async () => {
+    if (!filtered.length) return;
+    setRegenBusy(true);
+    setRegenMsg(null);
+    try {
+      const result = await regenerateBriefings({
+        data: { courseId, flowId, studentIds: filtered.slice(0, 50).map(row => row.id) },
+      });
+      const base = `Briefinguri regenerate: ${result.done} din ${result.total}`;
+      setRegenMsg(result.failed ? `${base} · ${result.failed} eșuate` : base);
+    } catch (error: any) {
+      setRegenMsg(error?.message || 'Nu am putut regenera briefingurile.');
+    } finally {
+      setRegenBusy(false);
+    }
+  };
+
   const stats = useMemo(() => ({
     total: rows.length,
     faraQuiz: rows.filter(r => !r.quizDone).length,
@@ -165,6 +187,18 @@ export const AdminFlowPanel: React.FC = () => {
       {/* Modulul-poartă și lecțiile diferă de la un program la altul, deci lista se
           raportează la un program ales. */}
       <AdminScopeBar requireCourse showTariff={false} />
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, flexWrap: 'wrap', margin: '12px 0 18px' }}>
+        {regenMsg && <span style={{ fontSize: 12, color: 'var(--fg-3)', marginRight: 'auto' }}>{regenMsg}</span>}
+        <button
+          onClick={regenerateVisible}
+          disabled={regenBusy || loading || !filtered.length}
+          title="Regenerează briefingul pentru elevii afișați în filtrul curent și îl actualizează în ClickUp"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 14px', background: 'var(--gold-dim)', border: '1px solid var(--border-hi)', borderRadius: 8, cursor: regenBusy ? 'wait' : 'pointer', fontSize: 12, color: 'var(--gold)', fontWeight: 700, opacity: regenBusy || loading || !filtered.length ? 0.55 : 1 }}
+        >
+          <Sparkles size={13} /> {regenBusy ? 'Se regenerează…' : `Regenerează briefingurile (${filtered.length})`}
+        </button>
+      </div>
 
       {/* Sumar de pregătire a apelului */}
       <div style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', marginBottom: 20 }}>

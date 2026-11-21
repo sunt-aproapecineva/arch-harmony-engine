@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 import { computeScores, detectStuckModule, type StudentScores } from './studentScoring';
 import { staticExercisesByModuleOrder, allStaticExercises } from './staticExercises';
+import { selectInsightEnrollments } from './insightScope';
 
 /**
  * Plasă pentru perioada dintre deploy și rularea migrației multicurs: dacă `course_id`
@@ -327,6 +328,23 @@ async function runGeneration(admin: any, studentId: string, courseId: string) {
     .upsert(upsertPayload, { onConflict: 'user_id,course_id' });
   if (upErr) throw new Error(upErr.message);
 
+  // Briefingul proaspăt ajunge în același comentariu ClickUp. O problemă ClickUp
+  // nu invalidează briefingul deja salvat în platformă.
+  try {
+    const lovableApiKey = process.env['LOVABLE_API_KEY'];
+    const connectionKey = process.env['CLICKUP_CONNECTION_KEY'];
+    if (lovableApiKey && connectionKey) {
+      const { syncStudentWithClickUp } = await import('./clickupSync.server');
+      await syncStudentWithClickUp(
+        admin,
+        { studentId, courseId, briefingOnly: true },
+        { lovableApiKey, connectionKey },
+      );
+    }
+  } catch (syncError) {
+    console.error('[studentInsights] ClickUp briefing sync failed', syncError);
+  }
+
   return { ...upsertPayload, fromCache: false };
 }
 
@@ -337,25 +355,29 @@ async function runGeneration(admin: any, studentId: string, courseId: string) {
 export const regenerateAllInsights = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({
-    courseId: z.string().default('business'),
+    courseId: z.string().nullable().optional(),
+    flowId: z.string().nullable().optional(),
+    tariffId: z.string().nullable().optional(),
+    studentIds: z.array(z.string().uuid()).max(50).optional(),
   }).parse(input ?? {}))
   .handler(async ({ data, context }) => {
     const admin = await ensureAdmin(context);
 
     const [enrollRes, rolesRes] = await Promise.all([
-      admin.from('enrollments').select('user_id').eq('course_id', data.courseId),
+      admin.from('enrollments').select('user_id,course_id,flow_id,tariff'),
       admin.from('user_roles').select('user_id,role'),
     ]);
+    if (enrollRes.error) throw new Error(enrollRes.error.message);
+    if (rolesRes.error) throw new Error(rolesRes.error.message);
     const adminIds = new Set((rolesRes.data || []).filter((r: any) => r.role === 'admin').map((r: any) => r.user_id));
-    const studentIds = [...new Set((enrollRes.data || []).map((e: any) => e.user_id))]
-      .filter((id: string) => !adminIds.has(id))
+    const selected = selectInsightEnrollments(enrollRes.data || [], adminIds, data)
       .slice(0, 50); // plafon de siguranță per rulare
 
     let done = 0;
     const failed: string[] = [];
-    for (const id of studentIds) {
+    for (const enrollment of selected) {
       try {
-        await runGeneration(admin, id, data.courseId);
+        await runGeneration(admin, enrollment.user_id, enrollment.course_id);
         done++;
       } catch (e: any) {
         failed.push(e?.message || 'eroare necunoscută');
@@ -363,7 +385,7 @@ export const regenerateAllInsights = createServerFn({ method: 'POST' })
         if (e?.message?.includes('Prea multe cereri') || e?.message?.includes('Creditele AI')) break;
       }
     }
-    return { total: studentIds.length, done, failed: failed.length, stoppedEarly: done + failed.length < studentIds.length };
+    return { total: selected.length, done, failed: failed.length, stoppedEarly: done + failed.length < selected.length };
   });
 
 // ── Supervisor notes CRUD ────────────────────────────────────────────────────

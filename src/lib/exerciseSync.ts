@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { syncStudentClickUp } from '@/lib/clickupSync.functions';
+import { courseIdForExercise } from '@/lib/clickupFormatting';
 
 // Debounce per (user, exerciseId) so rapid edits coalesce into one upsert.
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -26,6 +28,14 @@ export function subscribeExerciseSync(exerciseId: string, listener: SyncListener
 
 function notifyExerciseSync(exerciseId: string, result: SyncResult) {
   listeners.get(exerciseId)?.forEach((listener) => listener({ ...result, exerciseId }));
+}
+
+/** ClickUp nu blochează salvarea răspunsului și nu regenerează briefingul AI. */
+function syncClickUpAfterSave(userId: string, exerciseId: string) {
+  const courseId = courseIdForExercise(exerciseId);
+  if (!courseId) return;
+  void syncStudentClickUp({ data: { studentId: userId, courseId, exerciseId } })
+    .catch((error: unknown) => console.warn('[exerciseSync] ClickUp sync failed', error));
 }
 
 /**
@@ -71,6 +81,7 @@ export function pushExerciseResponse(exerciseId: string, response: unknown, inte
           return;
         }
         notifyExerciseSync(exerciseId, { ok: true });
+        syncClickUpAfterSave(userId, exerciseId);
       } catch (e) {
         console.error('[exerciseSync] push failed', e);
         notifyExerciseSync(exerciseId, { ok: false, error: 'Eroare la sincronizare' });
@@ -110,6 +121,7 @@ export async function flushExerciseResponse(exerciseId: string, response: unknow
   );
   if (error) throw new Error(error.message || 'Nu am putut salva răspunsul exercițiului.');
   notifyExerciseSync(exerciseId, { ok: true });
+  syncClickUpAfterSave(userId, exerciseId);
 }
 
 /** Load saved response from Supabase (returns null if none or not signed in). */
