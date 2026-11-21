@@ -37,3 +37,11 @@
 # Module 7 START exercises
 
 - [x] Integrated workbook exercises 7.1–7.2 beside their published lessons and opened Module 7 for both AA START editions, including an immediate Edition 2 override. Thirteen regression tests passed; signed-in browser checks confirmed both forms, scorecard/review fields and saved-answer readback without runtime errors.
+
+# ClickUp student mentoring sync
+
+- [ ] Create one student task with one subtask per course module and readable exercise answers in each subtask.
+- [ ] Sync exercise submissions automatically and publish/update the student's briefing as a task comment.
+- [ ] Add per-student ClickUp sync controls in Admin → Utilizatori.
+- [ ] Respect the full selected course/flow/tariff filter when regenerating briefings in bulk.
+- [ ] Run an end-to-end ClickUp test with a test student and verify the resulting task, subtasks, answers and briefing comment.
