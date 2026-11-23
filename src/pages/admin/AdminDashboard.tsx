@@ -55,8 +55,8 @@ export const AdminDashboard: React.FC = () => {
   useEffect(() => {
     // Reținem și ținta anunțului afișat: ștergerea trebuie să lovească exact anunțul
     // pe care îl vede adminul, nu fluxul selectat acum în filtru.
-    getActiveAnnouncement().then(a => setCurrentNotif(a ? { message: a.message, type: a.type, flowId: a.flow_id ?? null } : null));
-  }, []);
+    getActiveAnnouncement(flowId).then(a => setCurrentNotif(a ? { message: a.message, type: a.type, flowId: a.flow_id ?? null } : null));
+  }, [flowId]);
 
   const [newEmail, setNewEmail] = useState('');
   const [addedEmail, setAddedEmail] = useState(false);

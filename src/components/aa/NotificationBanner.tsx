@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Info, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getActiveAnnouncement } from '../../lib/announcements';
+import { useCourse } from '../../context/CourseContext';
 
 interface NotificationData {
   message: string;
@@ -12,6 +13,8 @@ interface NotificationData {
 const DISMISSED_KEY = 'aa_notification_dismissed';
 
 export const NotificationBanner: React.FC = () => {
+  const { flow } = useCourse();
+  const flowId = flow?.id ?? null;
   const [notification, setNotification] = useState<NotificationData | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
@@ -19,7 +22,10 @@ export const NotificationBanner: React.FC = () => {
 
   useEffect(() => {
     let cancelled = false;
-    getActiveAnnouncement().then(a => {
+    setNotification(null);
+    setActiveId(null);
+    setDismissed(false);
+    getActiveAnnouncement(flowId).then(a => {
       if (cancelled || !a) return;
       try {
         if (sessionStorage.getItem(DISMISSED_KEY) === a.id) {
@@ -31,7 +37,7 @@ export const NotificationBanner: React.FC = () => {
       setNotification({ message: a.message, type: (a.type as any) || 'info', exp: 0 });
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [flowId]);
 
   const handleDismiss = () => {
     try { if (activeId) sessionStorage.setItem(DISMISSED_KEY, activeId); } catch {}

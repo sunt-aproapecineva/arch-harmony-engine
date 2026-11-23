@@ -49,6 +49,11 @@
 # ClickUp existing-student merge
 
 - [x] Inventory START Flux 2 and Business Flux 3 Q&A tasks, student tasks, duplicates, tags and comments: 14 Business duplicate pairs, Andrei without an old Q&A task, Eugeniu with three copies of each module.
-- [ ] Reuse the existing Q&A child for each student and merge missing platform context without removing existing content; blocked because the first real ClickUp write was rejected and no real task was changed.
-- [ ] Preserve tags and comments on the canonical student task; comment sources identified for Melega, Elena and Triboi. After merging, close each duplicate and add a note identifying the retained task; do not delete duplicates. Real writes require approval.
-- [x] Update automatic sync so it reuses existing student/module tasks, preserves mentor descriptions and places START Flux 2/Business Flux 3 students under Q&A; seven tests pass, real ClickUp writes not performed.
+- [x] Reuse the Q&A student tasks and merge platform context without removing mentor notes; all 15 Business students are active under Q&A, and Eugeniu's retained START task includes his original description.
+- [x] Preserve tariff/access/issue tags and copy the nine existing comments for Melega, Elena and Triboi with original author/date in the text. Closed and labelled 34 duplicates without deleting content: 15 student tasks and 19 START module tasks; canonical module answers and all comments were checked first.
+- [x] Update automatic sync so it reuses existing student/module tasks, preserves mentor descriptions and places START Flux 2/Business Flux 3 students under Q&A; regression tests pass and real ClickUp results were read back.
+
+# Business notification review
+
+- [x] The screenshot showed the START Edition 2 live announcement on Business Flux 3. The announcement itself was correctly targeted to `start-f2`; the unscoped query returned it because admins may read every flow's announcements.
+- [x] Scope both the student banner and Admin notification preview to the selected flow plus global announcements, clear stale banners on flow change and retain a defensive flow check. Verified Business Flux 3 no longer shows the START banner in the signed-in preview; nine targeted tests pass and the preview build is OK.

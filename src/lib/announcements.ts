@@ -16,17 +16,25 @@ export interface Announcement {
  * (Previously this lived in localStorage, so only the admin's own browser
  * ever displayed the banner.)
  */
-export async function getActiveAnnouncement(): Promise<Announcement | null> {
+export function announcementMatchesFlow(announcementFlowId: string | null | undefined, selectedFlowId: string | null): boolean {
+  return announcementFlowId == null || announcementFlowId === selectedFlowId;
+}
+
+export async function getActiveAnnouncement(flowId: string | null = null): Promise<Announcement | null> {
   try {
     const nowIso = new Date().toISOString();
-    // Filtrarea pe flux e făcută de RLS, nu aici: un elev vede doar anunțurile
-    // fluxului lui plus cele globale. Luăm cel mai recent dintre ele.
-    const { data, error } = await supabase
+    // Elevii sunt filtrați și de RLS, dar administratorii pot citi toate
+    // anunțurile. Filtrul explicit împiedică afișarea unui anunț START în Business.
+    let query = supabase
       .from('announcements')
       .select('id, message, type, expires_at, created_at, flow_id')
       .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
       .order('created_at', { ascending: false })
       .limit(1);
+    query = flowId
+      ? query.or(`flow_id.is.null,flow_id.eq.${flowId}`)
+      : query.is('flow_id', null);
+    const { data, error } = await query;
     if (error && error.code === '42703') {
       const legacy = await supabase
         .from('announcements')
@@ -36,7 +44,8 @@ export async function getActiveAnnouncement(): Promise<Announcement | null> {
         .limit(1);
       return (legacy.data && legacy.data[0]) || null;
     }
-    return (data && data[0]) || null;
+    const announcement = (data && data[0]) || null;
+    return announcement && announcementMatchesFlow(announcement.flow_id, flowId) ? announcement : null;
   } catch {
     return null;
   }
