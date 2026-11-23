@@ -21,6 +21,7 @@ import { AdminScopeBar } from '../../components/admin/AdminScopeBar';
 import { activeCourses, defaultTier, getCourse } from '../../lib/courses';
 import { courseLessonIndex, overallPct, doneByUser } from '../../lib/adminProgress';
 import { useAdminCourseScope } from '@/hooks/useAdminCourseScope';
+import { fetchFlows } from '../../lib/flows';
 import { AttentionQueueCard } from '../../components/admin/AttentionQueueCard';
 
 function ActivityIcon({ type }: { type: ActivityType }) {
@@ -49,14 +50,35 @@ export const AdminDashboard: React.FC = () => {
   const [notifMessage, setNotifMessage] = useState('');
   const [notifType, setNotifType] = useState<'info' | 'success' | 'warning'>('info');
   const [notifPublished, setNotifPublished] = useState(false);
+  // Audiența se alege direct în card: 'all' | 'course:<id>' | '<flowId>'.
+  const [allFlows, setAllFlows] = useState<any[]>([]);
+  const [audience, setAudience] = useState<string>('all');
+  useEffect(() => { fetchFlows(null).then(setAllFlows); }, []);
+  useEffect(() => { setAudience(flowId || (courseId ? `course:${courseId}` : 'all')); }, [flowId, courseId]);
+  const audienceFlowIds = (): (string | null)[] => {
+    if (audience === 'all') return [null];
+    if (audience.startsWith('course:')) {
+      const cid = audience.slice(7);
+      return allFlows.filter(f => f.course_id === cid).map(f => f.id);
+    }
+    return [audience];
+  };
+  const audienceLabel = audience === 'all'
+    ? 'TOȚI elevii, din toate programele și fluxurile'
+    : audience.startsWith('course:')
+      ? `toți elevii ${getCourse(audience.slice(7))?.shortTitle || audience.slice(7)} (${audienceFlowIds().length} fluxuri)`
+      : `doar ${allFlows.find(f => f.id === audience)?.name || 'fluxul selectat'} · ${getCourse(allFlows.find(f => f.id === audience)?.course_id)?.shortTitle || ''}`;
   const [currentNotif, setCurrentNotif] = useState<{ message: string; type: string; flowId: string | null } | null>(null);
 
   // Announcements live in the database so every student sees them.
   useEffect(() => {
     // Reținem și ținta anunțului afișat: ștergerea trebuie să lovească exact anunțul
     // pe care îl vede adminul, nu fluxul selectat acum în filtru.
-    getActiveAnnouncement(flowId).then(a => setCurrentNotif(a ? { message: a.message, type: a.type, flowId: a.flow_id ?? null } : null));
-  }, [flowId]);
+    const ids = audienceFlowIds();
+    const first = ids[0] ?? null;
+    if (ids.length === 0) { setCurrentNotif(null); return; }
+    getActiveAnnouncement(first).then(a => setCurrentNotif(a ? { message: a.message, type: a.type, flowId: a.flow_id ?? null } : null));
+  }, [audience, allFlows]);
 
   const [newEmail, setNewEmail] = useState('');
   const [addedEmail, setAddedEmail] = useState(false);
@@ -125,16 +147,17 @@ export const AdminDashboard: React.FC = () => {
   const handlePublishNotif = async () => {
     if (!notifMessage.trim()) return;
     // Ținta e fluxul selectat în filtrul de sus. „Toate fluxurile" publică global.
-    const created = await publishAnnouncement(notifMessage.trim(), notifType, user?.id ?? null, 7, flowId);
-    setCurrentNotif(created
-      ? { message: created.message, type: created.type, flowId: created.flow_id ?? null }
-      : { message: notifMessage.trim(), type: notifType, flowId });
+    const ids = audienceFlowIds();
+    if (ids.length === 0) return;
+    let created = null;
+    for (const id of ids) created = await publishAnnouncement(notifMessage.trim(), notifType, user?.id ?? null, 7, id);
+    setCurrentNotif({ message: notifMessage.trim(), type: notifType, flowId: created?.flow_id ?? ids[0] });
     setNotifPublished(true);
     setTimeout(() => setNotifPublished(false), 2000);
   };
 
   const handleDeleteNotif = async () => {
-    await clearAnnouncements(currentNotif ? currentNotif.flowId : flowId);
+    for (const id of audienceFlowIds()) await clearAnnouncements(id);
     sessionStorage.removeItem('aa_notification_dismissed');
     setCurrentNotif(null);
     setNotifMessage('');
@@ -293,6 +316,19 @@ export const AdminDashboard: React.FC = () => {
           </div>
         )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--fg-3)' }}>
+            Trimite către:
+            <select value={audience} onChange={e => setAudience(e.target.value)} aria-label="Audiența notificării"
+              style={{ flex: 1, maxWidth: 360, padding: '7px 10px', fontSize: 12, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)' }}>
+              <option value="all">Toată platforma</option>
+              {activeCourses().map(c => <option key={c.id} value={`course:${c.id}`}>Toți elevii {c.shortTitle}</option>)}
+              {activeCourses().map(c => (
+                <optgroup key={c.id} label={`Flux specific · ${c.shortTitle}`}>
+                  {allFlows.filter(f => f.course_id === c.id).map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
+                </optgroup>
+              ))}
+            </select>
+          </label>
           <textarea value={notifMessage} onChange={e => setNotifMessage(e.target.value)} placeholder="Mesajul notificării..." rows={2}
             style={{ width: '100%', padding: '9px 12px', fontSize: 13, background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--fg)', resize: 'vertical', boxSizing: 'border-box' }} />
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -310,10 +346,8 @@ export const AdminDashboard: React.FC = () => {
           </div>
           {/* Ținta anunțului. Fără linia asta, adminul n-are de unde ști că mesajul
               pleacă doar către fluxul selectat în filtrul de sus. */}
-          <p style={{ fontSize: 11, color: flowId ? 'var(--accent)' : 'var(--warn)', margin: '8px 0 0', lineHeight: 1.5 }}>
-            {flowId
-              ? `Anunțul merge doar către ${flows.find(f => f.id === flowId)?.name || 'fluxul selectat'}.`
-              : 'Anunțul merge către TOȚI elevii, din toate fluxurile. Alege un flux în filtrul de sus ca să-l țintești.'}
+          <p style={{ fontSize: 11, color: audience === 'all' ? 'var(--warn)' : 'var(--accent)', margin: '8px 0 0', lineHeight: 1.5 }}>
+            Anunțul merge către {audienceLabel}.
           </p>
         </div>
       </motion.div>
