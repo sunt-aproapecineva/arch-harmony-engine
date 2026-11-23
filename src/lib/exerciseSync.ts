@@ -8,6 +8,7 @@ const timers = new Map<string, ReturnType<typeof setTimeout>>();
 type SyncResult = { ok: boolean; error?: string };
 type SyncListener = (result: SyncResult & { exerciseId: string }) => void;
 const listeners = new Map<string, Set<SyncListener>>();
+const clickUpSyncQueues = new Map<string, Promise<void>>();
 
 export type CloudExerciseResponse = {
   response: unknown;
@@ -34,8 +35,17 @@ function notifyExerciseSync(exerciseId: string, result: SyncResult) {
 function syncClickUpAfterSave(userId: string, exerciseId: string) {
   const courseId = courseIdForExercise(exerciseId);
   if (!courseId) return;
-  void syncStudentClickUp({ data: { studentId: userId, courseId, exerciseId } })
+  const key = `${userId}:${courseId}`;
+  const previous = clickUpSyncQueues.get(key) || Promise.resolve();
+  const next = previous
+    .catch(() => undefined)
+    .then(() => syncStudentClickUp({ data: { studentId: userId, courseId, exerciseId } }))
+    .then(() => undefined)
     .catch((error: unknown) => console.warn('[exerciseSync] ClickUp sync failed', error));
+  clickUpSyncQueues.set(key, next);
+  void next.then(() => {
+    if (clickUpSyncQueues.get(key) === next) clickUpSyncQueues.delete(key);
+  });
 }
 
 /**

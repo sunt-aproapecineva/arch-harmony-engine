@@ -138,6 +138,48 @@ export type Database = {
           },
         ]
       }
+      clickup_sync_locks: {
+        Row: {
+          course_id: string
+          created_at: string
+          expires_at: string
+          lock_token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          expires_at: string
+          lock_token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          expires_at?: string
+          lock_token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clickup_sync_locks_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clickup_sync_locks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           created_at: string

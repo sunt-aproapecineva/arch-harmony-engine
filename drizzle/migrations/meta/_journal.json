@@ -29,6 +29,13 @@
       "when": 1795261002560,
       "tag": "0003_add_clickup_student_sync",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795434474605,
+      "tag": "0004_prevent_concurrent_clickup_syncs",
+      "breakpoints": true
     }
   ]
 }

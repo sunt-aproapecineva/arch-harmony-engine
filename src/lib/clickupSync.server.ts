@@ -41,8 +41,72 @@ async function saveMapping(admin: any, payload: Record<string, unknown>) {
   if (error) throw new Error(`Nu pot salva legătura ClickUp: ${error.message}`);
 }
 
-/** Server-only: apelată după verificarea identității și a rolului în createServerFn. */
-export async function syncStudentWithClickUp(admin: any, input: SyncInput, credentials: Credentials) {
+const LOCK_LEASE_MS = 120_000;
+const LOCK_WAIT_MS = 30_000;
+const LOCK_RETRY_MS = 250;
+
+function lockExpiry() {
+  return new Date(Date.now() + LOCK_LEASE_MS).toISOString();
+}
+
+/**
+ * Un răspuns poate fi salvat simultan din mai multe taburi sau dispozitive.
+ * Lockul persistent împiedică două invocări să creeze același task ClickUp.
+ */
+async function acquireSyncLock(admin: any, studentId: string, courseId: string) {
+  const token = crypto.randomUUID();
+  const deadline = Date.now() + LOCK_WAIT_MS;
+  let inserted = false;
+
+  while (true) {
+    if (!inserted) {
+      inserted = true;
+      const { data, error } = await admin.from('clickup_sync_locks').upsert({
+        user_id: studentId,
+        course_id: courseId,
+        lock_token: token,
+        expires_at: lockExpiry(),
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,course_id', ignoreDuplicates: true }).select('lock_token').maybeSingle();
+      if (error) throw new Error(`Nu pot bloca sincronizarea ClickUp: ${error.message}`);
+      if (data?.lock_token === token) return token;
+    } else {
+      const { data, error } = await admin.from('clickup_sync_locks').update({
+        lock_token: token,
+        expires_at: lockExpiry(),
+        updated_at: new Date().toISOString(),
+      }).eq('user_id', studentId).eq('course_id', courseId)
+        .lte('expires_at', new Date().toISOString()).select('lock_token').maybeSingle();
+      if (error) throw new Error(`Nu pot prelua lockul ClickUp: ${error.message}`);
+      if (data?.lock_token === token) return token;
+    }
+
+    if (Date.now() >= deadline) {
+      throw new Error('O altă sincronizare ClickUp este încă în curs. Răspunsul este salvat; reîncearcă sincronizarea în scurt timp.');
+    }
+    await new Promise(resolve => setTimeout(resolve, LOCK_RETRY_MS));
+  }
+}
+
+async function renewSyncLock(admin: any, studentId: string, courseId: string, token: string) {
+  const { data, error } = await admin.from('clickup_sync_locks').update({
+    expires_at: lockExpiry(),
+    updated_at: new Date().toISOString(),
+  }).eq('user_id', studentId).eq('course_id', courseId).eq('lock_token', token)
+    .select('lock_token').maybeSingle();
+  if (error) throw new Error(`Nu pot prelungi lockul ClickUp: ${error.message}`);
+  if (!data) throw new Error('Lockul ClickUp a expirat. Sincronizarea a fost oprită pentru a preveni duplicatele.');
+}
+
+async function releaseSyncLock(admin: any, studentId: string, courseId: string, token: string) {
+  const { error } = await admin.from('clickup_sync_locks').update({
+    expires_at: new Date(0).toISOString(),
+    updated_at: new Date().toISOString(),
+  }).eq('user_id', studentId).eq('course_id', courseId).eq('lock_token', token);
+  if (error) throw new Error(`Nu pot elibera lockul ClickUp: ${error.message}`);
+}
+
+async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, credentials: Credentials, lockToken: string) {
   const { studentId, courseId, exerciseId } = input;
   const course = getCourse(courseId);
   if (!course) throw new Error('Program necunoscut.');
@@ -88,6 +152,8 @@ export async function syncStudentWithClickUp(admin: any, input: SyncInput, crede
     '',
     'Modulele și răspunsurile sunt actualizate automat din platformă. Briefingul AI este în comentariul dedicat de mai jos.',
   ].join('\n');
+
+  await renewSyncLock(admin, studentId, courseId, lockToken);
 
   try {
     if (taskId) {
@@ -139,6 +205,7 @@ export async function syncStudentWithClickUp(admin: any, input: SyncInput, crede
           : modules;
 
     for (const mod of targets) {
+      await renewSyncLock(admin, studentId, courseId, lockToken);
       const body = {
         name: `${mod.etapa} · ${mod.title}`,
         markdown_description: buildModuleMarkdown(mod, responses),
@@ -173,6 +240,7 @@ export async function syncStudentWithClickUp(admin: any, input: SyncInput, crede
       }
     }
 
+    await renewSyncLock(admin, studentId, courseId, lockToken);
     const summary = insightRes.data?.summary?.trim();
     if (summary && taskId) {
       const commentText = buildBriefingComment(summary, insightRes.data.generated_at);
@@ -230,5 +298,16 @@ export async function syncStudentWithClickUp(admin: any, input: SyncInput, crede
       }).catch(() => undefined);
     }
     throw error;
+  }
+}
+
+/** Server-only: apelată după verificarea identității și a rolului în createServerFn. */
+export async function syncStudentWithClickUp(admin: any, input: SyncInput, credentials: Credentials) {
+  const lockToken = await acquireSyncLock(admin, input.studentId, input.courseId);
+  try {
+    return await syncStudentWithClickUpLocked(admin, input, credentials, lockToken);
+  } finally {
+    await releaseSyncLock(admin, input.studentId, input.courseId, lockToken)
+      .catch((error: unknown) => console.error('[clickupSync] Could not release sync lock', error));
   }
 }
