@@ -11,7 +11,7 @@ class FakeQuery {
   private options: Row = {};
   private filters: { field: string; operator: 'eq' | 'lte'; value: unknown }[] = [];
 
-  constructor(private table: string, private state: { mapping: Row | null; lock: Row | null }) {}
+  constructor(private table: string, private state: { mapping: Row | null; lock: Row | null; flowId?: string }) {}
 
   select(_columns?: string) { return this; }
   upsert(payload: Row, options: Row) { this.action = 'upsert'; this.payload = payload; this.options = options; return this; }
@@ -32,7 +32,7 @@ class FakeQuery {
 
   private async execute() {
     if (this.table === 'profiles') return { data: { id: 'student', email: 'elev@example.com', full_name: 'Elev Test', tariff: 'pro', created_at: '' }, error: null };
-    if (this.table === 'enrollments') return { data: { course_id: 'start', flow_id: 'start-f1', tariff: 'pro', granted_at: '' }, error: null };
+    if (this.table === 'enrollments') return { data: { course_id: 'start', flow_id: this.state.flowId || 'start-f1', tariff: 'pro', granted_at: '' }, error: null };
     if (this.table === 'exercise_responses') return { data: [], error: null };
     if (this.table === 'student_insights') return { data: null, error: null };
     if (this.table === 'clickup_student_sync') {
@@ -56,7 +56,7 @@ class FakeQuery {
 
 describe('ClickUp synchronization locking', () => {
   test('two simultaneous autosaves create one student task and one subtask per module', async () => {
-    const state: { mapping: Row | null; lock: Row | null } = { mapping: null, lock: null };
+    const state: { mapping: Row | null; lock: Row | null; flowId?: string } = { mapping: null, lock: null, flowId: 'start-f2' };
     const admin = { from: (table: string) => new FakeQuery(table, state) };
     const createdTasks: Row[] = [];
     let nextId = 0;
@@ -85,9 +85,9 @@ describe('ClickUp synchronization locking', () => {
       ]);
 
       const modules = getCourseModules('start');
-      const parents = createdTasks.filter(task => !task.parent);
-      const subtasks = createdTasks.filter(task => task.parent);
-      assert.equal(parents.length, 1);
+      const students = createdTasks.filter(task => task.parent === '1248h53exqd');
+      const subtasks = createdTasks.filter(task => task.parent && task.parent !== '1248h53exqd');
+      assert.equal(students.length, 1);
       assert.equal(subtasks.length, modules.length);
       assert.equal(new Set(subtasks.map(task => task.name)).size, modules.length);
       assert.equal(new Set(subtasks.map(task => task.parent)).size, 1);

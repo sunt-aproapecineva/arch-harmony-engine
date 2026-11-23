@@ -45,3 +45,10 @@
 - [x] Add per-student ClickUp sync controls in Admin → Utilizatori.
 - [x] Respect the full selected course/flow/tariff filter when regenerating briefings in bulk, including visible students in Înainte de apel.
 - [x] Verified the existing test student's real ClickUp task: 10 module subtasks, readable test answers, stable task/comment IDs after repeated sync, and no duplicate briefing comment.
+
+# ClickUp existing-student merge
+
+- [ ] Inventory START Flux 2 and Business Flux 3 Q&A tasks, student tasks, duplicates, tags and comments.
+- [ ] Reuse the existing Q&A child for each student and merge missing platform context without removing existing content.
+- [ ] Preserve tags and comments on the canonical student task; hold duplicate deletion or closure for the user's choice.
+- [ ] Update automatic sync so it reuses the merged task and Q&A parent without creating new duplicates.

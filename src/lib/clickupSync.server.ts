@@ -1,6 +1,6 @@
 import { getCourse } from './courses';
 import { getCourseModules } from './content';
-import { buildBriefingComment, buildModuleMarkdown, clickUpModuleStatus, moduleIdForExercise } from './clickupFormatting';
+import { buildBriefingComment, buildModuleMarkdown, clickUpModuleStatus, mergeClickUpStudentDescription, moduleIdForExercise, normalizeClickUpStudentName } from './clickupFormatting';
 
 const GATEWAY_URL = 'https://connector-gateway.lovable.dev/clickup';
 const PUBLIC_SITE = 'https://aa.morarvictor.com';
@@ -9,6 +9,11 @@ const LIST_BY_FLOW: Record<string, string> = {
   'start-f1': '901524977985',
   'start-f2': '1200960000011204',
   'business-f3': '1200960000011209',
+};
+
+const QA_TASK_BY_FLOW: Record<string, string> = {
+  'start-f2': '1248h53exqd',
+  'business-f3': '1248h53eyjp',
 };
 
 type Credentials = { lovableApiKey: string; connectionKey: string };
@@ -34,6 +39,43 @@ async function clickUp<T>(path: string, credentials: Credentials, init: RequestI
   });
   if (!response.ok) throw new ClickUpError(response.status, await response.text());
   return (response.status === 204 ? undefined : await response.json()) as T;
+}
+
+type ClickUpTask = {
+  id: string;
+  name: string;
+  url?: string;
+  description?: string | null;
+  parent?: string | null;
+};
+
+async function listClickUpTasks(listId: string, credentials: Credentials) {
+  const tasks: ClickUpTask[] = [];
+  for (let page = 0; page < 20; page += 1) {
+    const params = new URLSearchParams({
+      page: String(page),
+      include_closed: 'true',
+      subtasks: 'true',
+      archived: 'false',
+    });
+    const result = await clickUp<{ tasks?: ClickUpTask[]; last_page?: boolean }>(
+      `api/v2/list/${listId}/task?${params}`,
+      credentials,
+    );
+    tasks.push(...(result.tasks || []));
+    if (result.last_page !== false || !result.tasks?.length) return tasks;
+  }
+  throw new Error('Prea multe pagini de taskuri ClickUp.');
+}
+
+function existingModuleIds(tasks: ClickUpTask[], taskId: string, modules: ReturnType<typeof getCourseModules>) {
+  const ids: Record<string, string> = {};
+  for (const mod of modules) {
+    const name = `${mod.etapa} · ${mod.title}`;
+    const existing = tasks.find(task => task.parent === taskId && task.name === name);
+    if (existing) ids[mod.id] = existing.id;
+  }
+  return ids;
 }
 
 async function saveMapping(admin: any, payload: Record<string, unknown>) {
@@ -155,13 +197,13 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
 
   await renewSyncLock(admin, studentId, courseId, lockToken);
 
+  const qaTaskId = QA_TASK_BY_FLOW[flowId];
+
   try {
+    let currentTask: ClickUpTask | undefined;
     if (taskId) {
       try {
-        await clickUp(`api/v2/task/${taskId}`, credentials, {
-          method: 'PUT',
-          body: JSON.stringify({ name: studentName, markdown_description: parentDescription }),
-        });
+        currentTask = await clickUp<ClickUpTask>(`api/v2/task/${taskId}`, credentials);
       } catch (error) {
         if (!(error instanceof ClickUpError) || error.status !== 404) throw error;
         taskId = undefined;
@@ -172,9 +214,38 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
     }
 
     if (!taskId) {
+      const tasks = await listClickUpTasks(listId, credentials);
+      const normalizedName = normalizeClickUpStudentName(studentName);
+      const candidates = tasks.filter(task => normalizeClickUpStudentName(task.name) === normalizedName
+        && (task.parent === qaTaskId || !task.parent));
+      currentTask = candidates.sort((a, b) => Number(b.parent === qaTaskId) - Number(a.parent === qaTaskId))[0];
+      if (currentTask) {
+        taskId = currentTask.id;
+        taskUrl = currentTask.url || null;
+        subtasks = existingModuleIds(tasks, taskId, modules);
+        briefingCommentId = null;
+      }
+    }
+
+    if (taskId) {
+      currentTask ||= await clickUp<ClickUpTask>(`api/v2/task/${taskId}`, credentials);
+      await clickUp(`api/v2/task/${taskId}`, credentials, {
+        method: 'PUT',
+        body: JSON.stringify({
+          markdown_description: mergeClickUpStudentDescription(currentTask.description, parentDescription),
+          ...(qaTaskId ? { parent: qaTaskId } : {}),
+        }),
+      });
+    } else {
       const created = await clickUp<{ id: string; url: string }>(`api/v2/list/${listId}/task`, credentials, {
         method: 'POST',
-        body: JSON.stringify({ name: studentName, markdown_description: parentDescription, status: 'in progres', notify_all: false }),
+        body: JSON.stringify({
+          name: studentName,
+          markdown_description: mergeClickUpStudentDescription('', parentDescription),
+          status: 'in progres',
+          notify_all: false,
+          ...(qaTaskId ? { parent: qaTaskId } : {}),
+        }),
       });
       taskId = created.id;
       taskUrl = created.url;
@@ -194,7 +265,21 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
       updated_at: new Date().toISOString(),
     });
 
-    const missing = modules.filter(mod => !subtasks[mod.id]);
+    let missing = modules.filter(mod => !subtasks[mod.id]);
+    if (missing.length && taskId) {
+      const tasks = await listClickUpTasks(listId, credentials);
+      subtasks = { ...existingModuleIds(tasks, taskId, modules), ...subtasks };
+      missing = modules.filter(mod => !subtasks[mod.id]);
+      await saveMapping(admin, {
+        user_id: studentId,
+        course_id: courseId,
+        task_id: taskId,
+        task_url: taskUrl,
+        subtasks,
+        briefing_comment_id: briefingCommentId,
+        updated_at: new Date().toISOString(),
+      });
+    }
     const targetModuleId = exerciseId ? moduleIdForExercise(courseId, exerciseId) : undefined;
     const targets = missing.length
       ? modules

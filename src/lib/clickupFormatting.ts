@@ -142,6 +142,34 @@ export function clickUpModuleStatus(mod: Module, responses: ExerciseResponseMap)
   return answered > 0 ? 'in progres' : 'de facut';
 }
 
+export function normalizeClickUpStudentName(name: string): string {
+  return name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean).sort().join(' ');
+}
+
+const CONTEXT_START = '<!-- AA_PLATFORM_CONTEXT_START -->';
+const CONTEXT_END = '<!-- AA_PLATFORM_CONTEXT_END -->';
+
+/** Păstrează notițele mentorului și înlocuiește doar blocul deținut de platformă. */
+export function mergeClickUpStudentDescription(existing: string | null | undefined, context: string): string {
+  const marked = `${CONTEXT_START}\n${context.trim()}\n${CONTEXT_END}`;
+  const source = existing?.trim() || '';
+  if (!source) return marked;
+
+  const markerPattern = /<!-- AA_PLATFORM_CONTEXT_START -->[\s\S]*?<!-- AA_PLATFORM_CONTEXT_END -->/;
+  if (markerPattern.test(source)) return source.replace(markerPattern, marked);
+
+  // Descrierile create înainte de marcaje pot fi înlocuite fără să pierdem
+  // notițele manuale adăugate înainte sau după ele.
+  const legacy = context.trim();
+  const withoutLegacy = source === legacy
+    ? ''
+    : source.endsWith(legacy)
+      ? source.slice(0, -legacy.length).trim()
+      : source;
+  return withoutLegacy ? `${withoutLegacy}\n\n---\n\n${marked}` : marked;
+}
+
 export function buildBriefingComment(summary: string, generatedAt?: string | null): string {
   const stamp = generatedAt
     ? new Date(generatedAt).toLocaleString('ro-RO', { timeZone: 'Europe/Chisinau' })

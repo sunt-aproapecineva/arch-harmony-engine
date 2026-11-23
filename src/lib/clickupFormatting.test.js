@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { buildBriefingComment, buildModuleMarkdown, clickUpModuleStatus, courseIdForExercise, hasMeaningfulResponse, moduleIdForExercise, renderResponseMarkdown } from './clickupFormatting';
+import { buildBriefingComment, buildModuleMarkdown, clickUpModuleStatus, courseIdForExercise, hasMeaningfulResponse, mergeClickUpStudentDescription, moduleIdForExercise, normalizeClickUpStudentName, renderResponseMarkdown } from './clickupFormatting';
 import { getCourseModules } from './content';
 import { getExerciseTemplate } from './exerciseData';
 
@@ -28,6 +28,22 @@ describe('ClickUp student content formatting', () => {
     expect(markdown).toContain('Exercițiul 7.1');
     expect(markdown).toContain('Exercițiul 7.2');
     expect(clickUpModuleStatus(mod, { 'st-e-7-1': response })).toBe('in progres');
+  });
+
+  test('student matching tolerates reversed names and diacritics', () => {
+    expect(normalizeClickUpStudentName('Taralunga Eugeniu')).toBe(normalizeClickUpStudentName('Eugeniu Taralunga'));
+    expect(normalizeClickUpStudentName('Ciobănescu Andrei')).toBe(normalizeClickUpStudentName('Andrei Ciobanescu'));
+  });
+
+  test('platform context preserves mentor notes and replaces only its own marked block', () => {
+    const first = mergeClickUpStudentDescription('Notițe mentor\nTelefon: 070000000', '## Elev\n- **Email:** elev@example.com');
+    expect(first).toContain('Notițe mentor');
+    expect(first).toContain('AA_PLATFORM_CONTEXT_START');
+    const second = mergeClickUpStudentDescription(first, '## Elev\n- **Email:** nou@example.com');
+    expect(second).toContain('Notițe mentor');
+    expect(second).toContain('nou@example.com');
+    expect(second).not.toContain('- **Email:** elev@example.com');
+    expect(second.match(/AA_PLATFORM_CONTEXT_START/g)).toHaveLength(1);
   });
 
   test('briefing comment keeps the saved summary without generating new content', () => {
