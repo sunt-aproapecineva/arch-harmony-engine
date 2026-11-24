@@ -135,11 +135,28 @@ export function buildModuleMarkdown(mod: Module, responses: ExerciseResponseMap)
   return lines.join('\n');
 }
 
-export function clickUpModuleStatus(mod: Module, responses: ExerciseResponseMap): 'de facut' | 'in progres' | 'facut' {
+export type ClickUpModuleStatus = 'de facut' | 'in progres' | 'spre aprobare';
+
+/** Statusuri setate automat; restul (facut, blocat, in asteptare...) aparțin mentorului. */
+export const AUTO_MODULE_STATUSES = ['de facut', 'in progres', 'spre aprobare'];
+
+/**
+ * Toate exercițiile completate → „spre aprobare” (mentorul pune manual „facut”).
+ * Orice lecție bifată sau exercițiu început → „in progres”.
+ */
+export function clickUpModuleStatus(mod: Module, responses: ExerciseResponseMap, completedLessonIds: Iterable<string> = []): ClickUpModuleStatus {
   const exercises = exercisesForModule(mod);
   const answered = exercises.filter(exercise => hasMeaningfulResponse(responses[exercise.id])).length;
-  if (exercises.length > 0 && answered === exercises.length) return 'facut';
-  return answered > 0 ? 'in progres' : 'de facut';
+  if (exercises.length > 0 && answered === exercises.length) return 'spre aprobare';
+  const done = new Set(completedLessonIds);
+  const lessonStarted = (mod.lessons ?? []).some(lesson => done.has(lesson.id));
+  return answered > 0 || lessonStarted ? 'in progres' : 'de facut';
+}
+
+/** Nu suprascriem statusurile puse manual de mentor (ex. „facut”, „blocat”). */
+export function shouldApplyModuleStatus(currentStatus: string | null | undefined): boolean {
+  if (!currentStatus) return true;
+  return AUTO_MODULE_STATUSES.includes(currentStatus.trim().toLowerCase());
 }
 
 export function normalizeClickUpStudentName(name: string): string {

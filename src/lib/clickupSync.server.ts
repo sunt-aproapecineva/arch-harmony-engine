@@ -1,6 +1,6 @@
 import { getCourse } from './courses';
 import { getCourseModules } from './content';
-import { buildBriefingComment, buildModuleMarkdown, clickUpModuleStatus, mergeClickUpStudentDescription, moduleIdForExercise, normalizeClickUpStudentName } from './clickupFormatting';
+import { buildBriefingComment, buildModuleMarkdown, clickUpModuleStatus, mergeClickUpStudentDescription, shouldApplyModuleStatus, moduleIdForExercise, normalizeClickUpStudentName } from './clickupFormatting';
 
 const GATEWAY_URL = 'https://connector-gateway.lovable.dev/clickup';
 const PUBLIC_SITE = 'https://aa.morarvictor.com';
@@ -155,12 +155,13 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
   const modules = getCourseModules(courseId);
   if (!modules.length) throw new Error('Programul nu are module configurate.');
 
-  const [profileRes, enrollmentRes, responsesRes, insightRes, mappingRes] = await Promise.all([
+  const [profileRes, enrollmentRes, responsesRes, insightRes, mappingRes, progressRes] = await Promise.all([
     admin.from('profiles').select('id,email,full_name,tariff,created_at').eq('id', studentId).maybeSingle(),
     admin.from('enrollments').select('course_id,flow_id,tariff,granted_at').eq('user_id', studentId).eq('course_id', courseId).maybeSingle(),
     admin.from('exercise_responses').select('exercise_id,response,updated_at').eq('user_id', studentId),
     admin.from('student_insights').select('summary,generated_at').eq('user_id', studentId).eq('course_id', courseId).maybeSingle(),
     admin.from('clickup_student_sync').select('*').eq('user_id', studentId).eq('course_id', courseId).maybeSingle(),
+    admin.from('progress').select('lesson_id').eq('user_id', studentId),
   ]);
   if (profileRes.error) throw new Error(profileRes.error.message);
   if (enrollmentRes.error) throw new Error(enrollmentRes.error.message);
@@ -177,6 +178,7 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
 
   const responses: Record<string, unknown> = {};
   for (const row of responsesRes.data || []) responses[row.exercise_id] = row.response;
+  const completedLessonIds = (progressRes?.data || []).map((row: { lesson_id: string }) => row.lesson_id);
   const existing = mappingRes.data;
   let taskId: string | undefined = existing?.task_id;
   let taskUrl: string | null = existing?.task_url ?? null;
@@ -296,16 +298,19 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
 
     for (const mod of targets) {
       await renewSyncLock(admin, studentId, courseId, lockToken);
-      const body = {
+      const status = clickUpModuleStatus(mod, responses, completedLessonIds);
+      const body: Record<string, unknown> = {
         name: `${mod.etapa} · ${mod.title}`,
         markdown_description: buildModuleMarkdown(mod, responses),
-        status: clickUpModuleStatus(mod, responses),
+        status,
         notify_all: false,
       };
       let subtaskId: string | undefined = subtasks[mod.id];
       if (subtaskId) {
         try {
-          await clickUp(`api/v2/task/${subtaskId}`, credentials, { method: 'PUT', body: JSON.stringify(body) });
+          const current = await clickUp<{ status?: { status?: string } }>(`api/v2/task/${subtaskId}`, credentials);
+          const update = shouldApplyModuleStatus(current?.status?.status) ? body : { ...body, status: undefined };
+          await clickUp(`api/v2/task/${subtaskId}`, credentials, { method: 'PUT', body: JSON.stringify(update) });
         } catch (error) {
           if (!(error instanceof ClickUpError) || error.status !== 404) throw error;
           subtaskId = undefined;

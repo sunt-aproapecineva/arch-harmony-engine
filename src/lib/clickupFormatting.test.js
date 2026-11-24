@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { buildBriefingComment, buildModuleMarkdown, clickUpModuleStatus, courseIdForExercise, hasMeaningfulResponse, mergeClickUpStudentDescription, moduleIdForExercise, normalizeClickUpStudentName, renderResponseMarkdown } from './clickupFormatting';
+import { exercisesForModule, shouldApplyModuleStatus, buildBriefingComment, buildModuleMarkdown, clickUpModuleStatus, courseIdForExercise, hasMeaningfulResponse, mergeClickUpStudentDescription, moduleIdForExercise, normalizeClickUpStudentName, renderResponseMarkdown } from './clickupFormatting';
 import { getCourseModules } from './content';
 import { getExerciseTemplate } from './exerciseData';
 
@@ -28,6 +28,17 @@ describe('ClickUp student content formatting', () => {
     expect(markdown).toContain('Exercițiul 7.1');
     expect(markdown).toContain('Exercițiul 7.2');
     expect(clickUpModuleStatus(mod, { 'st-e-7-1': response })).toBe('in progres');
+  });
+
+  test('module status: lesson started → in progres, all exercises → spre aprobare, mentor statuses kept', () => {
+    const mod = getCourseModules('start').find(m => exercisesForModule(m).length > 0 && m.lessons.length > 0);
+    expect(clickUpModuleStatus(mod, {})).toBe('de facut');
+    expect(clickUpModuleStatus(mod, {}, [mod.lessons[0].id])).toBe('in progres');
+    const all = Object.fromEntries(exercisesForModule(mod).map(e => [e.id, 'răspuns']));
+    expect(clickUpModuleStatus(mod, all)).toBe('spre aprobare');
+    expect(shouldApplyModuleStatus('facut')).toBe(false);
+    expect(shouldApplyModuleStatus('blocat')).toBe(false);
+    expect(shouldApplyModuleStatus('IN PROGRES')).toBe(true);
   });
 
   test('student matching tolerates reversed names and diacritics', () => {
