@@ -269,7 +269,7 @@ export const generateStudentInsight = createServerFn({ method: 'POST' })
   });
 
 // Nucleul generării, folosit și de regenerarea în masă de mai jos.
-async function runGeneration(admin: any, studentId: string, courseId: string) {
+export async function runGeneration(admin: any, studentId: string, courseId: string) {
   const gathered = await gatherStudent(admin, studentId, courseId);
   const prompt = buildPrompt({
     profile: gathered.profile,

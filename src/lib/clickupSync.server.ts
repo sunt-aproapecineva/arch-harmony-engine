@@ -183,7 +183,7 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
   let subtasks: Record<string, string> = { ...(existing?.subtasks || {}) };
   let briefingCommentId: string | null = existing?.briefing_comment_id ?? null;
   const studentName = profile.full_name || profile.email;
-  const parentDescription = [
+  const parentDescriptionLines = [
     `## ${studentName}`,
     '',
     `- **Email:** ${profile.email}`,
@@ -192,8 +192,13 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
     `- **Flux:** ${flowId}`,
     `- **Profil Admin:** ${PUBLIC_SITE}/admin/student/${studentId}`,
     '',
-    'Modulele și răspunsurile sunt actualizate automat din platformă. Briefingul AI este în comentariul dedicat de mai jos.',
-  ].join('\n');
+    'Modulele și răspunsurile sunt actualizate automat din platformă.',
+  ];
+  const briefingSummary = insightRes.data?.summary?.trim();
+  if (briefingSummary) {
+    parentDescriptionLines.push('', buildBriefingComment(briefingSummary, insightRes.data.generated_at));
+  }
+  const parentDescription = parentDescriptionLines.join('\n');
 
   await renewSyncLock(admin, studentId, courseId, lockToken);
 
