@@ -19,6 +19,7 @@ import { useServerFn } from '@tanstack/react-start';
 import { sendStudentInvite, INVITE_SITE_ORIGIN } from '@/lib/inviteEmail.functions';
 import { regenerateAllInsights } from '@/lib/studentInsights.functions';
 import { syncStudentClickUp } from '@/lib/clickupSync.functions';
+import { refreshInactiveClickUpTags } from '@/lib/clickupInactivity.functions';
 import { timeAgo } from '../../lib/activity';
 import {
   fetchAdminUsers, fetchAllProgress, setUserAdmin,
@@ -87,6 +88,16 @@ export const AdminUsers: React.FC = () => {
   const [clickupMsg, setClickupMsg] = useState<string | null>(null);
   const [clickupUrl, setClickupUrl] = useState<string | null>(null);
   const syncClickUp = useServerFn(syncStudentClickUp);
+  const refreshInactive = useServerFn(refreshInactiveClickUpTags);
+  const [inactiveBusy, setInactiveBusy] = useState(false);
+  const onRefreshInactive = async () => {
+    setInactiveBusy(true); setClickupUrl(null);
+    try {
+      const r = await refreshInactive();
+      setClickupMsg(`✓ Status inactivi actualizat: ${r.tagged} elevi cu tag „Inactiv 4+ zile”, ${r.cleared} activi${r.failed ? `, ${r.failed} erori` : ''}.`);
+    } catch (e: any) { setClickupMsg(`✗ ${e?.message || 'Actualizarea a eșuat.'}`); }
+    finally { setInactiveBusy(false); }
+  };
 
   const handleSyncClickUp = async (user: AdminUserRow, enrollments: AdminUserRow['enrollments']) => {
     setClickupBusy(user.id);
@@ -350,6 +361,9 @@ export const AdminUsers: React.FC = () => {
           {regenMsg && <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>{regenMsg}</span>}
           <button onClick={onRegenerateAll} disabled={regenBusy} className="aa-tap" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: 8, cursor: regenBusy ? 'wait' : 'pointer', fontSize: 12, color: 'var(--fg-2)', opacity: regenBusy ? 0.6 : 1 }}>
             <Sparkles size={13} className={regenBusy ? 'animate-spin' : ''} /> {regenBusy ? 'Se regenerează…' : 'Regenerează briefingurile'}
+          </button>
+          <button onClick={onRefreshInactive} disabled={inactiveBusy} className="aa-tap" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: 8, cursor: inactiveBusy ? 'wait' : 'pointer', fontSize: 12, color: 'var(--fg-2)', opacity: inactiveBusy ? 0.6 : 1 }}>
+            <RefreshCw size={13} className={inactiveBusy ? 'animate-spin' : ''} /> {inactiveBusy ? 'Se verifică…' : 'Actualizează status inactivi'}
           </button>
           <button onClick={reload} className="aa-tap" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', fontSize: 12, color: 'var(--fg-2)' }}>
             <RefreshCw size={13} className={loading ? 'animate-spin' : ''} /> Reîncarcă

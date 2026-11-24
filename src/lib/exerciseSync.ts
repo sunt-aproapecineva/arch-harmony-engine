@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { syncStudentClickUp } from '@/lib/clickupSync.functions';
+import { clearMyInactiveTag } from '@/lib/clickupInactivity.functions';
 import { courseIdForExercise } from '@/lib/clickupFormatting';
 
 // Debounce per (user, exerciseId) so rapid edits coalesce into one upsert.
@@ -31,10 +32,16 @@ function notifyExerciseSync(exerciseId: string, result: SyncResult) {
   listeners.get(exerciseId)?.forEach((listener) => listener({ ...result, exerciseId }));
 }
 
+const inactiveTagCleared = new Set<string>();
+
 /** ClickUp nu blochează salvarea răspunsului și nu regenerează briefingul AI. */
 function syncClickUpAfterSave(userId: string, exerciseId: string) {
   const courseId = courseIdForExercise(exerciseId);
   if (!courseId) return;
+  if (!inactiveTagCleared.has(userId)) {
+    inactiveTagCleared.add(userId);
+    void clearMyInactiveTag().catch(() => inactiveTagCleared.delete(userId));
+  }
   const key = `${userId}:${courseId}`;
   const previous = clickUpSyncQueues.get(key) || Promise.resolve();
   const next = previous

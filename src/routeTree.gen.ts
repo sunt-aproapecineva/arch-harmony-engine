@@ -39,6 +39,7 @@ import { Route as CCourseSlugQuizRouteImport } from './routes/c.$courseSlug.quiz
 import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as AppCCourseSlugIndexRouteImport } from './routes/_app.c.$courseSlug.index'
 import { Route as AppCCourseSlugDashboardRouteImport } from './routes/_app.c.$courseSlug.dashboard'
+import { Route as ApiPublicCronClickupInactivityRouteImport } from './routes/api/public/cron/clickup-inactivity'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as AppCCourseSlugDocumentsIndexRouteImport } from './routes/_app.c.$courseSlug.documents.index'
 import { Route as AppCCourseSlugLessonIdRouteImport } from './routes/_app.c.$courseSlug.lesson.$id'
@@ -197,6 +198,12 @@ const AppCCourseSlugDashboardRoute = AppCCourseSlugDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppCCourseSlugRoute,
 } as any)
+const ApiPublicCronClickupInactivityRoute =
+  ApiPublicCronClickupInactivityRouteImport.update({
+    id: '/api/public/cron/clickup-inactivity',
+    path: '/api/public/cron/clickup-inactivity',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
     id: '/lovable/email/transactional/preview',
@@ -273,6 +280,7 @@ export interface FileRoutesByFullPath {
   '/library/': typeof AppLibraryIndexRoute
   '/materials/': typeof AppMaterialsIndexRoute
   '/c/$courseSlug/dashboard': typeof AppCCourseSlugDashboardRoute
+  '/api/public/cron/clickup-inactivity': typeof ApiPublicCronClickupInactivityRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/c/$courseSlug/': typeof AppCCourseSlugIndexRoute
   '/c/$courseSlug/lesson/$id': typeof AppCCourseSlugLessonIdRoute
@@ -310,6 +318,7 @@ export interface FileRoutesByTo {
   '/library': typeof AppLibraryIndexRoute
   '/materials': typeof AppMaterialsIndexRoute
   '/c/$courseSlug/dashboard': typeof AppCCourseSlugDashboardRoute
+  '/api/public/cron/clickup-inactivity': typeof ApiPublicCronClickupInactivityRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/c/$courseSlug': typeof AppCCourseSlugIndexRoute
   '/c/$courseSlug/lesson/$id': typeof AppCCourseSlugLessonIdRoute
@@ -351,6 +360,7 @@ export interface FileRoutesById {
   '/_app/library/': typeof AppLibraryIndexRoute
   '/_app/materials/': typeof AppMaterialsIndexRoute
   '/_app/c/$courseSlug/dashboard': typeof AppCCourseSlugDashboardRoute
+  '/api/public/cron/clickup-inactivity': typeof ApiPublicCronClickupInactivityRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/_app/c/$courseSlug/': typeof AppCCourseSlugIndexRoute
   '/_app/c/$courseSlug/lesson/$id': typeof AppCCourseSlugLessonIdRoute
@@ -392,6 +402,7 @@ export interface FileRouteTypes {
     | '/library/'
     | '/materials/'
     | '/c/$courseSlug/dashboard'
+    | '/api/public/cron/clickup-inactivity'
     | '/lovable/email/transactional/preview'
     | '/c/$courseSlug/'
     | '/c/$courseSlug/lesson/$id'
@@ -429,6 +440,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/materials'
     | '/c/$courseSlug/dashboard'
+    | '/api/public/cron/clickup-inactivity'
     | '/lovable/email/transactional/preview'
     | '/c/$courseSlug'
     | '/c/$courseSlug/lesson/$id'
@@ -469,6 +481,7 @@ export interface FileRouteTypes {
     | '/_app/library/'
     | '/_app/materials/'
     | '/_app/c/$courseSlug/dashboard'
+    | '/api/public/cron/clickup-inactivity'
     | '/lovable/email/transactional/preview'
     | '/_app/c/$courseSlug/'
     | '/_app/c/$courseSlug/lesson/$id'
@@ -493,6 +506,7 @@ export interface RootRouteChildren {
   WelcomeRoute: typeof WelcomeRoute
   CCourseSlugQuizRoute: typeof CCourseSlugQuizRoute
   LovableEmailEventsRoute: typeof LovableEmailEventsRoute
+  ApiPublicCronClickupInactivityRoute: typeof ApiPublicCronClickupInactivityRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
@@ -708,6 +722,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCCourseSlugDashboardRouteImport
       parentRoute: typeof AppCCourseSlugRoute
     }
+    '/api/public/cron/clickup-inactivity': {
+      id: '/api/public/cron/clickup-inactivity'
+      path: '/api/public/cron/clickup-inactivity'
+      fullPath: '/api/public/cron/clickup-inactivity'
+      preLoaderRoute: typeof ApiPublicCronClickupInactivityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
       path: '/lovable/email/transactional/preview'
@@ -856,6 +877,7 @@ const rootRouteChildren: RootRouteChildren = {
   WelcomeRoute: WelcomeRoute,
   CCourseSlugQuizRoute: CCourseSlugQuizRoute,
   LovableEmailEventsRoute: LovableEmailEventsRoute,
+  ApiPublicCronClickupInactivityRoute: ApiPublicCronClickupInactivityRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport

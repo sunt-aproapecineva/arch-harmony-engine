@@ -12,3 +12,4 @@
 - Build student invitation and registration links from the canonical public site origin exported by `src/lib/inviteEmail.functions.ts`, never from the origin of the window the administrator is working in, because preview origins are not usable by students.
 - Keep ClickUp credentials and task mutations in the server-only sync module; reuse the persisted student task/subtask/comment IDs so exercise saves and briefing regeneration update existing ClickUp records without AI generation or duplicates.
 
+- ClickUp inactivity tags are recomputed by a daily scheduled callback plus an admin button, and cleared on the student's next exercise save, because inactive students emit no events.
