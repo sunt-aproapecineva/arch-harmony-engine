@@ -33,7 +33,7 @@ class FakeQuery {
   private async execute() {
     if (this.table === 'profiles') return { data: { id: 'student', email: 'elev@example.com', full_name: 'Elev Test', tariff: 'pro', created_at: '' }, error: null };
     if (this.table === 'enrollments') return { data: { course_id: 'start', flow_id: this.state.flowId || 'start-f1', tariff: 'pro', granted_at: '' }, error: null };
-    if (this.table === 'exercise_responses') return { data: [], error: null };
+    if (this.table === 'exercise_responses' || this.table === 'progress') return { data: [], error: null };
     if (this.table === 'student_insights') return { data: null, error: null };
     if (this.table === 'clickup_student_sync') {
       if (this.action === 'select') return { data: this.state.mapping, error: null };
