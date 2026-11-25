@@ -140,7 +140,7 @@ export const START_MODULES: Module[] = [
           "Înțelegi diferența reală dintre tipurile de structuri de business și decizi conștient ce construiești — nu din entuziasm, ci din claritate.",
         video_url: "",
         duration_min: 0,
-        order_index: 9,
+        order_index: 8,
         is_published: true,
         type: "exercise",
         exercise_id: "st-e-0-1",
@@ -309,7 +309,7 @@ export const START_MODULES: Module[] = [
         description: "Harta soluțiilor actuale și fișa de observație pentru minimum 3 segmente.",
         video_url: "",
         duration_min: 0,
-        order_index: 9,
+        order_index: 8,
         is_published: true,
         type: "exercise",
         exercise_id: "st-e-1-4",
@@ -501,7 +501,7 @@ export const START_MODULES: Module[] = [
           "Cum documentezi minimum 10 conversații: faptele separate de interpretare, tiparele care se repetă și contradicțiile care contează.",
         video_url: "https://youtu.be/F4mYJSOuDk4",
         duration_min: 0,
-        order_index: 9,
+        order_index: 8,
         is_published: true,
         type: "video",
       },
@@ -711,7 +711,7 @@ export const START_MODULES: Module[] = [
           "Traseul de la comandă la rezultat: ce vede clientul, ce se întâmplă în spate, de cine depinzi, unde e riscul și care e standardul minim.",
         video_url: "https://www.youtube.com/watch?v=wXCuUBtZQ0g",
         duration_min: 0,
-        order_index: 9,
+        order_index: 8,
         is_published: true,
         type: "video",
       },
@@ -916,7 +916,7 @@ export const START_MODULES: Module[] = [
           "Onboarding activat, feedback real în loc de complimente, testimonial la momentul potrivit, referrals.",
         video_url: "",
         duration_min: 0,
-        order_index: 9,
+        order_index: 8,
         is_published: false,
         type: "video",
       },
@@ -1115,7 +1115,7 @@ export const START_MODULES: Module[] = [
         description: "",
         video_url: "",
         duration_min: 0,
-        order_index: 9,
+        order_index: 8,
         is_published: false,
         type: "video",
       },
@@ -1388,22 +1388,22 @@ export const START_MODULES: Module[] = [
     ],
   },
   {
-    id: "st-m-9",
+    id: "st-m-8",
     title: "Cum Funcționează Investițiile",
     subtitle: "Cunoaștere obligatorie, chiar dacă nu cauți bani mâine.",
     description:
       "Dacă nu știi cum funcționează acum, vei lua decizii proaste când momentul vine — sau vei pierde o oportunitate fiindcă nu ești pregătit să o recunoști.",
-    order_index: 9,
+    order_index: 8,
     unlockWeek: 11,
     manualLock: true,
-    etapa: "Modulul 9",
+    etapa: "Modulul 8",
     saptamana: "Săptămâna 11",
     deliverable:
       "Înțelegi mecanismele de investiție, știi ce face o afacere investabilă, poți calcula o evaluare simplă și identifici ce tip de capital ți se potrivește.",
     lessons: [
       {
-        id: "st-l-9-1",
-        module_id: "st-m-9",
+        id: "st-l-8-1",
+        module_id: "st-m-8",
         title: "Tipurile de Capital",
         description:
           "Credit, granturi, equity, parteneriat strategic, acceleratoare, crowdfunding, familie și prieteni — cu contract, nu cu promisiuni.",
@@ -1414,8 +1414,8 @@ export const START_MODULES: Module[] = [
         type: "video",
       },
       {
-        id: "st-l-9-2",
-        module_id: "st-m-9",
+        id: "st-l-8-2",
+        module_id: "st-m-8",
         title: "Cum Se Evaluează o Companie",
         description: "Revenue Multiple, EBITDA Multiple, Asset-Based, DCF. Pre-money vs. post-money. Diluarea.",
         video_url: "",
@@ -1425,8 +1425,8 @@ export const START_MODULES: Module[] = [
         type: "video",
       },
       {
-        id: "st-l-9-3",
-        module_id: "st-m-9",
+        id: "st-l-8-3",
+        module_id: "st-m-8",
         title: "Ce Caută Investitorii",
         description:
           "Echipa, tracțiunea, piața, modelul, sistemul, finanțele curate. Dacă ai executat modulele 1–8, ești deja investment-ready în principiu.",
@@ -1437,8 +1437,8 @@ export const START_MODULES: Module[] = [
         type: "video",
       },
       {
-        id: "st-l-9-4",
-        module_id: "st-m-9",
+        id: "st-l-8-4",
+        module_id: "st-m-8",
         title: "Procesul Pas cu Pas: De la Căutare la Closing",
         description: "Materiale, investitorul potrivit, pitch, due diligence, term sheet, closing.",
         video_url: "",
@@ -1448,8 +1448,8 @@ export const START_MODULES: Module[] = [
         type: "video",
       },
       {
-        id: "st-l-9-5",
-        module_id: "st-m-9",
+        id: "st-l-8-5",
+        module_id: "st-m-8",
         title: "Greșelile Care Distrug Deal-urile",
         description:
           "Cauți prea devreme, dai prea mult equity, iei orice bani, nu protejezi IP-ul, confunzi valoarea cu ego-ul.",
@@ -1460,8 +1460,8 @@ export const START_MODULES: Module[] = [
         type: "video",
       },
       {
-        id: "st-l-9-ex-1",
-        module_id: "st-m-9",
+        id: "st-l-8-ex-1",
+        module_id: "st-m-8",
         title: "Livrabilul modulului · Cum Funcționează Investițiile",
         description:
           "Înțelegi mecanismele de investiție, știi ce face o afacere investabilă, poți calcula o evaluare simplă și identifici ce tip de capital ți se potrivește.",
@@ -1470,13 +1470,13 @@ export const START_MODULES: Module[] = [
         order_index: 6,
         is_published: true,
         type: "exercise",
-        exercise_id: "st-e-9-1",
+        exercise_id: "st-e-8-1",
       },
     ],
     exercises: [
       {
-        id: "st-e-9-1",
-        module_id: "st-m-9",
+        id: "st-e-8-1",
+        module_id: "st-m-8",
         title: "Livrabilul modulului · Cum Funcționează Investițiile",
         description:
           "Înțelegi mecanismele de investiție, știi ce face o afacere investabilă, poți calcula o evaluare simplă și identifici ce tip de capital ți se potrivește.",
