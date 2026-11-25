@@ -1,19 +1,28 @@
-import { getCourse } from './courses';
-import { getCourseModules } from './content';
-import { buildBriefingComment, buildModuleMarkdown, clickUpModuleStatus, mergeClickUpStudentDescription, shouldApplyModuleStatus, moduleIdForExercise, normalizeClickUpStudentName } from './clickupFormatting';
+import { getCourse } from "./courses";
+import { getCourseModules } from "./content";
+import {
+  buildBriefingComment,
+  buildModuleMarkdown,
+  clickUpModuleStatus,
+  mergeClickUpStudentDescription,
+  shouldApplyModuleStatus,
+  moduleIdForExercise,
+  normalizeClickUpStudentName,
+} from "./clickupFormatting";
 
-const GATEWAY_URL = 'https://connector-gateway.lovable.dev/clickup';
-const PUBLIC_SITE = 'https://aa.morarvictor.com';
+const GATEWAY_URL = "https://connector-gateway.lovable.dev/clickup";
+const PUBLIC_SITE = "https://aa.morarvictor.com";
 
 const LIST_BY_FLOW: Record<string, string> = {
-  'start-f1': '901524977985',
-  'start-f2': '1200960000011204',
-  'business-f3': '1200960000011209',
+  "start-f1": "901524977985",
+  "start-f2": "1200960000011204",
+  "business-f3": "1200960000011209",
 };
 
 const QA_TASK_BY_FLOW: Record<string, string> = {
-  'start-f2': '1248h53exqd',
-  'business-f3': '1248h53eyjp',
+  "start-f1": "86cbejthb",
+  "start-f2": "1248h53exqd",
+  "business-f3": "1248h53eyjp",
 };
 
 type Credentials = { lovableApiKey: string; connectionKey: string };
@@ -28,12 +37,12 @@ class ClickUpError extends Error {
 }
 
 async function clickUp<T>(path: string, credentials: Credentials, init: RequestInit = {}): Promise<T> {
-  const response = await fetch(`${GATEWAY_URL}/${path.replace(/^\//, '')}`, {
+  const response = await fetch(`${GATEWAY_URL}/${path.replace(/^\//, "")}`, {
     ...init,
     headers: {
       Authorization: `Bearer ${credentials.lovableApiKey}`,
-      'X-Connection-Api-Key': credentials.connectionKey,
-      'Content-Type': 'application/json',
+      "X-Connection-Api-Key": credentials.connectionKey,
+      "Content-Type": "application/json",
       ...init.headers,
     },
   });
@@ -54,9 +63,9 @@ async function listClickUpTasks(listId: string, credentials: Credentials) {
   for (let page = 0; page < 20; page += 1) {
     const params = new URLSearchParams({
       page: String(page),
-      include_closed: 'true',
-      subtasks: 'true',
-      archived: 'false',
+      include_closed: "true",
+      subtasks: "true",
+      archived: "false",
     });
     const result = await clickUp<{ tasks?: ClickUpTask[]; last_page?: boolean }>(
       `api/v2/list/${listId}/task?${params}`,
@@ -65,21 +74,21 @@ async function listClickUpTasks(listId: string, credentials: Credentials) {
     tasks.push(...(result.tasks || []));
     if (result.last_page !== false || !result.tasks?.length) return tasks;
   }
-  throw new Error('Prea multe pagini de taskuri ClickUp.');
+  throw new Error("Prea multe pagini de taskuri ClickUp.");
 }
 
 function existingModuleIds(tasks: ClickUpTask[], taskId: string, modules: ReturnType<typeof getCourseModules>) {
   const ids: Record<string, string> = {};
   for (const mod of modules) {
     const name = `${mod.etapa} · ${mod.title}`;
-    const existing = tasks.find(task => task.parent === taskId && task.name === name);
+    const existing = tasks.find((task) => task.parent === taskId && task.name === name);
     if (existing) ids[mod.id] = existing.id;
   }
   return ids;
 }
 
 async function saveMapping(admin: any, payload: Record<string, unknown>) {
-  const { error } = await admin.from('clickup_student_sync').upsert(payload, { onConflict: 'user_id,course_id' });
+  const { error } = await admin.from("clickup_student_sync").upsert(payload, { onConflict: "user_id,course_id" });
   if (error) throw new Error(`Nu pot salva legătura ClickUp: ${error.message}`);
 }
 
@@ -103,77 +112,115 @@ async function acquireSyncLock(admin: any, studentId: string, courseId: string) 
   while (true) {
     if (!inserted) {
       inserted = true;
-      const { data, error } = await admin.from('clickup_sync_locks').upsert({
-        user_id: studentId,
-        course_id: courseId,
-        lock_token: token,
-        expires_at: lockExpiry(),
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'user_id,course_id', ignoreDuplicates: true }).select('lock_token').maybeSingle();
+      const { data, error } = await admin
+        .from("clickup_sync_locks")
+        .upsert(
+          {
+            user_id: studentId,
+            course_id: courseId,
+            lock_token: token,
+            expires_at: lockExpiry(),
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "user_id,course_id", ignoreDuplicates: true },
+        )
+        .select("lock_token")
+        .maybeSingle();
       if (error) throw new Error(`Nu pot bloca sincronizarea ClickUp: ${error.message}`);
       if (data?.lock_token === token) return token;
     } else {
-      const { data, error } = await admin.from('clickup_sync_locks').update({
-        lock_token: token,
-        expires_at: lockExpiry(),
-        updated_at: new Date().toISOString(),
-      }).eq('user_id', studentId).eq('course_id', courseId)
-        .lte('expires_at', new Date().toISOString()).select('lock_token').maybeSingle();
+      const { data, error } = await admin
+        .from("clickup_sync_locks")
+        .update({
+          lock_token: token,
+          expires_at: lockExpiry(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", studentId)
+        .eq("course_id", courseId)
+        .lte("expires_at", new Date().toISOString())
+        .select("lock_token")
+        .maybeSingle();
       if (error) throw new Error(`Nu pot prelua lockul ClickUp: ${error.message}`);
       if (data?.lock_token === token) return token;
     }
 
     if (Date.now() >= deadline) {
-      throw new Error('O altă sincronizare ClickUp este încă în curs. Răspunsul este salvat; reîncearcă sincronizarea în scurt timp.');
+      throw new Error(
+        "O altă sincronizare ClickUp este încă în curs. Răspunsul este salvat; reîncearcă sincronizarea în scurt timp.",
+      );
     }
-    await new Promise(resolve => setTimeout(resolve, LOCK_RETRY_MS));
+    await new Promise((resolve) => setTimeout(resolve, LOCK_RETRY_MS));
   }
 }
 
 async function renewSyncLock(admin: any, studentId: string, courseId: string, token: string) {
-  const { data, error } = await admin.from('clickup_sync_locks').update({
-    expires_at: lockExpiry(),
-    updated_at: new Date().toISOString(),
-  }).eq('user_id', studentId).eq('course_id', courseId).eq('lock_token', token)
-    .select('lock_token').maybeSingle();
+  const { data, error } = await admin
+    .from("clickup_sync_locks")
+    .update({
+      expires_at: lockExpiry(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", studentId)
+    .eq("course_id", courseId)
+    .eq("lock_token", token)
+    .select("lock_token")
+    .maybeSingle();
   if (error) throw new Error(`Nu pot prelungi lockul ClickUp: ${error.message}`);
-  if (!data) throw new Error('Lockul ClickUp a expirat. Sincronizarea a fost oprită pentru a preveni duplicatele.');
+  if (!data) throw new Error("Lockul ClickUp a expirat. Sincronizarea a fost oprită pentru a preveni duplicatele.");
 }
 
 async function releaseSyncLock(admin: any, studentId: string, courseId: string, token: string) {
-  const { error } = await admin.from('clickup_sync_locks').update({
-    expires_at: new Date(0).toISOString(),
-    updated_at: new Date().toISOString(),
-  }).eq('user_id', studentId).eq('course_id', courseId).eq('lock_token', token);
+  const { error } = await admin
+    .from("clickup_sync_locks")
+    .update({
+      expires_at: new Date(0).toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", studentId)
+    .eq("course_id", courseId)
+    .eq("lock_token", token);
   if (error) throw new Error(`Nu pot elibera lockul ClickUp: ${error.message}`);
 }
 
 async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, credentials: Credentials, lockToken: string) {
   const { studentId, courseId, exerciseId } = input;
   const course = getCourse(courseId);
-  if (!course) throw new Error('Program necunoscut.');
+  if (!course) throw new Error("Program necunoscut.");
   const modules = getCourseModules(courseId);
-  if (!modules.length) throw new Error('Programul nu are module configurate.');
+  if (!modules.length) throw new Error("Programul nu are module configurate.");
 
   const [profileRes, enrollmentRes, responsesRes, insightRes, mappingRes, progressRes] = await Promise.all([
-    admin.from('profiles').select('id,email,full_name,tariff,created_at').eq('id', studentId).maybeSingle(),
-    admin.from('enrollments').select('course_id,flow_id,tariff,granted_at').eq('user_id', studentId).eq('course_id', courseId).maybeSingle(),
-    admin.from('exercise_responses').select('exercise_id,response,updated_at').eq('user_id', studentId),
-    admin.from('student_insights').select('summary,generated_at').eq('user_id', studentId).eq('course_id', courseId).maybeSingle(),
-    admin.from('clickup_student_sync').select('*').eq('user_id', studentId).eq('course_id', courseId).maybeSingle(),
-    admin.from('progress').select('lesson_id').eq('user_id', studentId),
+    admin.from("profiles").select("id,email,full_name,tariff,created_at").eq("id", studentId).maybeSingle(),
+    admin
+      .from("enrollments")
+      .select("course_id,flow_id,tariff,granted_at")
+      .eq("user_id", studentId)
+      .eq("course_id", courseId)
+      .maybeSingle(),
+    admin.from("exercise_responses").select("exercise_id,response,updated_at").eq("user_id", studentId),
+    admin
+      .from("student_insights")
+      .select("summary,generated_at")
+      .eq("user_id", studentId)
+      .eq("course_id", courseId)
+      .maybeSingle(),
+    admin.from("clickup_student_sync").select("*").eq("user_id", studentId).eq("course_id", courseId).maybeSingle(),
+    admin.from("progress").select("lesson_id").eq("user_id", studentId),
   ]);
   if (profileRes.error) throw new Error(profileRes.error.message);
   if (enrollmentRes.error) throw new Error(enrollmentRes.error.message);
   if (responsesRes.error) throw new Error(responsesRes.error.message);
   const profile = profileRes.data;
   const enrollment = enrollmentRes.data;
-  if (!profile) throw new Error('Elev inexistent.');
-  if (!enrollment) throw new Error('Elevul nu este înscris la acest program.');
+  if (!profile) throw new Error("Elev inexistent.");
+  if (!enrollment) throw new Error("Elevul nu este înscris la acest program.");
   const flowId = enrollment.flow_id;
   const listId = flowId ? LIST_BY_FLOW[flowId] : undefined;
   if (!flowId || !listId) {
-    throw new Error(`Fluxul ${flowId || 'neasignat'} nu are o listă ClickUp configurată. Listele disponibile sunt START Flux 1, START Flux 2 și Business Flux 3.`);
+    throw new Error(
+      `Fluxul ${flowId || "neasignat"} nu are o listă ClickUp configurată. Listele disponibile sunt START Flux 1, START Flux 2 și Business Flux 3.`,
+    );
   }
 
   const responses: Record<string, unknown> = {};
@@ -187,20 +234,20 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
   const studentName = profile.full_name || profile.email;
   const parentDescriptionLines = [
     `## ${studentName}`,
-    '',
+    "",
     `- **Email:** ${profile.email}`,
     `- **Program:** ${course.title}`,
     `- **Treaptă:** ${enrollment.tariff}`,
     `- **Flux:** ${flowId}`,
     `- **Profil Admin:** ${PUBLIC_SITE}/admin/student/${studentId}`,
-    '',
-    'Modulele și răspunsurile sunt actualizate automat din platformă.',
+    "",
+    "Modulele și răspunsurile sunt actualizate automat din platformă.",
   ];
   const briefingSummary = insightRes.data?.summary?.trim();
   if (briefingSummary) {
-    parentDescriptionLines.push('', buildBriefingComment(briefingSummary, insightRes.data.generated_at));
+    parentDescriptionLines.push("", buildBriefingComment(briefingSummary, insightRes.data.generated_at));
   }
-  const parentDescription = parentDescriptionLines.join('\n');
+  const parentDescription = parentDescriptionLines.join("\n");
 
   await renewSyncLock(admin, studentId, courseId, lockToken);
 
@@ -223,8 +270,10 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
     if (!taskId) {
       const tasks = await listClickUpTasks(listId, credentials);
       const normalizedName = normalizeClickUpStudentName(studentName);
-      const candidates = tasks.filter(task => normalizeClickUpStudentName(task.name) === normalizedName
-        && (task.parent === qaTaskId || !task.parent));
+      const candidates = tasks.filter(
+        (task) =>
+          normalizeClickUpStudentName(task.name) === normalizedName && (task.parent === qaTaskId || !task.parent),
+      );
       currentTask = candidates.sort((a, b) => Number(b.parent === qaTaskId) - Number(a.parent === qaTaskId))[0];
       if (currentTask) {
         taskId = currentTask.id;
@@ -237,7 +286,7 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
     if (taskId) {
       currentTask ||= await clickUp<ClickUpTask>(`api/v2/task/${taskId}`, credentials);
       await clickUp(`api/v2/task/${taskId}`, credentials, {
-        method: 'PUT',
+        method: "PUT",
         body: JSON.stringify({
           markdown_description: mergeClickUpStudentDescription(currentTask.description, parentDescription),
           ...(qaTaskId ? { parent: qaTaskId } : {}),
@@ -245,11 +294,11 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
       });
     } else {
       const created = await clickUp<{ id: string; url: string }>(`api/v2/list/${listId}/task`, credentials, {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify({
           name: studentName,
-          markdown_description: mergeClickUpStudentDescription('', parentDescription),
-          status: 'in progres',
+          markdown_description: mergeClickUpStudentDescription("", parentDescription),
+          status: "in progres",
           notify_all: false,
           ...(qaTaskId ? { parent: qaTaskId } : {}),
         }),
@@ -272,11 +321,11 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
       updated_at: new Date().toISOString(),
     });
 
-    let missing = modules.filter(mod => !subtasks[mod.id]);
+    let missing = modules.filter((mod) => !subtasks[mod.id]);
     if (missing.length && taskId) {
       const tasks = await listClickUpTasks(listId, credentials);
       subtasks = { ...existingModuleIds(tasks, taskId, modules), ...subtasks };
-      missing = modules.filter(mod => !subtasks[mod.id]);
+      missing = modules.filter((mod) => !subtasks[mod.id]);
       await saveMapping(admin, {
         user_id: studentId,
         course_id: courseId,
@@ -293,7 +342,7 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
       : input.briefingOnly
         ? []
         : targetModuleId
-          ? modules.filter(mod => mod.id === targetModuleId)
+          ? modules.filter((mod) => mod.id === targetModuleId)
           : modules;
 
     for (const mod of targets) {
@@ -310,7 +359,7 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
         try {
           const current = await clickUp<{ status?: { status?: string } }>(`api/v2/task/${subtaskId}`, credentials);
           const update = shouldApplyModuleStatus(current?.status?.status) ? body : { ...body, status: undefined };
-          await clickUp(`api/v2/task/${subtaskId}`, credentials, { method: 'PUT', body: JSON.stringify(update) });
+          await clickUp(`api/v2/task/${subtaskId}`, credentials, { method: "PUT", body: JSON.stringify(update) });
         } catch (error) {
           if (!(error instanceof ClickUpError) || error.status !== 404) throw error;
           subtaskId = undefined;
@@ -318,7 +367,7 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
       }
       if (!subtaskId) {
         const created = await clickUp<{ id: string }>(`api/v2/list/${listId}/task`, credentials, {
-          method: 'POST',
+          method: "POST",
           body: JSON.stringify({ ...body, parent: taskId }),
         });
         subtaskId = created.id;
@@ -342,7 +391,7 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
       if (briefingCommentId) {
         try {
           await clickUp(`api/v2/comment/${briefingCommentId}`, credentials, {
-            method: 'PUT',
+            method: "PUT",
             body: JSON.stringify({ comment_text: commentText }),
           });
         } catch (error) {
@@ -352,7 +401,7 @@ async function syncStudentWithClickUpLocked(admin: any, input: SyncInput, creden
       }
       if (!briefingCommentId) {
         const comment = await clickUp<{ id: string | number }>(`api/v2/task/${taskId}/comment`, credentials, {
-          method: 'POST',
+          method: "POST",
           body: JSON.stringify({ comment_text: commentText, notify_all: false }),
         });
         briefingCommentId = String(comment.id);
@@ -402,7 +451,8 @@ export async function syncStudentWithClickUp(admin: any, input: SyncInput, crede
   try {
     return await syncStudentWithClickUpLocked(admin, input, credentials, lockToken);
   } finally {
-    await releaseSyncLock(admin, input.studentId, input.courseId, lockToken)
-      .catch((error: unknown) => console.error('[clickupSync] Could not release sync lock', error));
+    await releaseSyncLock(admin, input.studentId, input.courseId, lockToken).catch((error: unknown) =>
+      console.error("[clickupSync] Could not release sync lock", error),
+    );
   }
 }
